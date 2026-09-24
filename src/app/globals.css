@@ -100,6 +100,16 @@
   }
 }
 
+/* Unlayered on purpose: layered rules lose to any unlayered host stylesheet
+   (e.g. an embedding page's reset), which would repaint the page light. */
+html,
+body {
+  color-scheme: dark;
+  background: var(--color-ink-950) !important;
+  color: var(--color-fg) !important;
+  font-family: var(--font-sans) !important;
+}
+
 @layer components {
   /* Frosted glass surface — thin light edge, no heavy glow. */
   .glass {
