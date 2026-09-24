@@ -98,10 +98,10 @@ export const heroCharacterConfig = {
  * While `photo` is empty a monogram card is shown instead.
  */
 export const founder = {
-  name: "Shewale Sunil",
+  name: "Sunil S.",
   role: "Founder & AI Automation Strategist",
   photo: "/images/founder/shewale-sunil.webp",
-  photoAlt: "Shewale Sunil, founder of Nexa Flow AI",
+  photoAlt: "Sunil S., founder of Nexa Flow AI",
   headline:
     "Building next-generation digital systems that combine AI, automation, websites, WhatsApp, voice technology, and intelligent business workflows.",
   bio: [

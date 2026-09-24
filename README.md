@@ -49,7 +49,7 @@ Each section carries one idea:
 7. **Work / Demos** — case-study cards with a sample system log that streams events when in view.
 8. **How It Works** *(pinned on desktop)* — Discover → Design → Automate → Launch.
 9. **Why Nexa Flow AI** — the statement lights up word by word as you scroll, followed by three principles.
-10. **About · Founder** — Shewale Sunil's profile, focus areas and vision (`founder` in `src/config/site.ts`; portrait in `public/images/founder/`; with `photo` empty a monogram card is shown).
+10. **About · Founder** — Sunil S.'s profile, focus areas and vision (`founder` in `src/config/site.ts`; portrait in `public/images/founder/`; with `photo` empty a monogram card is shown).
 11. **FAQ** — a native `<details>` accordion (`src/content/faq.ts`).
 12. **Final CTA** — a glowing horizon with "READY TO BUILD YOUR NEXT FLOW?"
 
