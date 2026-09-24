@@ -39,11 +39,11 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 
 Each section carries one idea:
 
-1. **Hero** — "BUILD THE BUSINESS OF 2035." A 3D AI core, floating glass UI panels that react to the cursor, and a slot for the future character.
+1. **Hero** — "THE BUSINESS THAT NEVER SLEEPS." A 3D AI core, four clickable glass panels (call, WhatsApp, lead, booking) that react to the cursor and open the matching solution demo, and a slot for the future character.
 2. **Problem** *(pinned)* — six scattered tools, each with a broken status (Missed call, 12 unread…). As you scroll they snap into one line, a pulse runs through them, and the headline changes to **WE CONNECT THE FLOW.**
 3. **What We Build** — the customer journey (Website → AI Conversation → … → Google Review). The line fills as you scroll and a sticky panel describes the current stage.
 4. **Solutions** — seven accessible tabs, each with a looping live mini-demo (website, WhatsApp chat, voice call, chatbot, booking, reviews, workflow graph).
-5. **One System** — the hub: eight systems fan out of the central AI layer as the section scrolls in.
+5. **One System** — the hub: six systems, each with a one-line job (Website "Brings customers in", WhatsApp "Replies instantly"…), fan out of Nexa AI as the section scrolls in. Mobile shows them as a simple list.
 6. **Industries** — pick an industry and its example automation flow animates in.
 7. **Work / Demos** — case-study cards with a sample system log that streams events when in view.
 8. **How It Works** *(pinned on desktop)* — Discover → Design → Automate → Launch.
@@ -79,7 +79,7 @@ Content lives in `src/content`, separate from the components, so copy, industrie
 
 ## Design system
 
-- **Palette — "Obsidian Aurora":** obsidian canvas `#030807` with green-black surfaces (`ink-*` tokens)
+- **Palette — "Obsidian Aurora":** semi-dark slate-green canvas `#111b19` with slightly lighter surfaces (`ink-*` tokens)
 - **Type:** warm ivory `fg` (`#f1eee6`), muted `fg-muted`. Oversized headlines (`.display`, tight tracking) with a subtle champagne-metal fill (`.text-metal`)
 - **Accent:** aurora jade `flow` (`#45d6b0`) plus a champagne gold `live` signal (`#e8c987`) for success and live states. No neon, and gradients only on key words
 - **Surfaces:** `.glass` — thin light edge, blur, soft shadow

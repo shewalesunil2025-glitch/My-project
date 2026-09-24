@@ -1,9 +1,10 @@
 "use client";
 
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, CalendarCheck, CheckCircle2, MessageSquareHeart, Inbox, Star } from "lucide-react";
 import { solutions, type SolutionId } from "@/content/solutions";
+import { SHOW_SOLUTION_EVENT } from "@/lib/solutionLinks";
 import { cn } from "@/lib/cn";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
@@ -49,6 +50,12 @@ export function Solutions() {
   const baseId = useId();
   const active = solutions.find((s) => s.id === activeId) ?? solutions[0];
 
+  useEffect(() => {
+    const onShow = (e: Event) => setActiveId((e as CustomEvent<SolutionId>).detail);
+    window.addEventListener(SHOW_SOLUTION_EVENT, onShow);
+    return () => window.removeEventListener(SHOW_SOLUTION_EVENT, onShow);
+  }, []);
+
   const onKeyDown = (e: KeyboardEvent, index: number) => {
     const keys: Record<string, number> = {
       ArrowDown: 1,
@@ -81,7 +88,7 @@ export function Solutions() {
           lead="Seven systems. Use one, or connect them all."
         />
 
-        <div className="mt-14 grid gap-6 lg:mt-20 lg:grid-cols-12 lg:gap-10">
+        <div id="solutions-demo" className="mt-14 grid scroll-mt-28 gap-6 lg:mt-20 lg:grid-cols-12 lg:gap-10">
           <div
             role="tablist"
             aria-label="Solutions"

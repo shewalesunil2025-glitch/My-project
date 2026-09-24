@@ -73,13 +73,13 @@ export function HeroVisual() {
         />
       )}
 
-      <FloatingPanel pointer={pointer} depth={26} delay={1.1} className="top-[8%] left-0 w-[46%] sm:w-[40%]">
+      <FloatingPanel pointer={pointer} solution="voice" label="See the AI voice receptionist demo" depth={26} delay={1.1} className="top-[8%] left-0 w-[46%] sm:w-[40%]">
         <PanelHeader icon={<PhoneCall className="size-3.5" />} label="Incoming call" live />
         <p className="mt-2 text-[0.8rem] text-fg">AI receptionist answering</p>
         <Waveform />
       </FloatingPanel>
 
-      <FloatingPanel pointer={pointer} depth={34} delay={1.35} className="top-[4%] right-0 w-[48%] sm:w-[42%]">
+      <FloatingPanel pointer={pointer} solution="whatsapp" label="See the WhatsApp automation demo" depth={34} delay={1.35} className="top-[4%] right-0 w-[48%] sm:w-[42%]">
         <PanelHeader icon={<MessageCircle className="size-3.5" />} label="WhatsApp" />
         <p className="mt-2 w-fit rounded-xl rounded-tl-sm bg-white/[0.06] px-2.5 py-1.5 text-[0.75rem] text-fg-muted">
           Can I book for Thursday?
@@ -91,6 +91,8 @@ export function HeroVisual() {
 
       <FloatingPanel
         pointer={pointer}
+        solution="websites"
+        label="See the lead-capturing website demo"
         depth={18}
         delay={1.6}
         className="bottom-[6%] left-[2%] hidden w-[40%] sm:block"
@@ -105,7 +107,7 @@ export function HeroVisual() {
         </div>
       </FloatingPanel>
 
-      <FloatingPanel pointer={pointer} depth={30} delay={1.85} className="right-0 bottom-[2%] w-[50%] sm:w-[42%]">
+      <FloatingPanel pointer={pointer} solution="booking" label="See the booking automation demo" depth={30} delay={1.85} className="right-0 bottom-[2%] w-[50%] sm:w-[42%]">
         <PanelHeader icon={<CalendarCheck className="size-3.5" />} label="Booking" />
         <p className="mt-2 text-[0.8rem] text-fg">Appointment confirmed</p>
         <p className="font-mono text-[0.7rem] text-live">Thu · 4:30 PM · reminder set</p>

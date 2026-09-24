@@ -7,14 +7,16 @@ import { CoreOrb } from "@/components/3d/CoreOrb";
 import { usePointerParallax } from "@/hooks/usePointerParallax";
 import { Reveal } from "@/components/effects/Reveal";
 
-const RADIUS = 40; // % of stage
+const RADIUS = 38; // % of stage
+
+type System = (typeof ecosystem)[number];
 
 export function OneSystem() {
   const ref = useRef<HTMLDivElement>(null);
   const pointer = usePointerParallax();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
   const spread = useTransform(scrollYProgress, [0.15, 1], [0, 1]);
-  const stageScale = useTransform(scrollYProgress, [0, 1], [0.88, 1]);
+  const stageScale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
 
   return (
     <section id="about" aria-labelledby="one-title" className="relative overflow-hidden py-28 md:py-40">
@@ -31,49 +33,85 @@ export function OneSystem() {
         </Reveal>
         <Reveal delay={0.16}>
           <p className="mx-auto mt-6 max-w-xl text-lg text-fg-muted md:text-xl">
-            Every channel, tool and conversation connected through one central AI automation layer.
+            One AI in the middle runs all six. A new lead on your website becomes a WhatsApp chat, a booking and a
+            review — automatically.
           </p>
         </Reveal>
 
+        {/* Desktop & tablet — hub and spokes */}
         <motion.div
           ref={ref}
           style={{ scale: stageScale }}
-          className="relative mx-auto mt-16 aspect-square w-full max-w-[44rem] md:mt-20"
+          className="relative mx-auto mt-16 hidden aspect-square w-full max-w-[46rem] md:mt-20 md:block"
         >
           <svg viewBox="0 0 100 100" className="absolute inset-0 size-full" aria-hidden>
             <circle cx="50" cy="50" r={RADIUS} fill="none" stroke="rgb(255 255 255 / .06)" strokeWidth="0.2" />
-            <circle cx="50" cy="50" r={RADIUS * 0.62} fill="none" stroke="rgb(255 255 255 / .04)" strokeWidth="0.2" strokeDasharray="0.6 1.2" />
             {ecosystem.map((item, i) => (
               <Spoke key={item.label} index={i} spread={spread} />
             ))}
           </svg>
 
-          <div className="absolute inset-[31%]">
+          <div className="absolute inset-[33%]">
             <CoreOrb pointerX={pointer.x} pointerY={pointer.y} className="size-full" />
           </div>
-          <p className="absolute top-1/2 left-1/2 -translate-1/2 pt-[calc(19%+1.5rem)] font-mono text-[0.6rem] tracking-[0.3em] whitespace-nowrap text-fg-subtle uppercase md:text-[0.65rem]">
-            Nexa AI layer
-          </p>
+          <CoreLabel className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[calc(50%+4.25rem)] rounded-2xl border border-white/10 bg-ink-900/90 px-4 py-2 backdrop-blur-sm" />
 
           <ul aria-label="Connected systems">
             {ecosystem.map((item, i) => (
-              <Satellite key={item.label} index={i} spread={spread} label={item.label} Icon={item.icon} />
+              <Satellite key={item.label} index={i} spread={spread} item={item} />
             ))}
           </ul>
         </motion.div>
+
+        {/* Mobile — simple list */}
+        <div className="mt-14 md:hidden">
+          <div className="mx-auto w-40">
+            <CoreOrb pointerX={pointer.x} pointerY={pointer.y} className="size-full" />
+          </div>
+          <CoreLabel className="mt-4" />
+          <ul aria-label="Connected systems" className="mt-8 grid grid-cols-2 gap-3 text-left">
+            {ecosystem.map((item, i) => (
+              <Reveal as="li" key={item.label} delay={i * 0.05}>
+                <SystemCard item={item} />
+              </Reveal>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
 }
 
-function angle(i: number) {
-  return (i / ecosystem.length) * Math.PI * 2 - Math.PI / 2;
+function CoreLabel({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      <p className="text-base font-semibold tracking-tight whitespace-nowrap">Nexa AI</p>
+      <p className="text-sm whitespace-nowrap text-fg-muted">Connects everything</p>
+    </div>
+  );
+}
+
+function SystemCard({ item }: { item: System }) {
+  return (
+    <div className="flex h-full items-center gap-3 rounded-2xl border border-white/10 bg-ink-850 px-3.5 py-3 text-left shadow-[0_20px_40px_-20px_rgb(0_0_0/0.9)] md:px-4">
+      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-flow/15 text-flow-soft">
+        <item.icon className="size-4" aria-hidden />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold">{item.label}</span>
+        <span className="block text-xs text-fg-muted">{item.benefit}</span>
+      </span>
+    </div>
+  );
+}
+
+function point(i: number) {
+  const a = (i / ecosystem.length) * Math.PI * 2 - Math.PI / 2;
+  return { x: 50 + Math.cos(a) * RADIUS, y: 50 + Math.sin(a) * RADIUS };
 }
 
 function Spoke({ index, spread }: { index: number; spread: MotionValue<number> }) {
-  const a = angle(index);
-  const x = 50 + Math.cos(a) * RADIUS;
-  const y = 50 + Math.sin(a) * RADIUS;
+  const { x, y } = point(index);
   const d = `M50 50 L${x.toFixed(2)} ${y.toFixed(2)}`;
   return (
     <>
@@ -91,31 +129,16 @@ function Spoke({ index, spread }: { index: number; spread: MotionValue<number> }
   );
 }
 
-function Satellite({
-  index,
-  spread,
-  label,
-  Icon,
-}: {
-  index: number;
-  spread: MotionValue<number>;
-  label: string;
-  Icon: (typeof ecosystem)[number]["icon"];
-}) {
-  const a = angle(index);
-  const left = useTransform(spread, [0, 1], ["50%", `${50 + Math.cos(a) * RADIUS}%`]);
-  const top = useTransform(spread, [0, 1], ["50%", `${50 + Math.sin(a) * RADIUS}%`]);
+function Satellite({ index, spread, item }: { index: number; spread: MotionValue<number>; item: System }) {
+  const { x, y } = point(index);
+  const left = useTransform(spread, [0, 1], ["50%", `${x}%`]);
+  const top = useTransform(spread, [0, 1], ["50%", `${y}%`]);
   const opacity = useTransform(spread, [0, 0.4], [0, 1]);
   const scale = useTransform(spread, [0, 1], [0.4, 1]);
 
   return (
-    <motion.li style={{ left, top, opacity, scale }} className="absolute -translate-1/2">
-      <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-ink-850 shadow-[0_20px_40px_-20px_rgb(0_0_0/0.9)] px-2.5 py-2.5 md:flex-row md:gap-2.5 md:px-4 md:py-3">
-        <span className="grid size-7 place-items-center rounded-lg bg-flow/15 text-flow-soft md:size-8">
-          <Icon className="size-3.5 md:size-4" aria-hidden />
-        </span>
-        <span className="text-[0.7rem] font-medium whitespace-nowrap md:text-sm">{label}</span>
-      </div>
+    <motion.li style={{ left, top, opacity, scale }} className="absolute w-52 -translate-1/2">
+      <SystemCard item={item} />
     </motion.li>
   );
 }

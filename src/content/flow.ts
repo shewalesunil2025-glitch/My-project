@@ -9,7 +9,6 @@ import {
   Repeat,
   Star,
   UserPlus,
-  Workflow,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,14 +34,12 @@ export const customerFlow: FlowNode[] = [
 /** The fragmented tools most businesses juggle today. */
 export const fragmentedTools = ["Website", "WhatsApp", "Phone", "Bookings", "Follow-ups", "Reviews"] as const;
 
-/** Satellites around the central automation layer. */
-export const ecosystem: { label: string; icon: LucideIcon }[] = [
-  { label: "Website", icon: Globe },
-  { label: "WhatsApp", icon: MessageCircle },
-  { label: "Voice", icon: PhoneCall },
-  { label: "AI Chat", icon: Bot },
-  { label: "CRM", icon: Database },
-  { label: "Booking", icon: CalendarCheck },
-  { label: "Reviews", icon: Star },
-  { label: "Follow-ups", icon: Workflow },
+/** The six connected systems around the central Nexa AI, each with the job it does. */
+export const ecosystem: { label: string; benefit: string; icon: LucideIcon }[] = [
+  { label: "Website", benefit: "Brings customers in", icon: Globe },
+  { label: "WhatsApp", benefit: "Replies instantly", icon: MessageCircle },
+  { label: "AI Voice", benefit: "Answers every call", icon: PhoneCall },
+  { label: "Booking", benefit: "Fills your calendar", icon: CalendarCheck },
+  { label: "CRM", benefit: "Remembers every customer", icon: Database },
+  { label: "Reviews", benefit: "Grows your rating", icon: Star },
 ];

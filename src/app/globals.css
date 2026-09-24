@@ -9,11 +9,11 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --color-ink-950: #030807;
-  --color-ink-900: #06100e;
-  --color-ink-850: #0a1614;
-  --color-ink-800: #0f1d1a;
-  --color-ink-700: #172a26;
+  --color-ink-950: #111b19;
+  --color-ink-900: #15211e;
+  --color-ink-850: #1a2724;
+  --color-ink-800: #1f2e2b;
+  --color-ink-700: #2a3d39;
 
   --color-fg: #f1eee6;
   --color-fg-muted: #a3aba6;

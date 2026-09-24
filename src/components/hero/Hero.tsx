@@ -9,7 +9,7 @@ import { ParticleField } from "@/components/effects/ParticleField";
 import { HeroVisual } from "./HeroVisual";
 
 const ease = [0.16, 1, 0.3, 1] as const;
-const headline = ["BUILD THE", "BUSINESS", "OF 2035."];
+const headline = ["THE BUSINESS", "THAT NEVER", "SLEEPS."];
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -48,7 +48,7 @@ export function Hero() {
             Automation agency for intelligent businesses
           </motion.p>
 
-          <h1 id="hero-title" className="display text-[clamp(3.1rem,9.4vw,7.6rem)]">
+          <h1 id="hero-title" className="display text-[clamp(2.5rem,6.4vw,5.4rem)] whitespace-nowrap">
             {headline.map((line, i) => (
               <span key={line} className="block overflow-hidden pb-[0.06em]">
                 <motion.span
