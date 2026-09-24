@@ -9,15 +9,15 @@ export function Logo({ className }: { className?: string }) {
         <svg viewBox="0 0 32 32" className="size-7" aria-hidden>
           <defs>
             <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#b7cbff" />
-              <stop offset="1" stopColor="#5ef2c2" />
+              <stop offset="0" stopColor="#a8f0dc" />
+              <stop offset="1" stopColor="#e8c987" />
             </linearGradient>
           </defs>
           <rect x="1" y="1" width="30" height="30" rx="9" fill="none" stroke="rgb(255 255 255 / .14)" />
           <path d="M8 21c4 0 4-10 8-10s4 10 8 10" fill="none" stroke="url(#logo-g)" strokeWidth="2.2" strokeLinecap="round" />
-          <circle cx="8" cy="21" r="2.2" fill="#b7cbff" />
-          <circle cx="16" cy="11" r="2.2" fill="#7aa2ff" />
-          <circle cx="24" cy="21" r="2.2" fill="#5ef2c2" />
+          <circle cx="8" cy="21" r="2.2" fill="#a8f0dc" />
+          <circle cx="16" cy="11" r="2.2" fill="#45d6b0" />
+          <circle cx="24" cy="21" r="2.2" fill="#e8c987" />
         </svg>
         <span className="font-mono text-[0.8rem] font-medium tracking-[0.24em] text-fg">{siteConfig.wordmark}</span>
       </span>

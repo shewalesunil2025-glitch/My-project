@@ -79,9 +79,9 @@ Content lives in `src/content`, separate from the components, so copy, industrie
 
 ## Design system
 
-- **Canvas:** near-black `#04060b` / midnight navy surfaces (`ink-*` tokens)
-- **Type:** soft white `fg`, muted `fg-muted`. Oversized headlines (`.display`, tight tracking) with a subtle metallic fill (`.text-metal`)
-- **Accent:** one electric "flow" blue (`flow`) plus a mint "live" signal (`live`) for success and live states. No neon, and gradients only on key words
+- **Palette — "Obsidian Aurora":** obsidian canvas `#030807` with green-black surfaces (`ink-*` tokens)
+- **Type:** warm ivory `fg` (`#f1eee6`), muted `fg-muted`. Oversized headlines (`.display`, tight tracking) with a subtle champagne-metal fill (`.text-metal`)
+- **Accent:** aurora jade `flow` (`#45d6b0`) plus a champagne gold `live` signal (`#e8c987`) for success and live states. No neon, and gradients only on key words
 - **Surfaces:** `.glass` — thin light edge, blur, soft shadow
 - **Motion:** expo-out easing (`--ease-out-expo`). One idea animates at a time
 

@@ -8,7 +8,7 @@ export function FinalCta() {
     <section id="contact" aria-labelledby="cta-title" className="noise relative isolate overflow-hidden py-32 md:py-52">
       {/* Horizon */}
       <div aria-hidden className="absolute inset-x-0 bottom-0 -z-10 h-[70%]">
-        <div className="absolute left-1/2 top-full h-[160vw] w-[220vw] -translate-x-1/2 -translate-y-[18%] rounded-[50%] border-t border-flow/40 bg-[radial-gradient(closest-side,rgb(79_125_255/0.22),transparent)] shadow-[0_-40px_120px_-20px_rgb(79_125_255/0.35)] md:w-[160vw]" />
+        <div className="absolute left-1/2 top-full h-[160vw] w-[220vw] -translate-x-1/2 -translate-y-[18%] rounded-[50%] border-t border-flow/40 bg-[radial-gradient(closest-side,rgb(22_179_140/0.22),transparent)] shadow-[0_-40px_120px_-20px_rgb(22_179_140/0.35)] md:w-[160vw]" />
       </div>
       <div className="container-x text-center">
         <Reveal>

@@ -27,8 +27,8 @@ export function HeroVisual() {
       <svg viewBox="0 0 100 100" className="absolute inset-0 size-full overflow-visible" aria-hidden>
         <defs>
           <linearGradient id="hero-link" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#b7cbff" stopOpacity="0.05" />
-            <stop offset="1" stopColor="#7aa2ff" stopOpacity="0.55" />
+            <stop offset="0" stopColor="#a8f0dc" stopOpacity="0.05" />
+            <stop offset="1" stopColor="#45d6b0" stopOpacity="0.55" />
           </linearGradient>
         </defs>
         {links.map((d, i) => (
@@ -45,7 +45,7 @@ export function HeroVisual() {
             <path
               d={d}
               fill="none"
-              stroke="#b7cbff"
+              stroke="#a8f0dc"
               strokeWidth="0.45"
               strokeLinecap="round"
               strokeDasharray="0.6 11.4"

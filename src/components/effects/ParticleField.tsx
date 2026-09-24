@@ -55,7 +55,7 @@ export function ParticleField({ className, density = 0.00005 }: ParticleFieldPro
           const dy = p.y - q.y;
           const d2 = dx * dx + dy * dy;
           if (d2 < 9000) {
-            ctx.strokeStyle = `rgba(122,162,255,${0.07 * (1 - d2 / 9000)})`;
+            ctx.strokeStyle = `rgba(69,214,176,${0.07 * (1 - d2 / 9000)})`;
             ctx.lineWidth = 0.6;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -63,7 +63,7 @@ export function ParticleField({ className, density = 0.00005 }: ParticleFieldPro
             ctx.stroke();
           }
         }
-        ctx.fillStyle = `rgba(200,215,255,${p.a})`;
+        ctx.fillStyle = `rgba(210,245,232,${p.a})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();

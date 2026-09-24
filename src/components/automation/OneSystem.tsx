@@ -18,7 +18,7 @@ export function OneSystem() {
 
   return (
     <section id="about" aria-labelledby="one-title" className="relative overflow-hidden py-28 md:py-40">
-      <div className="absolute inset-0 bg-[radial-gradient(45%_45%_at_50%_58%,rgb(79_125_255/0.12),transparent_70%)]" aria-hidden />
+      <div className="absolute inset-0 bg-[radial-gradient(45%_45%_at_50%_58%,rgb(22_179_140/0.12),transparent_70%)]" aria-hidden />
       <div className="container-x relative text-center">
         <Reveal>
           <p className="eyebrow mb-5">One system</p>
@@ -77,10 +77,10 @@ function Spoke({ index, spread }: { index: number; spread: MotionValue<number> }
   const d = `M50 50 L${x.toFixed(2)} ${y.toFixed(2)}`;
   return (
     <>
-      <motion.path d={d} stroke="rgb(122 162 255 / .35)" strokeWidth="0.22" style={{ pathLength: spread }} />
+      <motion.path d={d} stroke="rgb(69 214 176 / .35)" strokeWidth="0.22" style={{ pathLength: spread }} />
       <path
         d={d}
-        stroke="#b7cbff"
+        stroke="#a8f0dc"
         strokeWidth="0.5"
         strokeLinecap="round"
         strokeDasharray="0.5 9.5"

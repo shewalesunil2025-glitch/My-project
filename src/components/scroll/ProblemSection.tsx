@@ -49,7 +49,7 @@ export function ProblemSection() {
   return (
     <section ref={ref} id="problem" aria-labelledby="problem-title" className="relative h-[320vh]">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(50%_40%_at_50%_60%,rgb(79_125_255/0.07),transparent_70%)]" aria-hidden />
+        <div className="absolute inset-0 bg-[radial-gradient(50%_40%_at_50%_60%,rgb(22_179_140/0.07),transparent_70%)]" aria-hidden />
 
         <div className="container-x relative z-10 pt-[calc(var(--header-h)+6vh)] text-center">
           <motion.div style={{ opacity: problemOpacity, y: problemY }}>
@@ -84,7 +84,7 @@ export function ProblemSection() {
           >
             <motion.span
               style={desktop ? { left: pulse, opacity: answerOpacity } : { top: pulse, opacity: answerOpacity }}
-              className="absolute size-2 -translate-1/2 rounded-full bg-live shadow-[0_0_16px_4px_rgb(94_242_194/0.6)]"
+              className="absolute size-2 -translate-1/2 rounded-full bg-live shadow-[0_0_16px_4px_rgb(232_201_135/0.6)]"
             />
           </div>
 
@@ -124,7 +124,7 @@ function ToolChip({
   const drift = useTransform(progress, [0, 0.4], [from.r * 3, 0]);
   const brokenOpacity = useTransform(progress, [0.5, 0.6], [1, 0]);
   const okOpacity = useTransform(progress, [0.68, 0.76], [0, 1]);
-  const borderColor = useTransform(progress, [0.6, 0.72], ["rgba(255,255,255,0.08)", "rgba(122,162,255,0.45)"]);
+  const borderColor = useTransform(progress, [0.6, 0.72], ["rgba(255,255,255,0.08)", "rgba(69,214,176,0.45)"]);
 
   return (
     <motion.div style={{ left, top, rotate, y: drift }} className="absolute -translate-1/2">

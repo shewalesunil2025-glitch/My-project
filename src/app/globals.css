@@ -9,20 +9,20 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --color-ink-950: #04060b;
-  --color-ink-900: #070a12;
-  --color-ink-850: #0a0e18;
-  --color-ink-800: #0e1320;
-  --color-ink-700: #161c2c;
+  --color-ink-950: #030807;
+  --color-ink-900: #06100e;
+  --color-ink-850: #0a1614;
+  --color-ink-800: #0f1d1a;
+  --color-ink-700: #172a26;
 
-  --color-fg: #eef1f7;
-  --color-fg-muted: #9aa3b5;
-  --color-fg-subtle: #7b8497;
+  --color-fg: #f1eee6;
+  --color-fg-muted: #a3aba6;
+  --color-fg-subtle: #7e8984;
 
-  --color-flow: #7aa2ff;
-  --color-flow-strong: #4f7dff;
-  --color-flow-soft: #b7cbff;
-  --color-live: #5ef2c2;
+  --color-flow: #45d6b0;
+  --color-flow-strong: #16b38c;
+  --color-flow-soft: #a8f0dc;
+  --color-live: #e8c987;
 
   --radius-panel: 1.25rem;
 
@@ -133,7 +133,7 @@
 
   /* Soft metallic headline fill. */
   .text-metal {
-    background: linear-gradient(180deg, #ffffff 0%, #d9dfeb 55%, #8f98ab 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #ede3cf 55%, #9c958a 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

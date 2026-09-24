@@ -16,17 +16,17 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          color: "#eef1f7",
+          color: "#f1eee6",
           background:
-            "radial-gradient(60% 60% at 75% 40%, rgba(79,125,255,0.35), transparent 70%), #04060b",
+            "radial-gradient(60% 60% at 75% 40%, rgba(22,179,140,0.35), transparent 70%), #030807",
         }}
       >
-        <div style={{ fontSize: 26, letterSpacing: 8, color: "#9aa3b5" }}>{siteConfig.wordmark}</div>
+        <div style={{ fontSize: 26, letterSpacing: 8, color: "#a3aba6" }}>{siteConfig.wordmark}</div>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 96, fontWeight: 700, letterSpacing: -4, lineHeight: 0.95 }}>
           <span>BUILD THE BUSINESS</span>
-          <span style={{ color: "#7aa2ff" }}>OF 2035.</span>
+          <span style={{ color: "#45d6b0" }}>OF 2035.</span>
         </div>
-        <div style={{ fontSize: 28, color: "#9aa3b5" }}>{siteConfig.tagline}</div>
+        <div style={{ fontSize: 28, color: "#a3aba6" }}>{siteConfig.tagline}</div>
       </div>
     ),
     size,

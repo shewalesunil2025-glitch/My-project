@@ -30,7 +30,7 @@ export function Hero() {
       {/* Horizon light */}
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-full bg-[radial-gradient(60%_50%_at_70%_40%,rgb(79_125_255/0.16),transparent_70%),radial-gradient(40%_30%_at_10%_90%,rgb(94_242_194/0.06),transparent_70%)]"
+        className="absolute inset-x-0 top-0 -z-10 h-full bg-[radial-gradient(60%_50%_at_70%_40%,rgb(22_179_140/0.16),transparent_70%),radial-gradient(40%_30%_at_10%_90%,rgb(232_201_135/0.06),transparent_70%)]"
       />
       <ParticleField className="-z-10 opacity-80" />
 

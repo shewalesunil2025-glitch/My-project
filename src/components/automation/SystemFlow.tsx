@@ -87,7 +87,7 @@ export function SystemFlow() {
                   className={cn(
                     "relative z-10 grid size-12 shrink-0 place-items-center rounded-2xl border transition-all duration-700",
                     on
-                      ? "border-flow/50 bg-ink-800 text-flow-soft shadow-[0_0_30px_-4px_rgb(122_162_255/0.55)]"
+                      ? "border-flow/50 bg-ink-800 text-flow-soft shadow-[0_0_30px_-4px_rgb(69_214_176/0.55)]"
                       : "border-white/10 bg-ink-900 text-fg-subtle",
                   )}
                 >

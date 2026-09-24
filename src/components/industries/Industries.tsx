@@ -95,7 +95,7 @@ export function Industries() {
                     transition={{ duration: 0.6, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
                     className="relative flex flex-col items-start gap-3 rounded-2xl border border-white/[0.07] bg-ink-900/60 p-4 xl:items-center xl:border-0 xl:bg-transparent xl:p-0 xl:text-center"
                   >
-                    <span className="relative z-10 grid size-14 place-items-center rounded-2xl border border-flow/30 bg-ink-850 font-mono text-xs text-flow-soft shadow-[0_0_30px_-8px_rgb(122_162_255/0.6)]">
+                    <span className="relative z-10 grid size-14 place-items-center rounded-2xl border border-flow/30 bg-ink-850 font-mono text-xs text-flow-soft shadow-[0_0_30px_-8px_rgb(69_214_176/0.6)]">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span className="text-sm font-medium md:text-base">{step}</span>

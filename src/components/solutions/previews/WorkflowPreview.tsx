@@ -33,7 +33,7 @@ export function WorkflowPreview() {
             y1={nodes[a].y}
             x2={nodes[b].x}
             y2={nodes[b].y}
-            stroke={step > i ? "#7aa2ff" : "rgba(255,255,255,0.1)"}
+            stroke={step > i ? "#45d6b0" : "rgba(255,255,255,0.1)"}
             strokeWidth={1.2}
             vectorEffect="non-scaling-stroke"
             className="transition-[stroke] duration-500"
@@ -51,7 +51,7 @@ export function WorkflowPreview() {
             <div
               className={cn(
                 "flex items-center gap-2 rounded-xl border px-2.5 py-2 transition-all duration-500",
-                on ? "border-flow/50 bg-ink-800 shadow-[0_0_24px_-6px_rgb(122_162_255/0.7)]" : "border-white/10 bg-ink-900",
+                on ? "border-flow/50 bg-ink-800 shadow-[0_0_24px_-6px_rgb(69_214_176/0.7)]" : "border-white/10 bg-ink-900",
               )}
             >
               <n.icon className={cn("size-3.5 transition-colors", on ? "text-flow-soft" : "text-fg-subtle")} aria-hidden />
