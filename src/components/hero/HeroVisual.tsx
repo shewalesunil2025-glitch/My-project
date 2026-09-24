@@ -1,14 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { CalendarCheck, MessageCircle, PhoneCall, UserPlus } from "lucide-react";
 import { CoreOrb } from "@/components/3d/CoreOrb";
 import { heroCharacterConfig } from "@/config/site";
 import { usePointerParallax } from "@/hooks/usePointerParallax";
 import { cn } from "@/lib/cn";
 import type { SolutionId } from "@/content/solutions";
-import { SOLUTION_DEMO_ANCHOR, showSolution } from "@/lib/solutionLinks";
 import { FloatingPanel } from "./FloatingPanel";
+import { SolutionInfo } from "./SolutionInfo";
 import { HeroCharacter } from "./HeroCharacter";
 
 /** Connection paths from each panel anchor into the AI core (viewBox 0–100). */
@@ -22,9 +23,27 @@ const links = [
 export function HeroVisual() {
   const pointer = usePointerParallax();
   const hasCharacter = Boolean(heroCharacterConfig.src);
+  const [openId, setOpenId] = useState<SolutionId | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const toggle = (id: SolutionId) => setOpenId((cur) => (cur === id ? null : id));
+
+  // Close on Escape or a click anywhere outside the panels.
+  useEffect(() => {
+    if (!openId) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpenId(null);
+    const onDown = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpenId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onDown);
+    };
+  }, [openId]);
 
   return (
-    <>
+    <div ref={rootRef}>
     <div className="relative mx-auto aspect-[1/1] w-full max-w-[40rem] select-none">
       <div className="grid-backdrop absolute inset-[-10%] opacity-70" aria-hidden />
 
@@ -82,13 +101,13 @@ export function HeroVisual() {
 
       {/* With a character on small screens the panels would cover the face — they move to the chip row below. */}
       <div className={cn("pointer-events-none absolute inset-0", hasCharacter && "hidden sm:block")}>
-      <FloatingPanel pointer={pointer} solution="voice" label="See the AI voice receptionist demo" depth={26} delay={1.1} className="top-[2%] -left-[2%] w-[46%] sm:w-[38%]">
+      <FloatingPanel solution="voice" label="About the AI voice receptionist" open={openId === "voice"} onToggle={() => toggle("voice")} placement="below" align="start" delay={1.1} className="top-[2%] -left-[2%] w-[46%] sm:w-[38%]">
         <PanelHeader icon={<PhoneCall className="size-3.5" />} label="Incoming call" live />
         <p className="mt-2 text-[0.8rem] text-fg">AI receptionist answering</p>
         <Waveform />
       </FloatingPanel>
 
-      <FloatingPanel pointer={pointer} solution="whatsapp" label="See the WhatsApp automation demo" depth={34} delay={1.35} className="top-0 -right-[2%] w-[48%] sm:w-[40%]">
+      <FloatingPanel solution="whatsapp" label="About WhatsApp automation" open={openId === "whatsapp"} onToggle={() => toggle("whatsapp")} placement="below" align="end" delay={1.35} className="top-0 -right-[2%] w-[48%] sm:w-[40%]">
         <PanelHeader icon={<MessageCircle className="size-3.5" />} label="WhatsApp" />
         <p className="mt-2 w-fit rounded-xl rounded-tl-sm bg-white/[0.06] px-2.5 py-1.5 text-[0.75rem] text-fg-muted">
           Can I book for Thursday?
@@ -99,10 +118,12 @@ export function HeroVisual() {
       </FloatingPanel>
 
       <FloatingPanel
-        pointer={pointer}
         solution="websites"
-        label="See the lead-capturing website demo"
-        depth={18}
+        label="About lead-capturing websites"
+        open={openId === "websites"}
+        onToggle={() => toggle("websites")}
+        placement="above"
+        align="start"
         delay={1.6}
         className="bottom-0 -left-[2%] hidden w-[36%] sm:block"
       >
@@ -116,15 +137,15 @@ export function HeroVisual() {
         </div>
       </FloatingPanel>
 
-      <FloatingPanel pointer={pointer} solution="booking" label="See the booking automation demo" depth={30} delay={1.85} className="-right-[2%] bottom-0 w-[50%] sm:w-[38%]">
+      <FloatingPanel solution="booking" label="About booking automation" open={openId === "booking"} onToggle={() => toggle("booking")} placement="above" align="end" delay={1.85} className="-right-[2%] bottom-0 w-[50%] sm:w-[38%]">
         <PanelHeader icon={<CalendarCheck className="size-3.5" />} label="Booking" />
         <p className="mt-2 text-[0.8rem] text-fg">Appointment confirmed</p>
         <p className="font-mono text-[0.7rem] text-live">Thu · 4:30 PM · reminder set</p>
       </FloatingPanel>
       </div>
     </div>
-    {hasCharacter && <MobileDemoChips />}
-    </>
+    {hasCharacter && <MobileDemoChips openId={openId} onToggle={toggle} onClose={() => setOpenId(null)} />}
+    </div>
   );
 }
 
@@ -160,27 +181,58 @@ const chips: { label: string; solution: SolutionId; icon: typeof PhoneCall }[] =
   { label: "Booking", solution: "booking", icon: CalendarCheck },
 ];
 
-/** Touch-friendly shortcuts to each solution demo, shown under the character on small screens. */
-function MobileDemoChips() {
+/** Touch-friendly version of the hero panels: tap a chip to read about it right below. */
+function MobileDemoChips({
+  openId,
+  onToggle,
+  onClose,
+}: {
+  openId: SolutionId | null;
+  onToggle: (id: SolutionId) => void;
+  onClose: () => void;
+}) {
   return (
-    <ul className="mt-4 grid grid-cols-2 gap-2 sm:hidden" aria-label="See a demo">
-      {chips.map((c) => (
-        <li key={c.solution}>
-          <a
-            href={SOLUTION_DEMO_ANCHOR}
-            onClick={() => showSolution(c.solution)}
-            className="glass flex items-center gap-2.5 rounded-2xl px-3.5 py-3 text-sm font-medium active:scale-[0.98]"
+    <div className="mt-4 sm:hidden">
+      <ul className="grid grid-cols-2 gap-2" aria-label="What the AI handles">
+        {chips.map((c) => {
+          const open = openId === c.solution;
+          return (
+            <li key={c.solution}>
+              <button
+                type="button"
+                aria-expanded={open}
+                onClick={() => onToggle(c.solution)}
+                className={cn(
+                  "glass flex w-full items-center gap-2.5 rounded-2xl px-3.5 py-3 text-left text-sm font-medium transition-colors active:scale-[0.98]",
+                  open && "border-flow/60",
+                )}
+              >
+                <span className="grid size-8 place-items-center rounded-xl bg-flow/15 text-flow-soft">
+                  <c.icon className="size-4" aria-hidden />
+                </span>
+                {c.label}
+                <span className={cn("ml-auto text-flow-soft transition-transform", open && "rotate-45")} aria-hidden>
+                  +
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      <AnimatePresence mode="wait">
+        {openId && (
+          <motion.div
+            key={openId}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            className="mt-3"
           >
-            <span className="grid size-8 place-items-center rounded-xl bg-flow/15 text-flow-soft">
-              <c.icon className="size-4" aria-hidden />
-            </span>
-            {c.label}
-            <span className="ml-auto text-flow-soft" aria-hidden>
-              ↗
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
+            <SolutionInfo id={openId} onClose={onClose} headingId="mobile-solution-info" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

@@ -1,50 +1,91 @@
 "use client";
 
-import { motion, useTransform } from "framer-motion";
-import type { ReactNode } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { useId, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
-import type { PointerParallax } from "@/hooks/usePointerParallax";
 import type { SolutionId } from "@/content/solutions";
-import { SOLUTION_DEMO_ANCHOR, showSolution } from "@/lib/solutionLinks";
+import { SolutionInfo } from "./SolutionInfo";
 
 type FloatingPanelProps = {
   children: ReactNode;
-  pointer: PointerParallax;
-  /** Solution demo this panel opens when clicked. */
   solution: SolutionId;
-  /** Accessible name, e.g. "See the AI voice receptionist demo". */
+  /** Accessible name, e.g. "About the AI voice receptionist". */
   label: string;
-  /** Parallax depth — larger values feel closer to the viewer. */
-  depth?: number;
+  open: boolean;
+  onToggle: () => void;
+  /** Where the info card opens relative to the panel. */
+  placement?: "below" | "above";
+  /** Which edge the info card lines up with. */
+  align?: "start" | "end";
   delay?: number;
   className?: string;
 };
 
-/** Clickable glass panel that floats at a given depth, reacts to the cursor and opens its solution demo. */
-export function FloatingPanel({ children, pointer, solution, label, depth = 20, delay = 0, className }: FloatingPanelProps) {
-  const x = useTransform(pointer.x, [-1, 1], [-depth, depth]);
-  const y = useTransform(pointer.y, [-1, 1], [-depth * 0.7, depth * 0.7]);
+/**
+ * Fixed glass panel around the hero character. Clicking it opens a short
+ * explainer right beside it, without leaving the hero.
+ */
+export function FloatingPanel({
+  children,
+  solution,
+  label,
+  open,
+  onToggle,
+  placement = "below",
+  align = "start",
+  delay = 0,
+  className,
+}: FloatingPanelProps) {
+  const id = useId();
+  const infoId = `${id}-info`;
 
   return (
-    <motion.div style={{ x, y }} className={cn("absolute z-20", className)}>
-      <motion.a
-        href={SOLUTION_DEMO_ANCHOR}
+    <div className={cn("pointer-events-auto absolute", open ? "z-40" : "z-20", className)}>
+      <motion.button
+        type="button"
         aria-label={label}
-        onClick={() => showSolution(solution)}
+        aria-expanded={open}
+        aria-controls={infoId}
+        onClick={onToggle}
         initial={{ opacity: 0, y: 24, scale: 0.94, filter: "blur(10px)" }}
         animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-        whileHover={{ y: -4, scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
         transition={{ duration: 1.1, delay, ease: [0.16, 1, 0.3, 1] }}
-        className="glass group pointer-events-auto block cursor-pointer rounded-2xl p-3.5 text-left transition-[border-color,box-shadow] duration-300 hover:border-flow/50 hover:shadow-[0_0_40px_-10px_rgb(69_214_176/0.55)] sm:p-4"
+        className={cn(
+          "glass group block w-full cursor-pointer rounded-2xl p-3.5 text-left transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-flow/50 hover:shadow-[0_0_40px_-10px_rgb(69_214_176/0.55)] sm:p-4",
+          open && "border-flow/60 shadow-[0_0_40px_-10px_rgb(69_214_176/0.6)]",
+        )}
       >
         {children}
         <span className="mt-2.5 flex items-center gap-1 font-mono text-[0.6rem] tracking-[0.16em] text-flow-soft/70 uppercase transition-colors group-hover:text-flow-soft">
-          View demo
-          <ArrowUpRight className="size-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+          {open ? "Close" : "Know more"}
+          <Plus
+            className={cn("size-3 transition-transform duration-300", open && "rotate-45")}
+            aria-hidden
+          />
         </span>
-      </motion.a>
-    </motion.div>
+      </motion.button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id={infoId}
+            role="region"
+            aria-labelledby={`${infoId}-title`}
+            initial={{ opacity: 0, y: placement === "below" ? -8 : 8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: placement === "below" ? -8 : 8, scale: 0.97, transition: { duration: 0.18 } }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className={cn(
+              "absolute w-[min(20rem,80vw)]",
+              placement === "below" ? "top-full mt-3" : "bottom-full mb-3",
+              align === "start" ? "left-0" : "right-0",
+            )}
+          >
+            <SolutionInfo id={solution} onClose={onToggle} headingId={`${infoId}-title`} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
