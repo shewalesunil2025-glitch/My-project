@@ -43,12 +43,13 @@ Each section carries one idea:
 2. **Problem** *(pinned)* — six scattered tools, each with a broken status (Missed call, 12 unread…). As you scroll they snap into one line, a pulse runs through them, and the headline changes to **WE CONNECT THE FLOW.**
 3. **What We Build** — the customer journey (Website → AI Conversation → … → Google Review). The line fills as you scroll and a sticky panel describes the current stage.
 4. **Solutions** — seven accessible tabs, each with a looping live mini-demo (website, WhatsApp chat, voice call, chatbot, booking, reviews, workflow graph).
+4b. **Services** — four pillars (Build, Automate, Grow, Partner) and three promises: free 30-minute call, proposal within 24 hours, fixed price (`src/content/pillars.ts`).
 5. **One System** — the hub: six systems, each with a one-line job (Website "Brings customers in", WhatsApp "Replies instantly"…), fan out of Nexa AI as the section scrolls in. Mobile shows them as a simple list.
 6. **Industries** — pick an industry and its example automation flow animates in.
 7. **Work / Demos** — case-study cards with a sample system log that streams events when in view.
 8. **How It Works** *(pinned on desktop)* — Discover → Design → Automate → Launch.
 9. **Why Nexa Flow AI** — the statement lights up word by word as you scroll, followed by three principles.
-10. **About · Founder** — Shewale Sunil's profile, focus areas and vision (`founder` in `src/config/site.ts`; set `photo` to show the portrait, otherwise a monogram card is shown).
+10. **About · Founder** — Shewale Sunil's profile, focus areas and vision (`founder` in `src/config/site.ts`; portrait in `public/images/founder/`; with `photo` empty a monogram card is shown).
 11. **FAQ** — a native `<details>` accordion (`src/content/faq.ts`).
 12. **Final CTA** — a glowing horizon with "READY TO BUILD YOUR NEXT FLOW?"
 

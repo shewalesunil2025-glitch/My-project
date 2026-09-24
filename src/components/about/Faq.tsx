@@ -17,7 +17,7 @@ export function Faq() {
                 Questions, <span className="text-flow">answered.</span>
               </>
             }
-            lead="Anything else? Ask us on the free demo call — we reply within one business day."
+            lead="Anything else? Ask us on the free 30-minute call — we reply within 24 hours."
           />
         </div>
         <ul className="lg:col-span-7 lg:col-start-6">

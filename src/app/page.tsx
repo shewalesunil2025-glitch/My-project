@@ -5,6 +5,7 @@ import { Hero } from "@/components/hero/Hero";
 import { ProblemSection } from "@/components/scroll/ProblemSection";
 import { SystemFlow } from "@/components/automation/SystemFlow";
 import { Solutions } from "@/components/solutions/Solutions";
+import { Pillars } from "@/components/solutions/Pillars";
 import { OneSystem } from "@/components/automation/OneSystem";
 import { Industries } from "@/components/industries/Industries";
 import { Demos } from "@/components/demos/Demos";
@@ -44,6 +45,7 @@ export default function HomePage() {
         <ProblemSection />
         <SystemFlow />
         <Solutions />
+        <Pillars />
         <OneSystem />
         <Industries />
         <Demos />

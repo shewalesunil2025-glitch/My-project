@@ -15,6 +15,7 @@ export const siteConfig = {
   },
   nav: [
     { label: "Solutions", href: "#solutions" },
+    { label: "Services", href: "#services" },
     { label: "How It Works", href: "#process" },
     { label: "Industries", href: "#industries" },
     { label: "Work / Demos", href: "#work" },
@@ -22,6 +23,7 @@ export const siteConfig = {
   ],
   footerNav: [
     { label: "Solutions", href: "#solutions" },
+    { label: "Services", href: "#services" },
     { label: "Industries", href: "#industries" },
     { label: "Work", href: "#work" },
     { label: "About", href: "#about" },
@@ -92,7 +94,7 @@ export const heroCharacterConfig = {
 export const founder = {
   name: "Shewale Sunil",
   role: "Founder & AI Automation Strategist",
-  photo: "",
+  photo: "/images/founder/shewale-sunil.webp",
   photoAlt: "Shewale Sunil, founder of Nexa Flow AI",
   headline:
     "Building next-generation digital systems that combine AI, automation, websites, WhatsApp, voice technology, and intelligent business workflows.",
