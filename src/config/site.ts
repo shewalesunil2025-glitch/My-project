@@ -62,10 +62,16 @@ export const heroCharacterConfig = {
   alt: "Nexa Flow AI mascot — a little boy in a turban with a painted moustache, watching your cursor",
   width: 1020,
   height: 738,
+  /** Depth map for the WebGL 3D head turn (white = nearest). */
+  depthSrc: "/images/hero-character/depth.webp",
+  /** How far the face slides as the head turns (fraction of the image). */
+  warpStrength: 0.09,
+  /** Depth at the eyes, read from the depth map. */
+  eyeDepth: 0.84,
   /** Max head travel in px at the viewport edge. */
-  intensity: 18,
-  /** Max head turn in degrees. */
-  headTurn: 14,
+  intensity: 10,
+  /** Max head tilt in degrees (the depth warp does the turning). */
+  headTurn: 7,
   /** How far the irises can travel, as a fraction of the iris size. */
   eyeRange: 0.3,
   /** "static" keeps the image on touch devices, "hidden" removes it. */

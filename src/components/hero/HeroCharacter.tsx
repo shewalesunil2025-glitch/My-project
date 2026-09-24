@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { animate, motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { DepthWarp } from "@/components/3d/DepthWarp";
 import { cn } from "@/lib/cn";
 import { useFinePointer } from "@/hooks/useMediaQuery";
 import type { HeroEye } from "@/config/site";
@@ -15,6 +16,12 @@ export type HeroCharacterProps = {
   height: number;
   /** Iris sprites + eye masks. Without them only the head follows the cursor. */
   eyes?: HeroEye[];
+  /** Grayscale depth map for the WebGL 3D head turn. Without it the head only tilts. */
+  depthSrc?: string;
+  /** Depth-parallax strength (fraction of the image). */
+  warpStrength?: number;
+  /** Depth value (0–1) at the eyes, so the iris overlays travel with the warped face. */
+  eyeDepth?: number;
   /** Max head travel in px at the viewport edge. */
   intensity?: number;
   /** Max head turn in degrees. */
@@ -39,6 +46,9 @@ export function HeroCharacter({
   width,
   height,
   eyes = [],
+  depthSrc,
+  warpStrength = 0.06,
+  eyeDepth = 0.84,
   intensity = 14,
   headTurn = 12,
   eyeRange = 0.2,
@@ -49,6 +59,8 @@ export function HeroCharacter({
   const fine = useFinePointer();
   const reduce = useReducedMotion();
   const active = fine && !reduce;
+  const [warpReady, setWarpReady] = useState(false);
+  const onWarpReady = useCallback(() => setWarpReady(true), []);
 
   // Eyes: unit direction from the face to the cursor, eased in over the first ~180px.
   const lookX = useMotionValue(0);
@@ -66,6 +78,9 @@ export function HeroCharacter({
   const rotateZ = useTransform(headX, [-1, 1], [-headTurn * 0.35, headTurn * 0.35]);
   const x = useTransform(headX, [-1, 1], [-intensity, intensity]);
   const y = useTransform(headY, [-1, 1], [-intensity * 0.6, intensity * 0.6]);
+  const warpOn = Boolean(depthSrc) && warpReady;
+  const faceShiftX = useTransform(headX, (v) => (warpOn ? `${v * warpStrength * (eyeDepth - 0.5) * 100}%` : "0%"));
+  const faceShiftY = useTransform(headY, (v) => (warpOn ? `${v * warpStrength * 0.75 * (eyeDepth - 0.5) * 100}%` : "0%"));
 
   useEffect(() => {
     const reset = () => {
@@ -76,7 +91,16 @@ export function HeroCharacter({
     };
     if (!active) {
       reset();
-      return;
+      if (reduce) return;
+      // Touch devices: a slow, gentle look-around so the character still feels alive.
+      const opts = { duration: 5, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
+      const a = [
+        animate(aimX, [-0.45, 0.45], opts),
+        animate(lookX, [-0.7, 0.7], opts),
+        animate(aimY, [-0.12, 0.12], { ...opts, duration: 7 }),
+        animate(lookY, [-0.2, 0.2], { ...opts, duration: 7 }),
+      ];
+      return () => a.forEach((c) => c.stop());
     }
     const onMove = (e: PointerEvent) => {
       const el = ref.current;
@@ -100,7 +124,7 @@ export function HeroCharacter({
       window.removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("pointerleave", reset);
     };
-  }, [active, lookX, lookY, aimX, aimY]);
+  }, [active, reduce, lookX, lookY, aimX, aimY]);
 
   return (
     <div
@@ -122,12 +146,25 @@ export function HeroCharacter({
           height={height}
           priority
           sizes="(min-width: 1024px) 40vw, 90vw"
-          className="h-auto w-full drop-shadow-[0_30px_60px_rgb(0_0_0/0.55)]"
+          className={cn("h-auto w-full drop-shadow-[0_30px_60px_rgb(0_0_0/0.55)]", warpOn && "opacity-0")}
           draggable={false}
         />
-        {eyes.map((eye) => (
-          <Eye key={eye.irisSrc} eye={eye} eyeX={eyeX} eyeY={eyeY} range={eyeRange} />
-        ))}
+        {depthSrc && (
+          <DepthWarp
+            src={src}
+            depthSrc={depthSrc}
+            aimX={headX}
+            aimY={headY}
+            strength={warpStrength}
+            onReady={onWarpReady}
+            className="drop-shadow-[0_30px_60px_rgb(0_0_0/0.55)]"
+          />
+        )}
+        <motion.div className="absolute inset-0" style={{ x: faceShiftX, y: faceShiftY }}>
+          {eyes.map((eye) => (
+            <Eye key={eye.irisSrc} eye={eye} eyeX={eyeX} eyeY={eyeY} range={eyeRange} />
+          ))}
+        </motion.div>
       </motion.div>
     </div>
   );
