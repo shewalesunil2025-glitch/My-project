@@ -61,11 +61,11 @@ export const heroCharacterConfig = {
   width: 1020,
   height: 738,
   /** Max head travel in px at the viewport edge. */
-  intensity: 14,
+  intensity: 18,
   /** Max head turn in degrees. */
-  headTurn: 12,
+  headTurn: 14,
   /** How far the irises can travel, as a fraction of the iris size. */
-  eyeRange: 0.22,
+  eyeRange: 0.3,
   /** "static" keeps the image on touch devices, "hidden" removes it. */
   mobileBehavior: "static" as "static" | "hidden",
   eyes: [

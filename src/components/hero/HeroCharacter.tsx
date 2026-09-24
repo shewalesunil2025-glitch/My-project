@@ -50,49 +50,57 @@ export function HeroCharacter({
   const reduce = useReducedMotion();
   const active = fine && !reduce;
 
-  // Aim direction in [-1, 1], relative to the face.
+  // Eyes: unit direction from the face to the cursor, eased in over the first ~180px.
+  const lookX = useMotionValue(0);
+  const lookY = useMotionValue(0);
+  // Head: softer aim across the whole viewport.
   const aimX = useMotionValue(0);
   const aimY = useMotionValue(0);
-  const eyeX = useSpring(aimX, { stiffness: 320, damping: 26, mass: 0.4 });
-  const eyeY = useSpring(aimY, { stiffness: 320, damping: 26, mass: 0.4 });
-  const headX = useSpring(aimX, { stiffness: 70, damping: 16, mass: 0.8 });
-  const headY = useSpring(aimY, { stiffness: 70, damping: 16, mass: 0.8 });
+  const eyeX = useSpring(lookX, { stiffness: 420, damping: 30, mass: 0.3 });
+  const eyeY = useSpring(lookY, { stiffness: 420, damping: 30, mass: 0.3 });
+  const headX = useSpring(aimX, { stiffness: 120, damping: 18, mass: 0.6 });
+  const headY = useSpring(aimY, { stiffness: 120, damping: 18, mass: 0.6 });
 
   const rotateY = useTransform(headX, [-1, 1], [-headTurn, headTurn]);
-  const rotateX = useTransform(headY, [-1, 1], [headTurn * 0.55, -headTurn * 0.55]);
-  const rotateZ = useTransform(headX, [-1, 1], [-headTurn * 0.25, headTurn * 0.25]);
+  const rotateX = useTransform(headY, [-1, 1], [headTurn * 0.6, -headTurn * 0.6]);
+  const rotateZ = useTransform(headX, [-1, 1], [-headTurn * 0.35, headTurn * 0.35]);
   const x = useTransform(headX, [-1, 1], [-intensity, intensity]);
-  const y = useTransform(headY, [-1, 1], [-intensity * 0.5, intensity * 0.5]);
+  const y = useTransform(headY, [-1, 1], [-intensity * 0.6, intensity * 0.6]);
 
   useEffect(() => {
-    if (!active) {
+    const reset = () => {
+      lookX.set(0);
+      lookY.set(0);
       aimX.set(0);
       aimY.set(0);
+    };
+    if (!active) {
+      reset();
       return;
     }
     const onMove = (e: PointerEvent) => {
       const el = ref.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      // Face centre ≈ between the eyes.
+      // Point between the eyes (≈ 50% across, 61% down the image).
       const fx = r.left + r.width * 0.5;
-      const fy = r.top + r.height * 0.6;
-      const nx = (e.clientX - fx) / (window.innerWidth * 0.45);
-      const ny = (e.clientY - fy) / (window.innerHeight * 0.45);
-      aimX.set(Math.max(-1, Math.min(1, nx)));
-      aimY.set(Math.max(-1, Math.min(1, ny)));
-    };
-    const onLeave = () => {
-      aimX.set(0);
-      aimY.set(0);
+      const fy = r.top + r.height * 0.61;
+      const dx = e.clientX - fx;
+      const dy = e.clientY - fy;
+      const dist = Math.hypot(dx, dy) || 1;
+      const reach = Math.min(1, dist / 180);
+      lookX.set((dx / dist) * reach);
+      lookY.set((dy / dist) * reach);
+      aimX.set(Math.max(-1, Math.min(1, dx / (window.innerWidth * 0.4))));
+      aimY.set(Math.max(-1, Math.min(1, dy / (window.innerHeight * 0.4))));
     };
     window.addEventListener("pointermove", onMove, { passive: true });
-    document.documentElement.addEventListener("pointerleave", onLeave);
+    document.documentElement.addEventListener("pointerleave", reset);
     return () => {
       window.removeEventListener("pointermove", onMove);
-      document.documentElement.removeEventListener("pointerleave", onLeave);
+      document.documentElement.removeEventListener("pointerleave", reset);
     };
-  }, [active, aimX, aimY]);
+  }, [active, lookX, lookY, aimX, aimY]);
 
   return (
     <div
@@ -139,7 +147,7 @@ function Eye({
   const [left, top, w, h] = eye.box;
   const [cx, cy, size] = eye.iris;
   const x = useTransform(eyeX, (v) => `${v * range * 100}%`);
-  const y = useTransform(eyeY, (v) => `${v * range * 45}%`);
+  const y = useTransform(eyeY, (v) => `${v * range * 40}%`);
   const mask = `url(${eye.maskSrc})`;
 
   return (
@@ -166,6 +174,8 @@ function Eye({
         {/* eslint-disable-next-line @next/next/no-img-element -- tiny sprite, next/image adds nothing here */}
         <img src={eye.irisSrc} alt="" className="size-full" draggable={false} />
       </motion.div>
+      {/* Upper-lid shadow so the iris sits under the lid instead of on top of it. */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(40_20_10/0.45),transparent_38%,transparent_85%,rgb(40_20_10/0.15))]" />
     </div>
   );
 }

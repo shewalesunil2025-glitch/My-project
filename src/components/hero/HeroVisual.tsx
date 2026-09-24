@@ -71,7 +71,7 @@ export function HeroVisual() {
 
       {hasCharacter && (
         <motion.div
-          className="absolute inset-x-[3%] top-[14%] z-10"
+          className="absolute inset-x-[17%] top-[24%] z-10"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.4, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
