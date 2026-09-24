@@ -48,7 +48,9 @@ Each section carries one idea:
 7. **Work / Demos** — case-study cards with a sample system log that streams events when in view.
 8. **How It Works** *(pinned on desktop)* — Discover → Design → Automate → Launch.
 9. **Why Nexa Flow AI** — the statement lights up word by word as you scroll, followed by three principles.
-10. **Final CTA** — a glowing horizon with "READY TO BUILD YOUR NEXT FLOW?"
+10. **About · Founder** — Shewale Sunil's profile, focus areas and vision (`founder` in `src/config/site.ts`; set `photo` to show the portrait, otherwise a monogram card is shown).
+11. **FAQ** — a native `<details>` accordion (`src/content/faq.ts`).
+12. **Final CTA** — a glowing horizon with "READY TO BUILD YOUR NEXT FLOW?"
 
 ## Architecture
 
@@ -85,26 +87,19 @@ Content lives in `src/content`, separate from the components, so copy, industrie
 - **Surfaces:** `.glass` — thin light edge, blur, soft shadow
 - **Motion:** expo-out easing (`--ease-out-expo`). One idea animates at a time
 
-## The hero character (to add later)
+## The hero character
 
-`<HeroCharacter />` is already in place. To turn it on:
+The hero mascot lives in `public/images/hero-character/` and is configured by `heroCharacterConfig` in `src/config/site.ts`.
 
-1. Add a transparent PNG/WebP cutout to `public/images/`, e.g. `hero-character.webp`.
-2. Set it in `src/config/site.ts`:
+| File | What it is |
+| --- | --- |
+| `body.webp` | Transparent cutout, cropped above the hand, bottom faded into the page, irises painted out |
+| `iris-left.webp` / `iris-right.webp` | Round iris sprites that move toward the cursor |
+| `eye-mask-left.png` / `eye-mask-right.png` | Eye-opening masks, so an iris never slides over the eyelids |
 
-```ts
-export const heroCharacterConfig = {
-  src: "/images/hero-character.webp",
-  headSrc: "",            // optional separate head layer → stronger head-follow + tilt
-  alt: "…",
-  width: 720,
-  height: 900,
-  intensity: 18,          // px of travel at the viewport edge
-  mobileBehavior: "hidden", // or "static"
-};
-```
+`<HeroCharacter />` measures the aim from the character's own face, so it looks *at* the cursor, not at the screen centre. The eyes follow fast; the head turns and tilts on the neck more slowly. It stays still on touch devices and with reduced motion. On phones the four hero panels move to a row of demo buttons under the character, so they don't cover the face.
 
-The body drifts with the cursor and rotates slightly in 3D. An optional head layer follows further and tilts. On touch devices and with reduced motion it stays still, or is hidden if `mobileBehavior` is `"hidden"`. The AI core orb stays behind it as a halo.
+To swap the character, replace the five files and update each eye's `box` (eye opening, % of the image) and `iris` (centre and size, % of the box). Set `src` to `""` to show only the AI core.
 
 ## Demos
 

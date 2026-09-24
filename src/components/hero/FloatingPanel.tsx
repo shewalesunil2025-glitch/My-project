@@ -37,7 +37,7 @@ export function FloatingPanel({ children, pointer, solution, label, depth = 20, 
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 1.1, delay, ease: [0.16, 1, 0.3, 1] }}
-        className="glass group block cursor-pointer rounded-2xl p-3.5 text-left transition-[border-color,box-shadow] duration-300 hover:border-flow/50 hover:shadow-[0_0_40px_-10px_rgb(69_214_176/0.55)] sm:p-4"
+        className="glass group pointer-events-auto block cursor-pointer rounded-2xl p-3.5 text-left transition-[border-color,box-shadow] duration-300 hover:border-flow/50 hover:shadow-[0_0_40px_-10px_rgb(69_214_176/0.55)] sm:p-4"
       >
         {children}
         <span className="mt-2.5 flex items-center gap-1 font-mono text-[0.6rem] tracking-[0.16em] text-flow-soft/70 uppercase transition-colors group-hover:text-flow-soft">

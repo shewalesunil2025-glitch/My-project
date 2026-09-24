@@ -19,7 +19,7 @@ export function OneSystem() {
   const stageScale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
 
   return (
-    <section id="about" aria-labelledby="one-title" className="relative overflow-hidden py-28 md:py-40">
+    <section id="ecosystem" aria-labelledby="one-title" className="relative overflow-hidden py-28 md:py-40">
       <div className="absolute inset-0 bg-[radial-gradient(45%_45%_at_50%_58%,rgb(22_179_140/0.12),transparent_70%)]" aria-hidden />
       <div className="container-x relative text-center">
         <Reveal>

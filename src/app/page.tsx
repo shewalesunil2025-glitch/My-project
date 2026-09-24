@@ -1,4 +1,4 @@
-import { siteConfig } from "@/config/site";
+import { founder, siteConfig } from "@/config/site";
 import { DemoProvider } from "@/components/cta/DemoProvider";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Hero } from "@/components/hero/Hero";
@@ -11,6 +11,8 @@ import { Demos } from "@/components/demos/Demos";
 import { Process } from "@/components/process/Process";
 import { Philosophy } from "@/components/cta/Philosophy";
 import { FinalCta } from "@/components/cta/FinalCta";
+import { Founder } from "@/components/about/Founder";
+import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
 
 const jsonLd = {
@@ -19,6 +21,7 @@ const jsonLd = {
   name: siteConfig.name,
   url: siteConfig.url,
   email: siteConfig.email,
+  founder: { "@type": "Person", name: founder.name, jobTitle: founder.role },
   description: siteConfig.description,
   serviceType: [
     "AI-powered websites",
@@ -46,6 +49,8 @@ export default function HomePage() {
         <Demos />
         <Process />
         <Philosophy />
+        <Founder />
+        <Faq />
         <FinalCta />
       </main>
       <Footer />
