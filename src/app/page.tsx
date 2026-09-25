@@ -2,8 +2,7 @@ import { founder, siteConfig } from "@/config/site";
 import { DemoProvider } from "@/components/cta/DemoProvider";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Hero } from "@/components/hero/Hero";
-import { ProblemSection } from "@/components/scroll/ProblemSection";
-import { SystemFlow } from "@/components/automation/SystemFlow";
+import { ConnectSection } from "@/components/scroll/ConnectSection";
 import { Solutions } from "@/components/solutions/Solutions";
 import { Pillars } from "@/components/solutions/Pillars";
 import { OneSystem } from "@/components/automation/OneSystem";
@@ -42,15 +41,14 @@ export default function HomePage() {
       <Navbar />
       <main id="main">
         <Hero />
-        <ProblemSection />
-        <SystemFlow />
+        <ConnectSection />
         <Solutions />
-        <Pillars />
-        <OneSystem />
-        <Industries />
-        <Demos />
-        <Process />
         <Philosophy />
+        <OneSystem />
+        <Demos />
+        <Industries />
+        <Pillars />
+        <Process />
         <Founder />
         <Faq />
         <FinalCta />

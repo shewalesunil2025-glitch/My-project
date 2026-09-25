@@ -18,13 +18,13 @@ export default function OpengraphImage() {
           padding: 72,
           color: "#f1eee6",
           background:
-            "radial-gradient(60% 60% at 75% 40%, rgba(22,179,140,0.35), transparent 70%), #111b19",
+            "radial-gradient(60% 60% at 75% 40%, rgba(255,90,31,0.4), transparent 70%), #0a0a0b",
         }}
       >
         <div style={{ fontSize: 26, letterSpacing: 8, color: "#a3aba6" }}>{siteConfig.wordmark}</div>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 96, fontWeight: 700, letterSpacing: -4, lineHeight: 0.95 }}>
           <span>THE BUSINESS THAT</span>
-          <span style={{ color: "#45d6b0" }}>NEVER SLEEPS.</span>
+          <span style={{ color: "#ff5a1f" }}>NEVER SLEEPS.</span>
         </div>
         <div style={{ fontSize: 28, color: "#a3aba6" }}>{siteConfig.tagline}</div>
       </div>

@@ -1,110 +1,75 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { MapPin } from "lucide-react";
 import { industries } from "@/content/industries";
-import { cn } from "@/lib/cn";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Reveal } from "@/components/effects/Reveal";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
 
+/** Pin positions for each card's little dotted "map" (in %). */
+const pins: [number, number][] = [
+  [22, 38], [64, 30], [44, 62], [78, 58], [30, 26], [58, 46], [18, 64], [70, 22], [40, 40], [84, 44],
+];
+
 export function Industries() {
-  const [activeId, setActiveId] = useState(industries[1].id);
-  const active = industries.find((i) => i.id === activeId) ?? industries[0];
-
   return (
-    <section id="industries" aria-labelledby="industries-title" className="relative py-28 md:py-40">
+    <section
+      id="industries"
+      aria-labelledby="industries-title"
+      className="paper relative z-10 mx-2 mt-4 rounded-[2rem] py-20 md:mx-4 md:rounded-[3rem] md:py-28"
+    >
       <div className="container-x">
-        <SectionHeading
-          id="industries-title"
-          eyebrow="Industries"
-          title={
-            <>
-              Built for businesses <span className="text-flow">that talk to customers.</span>
-            </>
-          }
-          lead="Choose an industry to see the flow we'd build."
-        />
+        <Reveal className="text-center">
+          <p className="badge">Industries</p>
+          <h2 id="industries-title" className="display mx-auto mt-5 max-w-3xl text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
+            A flexible solution for businesses that talk to customers
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-ink-muted md:text-lg">The flow we&apos;d build, industry by industry.</p>
+        </Reveal>
 
-        <div className="mt-12 flex flex-wrap gap-2" role="group" aria-label="Choose an industry">
-          {industries.map((ind) => {
-            const selected = ind.id === activeId;
-            return (
-              <button
-                key={ind.id}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => setActiveId(ind.id)}
-                className={cn(
-                  "relative rounded-full border px-4 py-2.5 text-sm transition-colors duration-300",
-                  selected ? "border-transparent text-ink-950" : "border-white/10 text-fg-muted hover:border-white/25 hover:text-fg",
-                )}
-              >
-                {selected && (
-                  <motion.span
-                    layoutId="industry-active"
-                    className="absolute inset-0 rounded-full bg-fg"
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  />
-                )}
-                <span className="relative">{ind.name}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="glass relative mt-8 overflow-hidden rounded-[1.75rem] p-6 md:p-10" aria-live="polite">
-          <div className="grid-backdrop absolute inset-0 opacity-50" aria-hidden />
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative"
-            >
-              <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-                <div>
-                  <p className="font-mono text-[0.65rem] tracking-[0.2em] text-fg-subtle uppercase">Example flow</p>
-                  <motion.h3
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className="display mt-3 text-[clamp(2rem,4.5vw,3.6rem)]"
-                  >
-                    {active.name}
-                  </motion.h3>
-                  <p className="mt-3 max-w-lg text-fg-muted">{active.outcome}</p>
-                </div>
-                <BookDemoButton label="Build this flow" interest={`${active.name} automation`} variant="ghost" icon />
-              </div>
-
-              <ol className="relative mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6 xl:gap-0">
-                <motion.span
-                  className="absolute top-7 right-[8%] left-[8%] hidden h-px origin-left bg-gradient-to-r from-flow-soft/30 via-flow to-live xl:block"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 1.4, delay: 0.2, ease: [0.65, 0, 0.35, 1] }}
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+          {industries.map((ind, i) => (
+            <Reveal as="li" key={ind.id} delay={(i % 3) * 0.06}>
+              <article className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-paper-line bg-paper-card transition-shadow duration-300 hover:shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)]">
+                <div
                   aria-hidden
-                />
-                {active.flow.map((step, i) => (
-                  <motion.li
-                    key={step}
-                    initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    transition={{ duration: 0.6, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative flex flex-col items-start gap-3 rounded-2xl border border-white/[0.07] bg-ink-900/60 p-4 xl:items-center xl:border-0 xl:bg-transparent xl:p-0 xl:text-center"
-                  >
-                    <span className="relative z-10 grid size-14 place-items-center rounded-2xl border border-flow/30 bg-ink-850 font-mono text-xs text-flow-soft shadow-[0_0_30px_-8px_rgb(69_214_176/0.6)]">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm font-medium md:text-base">{step}</span>
-                  </motion.li>
-                ))}
-              </ol>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+                  className="relative h-28 bg-[radial-gradient(circle,rgb(17_17_17/0.09)_1px,transparent_1.4px)] [background-size:12px_12px] [mask-image:linear-gradient(to_bottom,#000,transparent)]"
+                >
+                  <MapPin
+                    className="absolute size-6 -translate-1/2 fill-flow/20 text-flow transition-transform duration-500 group-hover:-translate-y-[70%]"
+                    style={{ left: `${pins[i % pins.length][0]}%`, top: `${pins[i % pins.length][1]}%` }}
+                  />
+                  <span
+                    className="absolute size-2 -translate-1/2 rounded-full bg-ink/20"
+                    style={{ left: `${pins[(i + 3) % pins.length][0]}%`, top: `${pins[(i + 3) % pins.length][1]}%` }}
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-6 pt-2">
+                  <h3 className="text-lg font-semibold tracking-tight text-ink">{ind.name}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{ind.outcome}</p>
+                  <ol className="mt-4 flex flex-wrap items-center gap-1.5 text-xs text-ink-muted" aria-label={`${ind.name} flow`}>
+                    {ind.flow.map((step, s) => (
+                      <li key={step} className="flex items-center gap-1.5">
+                        <span className="rounded-full bg-paper px-2.5 py-1 font-medium text-ink">{step}</span>
+                        {s < ind.flow.length - 1 && <span aria-hidden className="text-flow">→</span>}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+          <Reveal as="li" delay={0.12} className="sm:col-span-2 lg:col-span-2">
+            <div className="flex h-full flex-col justify-between gap-6 rounded-[1.5rem] bg-ink-950 p-7 text-fg md:p-9">
+              <div>
+                <p className="text-sm font-semibold text-flow">Don&apos;t see your industry?</p>
+                <p className="mt-2 max-w-md text-2xl leading-snug font-semibold tracking-tight">
+                  If your customers call, message or book — we can build your flow.
+                </p>
+              </div>
+              <BookDemoButton label="Build my flow" interest="Custom industry flow" icon className="w-fit" />
+            </div>
+          </Reveal>
+        </ul>
       </div>
     </section>
   );

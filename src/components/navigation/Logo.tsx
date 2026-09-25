@@ -1,25 +1,26 @@
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import { siteConfig } from "@/config/site";
 
-/** Wordmark with a flowing-path mark: three nodes joined into one line. */
-export function Logo({ className }: { className?: string }) {
+/** Ember square mark: three nodes joined into one flowing line. */
+export function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={cn("size-8", className)} aria-hidden>
+      <rect width="32" height="32" rx="9" fill="#ff5a1f" />
+      <path d="M8 21c4 0 4-10 8-10s4 10 8 10" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
+      <circle cx="8" cy="21" r="2.3" fill="#fff" />
+      <circle cx="16" cy="11" r="2.3" fill="#fff" />
+      <circle cx="24" cy="21" r="2.3" fill="#fff" />
+    </svg>
+  );
+}
+
+export function Logo({ className, compact }: { className?: string; compact?: boolean }) {
   return (
     <Link href="#top" className={className} aria-label={`${siteConfig.name} — home`}>
       <span className="flex items-center gap-2.5">
-        <svg viewBox="0 0 32 32" className="size-7" aria-hidden>
-          <defs>
-            <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#a8f0dc" />
-              <stop offset="1" stopColor="#e8c987" />
-            </linearGradient>
-          </defs>
-          <rect x="1" y="1" width="30" height="30" rx="9" fill="none" stroke="rgb(255 255 255 / .14)" />
-          <path d="M8 21c4 0 4-10 8-10s4 10 8 10" fill="none" stroke="url(#logo-g)" strokeWidth="2.2" strokeLinecap="round" />
-          <circle cx="8" cy="21" r="2.2" fill="#a8f0dc" />
-          <circle cx="16" cy="11" r="2.2" fill="#45d6b0" />
-          <circle cx="24" cy="21" r="2.2" fill="#e8c987" />
-        </svg>
-        <span className="font-mono text-[0.8rem] font-medium tracking-[0.24em] text-fg">{siteConfig.wordmark}</span>
+        <LogoMark className={compact ? "size-7" : "size-8"} />
+        {!compact && <span className="text-[0.95rem] font-bold tracking-tight text-fg">{siteConfig.wordmark}</span>}
       </span>
     </Link>
   );

@@ -12,7 +12,7 @@ export function Founder() {
 
   return (
     <section id="about" aria-labelledby="founder-title" className="relative py-28 md:py-40">
-      <div className="absolute inset-0 bg-[radial-gradient(40%_50%_at_20%_50%,rgb(22_179_140/0.10),transparent_70%)]" aria-hidden />
+      <div className="absolute inset-0 bg-[radial-gradient(40%_50%_at_20%_50%,rgb(255_90_31/0.10),transparent_70%)]" aria-hidden />
       <div className="container-x relative grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
         <Reveal className="lg:col-span-5">
           <figure className="relative mx-auto max-w-md">
@@ -27,7 +27,7 @@ export function Founder() {
                   className="object-cover object-top"
                 />
               ) : (
-                <div className="grid size-full place-items-center bg-[radial-gradient(circle_at_50%_35%,rgb(69_214_176/0.18),transparent_60%)]">
+                <div className="grid size-full place-items-center bg-[radial-gradient(circle_at_50%_35%,rgb(255_90_31/0.18),transparent_60%)]">
                   <span className="display text-flow text-[7rem]" aria-hidden>
                     {initials}
                   </span>
@@ -43,13 +43,13 @@ export function Founder() {
 
         <div className="lg:col-span-7">
           <Reveal>
-            <p className="eyebrow mb-5">About · Founder</p>
+            <p className="badge mb-5">About · Founder</p>
           </Reveal>
           <Reveal delay={0.06}>
             <h2 id="founder-title" className="display text-metal text-[clamp(2.4rem,5vw,4.2rem)]">
               {founder.name}
             </h2>
-            <p className="mt-3 font-mono text-xs tracking-[0.2em] text-flow-soft uppercase">{founder.role}</p>
+            <p className="mt-3 text-sm font-semibold text-flow">{founder.role}</p>
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-8 text-xl leading-relaxed text-fg md:text-2xl">{founder.headline}</p>
@@ -72,7 +72,7 @@ export function Founder() {
             <blockquote className="glass mt-10 flex gap-4 rounded-2xl p-6">
               <Quote className="size-6 shrink-0 text-live" aria-hidden />
               <div>
-                <p className="font-mono text-[0.65rem] tracking-[0.2em] text-fg-subtle uppercase">Vision</p>
+                <p className="text-xs font-semibold tracking-wide text-fg-subtle uppercase">Vision</p>
                 <p className="mt-2 text-xl font-medium tracking-tight">{founder.vision}</p>
               </div>
             </blockquote>

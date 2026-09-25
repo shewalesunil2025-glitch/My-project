@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { MotionConfig } from "framer-motion";
 import { siteConfig } from "@/config/site";
 import { SmoothScroll } from "@/components/effects/SmoothScroll";
 import "./globals.css";
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -36,13 +38,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111b19",
+  themeColor: "#0a0a0b",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${jakarta.variable} ${GeistMono.variable}`}>
       <body>
         <MotionConfig reducedMotion="user">
           <SmoothScroll />
