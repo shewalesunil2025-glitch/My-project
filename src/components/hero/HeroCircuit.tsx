@@ -247,11 +247,11 @@ function MobileChips({
                 aria-expanded={open}
                 onClick={() => onToggle(n.id)}
                 className={cn(
-                  "flex w-full items-center gap-2.5 rounded-2xl border bg-ink-850 px-3 py-3 text-left text-sm font-semibold transition-colors active:scale-[0.98]",
+                  "flex w-full items-center gap-2 rounded-2xl border bg-ink-850 px-2.5 py-2.5 text-left text-sm font-semibold transition-colors active:scale-[0.98]",
                   open ? "border-flow/60" : "border-white/10",
                 )}
               >
-                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
+                <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
                   <n.icon className="size-4" aria-hidden />
                 </span>
                 <span className="min-w-0 flex-1 truncate">{n.short}</span>
