@@ -92,17 +92,11 @@ Checked against the UI UX Pro Max skill (`.claude/skills/ui-ux-pro-max`): text c
 
 ## The hero character
 
-The hero mascot lives in `public/images/hero-character/` and is configured by `heroCharacterConfig` in `src/config/site.ts`.
+The mascot is built from a **turnaround video**: 23 frames (front, left and right profiles, looking up, looking down and the angles in between) with the background removed, in `public/images/character/`. Each frame has a `yaw` / `pitch` in `heroCharacterConfig.frames` (`src/config/site.ts`).
 
-| File | What it is |
-| --- | --- |
-| `body.webp` | Transparent cutout, cropped above the hand, bottom faded into the page, irises painted out |
-| `iris-left.webp` / `iris-right.webp` | Round iris sprites that move toward the cursor |
-| `eye-mask-left.png` / `eye-mask-right.png` | Eye-opening masks, so an iris never slides over the eyelids |
+`<HeroCharacter />` measures the cursor from the character's face, runs the target direction through a spring and draws the frame closest to it on a canvas. So the head turns through the in-between frames instead of snapping. The first frame is a normal `<Image>` for fast first paint; the other frames preload in the background. Touch devices get a slow look-around, and reduced motion shows the front frame. The bottom fades into the page with a CSS mask.
 
-`<HeroCharacter />` measures the aim from the character's own face, so it looks *at* the cursor, not at the screen centre. The eyes follow fast; the head turns and tilts on the neck more slowly. It stays still on touch devices and with reduced motion. On phones the four hero panels move to a row of demo buttons under the character, so they don't cover the face.
-
-To swap the character, replace the five files and update each eye's `box` (eye opening, % of the image) and `iris` (centre and size, % of the box). Set `src` to `""` to show only the AI core.
+To swap the character, export new frames and update their `yaw` (−1 left … 1 right) and `pitch` (−1 up … 1 down). Set `frames` to `[]` to hide it.
 
 ## Demos
 

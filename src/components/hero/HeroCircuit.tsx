@@ -85,7 +85,7 @@ export function HeroCircuit() {
   const [openId, setOpenId] = useState<SolutionId | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const toggle = (id: SolutionId) => setOpenId((cur) => (cur === id ? null : id));
-  const hasCharacter = Boolean(heroCharacterConfig.src);
+  const hasCharacter = heroCharacterConfig.frames.length > 0;
 
   useEffect(() => {
     if (!openId) return;
@@ -132,17 +132,17 @@ export function HeroCircuit() {
         {/* Ember glow behind the character — the "chip" */}
         <div
           aria-hidden
-          className="absolute bottom-0 left-1/2 h-[70%] w-[42%] -translate-x-1/2 rounded-[2rem] bg-[radial-gradient(60%_60%_at_50%_60%,rgb(255_90_31/0.28),transparent_70%)] max-sm:w-[80%]"
+          className="absolute bottom-0 left-1/2 h-[90%] w-[46%] -translate-x-1/2 bg-[radial-gradient(50%_50%_at_50%_45%,rgb(255_90_31/0.32),rgb(255_90_31/0.08)_55%,transparent_75%)] max-sm:w-[95%]"
         />
 
         {hasCharacter && (
           <motion.div
-            className="absolute bottom-0 left-1/2 w-[36%] -translate-x-1/2 max-sm:w-[82%]"
+            className="absolute bottom-0 left-1/2 h-[96%] -translate-x-1/2"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
-            <HeroCharacter {...heroCharacterConfig} />
+            <HeroCharacter {...heroCharacterConfig} className="h-full" />
           </motion.div>
         )}
 

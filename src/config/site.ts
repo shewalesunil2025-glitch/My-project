@@ -39,57 +39,53 @@ export const siteConfig = {
   ],
 } as const;
 
-export type HeroEye = {
-  /** Iris sprite (transparent, round) that moves inside the eye. */
-  irisSrc: string;
-  /** Eye-opening mask (white where the eye is open, transparent elsewhere). */
-  maskSrc: string;
-  /** Eye opening box as [left, top, width, height] in % of the character image. */
-  box: [number, number, number, number];
-  /** Iris centre [x, y] and diameter, in % of the eye box width/height. */
-  iris: [number, number, number];
+export type CharacterFrame = {
+  src: string;
+  /** Head direction: -1 = facing the viewer's left, 1 = right. */
+  yaw: number;
+  /** -1 = looking up, 1 = looking down. */
+  pitch: number;
 };
 
 /**
- * Hero character.
- * The body image has its irises painted out; each iris is a separate sprite that
- * follows the cursor inside its eye mask, while the head turns gently on the neck.
- * Replace the files in /public/images/hero-character to swap the character.
- * Set `src` to "" to show the AI core visual only.
+ * Hero character — frames taken from a 360° turnaround video with the background
+ * removed. The component shows whichever frame points closest to the cursor.
+ * Replace the files in /public/images/character (and these yaw/pitch values) to swap it.
+ * Set `frames` to [] to hide the character.
  */
 export const heroCharacterConfig = {
-  src: "/images/hero-character/body.webp",
-  alt: "Nexa Flow AI mascot — a little boy in a turban with a painted moustache, watching your cursor",
-  width: 1020,
-  height: 738,
-  /** Depth map for the WebGL 3D head turn (white = nearest). */
-  depthSrc: "/images/hero-character/depth.webp",
-  /** How far the face slides as the head turns (fraction of the image). */
-  warpStrength: 0.09,
-  /** Depth at the eyes, read from the depth map. */
-  eyeDepth: 0.84,
-  /** Max head travel in px at the viewport edge. */
-  intensity: 10,
-  /** Max head tilt in degrees (the depth warp does the turning). */
-  headTurn: 7,
-  /** How far the irises can travel, as a fraction of the iris size. */
-  eyeRange: 0.3,
+  alt: "Nexa Flow AI mascot — a little boy in a turban with a painted moustache, turning to follow your cursor",
+  width: 335,
+  height: 436,
+  /** Where the face sits in the frame (fraction of height) — the point the aim is measured from. */
+  faceY: 0.34,
   /** "static" keeps the image on touch devices, "hidden" removes it. */
   mobileBehavior: "static" as "static" | "hidden",
-  eyes: [
-    {
-      irisSrc: "/images/hero-character/iris-left.webp",
-      maskSrc: "/images/hero-character/eye-mask-left.png",
-      box: [38.039, 56.911, 10.49, 10.027],
-      iris: [52.336, 51.351, 56.075],
-    },
-    {
-      irisSrc: "/images/hero-character/iris-right.webp",
-      maskSrc: "/images/hero-character/eye-mask-right.png",
-      box: [56.275, 55.014, 10.0, 10.84],
-      iris: [46.078, 50.0, 58.824],
-    },
-  ] as HeroEye[],
+  frames: [
+    { src: "/images/character/pose-232.webp", yaw: 0.0, pitch: 0.0 },
+    { src: "/images/character/pose-004.webp", yaw: -0.05, pitch: 0.0 },
+    { src: "/images/character/pose-036.webp", yaw: -0.4, pitch: 0.15 },
+    { src: "/images/character/pose-040.webp", yaw: -0.75, pitch: 0.05 },
+    { src: "/images/character/pose-048.webp", yaw: -1.0, pitch: 0.0 },
+    { src: "/images/character/pose-076.webp", yaw: -0.65, pitch: -0.4 },
+    { src: "/images/character/pose-080.webp", yaw: -0.35, pitch: -0.65 },
+    { src: "/images/character/pose-084.webp", yaw: -0.15, pitch: -0.85 },
+    { src: "/images/character/pose-096.webp", yaw: 0.0, pitch: -1.0 },
+    { src: "/images/character/pose-104.webp", yaw: 0.05, pitch: -1.0 },
+    { src: "/images/character/pose-112.webp", yaw: 0.15, pitch: -0.95 },
+    { src: "/images/character/pose-120.webp", yaw: 0.4, pitch: -0.75 },
+    { src: "/images/character/pose-124.webp", yaw: 0.6, pitch: -0.55 },
+    { src: "/images/character/pose-128.webp", yaw: 0.75, pitch: -0.4 },
+    { src: "/images/character/pose-136.webp", yaw: 0.9, pitch: -0.25 },
+    { src: "/images/character/pose-140.webp", yaw: 1.0, pitch: -0.1 },
+    { src: "/images/character/pose-160.webp", yaw: 1.0, pitch: 0.05 },
+    { src: "/images/character/pose-176.webp", yaw: 0.85, pitch: 0.2 },
+    { src: "/images/character/pose-180.webp", yaw: 0.65, pitch: 0.45 },
+    { src: "/images/character/pose-184.webp", yaw: 0.3, pitch: 0.75 },
+    { src: "/images/character/pose-200.webp", yaw: 0.0, pitch: 1.0 },
+    { src: "/images/character/pose-216.webp", yaw: 0.0, pitch: 0.35 },
+    { src: "/images/character/pose-220.webp", yaw: 0.0, pitch: 0.15 },
+  ] as CharacterFrame[],
 };
 
 /**
