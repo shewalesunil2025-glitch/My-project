@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { faqs } from "@/content/faq";
+import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
 
 /** Native <details> accordion in the reference's rounded dark cards. */
@@ -10,7 +11,7 @@ export function Faq() {
         <Reveal className="text-center">
           <p className="badge">FAQ</p>
           <h2 id="faq-title" className="display mt-5 text-[clamp(2rem,4.4vw,3.4rem)]">
-            Frequently asked questions
+            <RevealWords text="Frequently asked questions" />
           </h2>
           <p className="mx-auto mt-4 max-w-md text-fg-muted">
             Anything else? Ask us on the free 30-minute call — we reply within 24 hours.

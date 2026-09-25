@@ -81,7 +81,7 @@ const nodes: NodeDef[] = [
  * where the AI chip would be, with four fixed channel tiles wired into it.
  * Each tile opens a short explainer right beside it.
  */
-export function HeroCircuit() {
+export function HeroCircuit({ delay = 0 }: { delay?: number }) {
   const [openId, setOpenId] = useState<SolutionId | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const toggle = (id: SolutionId) => setOpenId((cur) => (cur === id ? null : id));
@@ -113,7 +113,17 @@ export function HeroCircuit() {
         >
           {nodes.map((n, i) => (
             <g key={n.id}>
-              <path d={n.path} fill="none" stroke="rgb(255 255 255 / 0.12)" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+              {/* Traces draw themselves from the tile toward the character. */}
+              <motion.path
+                d={n.path}
+                fill="none"
+                stroke="rgb(255 255 255 / 0.12)"
+                strokeWidth={1.2}
+                vectorEffect="non-scaling-stroke"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1.3, delay: delay + 0.8 + i * 0.1, ease: [0.65, 0, 0.35, 1] }}
+              />
               <path
                 d={n.path}
                 fill="none"
@@ -140,7 +150,7 @@ export function HeroCircuit() {
             className="absolute bottom-0 left-1/2 h-[96%] -translate-x-1/2"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.4, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.4, delay: delay + 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
             <HeroCharacter {...heroCharacterConfig} className="h-full" />
           </motion.div>
@@ -150,7 +160,7 @@ export function HeroCircuit() {
           <NodeTile
             key={n.id}
             node={n}
-            delay={0.9 + i * 0.12}
+            delay={delay + 0.9 + i * 0.12}
             open={openId === n.id}
             onToggle={() => toggle(n.id)}
           />

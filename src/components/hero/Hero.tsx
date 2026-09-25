@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ButtonLink } from "@/components/ui/Button";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
+import { introDelay } from "@/components/effects/IntroLoader";
 import { HeroCircuit } from "./HeroCircuit";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -11,6 +12,8 @@ const ease = [0.16, 1, 0.3, 1] as const;
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+  // Start the entrances as the intro curtain lifts (0 when there was no intro).
+  const [d] = useState(introDelay);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -80]);
   const copyOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
@@ -35,20 +38,21 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease }}
+          transition={{ duration: 0.8, delay: d, ease }}
           className="badge"
         >
           AI automation agency
         </motion.p>
 
-        <h1 id="hero-title" className="display text-metal mx-auto mt-6 max-w-4xl text-[clamp(2.6rem,6.6vw,5.4rem)]">
+        <h1 id="hero-title" className="display mx-auto mt-6 max-w-4xl text-[clamp(2.6rem,6.6vw,5.4rem)]">
           {["The business", "that never sleeps."].map((line, i) => (
             <span key={line} className="block overflow-hidden pb-[0.08em]">
               <motion.span
-                className="block"
+                // Gradient on each moving line: Chrome paints clipped text late on moving children.
+                className="text-metal block"
                 initial={reduce ? { opacity: 0 } : { y: "105%" }}
                 animate={reduce ? { opacity: 1 } : { y: "0%" }}
-                transition={{ duration: 1.1, delay: 0.1 + i * 0.12, ease }}
+                transition={{ duration: 1.1, delay: d + 0.1 + i * 0.12, ease }}
               >
                 {line}
               </motion.span>
@@ -59,7 +63,7 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5, ease }}
+          transition={{ duration: 1, delay: d + 0.5, ease }}
           className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-fg-muted md:text-lg"
         >
           AI-powered websites, conversations and workflows that work together as one intelligent business system —
@@ -69,7 +73,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.65, ease }}
+          transition={{ duration: 1, delay: d + 0.65, ease }}
           className="mt-9 flex flex-wrap items-center justify-center gap-3"
         >
           <BookDemoButton size="lg" />
@@ -79,7 +83,7 @@ export function Hero() {
         </motion.div>
       </motion.div>
 
-      <HeroCircuit />
+      <HeroCircuit delay={d} />
     </section>
   );
 }

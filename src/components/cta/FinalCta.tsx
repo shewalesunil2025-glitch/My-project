@@ -1,5 +1,6 @@
 import { siteConfig } from "@/config/site";
 import { ButtonLink } from "@/components/ui/Button";
+import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
 import { BookDemoButton } from "./BookDemoButton";
 
@@ -16,8 +17,8 @@ export function FinalCta() {
           </Reveal>
           <Reveal delay={0.06}>
             <h2 id="cta-title" className="display mx-auto mt-5 max-w-3xl text-[clamp(2.2rem,5.2vw,4.2rem)]">
-              Ready to build your next flow?
-            </h2>
+            <RevealWords text="Ready to build your next flow?" />
+          </h2>
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mx-auto mt-5 max-w-xl text-fg-muted md:text-lg">

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { customerFlow, fragmentedTools } from "@/content/flow";
+import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
 
 /**
@@ -19,7 +20,7 @@ export function ConnectSection() {
         <Reveal className="text-center">
           <p className="badge">The problem</p>
           <h2 id="connect-title" className="display mx-auto mt-5 max-w-4xl text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
-            Your business shouldn&apos;t need five different tools to talk to one customer.
+            <RevealWords text="Your business shouldn’t need five different tools to talk to one customer." />
           </h2>
         </Reveal>
 

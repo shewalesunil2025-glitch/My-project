@@ -14,6 +14,7 @@ import { FinalCta } from "@/components/cta/FinalCta";
 import { Founder } from "@/components/about/Founder";
 import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
+import { ScrollPanel } from "@/components/effects/ScrollPanel";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -41,17 +42,39 @@ export default function HomePage() {
       <Navbar />
       <main id="main">
         <Hero />
-        <ConnectSection />
-        <Solutions />
-        <Philosophy />
-        <OneSystem />
-        <Demos />
-        <Industries />
-        <Pillars />
-        <Process />
-        <Founder />
-        <Faq />
-        <FinalCta />
+        <ScrollPanel variant="paper">
+          <ConnectSection />
+        </ScrollPanel>
+        <ScrollPanel>
+          <Solutions />
+        </ScrollPanel>
+        <ScrollPanel>
+          <Philosophy />
+        </ScrollPanel>
+        <ScrollPanel>
+          <OneSystem />
+        </ScrollPanel>
+        <ScrollPanel variant="paper">
+          <Demos />
+        </ScrollPanel>
+        <ScrollPanel variant="paper">
+          <Industries />
+        </ScrollPanel>
+        <ScrollPanel>
+          <Pillars />
+        </ScrollPanel>
+        <ScrollPanel>
+          <Process />
+        </ScrollPanel>
+        <ScrollPanel>
+          <Founder />
+        </ScrollPanel>
+        <ScrollPanel>
+          <Faq />
+        </ScrollPanel>
+        <ScrollPanel>
+          <FinalCta />
+        </ScrollPanel>
       </main>
       <Footer />
     </DemoProvider>

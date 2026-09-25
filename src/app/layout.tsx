@@ -4,6 +4,9 @@ import { GeistMono } from "geist/font/mono";
 import { MotionConfig } from "framer-motion";
 import { siteConfig } from "@/config/site";
 import { SmoothScroll } from "@/components/effects/SmoothScroll";
+import { IntroLoader } from "@/components/effects/IntroLoader";
+import { ScrollProgress } from "@/components/effects/ScrollProgress";
+import { Spotlight } from "@/components/effects/Spotlight";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
@@ -44,10 +47,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${jakarta.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body>
+        <IntroLoader />
         <MotionConfig reducedMotion="user">
           <SmoothScroll />
+          <ScrollProgress />
+          <Spotlight />
           {children}
         </MotionConfig>
       </body>

@@ -6,6 +6,7 @@ import { ArrowUpRight, Bot, CalendarCheck, Globe, MessageCircle, PhoneCall, Spar
 import { demos } from "@/content/demos";
 import { cn } from "@/lib/cn";
 import { useSequence } from "@/hooks/useSequence";
+import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
 import { Appear } from "@/components/solutions/previews/parts";
 import { ButtonLink } from "@/components/ui/Button";
@@ -31,7 +32,7 @@ export function Demos() {
         <Reveal className="text-center">
           <p className="badge">Work / Demos</p>
           <h2 id="work-title" className="display mt-5 text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
-            Experience it now
+            <RevealWords text="Experience it now" />
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-ink-muted md:text-lg">
             Live systems, not screenshots. Each demo is a complete concept: the website, the conversations and the

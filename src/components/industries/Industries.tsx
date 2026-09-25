@@ -2,6 +2,7 @@
 
 import { MapPin } from "lucide-react";
 import { industries } from "@/content/industries";
+import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
 
@@ -21,7 +22,7 @@ export function Industries() {
         <Reveal className="text-center">
           <p className="badge">Industries</p>
           <h2 id="industries-title" className="display mx-auto mt-5 max-w-3xl text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
-            A flexible solution for businesses that talk to customers
+            <RevealWords text="A flexible solution for businesses that talk to customers" />
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-ink-muted md:text-lg">The flow we&apos;d build, industry by industry.</p>
         </Reveal>
@@ -29,7 +30,7 @@ export function Industries() {
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
           {industries.map((ind, i) => (
             <Reveal as="li" key={ind.id} delay={(i % 3) * 0.06}>
-              <article className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-paper-line bg-paper-card transition-shadow duration-300 hover:shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)]">
+              <article data-spotlight className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-paper-line bg-paper-card transition-shadow duration-300 hover:shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)]">
                 <div
                   aria-hidden
                   className="relative h-28 bg-[radial-gradient(circle,rgb(17_17_17/0.09)_1px,transparent_1.4px)] [background-size:12px_12px] [mask-image:linear-gradient(to_bottom,#000,transparent)]"
