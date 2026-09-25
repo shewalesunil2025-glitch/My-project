@@ -57,8 +57,8 @@ export function HeroCharacter({
 
   const yawTarget = useMotionValue(0);
   const pitchTarget = useMotionValue(0);
-  const yaw = useSpring(yawTarget, { stiffness: 90, damping: 18, mass: 0.7 });
-  const pitch = useSpring(pitchTarget, { stiffness: 90, damping: 18, mass: 0.7 });
+  const yaw = useSpring(yawTarget, { stiffness: 55, damping: 16, mass: 0.9 });
+  const pitch = useSpring(pitchTarget, { stiffness: 55, damping: 16, mass: 0.9 });
 
   const front = nearest(frames, 0, 0);
 
@@ -90,41 +90,78 @@ export function HeroCharacter({
     };
   }, [frames]);
 
-  // Draw the frame nearest to the current (spring-smoothed) head direction.
+  // Draw the frame nearest to the current (spring-smoothed) head direction,
+  // cross-fading from the previous frame so the turn reads as continuous motion.
   useEffect(() => {
     if (!ready) return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    const draw = (index: number) => {
+    const FADE_MS = 140;
+    let from = currentRef.current;
+    let fadeStart = 0;
+    let raf = 0;
+
+    const drawFrame = (index: number) => {
       const img = imagesRef.current[index];
       if (!img) return;
+      if (frames[index].mirror) {
+        ctx.save();
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      } else {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+    };
+    const paint = (now: number) => {
+      raf = 0;
+      const to = currentRef.current;
+      const t = fadeStart ? Math.min(1, (now - fadeStart) / FADE_MS) : 1;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      if (t < 1) {
+        ctx.globalAlpha = 1;
+        drawFrame(from);
+        ctx.globalAlpha = t;
+      }
+      drawFrame(to);
+      ctx.globalAlpha = 1;
+      if (t < 1) raf = requestAnimationFrame(paint);
+      else from = to;
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(paint);
     };
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const r = canvas.getBoundingClientRect();
       canvas.width = Math.round(r.width * dpr);
       canvas.height = Math.round(r.height * dpr);
-      draw(currentRef.current);
+      ctx.imageSmoothingQuality = "high";
+      schedule();
     };
     const update = () => {
       const i = nearest(frames, yaw.get(), pitch.get());
       if (i !== currentRef.current) {
+        // Start the fade from whatever is on screen now.
+        from = currentRef.current;
         currentRef.current = i;
-        draw(i);
+        fadeStart = performance.now();
+        schedule();
       }
     };
 
     currentRef.current = nearest(frames, yaw.get(), pitch.get());
+    from = currentRef.current;
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
     resize();
     const u1 = yaw.on("change", update);
     const u2 = pitch.on("change", update);
     return () => {
+      cancelAnimationFrame(raf);
       ro.disconnect();
       u1();
       u2();

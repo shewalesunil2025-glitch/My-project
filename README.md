@@ -92,9 +92,9 @@ Checked against the UI UX Pro Max skill (`.claude/skills/ui-ux-pro-max`): text c
 
 ## The hero character
 
-The mascot is built from a **turnaround video**: 23 frames (front, left and right profiles, looking up, looking down and the angles in between) with the background removed, in `public/images/character/`. Each frame has a `yaw` / `pitch` in `heroCharacterConfig.frames` (`src/config/site.ts`).
+The mascot is built from a **turnaround video**: 65 frames (front, left and right profiles, looking up, looking down and the angles in between), upscaled 4× with Real-ESRGAN, background removed and edge-defringed, in `public/images/character/`. Ten of them are also used mirrored to fill angles the video never shows. Each frame has a `yaw` / `pitch` in `heroCharacterConfig.frames` (`src/config/site.ts`).
 
-`<HeroCharacter />` measures the cursor from the character's face, runs the target direction through a spring and draws the frame closest to it on a canvas. So the head turns through the in-between frames instead of snapping. The first frame is a normal `<Image>` for fast first paint; the other frames preload in the background. Touch devices get a slow look-around, and reduced motion shows the front frame. The bottom fades into the page with a CSS mask.
+`<HeroCharacter />` measures the cursor from the character's face, runs the target direction through a spring and draws the frame closest to it on a canvas, cross-fading between frames. So the head turns smoothly through the in-between angles. The first frame is a normal `<Image>` for fast first paint; the other frames preload in the background. Touch devices get a slow look-around, and reduced motion shows the front frame. The bottom fades into the page with a CSS mask.
 
 To swap the character, export new frames and update their `yaw` (−1 left … 1 right) and `pitch` (−1 up … 1 down). Set `frames` to `[]` to hide it.
 
