@@ -2,7 +2,7 @@ export const processSteps = [
   {
     index: "01",
     title: "Discover",
-    body: "We map how your customers reach you today — and where they get lost.",
+    body: "A free 30-minute call. Within 24 hours you get a clear scope, timeline and fixed-price proposal — no commitment.",
   },
   {
     index: "02",

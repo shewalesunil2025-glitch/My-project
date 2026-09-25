@@ -14,6 +14,8 @@ const interests = [
   "AI chatbot",
   "Booking & reviews",
   "Workflow automation",
+  "Growth & marketing",
+  "Monthly partnership",
 ];
 
 type Status =
@@ -51,7 +53,7 @@ export function DemoRequestForm({ defaultInterest = "", className }: { defaultIn
           <Check className="size-5" aria-hidden />
         </div>
         <p className="text-lg font-medium">Request received.</p>
-        <p className="mt-1 text-fg-muted">We&apos;ll reach out within one business day to schedule your demo.</p>
+        <p className="mt-1 text-fg-muted">We&apos;ll reach out within 24 hours to schedule your free call.</p>
       </div>
     );
   }
@@ -114,7 +116,7 @@ export function DemoRequestForm({ defaultInterest = "", className }: { defaultIn
         {status.kind === "submitting" && <Loader2 className="size-4 animate-spin" aria-hidden />}
         {status.kind === "submitting" ? "Sending…" : "Request my demo"}
       </button>
-      <p className="text-center text-xs text-fg-subtle">No commitment. We reply within one business day.</p>
+      <p className="text-center text-xs text-fg-subtle">Free 30-minute call · Proposal within 24 hours · No commitment.</p>
     </form>
   );
 }

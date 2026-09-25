@@ -35,20 +35,22 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 
 **Honest by default:** if `LEAD_WEBHOOK_URL` is not set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
 
-## Scroll story
+## Page structure
 
-Each section carries one idea:
+The layout, colours and motion follow a reference landing page supplied as a screen recording: a near-black canvas, warm off-white "paper" panels with rounded shoulders, one ember-orange accent, a navbar that morphs into a floating pill, and headings whose words light up as you scroll. All content is Nexa Flow AI's own.
 
-1. **Hero** — "BUILD THE BUSINESS OF 2035." A 3D AI core, floating glass UI panels that react to the cursor, and a slot for the future character.
-2. **Problem** *(pinned)* — six scattered tools, each with a broken status (Missed call, 12 unread…). As you scroll they snap into one line, a pulse runs through them, and the headline changes to **WE CONNECT THE FLOW.**
-3. **What We Build** — the customer journey (Website → AI Conversation → … → Google Review). The line fills as you scroll and a sticky panel describes the current stage.
-4. **Solutions** — seven accessible tabs, each with a looping live mini-demo (website, WhatsApp chat, voice call, chatbot, booking, reviews, workflow graph).
-5. **One System** — the hub: eight systems fan out of the central AI layer as the section scrolls in.
-6. **Industries** — pick an industry and its example automation flow animates in.
-7. **Work / Demos** — case-study cards with a sample system log that streams events when in view.
-8. **How It Works** *(pinned on desktop)* — Discover → Design → Automate → Launch.
-9. **Why Nexa Flow AI** — the statement lights up word by word as you scroll, followed by three principles.
-10. **Final CTA** — a glowing horizon with "READY TO BUILD YOUR NEXT FLOW?"
+1. **Hero** — "The business that never sleeps." Ember light beam, then a circuit board with the 3D cursor-following character where the AI chip would be. Four fixed channel tiles (call, WhatsApp, lead, booking) are wired into it; each opens a short explainer beside it.
+2. **The problem** *(paper)* — "Your business shouldn't need five different tools…", the answer "We connect the flow." and the eight-step customer journey.
+3. **Solutions** — bento grid of all seven solutions, each with its looping live mini-demo.
+4. **Why Nexa Flow AI** — scroll-lit statement and three principles.
+5. **One system** — ember dotted globe (canvas, adapted from 21st.dev "Interactive Globe") with the six connected systems and their jobs.
+6. **Work / Demos** *(paper)* — "Experience it now": pick a demo and watch its sample flow run.
+7. **Industries** *(paper)* — ten industries with outcome and flow, plus a custom-industry CTA.
+8. **Services** — Build, Automate, Grow, Partner as pricing-style cards (no invented prices) and the three promises.
+9. **How it works** — Discover → Design → Automate → Launch.
+10. **About · Founder** — Sunil S.'s profile, portrait, focus areas and vision (`founder` in `src/config/site.ts`).
+11. **FAQ** — native `<details>` accordion (`src/content/faq.ts`).
+12. **Final CTA** — "Ready to build your next flow?" over an ember sunrise glow.
 
 ## Architecture
 
@@ -57,54 +59,48 @@ src/
   app/                  layout (metadata, fonts, MotionConfig), page, sitemap, robots, OG image, /api/lead
   config/site.ts        brand, nav, CTAs, contact, hero character config
   content/              all copy & data (flow, solutions, industries, demos, process)
-  hooks/                useMediaQuery / useFinePointer, usePointerParallax, useSequence
+  hooks/                useMediaQuery / useFinePointer, useSequence
   lib/                  cn(), lead validation + client submit
   components/
-    navigation/         Navbar (active-section pill, mobile menu), Logo
-    hero/               Hero, HeroVisual, FloatingPanel, HeroCharacter
-    scroll/             ProblemSection (pinned)
-    automation/         SystemFlow, OneSystem
-    solutions/          Solutions (tabs) + previews/* live mini-demos
+    navigation/         Navbar (morphing floating pill, mobile menu), Logo
+    hero/               Hero, HeroCircuit, HeroCharacter, SolutionInfo
+    scroll/             ConnectSection (problem + customer journey)
+    automation/         OneSystem (dotted globe)
+    solutions/          Solutions (bento), Pillars (services) + previews/* live mini-demos
     industries/         Industries
-    demos/              Demos, EventConsole
+    demos/              Demos (demo playground)
     process/            Process
+    about/              Founder, Faq
     cta/                Philosophy, FinalCta, DemoProvider, DemoDialog, DemoRequestForm, BookDemoButton
     footer/             Footer
-    3d/                 CoreOrb (CSS 3D sphere + orbit rings)
-    effects/            SmoothScroll, ParticleField, Reveal, Magnetic, TiltCard
-    ui/                 Button / ButtonLink, SectionHeading
+    3d/                 DepthWarp (WebGL head turn), DottedGlobe
+    effects/            SmoothScroll, Reveal, ScrollWords, Magnetic
+    ui/                 Button / ButtonLink
 ```
 
 Content lives in `src/content`, separate from the components, so copy, industries and demos can change without touching layout.
 
 ## Design system
 
-- **Canvas:** near-black `#04060b` / midnight navy surfaces (`ink-*` tokens)
-- **Type:** soft white `fg`, muted `fg-muted`. Oversized headlines (`.display`, tight tracking) with a subtle metallic fill (`.text-metal`)
-- **Accent:** one electric "flow" blue (`flow`) plus a mint "live" signal (`live`) for success and live states. No neon, and gradients only on key words
-- **Surfaces:** `.glass` — thin light edge, blur, soft shadow
-- **Motion:** expo-out easing (`--ease-out-expo`). One idea animates at a time
+Checked against the UI UX Pro Max skill (`.claude/skills/ui-ux-pro-max`): text contrast ≥ 4.5:1, interactive targets ≥ 24px, readable label sizes, visible focus, reduced motion.
 
-## The hero character (to add later)
+- **Canvas:** near-black `#0a0a0b` with `ink-*` surfaces; **paper** panels `#f6f4f1` with white cards
+- **Accent:** ember orange `flow` (`#ff5a1f`) for CTAs, badges, traces and glows
+- **Type:** Plus Jakarta Sans (headings semibold, tight tracking), Geist Mono for small data
+- **Surfaces:** `.glass` dark cards, `.badge` pill labels, `.paper` light sections
+- **Motion:** Framer Motion — scroll-lit headings (`ScrollWords`), reveals, the morphing navbar, animated circuit traces
 
-`<HeroCharacter />` is already in place. To turn it on:
+## The hero character
 
-1. Add a transparent PNG/WebP cutout to `public/images/`, e.g. `hero-character.webp`.
-2. Set it in `src/config/site.ts`:
+The mascot is **one front-facing image** (upscaled 4× with Real-ESRGAN, background removed) in `public/images/character/front.webp`. It stays exactly where it is and watches the cursor:
 
-```ts
-export const heroCharacterConfig = {
-  src: "/images/hero-character.webp",
-  headSrc: "",            // optional separate head layer → stronger head-follow + tilt
-  alt: "…",
-  width: 720,
-  height: 900,
-  intensity: 18,          // px of travel at the viewport edge
-  mobileBehavior: "hidden", // or "static"
-};
-```
+- **Body fixed:** the image is split at the neck with CSS masks. The body layer never moves.
+- **Eyes:** the irises (`eyes-iris.webp`) sit on their own layer over clean eye whites (`eyes-plate.webp`), clipped to the eyelid opening, and slide toward the cursor. They can never leave the eye.
+- **Head:** turns and tilts at most 4° / 3° toward the cursor, trailing slightly behind the eyes.
 
-The body drifts with the cursor and rotates slightly in 3D. An optional head layer follows further and tilts. On touch devices and with reduced motion it stays still, or is hidden if `mobileBehavior` is `"hidden"`. The AI core orb stays behind it as a halo.
+`<HeroCharacter />` measures the cursor from between the eyes, normalises the direction and eases the eyes (lerp 0.12) and head (0.06) with `requestAnimationFrame`, writing transforms directly to the DOM (no React re-renders). When the mouse stops it keeps looking at the last cursor position. Touch devices and reduced motion show the neutral front pose. An optional soft blink is behind `blink` in `heroCharacterConfig`.
+
+To swap the character, replace the three files and update `face`, `neckY` and the `eyes` box in `heroCharacterConfig` (`src/config/site.ts`). Set `src` to `""` to hide it.
 
 ## Demos
 
