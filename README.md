@@ -59,17 +59,18 @@ src/
   app/                  layout (metadata, fonts, MotionConfig), page, sitemap, robots, OG image, /api/lead
   config/site.ts        brand, nav, CTAs, contact, hero character config
   content/              all copy & data (flow, solutions, industries, demos, process)
-  hooks/                useMediaQuery / useFinePointer, usePointerParallax, useSequence
+  hooks/                useMediaQuery / useFinePointer, useSequence
   lib/                  cn(), lead validation + client submit
   components/
-    navigation/         Navbar (active-section pill, mobile menu), Logo
-    hero/               Hero, HeroVisual, FloatingPanel, HeroCharacter
+    navigation/         Navbar (morphing floating pill, mobile menu), Logo
+    hero/               Hero, HeroCircuit, HeroCharacter, SolutionInfo
     scroll/             ConnectSection (problem + customer journey)
     automation/         OneSystem (dotted globe)
-    solutions/          Solutions (tabs) + previews/* live mini-demos
+    solutions/          Solutions (bento), Pillars (services) + previews/* live mini-demos
     industries/         Industries
-    demos/              Demos, EventConsole
+    demos/              Demos (demo playground)
     process/            Process
+    about/              Founder, Faq
     cta/                Philosophy, FinalCta, DemoProvider, DemoDialog, DemoRequestForm, BookDemoButton
     footer/             Footer
     3d/                 DepthWarp (WebGL head turn), DottedGlobe
