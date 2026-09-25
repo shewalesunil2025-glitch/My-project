@@ -42,7 +42,6 @@
   --animate-float: float 7s ease-in-out infinite;
   --animate-dash: dash 1.6s linear infinite;
   --animate-beam: beam 7s ease-in-out infinite;
-  --animate-breathe: breathe 4.2s ease-in-out infinite;
 }
 
 @keyframes pulse-soft {
@@ -59,10 +58,6 @@
 @keyframes beam {
   0%, 100% { opacity: 0.85; }
   50% { opacity: 1; }
-}
-@keyframes breathe {
-  0%, 100% { scale: 1; }
-  50% { scale: 1.012; }
 }
 @keyframes dialog-in {
   from { opacity: 0; transform: translateY(16px) scale(0.98); }

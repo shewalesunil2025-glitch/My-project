@@ -92,11 +92,15 @@ Checked against the UI UX Pro Max skill (`.claude/skills/ui-ux-pro-max`): text c
 
 ## The hero character
 
-The mascot is built from a **turnaround video**: 71 frames (front, left and right profiles, looking up and the angles in between), upscaled 4× with Real-ESRGAN, background removed and edge-defringed, in `public/images/character/`. Frames are picked so each differs only slightly from the next, and every frame with closed or blinking eyelids is left out. Fourteen of them are also used mirrored to fill angles the video never shows. Each frame has a `yaw` / `pitch` in `heroCharacterConfig.frames` (`src/config/site.ts`).
+The mascot is **one front-facing image** (upscaled 4× with Real-ESRGAN, background removed) in `public/images/character/front.webp`. It stays exactly where it is and watches the cursor:
 
-`<HeroCharacter />` measures the cursor from the character's eyes. The eyes move first: a quick spring shifts the irises of the front frame (`eyes-plate.webp` / `eyes-iris.webp`, clipped by the eyelids), while a slower spring turns the head after them. The head is drawn on a canvas from the frame closest to its direction, blended with its neighbour in the video, and frames that can't blend are cross-faded. So the head turns smoothly through the in-between angles. The first frame is a normal `<Image>` for fast first paint; the other frames preload in the background. Touch devices get a slow look-around, and reduced motion shows the front frame. The bottom fades into the page with a CSS mask.
+- **Body fixed:** the image is split at the neck with CSS masks. The body layer never moves.
+- **Eyes:** the irises (`eyes-iris.webp`) sit on their own layer over clean eye whites (`eyes-plate.webp`), clipped to the eyelid opening, and slide toward the cursor. They can never leave the eye.
+- **Head:** turns and tilts at most 4° / 3° toward the cursor, trailing slightly behind the eyes.
 
-To swap the character, export new frames and update their `yaw` (−1 left … 1 right) and `pitch` (−1 up … 1 down). Set `frames` to `[]` to hide it.
+`<HeroCharacter />` measures the cursor from between the eyes, normalises the direction and eases the eyes (lerp 0.12) and head (0.06) with `requestAnimationFrame`, writing transforms directly to the DOM (no React re-renders). When the mouse stops it keeps looking at the last cursor position. Touch devices and reduced motion show the neutral front pose. An optional soft blink is behind `blink` in `heroCharacterConfig`.
+
+To swap the character, replace the three files and update `face`, `neckY` and the `eyes` box in `heroCharacterConfig` (`src/config/site.ts`). Set `src` to `""` to hide it.
 
 ## Demos
 

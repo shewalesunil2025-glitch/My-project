@@ -85,7 +85,7 @@ export function HeroCircuit() {
   const [openId, setOpenId] = useState<SolutionId | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const toggle = (id: SolutionId) => setOpenId((cur) => (cur === id ? null : id));
-  const hasCharacter = heroCharacterConfig.frames.length > 0;
+  const hasCharacter = Boolean(heroCharacterConfig.src);
 
   useEffect(() => {
     if (!openId) return;
