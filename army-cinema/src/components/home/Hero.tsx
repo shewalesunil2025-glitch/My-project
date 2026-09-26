@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { KerkettaSign } from '@/components/ui/KerkettaSign';
 
-const HERO_SRC = '/images/hero/hero.jpg';
+const HERO_SRC = `${import.meta.env.BASE_URL}images/hero/hero.jpg`;
 
 function HeroImage({ className }: { className?: string }) {
   const [failed, setFailed] = useState(false);
@@ -21,9 +21,9 @@ function HeroImage({ className }: { className?: string }) {
   return (
     <img
       src={HERO_SRC}
-      alt="An Army officer in uniform and a woman in a saree stand hand in hand in the rain"
-      width={736}
-      height={1104}
+      alt="An Army officer in a winter uniform reads a letter, seated on a snow-covered bench below misty mountains"
+      width={600}
+      height={768}
       fetchPriority="high"
       decoding="async"
       onError={() => setFailed(true)}
@@ -37,7 +37,7 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-function Heading() {
+function Heading({ withTagline = true }: { withTagline?: boolean }) {
   return (
     <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.08 } } }}>
       <motion.p variants={item} className="eyebrow flex items-center gap-2">
@@ -52,11 +52,21 @@ function Heading() {
         <span className="block text-tricolour">Auditorium</span>
       </motion.h1>
       <motion.div variants={item} className="tricolour-rule mt-4 w-28 rounded" />
-      <motion.p variants={item} className="mt-4 max-w-md text-base text-fg-muted sm:text-lg">
-        Movie ticket booking for serving personnel and their families.{' '}
-        <span lang="hi" className="text-fg">वीरों के लिए, वीरों के परिवार के लिए।</span>
-      </motion.p>
+      {withTagline && (
+        <motion.div variants={item}>
+          <Tagline />
+        </motion.div>
+      )}
     </motion.div>
+  );
+}
+
+function Tagline() {
+  return (
+    <p className="mt-4 max-w-md text-base text-fg-muted sm:text-lg">
+      Movie ticket booking for serving personnel and their families.{' '}
+      <span lang="hi" className="text-fg">वीरों के लिए, वीरों के परिवार के लिए।</span>
+    </p>
   );
 }
 
@@ -64,16 +74,19 @@ function Heading() {
 export function Hero({ nowShowing }: { nowShowing: ReactNode }) {
   return (
     <section aria-labelledby="hero-title" className="relative isolate">
-      {/* Phones: full-bleed photograph, heading over it */}
+      {/* Phones: full photograph with the heading over the mountains, the soldier stays clear */}
       <div className="relative -mt-16 md:hidden">
-        <HeroImage className="h-[64svh] min-h-[460px] w-full object-cover object-[50%_18%]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-900/70 via-transparent to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-ink-900 via-ink-900/80 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 px-4 pb-4">
-          <Heading />
+        <HeroImage className="block aspect-[600/768] w-full object-cover" />
+        <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-ink-900 via-ink-900/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-ink-900 to-transparent" />
+        <div className="absolute inset-x-0 top-16 px-4 pt-3">
+          <Heading withTagline={false} />
         </div>
       </div>
-      <div className="container-page mt-4 md:hidden">{nowShowing}</div>
+      <div className="container-page relative -mt-4 space-y-5 md:hidden">
+        <Tagline />
+        {nowShowing}
+      </div>
 
       {/* Tablet & desktop: heading and movie left, framed photograph right */}
       <div className="container-page hidden items-center gap-12 py-12 md:grid md:grid-cols-[1.15fr_0.85fr] lg:py-16">
@@ -90,7 +103,7 @@ export function Hero({ nowShowing }: { nowShowing: ReactNode }) {
           <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-[conic-gradient(from_200deg,#ff9933_0deg,#f5f7fb_120deg,#138808_240deg,#ff9933_360deg)] opacity-25 blur-3xl" />
           <div className="overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
             <div className="tricolour-rule" />
-            <HeroImage className="aspect-[2/3] w-full object-cover" />
+            <HeroImage className="aspect-[600/768] w-full object-cover" />
           </div>
           <KerkettaSign className="absolute -bottom-6 -left-6 size-24 drop-shadow-[0_10px_30px_rgb(0_0_0/0.6)]" />
         </motion.div>
