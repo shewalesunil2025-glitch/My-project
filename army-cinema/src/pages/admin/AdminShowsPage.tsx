@@ -1,15 +1,13 @@
 import { CalendarPlus, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useToast } from '@/context/ToastContext';
-import { CATEGORY_META } from '@/data/layouts';
 import { DEFAULT_PRICES } from '@/data/seed';
 import { useAsync } from '@/hooks/useAsync';
 import { addDays, formatDate, formatTime, isShowPast, todayKey } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import { usePageMeta } from '@/lib/seo';
 import { api, type ShowInput } from '@/services/api';
 import { toAppError } from '@/services/errors';
-import type { CategoryPrices, Movie, RankCategory, ShowWithRefs, Theatre } from '@/types';
+import type { Movie, ShowWithRefs, Theatre } from '@/types';
 import { AdminPageHeader } from '@/components/admin/AdminLayout';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { DataTable, type Column } from '@/components/admin/DataTable';
@@ -18,19 +16,6 @@ import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { ErrorState } from '@/components/ui/States';
-
-const CATS: RankCategory[] = ['OFFRS', 'JCOS', 'ORS'];
-
-function PriceFields({ value, onChange }: { value: CategoryPrices; onChange: (p: CategoryPrices) => void }) {
-  return (
-    <fieldset className="grid grid-cols-3 gap-3 sm:col-span-2">
-      <legend className="mb-2 text-sm font-medium">Ticket price (₹)</legend>
-      {CATS.map((c) => (
-        <Input key={c} label={CATEGORY_META[c].name} type="number" min={0} max={5000} value={value[c]} onChange={(e) => onChange({ ...value, [c]: Number(e.target.value) })} />
-      ))}
-    </fieldset>
-  );
-}
 
 function ShowForm({ movies, theatres, initial, id, locked, onDone }: { movies: Movie[]; theatres: Theatre[]; initial: ShowInput; id?: string; locked?: boolean; onDone: () => void }) {
   const toast = useToast();
@@ -61,8 +46,7 @@ function ShowForm({ movies, theatres, initial, id, locked, onDone }: { movies: M
       </Select>
       <Input label="Date" type="date" min={id ? undefined : todayKey()} value={v.date} onChange={(e) => setV({ ...v, date: e.target.value })} disabled={locked} />
       <Input label="Time" type="time" value={v.time} onChange={(e) => setV({ ...v, time: e.target.value })} disabled={locked} />
-      <PriceFields value={v.prices} onChange={(prices) => setV({ ...v, prices })} />
-      {locked && <p className="text-xs text-fg-subtle sm:col-span-2">This show has bookings, so only prices can be changed.</p>}
+      {locked && <p className="text-xs text-fg-subtle sm:col-span-2">This show has bookings, so it can’t be moved. Cancel it and create a new one instead.</p>}
       {error && <p role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger ring-1 ring-danger/25 sm:col-span-2">{error}</p>}
       <div className="flex justify-end sm:col-span-2"><Button type="submit" loading={busy}>{id ? 'Save changes' : 'Create show'}</Button></div>
     </form>
@@ -96,7 +80,6 @@ function GenerateForm({ movies, theatres, onDone }: { movies: Movie[]; theatres:
       </Select>
       <Input label="Starting" type="date" min={todayKey()} value={v.from} onChange={(e) => setV({ ...v, from: e.target.value })} />
       <Input label="Number of days" type="number" min={1} max={28} value={v.days} onChange={(e) => setV({ ...v, days: Number(e.target.value) })} />
-      <PriceFields value={v.prices} onChange={(prices) => setV({ ...v, prices })} />
       <p className="text-xs text-fg-subtle sm:col-span-2">Slots already taken on the screen are skipped automatically.</p>
       <div className="flex justify-end sm:col-span-2"><Button type="submit" loading={busy}>Generate shows</Button></div>
     </form>
@@ -133,7 +116,6 @@ export default function AdminShowsPage() {
         </span>
       ),
     },
-    { key: 'price', header: 'Price', cell: (s) => <span className="text-xs text-fg-muted">{CATS.map((c) => formatINR(s.prices[c])).join(' · ')}</span>, hideSm: true },
     {
       key: 'status',
       header: 'Status',
@@ -181,7 +163,7 @@ export default function AdminShowsPage() {
     <>
       <AdminPageHeader
         title="Shows"
-        description="Schedule screenings, set prices per enclosure and track seat availability."
+        description="Schedule screenings and track seat availability."
         action={
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => setGenerating(true)} disabled={!ready}><CalendarPlus className="size-4" aria-hidden /> From schedule</Button>
@@ -238,7 +220,7 @@ export default function AdminShowsPage() {
         title="Remove this show?"
         message={
           removing && removing.seatsAvailable < removing.seatsTotal
-            ? 'This show has bookings. It will be cancelled, every booking cancelled and online payments marked for refund.'
+            ? 'This show has bookings. The show and all its bookings will be cancelled.'
             : 'The show has no bookings and will be deleted.'
         }
         confirmLabel={removing && removing.seatsAvailable < removing.seatsTotal ? 'Cancel show' : 'Delete show'}

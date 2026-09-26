@@ -5,7 +5,6 @@ import { seatLabel } from '@/data/layouts';
 import { useAsync } from '@/hooks/useAsync';
 import { cn } from '@/lib/cn';
 import { formatDate, formatTime, isShowPast } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import { usePageMeta } from '@/lib/seo';
 import { api } from '@/services/api';
 import { toAppError } from '@/services/errors';
@@ -41,7 +40,7 @@ function BookingRow({ b, onCancel }: { b: BookingDetails; onCancel?: () => void 
           <div className="flex items-center gap-1.5"><dt className="sr-only">Theatre</dt><MapPin className="size-3.5 text-saffron" aria-hidden /><dd className="truncate">{b.theatre.name}</dd></div>
           <div className="flex items-center gap-1.5"><dt className="sr-only">Date</dt><CalendarDays className="size-3.5 text-saffron" aria-hidden /><dd>{formatDate(b.show.date)}</dd></div>
           <div className="flex items-center gap-1.5"><dt className="sr-only">Show time</dt><Clock className="size-3.5 text-saffron" aria-hidden /><dd>{formatTime(b.show.time)}</dd></div>
-          <div className="flex items-center gap-1.5"><dt className="sr-only">Seats</dt><Ticket className="size-3.5 text-saffron" aria-hidden /><dd>{b.seats.map(seatLabel).join(', ')} · {formatINR(b.total)}</dd></div>
+          <div className="flex items-center gap-1.5"><dt className="sr-only">Seats</dt><Ticket className="size-3.5 text-saffron" aria-hidden /><dd>{b.seats.map(seatLabel).join(', ')}</dd></div>
         </dl>
         <div className="mt-3 flex flex-wrap gap-2">
           <ButtonLink to={`/tickets/${b.id}`} size="sm" variant="secondary">View ticket</ButtonLink>
@@ -141,8 +140,7 @@ export default function MyBookingsPage() {
         }
       >
         <p className="text-sm text-fg-muted">
-          Your seats ({cancelling?.seats.map(seatLabel).join(', ')}) will be released for others. Online payments are refunded to the original method. Cancelling
-          also frees your weekly booking.
+          Your seats ({cancelling?.seats.map(seatLabel).join(', ')}) will be released for others. Cancelling also frees your weekly booking.
         </p>
       </Modal>
     </div>

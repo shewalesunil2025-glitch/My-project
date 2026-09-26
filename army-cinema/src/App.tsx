@@ -13,7 +13,6 @@ import HomePage from '@/pages/HomePage';
 // Route-level code splitting: only the home page ships in the first bundle.
 const SeatSelectionPage = lazy(() => import('@/pages/SeatSelectionPage'));
 const CheckoutSummaryPage = lazy(() => import('@/pages/CheckoutSummaryPage'));
-const PaymentPage = lazy(() => import('@/pages/PaymentPage'));
 const BookingConfirmationPage = lazy(() => import('@/pages/BookingConfirmationPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
@@ -40,7 +39,6 @@ const routes: RouteObject[] = [
       ...['movies', 'movies/:slug', 'theatres', 'theatres/:slug', 'book/:slug'].map((path) => ({ path, element: <Navigate to="/#book" replace /> })),
       { path: 'book/show/:showId/seats', element: <SeatSelectionPage /> },
       { path: 'checkout/:bookingId/summary', element: auth(<CheckoutSummaryPage />) },
-      { path: 'checkout/:bookingId/pay', element: auth(<PaymentPage />) },
       { path: 'booking/:bookingId', element: auth(<BookingConfirmationPage />) },
       { path: 'tickets/:bookingId', element: auth(<BookingConfirmationPage fresh={false} />) },
       { path: 'login', element: <LoginPage /> },

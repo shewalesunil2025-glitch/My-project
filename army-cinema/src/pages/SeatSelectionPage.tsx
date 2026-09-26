@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, ArrowLeft, Lock, ShieldAlert } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useBookingDraft } from '@/context/BookingContext';
@@ -9,7 +9,6 @@ import { CATEGORY_META, getLayout, MAX_SEATS_PER_BOOKING, seatLabel, sortSeatIds
 import { useAsync } from '@/hooks/useAsync';
 import { cn } from '@/lib/cn';
 import { formatDate, formatTime, weekEndKey, weekStartKey } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import { usePageMeta } from '@/lib/seo';
 import { api } from '@/services/api';
 import { AppError, toAppError } from '@/services/errors';
@@ -58,7 +57,10 @@ export default function SeatSelectionPage() {
   }, [reloadOcc]);
 
   // If someone else grabs a seat we had selected, drop it and tell the user.
+  // Set while our own hold is being placed, so our own seats aren't reported as "taken by someone else".
+  const holdingRef = useRef(false);
   useEffect(() => {
+    if (holdingRef.current) return;
     const lost = selected.filter((id) => occupied.has(id));
     if (lost.length) {
       setSelected((cur) => cur.filter((id) => !occupied.has(id)));
@@ -84,7 +86,6 @@ export default function SeatSelectionPage() {
   );
 
   const catSelected = selected.filter((x) => x.startsWith(`${activeCat}-`));
-  const price = s ? s.prices[activeCat] : 0;
   const categoryLocked = allowed !== 'ALL' && activeCat !== allowed;
   const unverified = !!user && user.verification !== 'verified';
 
@@ -95,11 +96,13 @@ export default function SeatSelectionPage() {
       return;
     }
     setHolding(true);
+    holdingRef.current = true;
     setBlocker(null);
     try {
       const booking = await api.holdSeats({ showId, seats: catSelected });
       navigate(`/checkout/${booking.id}/summary`);
     } catch (e) {
+      holdingRef.current = false;
       const err = toAppError(e);
       if (err.code === 'SEAT_TAKEN') {
         const clash = (err.details?.seats as string[]) ?? [];
@@ -208,7 +211,7 @@ export default function SeatSelectionPage() {
                 <span className="block truncate text-[0.7rem] text-fg-subtle">{c.full}</span>
                 <span className="mt-1 block text-xs">
                   <span className="font-semibold text-green">{avail}</span>
-                  <span className="text-fg-subtle"> / {c.bookable} free · {formatINR(s.prices[c.key])}</span>
+                  <span className="text-fg-subtle"> / {c.bookable} free</span>
                 </span>
               </button>
             );
@@ -257,11 +260,11 @@ export default function SeatSelectionPage() {
                       · {catSelected.length}/{MAX_SEATS_PER_BOOKING}
                     </span>
                   </p>
-                  <p className="font-display text-xl font-bold text-gold-soft">{formatINR(price * catSelected.length)}</p>
+                  <p className="text-xs text-fg-subtle">{CATEGORY_META[activeCat].full}</p>
                 </motion.div>
               ) : (
                 <motion.p key="none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-sm text-fg-muted">
-                  Select up to {MAX_SEATS_PER_BOOKING} seats · {formatINR(price)} each
+                  Select up to {MAX_SEATS_PER_BOOKING} seats
                 </motion.p>
               )}
             </AnimatePresence>

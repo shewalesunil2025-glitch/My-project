@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/Field';
 import { AuthShell } from './LoginPage';
 
 export default function ForgotPasswordPage() {
-  usePageMeta('Reset password', 'Reset your Veer Cinema password.');
+  usePageMeta('Reset password', 'Reset your Kerketta Auditorium booking password.');
   const navigate = useNavigate();
   const toast = useToast();
   const [identifier, setIdentifier] = useState('');

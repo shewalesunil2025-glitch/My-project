@@ -7,7 +7,6 @@ import { CATEGORY_META, getLayout } from '@/data/layouts';
 import { useAsync } from '@/hooks/useAsync';
 import { cn } from '@/lib/cn';
 import { addDays, DAY_NAMES, formatDate, formatDuration, formatTime, parseDateKey, todayKey, weekEndKey, weekStartKey } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import { usePageMeta } from '@/lib/seo';
 import { api } from '@/services/api';
 import type { Movie, RankCategory, ShowWithRefs } from '@/types';
@@ -74,7 +73,7 @@ function NowShowingCard({ movie, onTrailer }: { movie: Movie; onTrailer: () => v
 }
 
 export default function HomePage() {
-  usePageMeta('Kerketta Auditorium', 'Book movie tickets at Kerketta Auditorium — for serving Army personnel and their families.');
+  usePageMeta('', 'Book movie tickets at Kerketta Auditorium — for serving Army personnel and their families.');
   const navigate = useNavigate();
   const { user } = useAuth();
   const movies = useAsync(() => api.listMovies(), []);
@@ -243,7 +242,6 @@ export default function HomePage() {
                                 </>
                               )}
                             </span>
-                            <span className="block text-xs font-semibold text-gold-soft sm:text-sm">{formatINR(show.prices[cat.key])}</span>
                           </button>
                         );
                       })}

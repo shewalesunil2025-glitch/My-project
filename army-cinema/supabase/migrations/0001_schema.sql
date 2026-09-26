@@ -1,5 +1,5 @@
 -- ============================================================================
--- Veer Cinema — schema, row level security and booking RPCs
+-- Kerketta Auditorium booking — schema, row level security and booking RPCs
 -- Run in the Supabase SQL editor (or `supabase db push`), then run seed.sql.
 -- ============================================================================
 

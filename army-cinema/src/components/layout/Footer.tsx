@@ -33,8 +33,8 @@ export function Footer() {
       </div>
       <div className="border-t border-white/[0.06]">
         <p className="container-page py-5 text-xs leading-relaxed text-fg-subtle">
-          © {new Date().getFullYear()} Veer Cinema · Independent prototype. Not affiliated with, or endorsed by, the Indian Army,
-          the Ministry of Defence or any government body. Service verification uses demo data only and payments are simulated.
+          © {new Date().getFullYear()} Kerketta Auditorium · Independent prototype. Not affiliated with, or endorsed by, the Indian Army,
+          the Ministry of Defence or any government body. Service verification uses demo data only.
         </p>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const SITE = 'Veer Cinema';
+const SITE = 'Kerketta Auditorium';
 
 function setMeta(attr: 'name' | 'property', key: string, value: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
@@ -15,7 +15,7 @@ function setMeta(attr: 'name' | 'property', key: string, value: string) {
 /** Sets the document title, description and Open Graph tags for a page. */
 export function usePageMeta(title: string, description?: string) {
   useEffect(() => {
-    const full = title ? `${title} · ${SITE}` : `${SITE} — Movie tickets for Army personnel & families`;
+    const full = title && title !== SITE ? `${title} · ${SITE}` : `${SITE} — Movie ticket booking`;
     document.title = full;
     setMeta('property', 'og:title', full);
     if (description) {

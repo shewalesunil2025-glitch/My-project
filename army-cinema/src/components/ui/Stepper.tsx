@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
-export const BOOKING_STEPS = ['Show', 'Seats', 'Summary', 'Payment', 'Ticket'] as const;
+export const BOOKING_STEPS = ['Show', 'Seats', 'Confirm', 'Ticket'] as const;
 
 /** "Step n of 5" progress for the booking funnel. */
 export function Stepper({ current }: { current: number }) {

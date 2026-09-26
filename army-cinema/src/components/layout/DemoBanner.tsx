@@ -16,7 +16,7 @@ export function DemoBanner() {
       <div className="container-page flex items-center gap-2 py-2 pr-10">
         <FlaskConical className="size-3.5 shrink-0" aria-hidden />
         <p>
-          <strong className="font-semibold">Demo prototype</strong> — mock service verification &amp; simulated payments. Data is
+          <strong className="font-semibold">Demo prototype</strong> — mock service verification. Data is
           stored in this browser only.
         </p>
       </div>

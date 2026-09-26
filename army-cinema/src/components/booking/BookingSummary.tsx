@@ -2,7 +2,6 @@ import { CalendarDays, Clock, MapPin, Ticket } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { CATEGORY_META, seatLabel } from '@/data/layouts';
 import { formatDate, formatDuration, formatTime } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import type { Movie, RankCategory, Show, Theatre } from '@/types';
 import { Poster } from '@/components/ui/Poster';
 
@@ -12,15 +11,10 @@ interface Props {
   show: Pick<Show, 'date' | 'time'>;
   category: RankCategory;
   seats: string[];
-  unitPrice: number;
-  fee: number;
-  feeLabel?: string;
   children?: ReactNode;
 }
 
-export function BookingSummary({ movie, theatre, show, category, seats, unitPrice, fee, feeLabel = 'Booking fee', children }: Props) {
-  const subtotal = unitPrice * seats.length;
-  const total = subtotal + fee;
+export function BookingSummary({ movie, theatre, show, category, seats, children }: Props) {
   return (
     <section aria-label="Booking summary" className="card overflow-hidden">
       <div className="flex gap-4 p-4 sm:p-5">
@@ -56,25 +50,9 @@ export function BookingSummary({ movie, theatre, show, category, seats, unitPric
           ))}
         </div>
       </div>
-      <dl className="space-y-2 px-4 py-4 text-sm sm:px-5">
-        <div className="flex justify-between text-fg-muted">
-          <dt>Ticket quantity</dt>
-          <dd className="text-fg">{seats.length}</dd>
-        </div>
-        <div className="flex justify-between text-fg-muted">
-          <dt>Ticket price</dt>
-          <dd className="text-fg">
-            {formatINR(unitPrice)} × {seats.length}
-          </dd>
-        </div>
-        <div className="flex justify-between text-fg-muted">
-          <dt>{feeLabel}</dt>
-          <dd className={fee ? 'text-fg' : 'text-green'}>{fee ? formatINR(fee) : 'Waived'}</dd>
-        </div>
-        <div className="flex items-baseline justify-between border-t border-white/[0.07] pt-3">
-          <dt className="font-semibold">Total amount</dt>
-          <dd className="font-display text-2xl font-bold text-gold-soft">{formatINR(total)}</dd>
-        </div>
+      <dl className="flex items-baseline justify-between px-4 py-4 text-sm sm:px-5">
+        <dt className="text-fg-muted">Tickets</dt>
+        <dd className="font-display text-2xl font-bold text-gold-soft">{seats.length}</dd>
       </dl>
       {children}
     </section>

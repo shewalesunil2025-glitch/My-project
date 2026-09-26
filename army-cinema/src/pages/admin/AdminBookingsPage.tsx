@@ -5,7 +5,6 @@ import { useToast } from '@/context/ToastContext';
 import { CATEGORY_META, seatLabel } from '@/data/layouts';
 import { useAsync } from '@/hooks/useAsync';
 import { formatDate, formatDateTime, formatTime, isShowPast } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import { usePageMeta } from '@/lib/seo';
 import { api } from '@/services/api';
 import { toAppError } from '@/services/errors';
@@ -16,8 +15,6 @@ import { DataTable, type Column } from '@/components/admin/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/States';
-
-const PAY: Record<string, string> = { paid: 'Paid', pay_at_counter: 'At counter', refunded: 'Refunded', unpaid: 'Unpaid', failed: 'Failed' };
 
 export default function AdminBookingsPage() {
   usePageMeta('Manage bookings');
@@ -46,7 +43,6 @@ export default function AdminBookingsPage() {
     { key: 'date', header: 'Date', cell: (b) => formatDate(b.show.date, { year: false }) },
     { key: 'time', header: 'Time', cell: (b) => formatTime(b.show.time), hideSm: true },
     { key: 'seats', header: 'Seats', cell: (b) => <span title={CATEGORY_META[b.category].full}>{CATEGORY_META[b.category].name} · {b.seats.map(seatLabel).join(', ')}</span> },
-    { key: 'amount', header: 'Amount', cell: (b) => <span>{formatINR(b.total)}<span className="block text-xs text-fg-subtle">{PAY[b.paymentStatus]}</span></span> },
     {
       key: 'status',
       header: 'Status',

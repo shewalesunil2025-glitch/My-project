@@ -40,7 +40,7 @@ export default function BookingConfirmationPage({ fresh = true }: { fresh?: bool
     <div className="container-page max-w-3xl py-5 sm:py-8">
       {fresh && (
         <div className="no-print">
-          <Stepper current={4} />
+          <Stepper current={3} />
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 text-center">
             <motion.span
               initial={{ scale: 0 }}
@@ -54,7 +54,7 @@ export default function BookingConfirmationPage({ fresh = true }: { fresh?: bool
               {b.status === 'confirmed' ? 'Booking confirmed!' : 'Booking details'}
             </h1>
             <p className="mt-1 text-fg-muted">
-              {b.paymentStatus === 'pay_at_counter' ? 'Please pay at the theatre counter before the show.' : 'Enjoy the show — Jai Hind!'}
+              Show the QR code at the gate with your service ID card. Jai Hind!
             </p>
           </motion.div>
         </div>

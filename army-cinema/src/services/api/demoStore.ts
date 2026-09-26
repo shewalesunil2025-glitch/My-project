@@ -39,7 +39,7 @@ export interface DemoDb {
 }
 
 const DB_KEY = 'vc:db';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 export const CHANGE_EVENT = 'vc:db-changed';
 
 let cache: DemoDb | null = null;

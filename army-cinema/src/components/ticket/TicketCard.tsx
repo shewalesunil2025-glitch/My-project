@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { BadgeCheck, CalendarDays, Clock, MapPin } from 'lucide-react';
 import { CATEGORY_META, seatLabel } from '@/data/layouts';
 import { formatDate, formatDateTime, formatTime } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import { cn } from '@/lib/cn';
 import type { BookingDetails } from '@/types';
 import { QRCode, qrPayload } from './QRCode';
@@ -11,17 +10,10 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   confirmed: { label: 'Confirmed', cls: 'bg-green/15 text-green ring-green/30' },
   cancelled: { label: 'Cancelled', cls: 'bg-danger/15 text-danger ring-danger/30' },
   payment_failed: { label: 'Payment failed', cls: 'bg-danger/15 text-danger ring-danger/30' },
-  held: { label: 'Awaiting payment', cls: 'bg-warning/15 text-warning ring-warning/30' },
+  held: { label: 'Awaiting confirmation', cls: 'bg-warning/15 text-warning ring-warning/30' },
   expired: { label: 'Expired', cls: 'bg-white/10 text-fg-muted ring-white/10' },
 };
 
-const PAYMENT: Record<string, string> = {
-  paid: 'Paid online',
-  pay_at_counter: 'Pay at counter',
-  refunded: 'Refunded',
-  unpaid: 'Unpaid',
-  failed: 'Failed',
-};
 
 export function TicketCard({ booking, className }: { booking: BookingDetails; className?: string }) {
   const st = STATUS[booking.status] ?? STATUS.expired;
@@ -39,7 +31,7 @@ export function TicketCard({ booking, className }: { booking: BookingDetails; cl
         <div className="p-5 sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="eyebrow">Veer Cinema · E-ticket</p>
+              <p className="eyebrow">E-ticket</p>
               <h2 className="mt-1 font-display text-3xl font-bold uppercase leading-none tracking-wide">{booking.movie.title}</h2>
               <p className="mt-1.5 text-sm text-fg-muted print:text-black">
                 {booking.movie.language} · {booking.movie.certification}
@@ -89,10 +81,8 @@ export function TicketCard({ booking, className }: { booking: BookingDetails; cl
               <dd className="mt-0.5 font-semibold">{booking.customerName}</dd>
             </div>
             <div>
-              <dt className="text-[0.7rem] uppercase tracking-wider text-fg-subtle">Amount</dt>
-              <dd className="mt-0.5 font-semibold">
-                {formatINR(booking.total)} <span className="text-xs font-normal text-fg-muted">· {PAYMENT[booking.paymentStatus]}</span>
-              </dd>
+              <dt className="text-[0.7rem] uppercase tracking-wider text-fg-subtle">Tickets</dt>
+              <dd className="mt-0.5 font-semibold">{booking.seats.length}</dd>
             </div>
           </dl>
         </div>

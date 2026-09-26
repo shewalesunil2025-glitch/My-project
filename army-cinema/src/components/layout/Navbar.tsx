@@ -130,8 +130,8 @@ export function Navbar() {
       )}
     >
       <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Link to="/" aria-label="Veer Cinema home" className="rounded-xl">
-          <Logo />
+        <Link to="/" aria-label="Kerketta Auditorium home" className="rounded-xl">
+          <Logo showMark={false} />
         </Link>
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => (

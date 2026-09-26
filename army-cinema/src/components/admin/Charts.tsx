@@ -12,7 +12,7 @@ function niceMax(v: number) {
 }
 
 /** Column chart of bookings per day, with hover/focus tooltip and a table fallback. */
-export function DailyBookingsChart({ data }: { data: { date: string; bookings: number; revenue: number }[] }) {
+export function DailyBookingsChart({ data }: { data: { date: string; bookings: number }[] }) {
   const [hover, setHover] = useState<number | null>(null);
   const [table, setTable] = useState(false);
   const W = 640;
@@ -35,10 +35,10 @@ export function DailyBookingsChart({ data }: { data: { date: string; bookings: n
       {table ? (
         <div className="mt-3 max-h-60 overflow-auto">
           <table className="w-full text-sm">
-            <thead className="text-left text-xs text-fg-subtle"><tr><th className="py-1">Date</th><th>Bookings</th><th>Paid revenue</th></tr></thead>
+            <thead className="text-left text-xs text-fg-subtle"><tr><th className="py-1">Date</th><th>Bookings</th></tr></thead>
             <tbody>
               {data.map((d) => (
-                <tr key={d.date} className="border-t border-white/[0.05]"><td className="py-1">{d.date}</td><td>{d.bookings}</td><td>₹{d.revenue.toLocaleString('en-IN')}</td></tr>
+                <tr key={d.date} className="border-t border-white/[0.05]"><td className="py-1">{d.date}</td><td>{d.bookings}</td></tr>
               ))}
             </tbody>
           </table>
@@ -84,7 +84,7 @@ export function DailyBookingsChart({ data }: { data: { date: string; bookings: n
               style={{ left: `${((pad.l + hover * band + band / 2) / W) * 100}%` }}
             >
               <p className="font-semibold">{data[hover].date}</p>
-              <p className="text-fg-muted">{data[hover].bookings} bookings · ₹{data[hover].revenue.toLocaleString('en-IN')}</p>
+              <p className="text-fg-muted">{data[hover].bookings} bookings</p>
             </div>
           )}
         </div>

@@ -1,9 +1,8 @@
-import { Building2, CalendarDays, Clapperboard, IndianRupee, Ticket, TrendingUp, Trophy, Users } from 'lucide-react';
+import { Armchair, Building2, CalendarDays, Clapperboard, Ticket, TrendingUp, Trophy, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CATEGORY_META } from '@/data/layouts';
 import { useAsync } from '@/hooks/useAsync';
 import { formatDate, formatTime } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import { usePageMeta } from '@/lib/seo';
 import { api } from '@/services/api';
 import { AdminPageHeader } from '@/components/admin/AdminLayout';
@@ -28,12 +27,12 @@ export default function AdminDashboardPage() {
     <>
       <AdminPageHeader title="Dashboard" description="Live overview of bookings across all station theatres." />
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <DashboardCard index={0} icon={Ticket} label="Total bookings" value={s.totalBookings.toLocaleString('en-IN')} sub={`${s.ticketsSold.toLocaleString('en-IN')} tickets`} />
+        <DashboardCard index={0} icon={Ticket} label="Total bookings" value={s.totalBookings.toLocaleString('en-IN')} />
         <DashboardCard index={1} icon={TrendingUp} label="Today’s bookings" value={s.todaysBookings} />
         <DashboardCard index={2} icon={Users} label="Total users" value={s.totalUsers} sub={s.pendingVerifications ? `${s.pendingVerifications} awaiting verification` : 'All verified'} />
-        <DashboardCard index={3} icon={IndianRupee} label="Revenue (paid)" value={formatINR(s.revenue)} />
+        <DashboardCard index={3} icon={Armchair} label="Tickets issued" value={s.ticketsSold.toLocaleString('en-IN')} />
         <DashboardCard index={4} icon={Clapperboard} label="Total movies" value={s.totalMovies} />
-        <DashboardCard index={5} icon={Building2} label="Total theatres" value={s.totalTheatres} />
+        <DashboardCard index={5} icon={Building2} label="Auditoriums" value={s.totalTheatres} />
         <DashboardCard index={6} icon={CalendarDays} label="Busiest day" value={s.busiestDay ? formatDate(s.busiestDay.date, { year: false, weekday: false }) : '—'} sub={s.busiestDay ? `${s.busiestDay.bookings} bookings` : 'No bookings yet'} />
         <DashboardCard index={7} icon={Trophy} label="Most popular" value={s.popularMovie?.title ?? '—'} sub={s.popularMovie ? `${s.popularMovie.bookings} bookings` : undefined} />
       </div>

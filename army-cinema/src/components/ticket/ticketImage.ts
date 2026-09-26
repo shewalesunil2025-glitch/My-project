@@ -1,7 +1,6 @@
 import QR from 'qrcode';
 import { CATEGORY_META, seatLabel } from '@/data/layouts';
 import { formatDate, formatTime } from '@/lib/date';
-import { formatINR } from '@/lib/format';
 import type { BookingDetails } from '@/types';
 import { qrPayload } from './QRCode';
 
@@ -61,7 +60,7 @@ export async function downloadTicketImage(b: BookingDetails) {
 
   ctx.fillStyle = '#ffb766';
   ctx.font = font(600, 16, display);
-  ctx.fillText('VEER CINEMA  ·  E-TICKET', 80, 104);
+  ctx.fillText('KERKETTA AUDITORIUM  ·  E-TICKET', 80, 104);
   ctx.fillStyle = '#f5f7fb';
   ctx.font = font(700, 44, display);
   ctx.fillText(b.movie.title.toUpperCase().slice(0, 26), 80, 158);
@@ -82,9 +81,8 @@ export async function downloadTicketImage(b: BookingDetails) {
   field('Theatre', b.theatre.name, 80, 330);
   field('Category', `${CATEGORY_META[b.category].name} — ${CATEGORY_META[b.category].full}`.slice(0, 34), 80, 410);
   field('Seats', b.seats.map(seatLabel).join(', '), 80, 490);
-  field('Tickets', String(b.seats.length), 400, 490);
   field('Name', b.customerName, 80, 570);
-  field('Amount', `${formatINR(b.total).replace('₹', 'Rs ')}${b.paymentStatus === 'pay_at_counter' ? ' (pay at counter)' : ''}`, 400, 570);
+  field('Tickets', String(b.seats.length), 400, 570);
 
   // perforation
   ctx.setLineDash([10, 10]);
