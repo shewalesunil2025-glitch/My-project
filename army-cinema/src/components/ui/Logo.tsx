@@ -26,7 +26,7 @@ export function Logo({ className, compact }: { className?: string; compact?: boo
           <span className="font-display text-xl font-bold uppercase tracking-[0.14em] text-fg">
             Veer <span className="text-saffron">Cinema</span>
           </span>
-          <span className="mt-1 text-[0.62rem] font-medium uppercase tracking-[0.22em] text-fg-subtle">For those who serve</span>
+          <span className="mt-1 whitespace-nowrap text-[0.62rem] font-medium uppercase tracking-[0.22em] text-fg-subtle max-[380px]:hidden">For those who serve</span>
         </span>
       )}
     </span>

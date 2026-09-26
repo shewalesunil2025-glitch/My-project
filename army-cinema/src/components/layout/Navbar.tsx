@@ -1,18 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Clapperboard, Home, LayoutDashboard, LogIn, LogOut, MapPin, Ticket, User } from 'lucide-react';
+import { Clapperboard, LayoutDashboard, LogIn, LogOut, Ticket, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { cn } from '@/lib/cn';
 import { ButtonLink } from '@/components/ui/Button';
+import { KerkettaSign } from '@/components/ui/KerkettaSign';
 import { Logo } from '@/components/ui/Logo';
 
 const LINKS = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/movies', label: 'Movies', icon: Clapperboard },
-  { to: '/theatres', label: 'Theatres', icon: MapPin },
-  { to: '/my-bookings', label: 'My Tickets', icon: Ticket },
+  { to: '/', label: 'Book Tickets', icon: Clapperboard, end: true },
+  { to: '/my-bookings', label: 'My Tickets', icon: Ticket, end: false },
 ];
 
 function initials(name: string) {
@@ -161,15 +160,18 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           {ready && !user && (
             <>
-              <ButtonLink to="/login" variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <ButtonLink to="/login" variant="ghost" size="sm" className="max-sm:hidden">
                 Log in
               </ButtonLink>
-              <ButtonLink to="/register" size="sm">
+              <ButtonLink to="/register" size="sm" className="max-sm:hidden">
                 Register
               </ButtonLink>
             </>
           )}
           <AccountMenu />
+          <Link to="/" aria-label="Kerketta Auditorium" className="ml-1 rounded-full" title="Kerketta Auditorium">
+            <KerkettaSign className="size-11 drop-shadow-[0_4px_14px_rgb(233_185_92/0.35)] sm:size-12" />
+          </Link>
         </div>
       </div>
     </header>
@@ -187,7 +189,7 @@ export function MobileTabBar() {
   ];
   return (
     <nav aria-label="Primary" className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.07] bg-ink-900/90 backdrop-blur-xl md:hidden">
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-3">
         {items.map((l) => (
           <li key={l.to}>
             <NavLink

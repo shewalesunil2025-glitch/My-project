@@ -120,7 +120,7 @@ export default function RegisterPage() {
               ? `Your enclosure: ${CATEGORY_META[done.rankCategory!].full}. You can book up to 4 seats, once per week.`
               : 'Your Service ID couldn’t be matched automatically. The station admin will review it — you can browse movies meanwhile.'}
           </p>
-          <ButtonLink to={verified ? '/movies' : '/profile'} size="lg" className="mt-6">
+          <ButtonLink to={verified ? '/#book' : '/profile'} size="lg" className="mt-6">
             {verified ? 'Start booking' : 'View my status'}
           </ButtonLink>
         </motion.div>

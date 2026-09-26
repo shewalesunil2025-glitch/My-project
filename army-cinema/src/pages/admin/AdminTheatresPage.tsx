@@ -1,4 +1,4 @@
-import { MapPin, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { MapPin, Pencil, X } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useToast } from '@/context/ToastContext';
 import { LAYOUTS } from '@/data/layouts';
@@ -9,7 +9,6 @@ import { api, type TheatreInput } from '@/services/api';
 import { toAppError } from '@/services/errors';
 import type { LayoutKey, Theatre, WeeklySchedule } from '@/types';
 import { AdminPageHeader } from '@/components/admin/AdminLayout';
-import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Input, Select, Textarea } from '@/components/ui/Field';
@@ -116,39 +115,21 @@ function TheatreForm({ initial, id, onDone }: { initial: TheatreInput; id?: stri
 
 export default function AdminTheatresPage() {
   usePageMeta('Manage theatres');
-  const toast = useToast();
   const { data, loading, error, reload } = useAsync(() => api.listTheatres(), []);
   const [editing, setEditing] = useState<{ theatre?: Theatre } | null>(null);
-  const [deleting, setDeleting] = useState<Theatre | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const doDelete = async () => {
-    if (!deleting) return;
-    setBusy(true);
-    try {
-      await api.deleteTheatre(deleting.id);
-      toast.success('Theatre deleted', deleting.name);
-    } catch (e) {
-      toast.error('Couldn’t delete', toAppError(e).message);
-    } finally {
-      setBusy(false);
-      setDeleting(null);
-      reload();
-    }
-  };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toInput = ({ id, createdAt, ...rest }: Theatre): TheatreInput => rest;
 
   return (
     <>
-      <AdminPageHeader title="Theatres" description="Station halls, capacity, facilities and weekly timings." action={<Button onClick={() => setEditing({})}><Plus className="size-4" aria-hidden /> Add theatre</Button>} />
+      <AdminPageHeader title="Auditorium" description="Kerketta Auditorium details, facilities and weekly show timings." />
       {error ? (
         <ErrorState error={error} onRetry={reload} />
       ) : loading && !data ? (
         <div className="grid gap-4 md:grid-cols-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-48" />)}</div>
       ) : !data?.length ? (
-        <EmptyState title="No theatres yet" action={<Button onClick={() => setEditing({})}>Add theatre</Button>} />
+        <EmptyState title="Auditorium not set up" action={<Button onClick={() => setEditing({})}>Add auditorium</Button>} />
       ) : (
         <ul className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {data.map((t) => (
@@ -176,7 +157,6 @@ export default function AdminTheatresPage() {
               </dl>
               <div className="mt-4 flex gap-2">
                 <Button size="sm" variant="secondary" onClick={() => setEditing({ theatre: t })}><Pencil className="size-4" aria-hidden /> Edit</Button>
-                <Button size="sm" variant="ghost" className="hover:text-danger" onClick={() => setDeleting(t)}><Trash2 className="size-4" aria-hidden /> Delete</Button>
               </div>
             </li>
           ))}
@@ -195,7 +175,6 @@ export default function AdminTheatresPage() {
           />
         )}
       </Modal>
-      <ConfirmDialog open={!!deleting} title={`Delete ${deleting?.name}?`} message="Theatres with booking history can’t be deleted — mark them inactive instead." onConfirm={doDelete} onClose={() => setDeleting(null)} busy={busy} />
     </>
   );
 }

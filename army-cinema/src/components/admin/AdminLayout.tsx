@@ -10,7 +10,7 @@ import { LoadingState } from '@/components/ui/States';
 const NAV = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/movies', label: 'Movies', icon: Clapperboard },
-  { to: '/admin/theatres', label: 'Theatres', icon: Building2 },
+  { to: '/admin/theatres', label: 'Auditorium', icon: Building2 },
   { to: '/admin/shows', label: 'Shows', icon: CalendarClock },
   { to: '/admin/bookings', label: 'Bookings', icon: Ticket },
   { to: '/admin/users', label: 'Users', icon: Users },

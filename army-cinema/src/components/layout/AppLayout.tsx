@@ -8,11 +8,16 @@ import { MobileTabBar, Navbar } from './Navbar';
 
 export function AppLayout() {
   const outlet = useOutlet();
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    if (hash) {
+      // Wait for the page transition, then bring the anchored section into view.
+      const t = window.setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
+      return () => window.clearTimeout(t);
+    }
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return (
     <div className="flex min-h-dvh flex-col">

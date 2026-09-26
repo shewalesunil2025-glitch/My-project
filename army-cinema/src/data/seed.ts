@@ -1,9 +1,9 @@
 import type { CategoryPrices, Movie, Profile, RankCategory, Screen, Theatre, WeeklySchedule } from '@/types';
 
 /**
- * Demo data. The Kerketta Auditorium entries (current movie, screening history,
- * weekly schedule and seat chart) are taken from the reference booking site;
- * everything else is illustrative demo content.
+ * Demo data for Kerketta Auditorium. The current movie, screening history,
+ * weekly schedule and seat chart are taken from the reference booking site;
+ * users, bookings and prices are illustrative demo content.
  */
 
 const created = '2026-06-01T09:00:00.000Z';
@@ -48,7 +48,7 @@ export const SEED_MOVIES: Movie[] = [
     cast: ['Thalapathy Vijay', 'Pooja Hegde', 'Bobby Deol', 'Mamitha Baiju'],
     posterUrl: null,
     trailerUrl: null,
-    status: 'now_showing',
+    status: 'archived',
     featured: false,
     palette: ['#7a3b06', '#101a33'],
     createdAt: created,
@@ -70,7 +70,7 @@ export const SEED_MOVIES: Movie[] = [
     cast: ['Ajay Devgn', 'Riteish Deshmukh', 'Arshad Warsi', 'Esha Gupta', 'Ravi Kishan', 'Jaaved Jaaferi'],
     posterUrl: null,
     trailerUrl: null,
-    status: 'now_showing',
+    status: 'archived',
     featured: false,
     palette: ['#8a2f6b', '#141b3a'],
     createdAt: created,
@@ -92,75 +92,9 @@ export const SEED_MOVIES: Movie[] = [
     cast: ['Akshay Kumar', 'Sunil Shetty', 'Raveena Tandon', 'Disha Patani'],
     posterUrl: null,
     trailerUrl: null,
-    status: 'now_showing',
+    status: 'archived',
     featured: false,
     palette: ['#14532d', '#0b1731'],
-    createdAt: created,
-  },
-  {
-    id: 'mv-northern-ridge',
-    slug: 'operation-northern-ridge',
-    title: 'Operation Northern Ridge',
-    tagline: 'Hold the line. Bring them home.',
-    description:
-      'Cut off by a winter storm, a small section of soldiers must hold a high-altitude post for seventy-two hours. (Demo title.)',
-    genres: ['War', 'Drama'],
-    language: 'Hindi',
-    durationMin: 152,
-    certification: 'UA 13+',
-    score: null,
-    releaseDate: '2026-10-16',
-    director: 'Demo Studio',
-    cast: ['Demo Cast'],
-    posterUrl: null,
-    trailerUrl: null,
-    status: 'upcoming',
-    featured: true,
-    palette: ['#1e3a5f', '#050b18'],
-    createdAt: created,
-  },
-  {
-    id: 'mv-siachen-sunrise',
-    slug: 'siachen-sunrise',
-    title: 'Siachen Sunrise',
-    tagline: 'The highest battlefield. The warmest hearts.',
-    description:
-      'A young medical officer and a veteran havildar build an unlikely bond at the roof of the world. (Demo title.)',
-    genres: ['Drama', 'Family'],
-    language: 'Hindi',
-    durationMin: 138,
-    certification: 'U',
-    score: null,
-    releaseDate: '2026-10-30',
-    director: 'Demo Studio',
-    cast: ['Demo Cast'],
-    posterUrl: null,
-    trailerUrl: null,
-    status: 'upcoming',
-    featured: false,
-    palette: ['#0e4c6e', '#0a1226'],
-    createdAt: created,
-  },
-  {
-    id: 'mv-wings-ladakh',
-    slug: 'wings-over-ladakh',
-    title: 'Wings Over Ladakh',
-    tagline: 'Every mission. Every life.',
-    description:
-      'Helicopter pilots race weather and terrain to evacuate a stranded village before nightfall. (Demo title.)',
-    genres: ['Action', 'Adventure'],
-    language: 'Hindi',
-    durationMin: 146,
-    certification: 'UA 7+',
-    score: null,
-    releaseDate: '2026-11-13',
-    director: 'Demo Studio',
-    cast: ['Demo Cast'],
-    posterUrl: null,
-    trailerUrl: null,
-    status: 'upcoming',
-    featured: false,
-    palette: ['#7c4a03', '#0b1731'],
     createdAt: created,
   },
 ];
@@ -191,32 +125,6 @@ export const SEED_THEATRES: Theatre[] = [
     active: true,
     createdAt: created,
   },
-  {
-    id: 'th-sudarshan',
-    slug: 'sudarshan-cinema-hall',
-    name: 'Sudarshan Cinema Hall',
-    location: 'Garrison Road',
-    city: 'Demo Cantonment',
-    description: 'A compact air-conditioned hall with evening and late shows. (Demo theatre.)',
-    facilities: ['Air-conditioned', 'Canteen', 'Wheelchair access'],
-    layoutKey: 'compact',
-    weeklySchedule: { 0: ['12:30', '18:00', '21:00'], 1: ['18:00'], 2: [], 3: ['18:00'], 4: ['18:00'], 5: ['18:00', '21:00'], 6: ['15:00', '18:00', '21:00'] },
-    active: true,
-    createdAt: created,
-  },
-  {
-    id: 'th-paramvir',
-    slug: 'param-vir-theatre',
-    name: 'Param Vir Theatre',
-    location: 'Station Complex',
-    city: 'Demo Cantonment',
-    description: 'A modern hall with recliner-style officer rows and a family enclosure. (Demo theatre.)',
-    facilities: ['Dolby audio', 'Family enclosure', 'Canteen', 'Parking'],
-    layoutKey: 'standard',
-    weeklySchedule: { 0: ['11:00', '15:00', '19:00'], 1: [], 2: ['19:00'], 3: ['19:00'], 4: ['19:00'], 5: ['19:00'], 6: ['15:00', '19:00'] },
-    active: true,
-    createdAt: created,
-  },
 ];
 
 export const SEED_SCREENS: Screen[] = SEED_THEATRES.map((t) => ({
@@ -231,8 +139,6 @@ export const DEFAULT_PRICES: CategoryPrices = { OFFRS: 150, JCOS: 100, ORS: 70 }
 /** Which movies each theatre rotates through when demo shows are generated. */
 export const THEATRE_ROTATION: Record<string, string[]> = {
   'th-kerketta': ['mv-mirzapur'],
-  'th-sudarshan': ['mv-welcome-jungle', 'mv-dulhaniya', 'mv-mirzapur'],
-  'th-paramvir': ['mv-jan-neta', 'mv-mirzapur', 'mv-dulhaniya'],
 };
 
 /**

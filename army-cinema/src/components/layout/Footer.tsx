@@ -9,17 +9,15 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
-            Simple, secure movie booking for serving personnel and their families at station and garrison theatres. Built with
-            gratitude for those who serve the nation.
+            Simple, secure movie booking at Kerketta Auditorium for serving personnel and their families. Built with gratitude for
+            those who serve the nation.
           </p>
           <p className="mt-4 font-display text-lg font-semibold uppercase tracking-[0.3em] text-tricolour">Jai Hind</p>
         </div>
         <nav aria-label="Footer">
           <h2 className="eyebrow mb-3 text-fg-subtle">Book</h2>
           <ul className="space-y-2 text-sm text-fg-muted">
-            <li><Link className="hover:text-fg" to="/movies">Now showing</Link></li>
-            <li><Link className="hover:text-fg" to="/movies?tab=upcoming">Coming soon</Link></li>
-            <li><Link className="hover:text-fg" to="/theatres">Theatres</Link></li>
+            <li><Link className="hover:text-fg" to="/#book">Book tickets</Link></li>
             <li><Link className="hover:text-fg" to="/my-bookings">My tickets</Link></li>
           </ul>
         </nav>

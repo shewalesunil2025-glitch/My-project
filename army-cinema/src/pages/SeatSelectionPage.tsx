@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, ArrowLeft, Lock, ShieldAlert } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useBookingDraft } from '@/context/BookingContext';
 import { useToast } from '@/context/ToastContext';
@@ -32,7 +32,11 @@ export default function SeatSelectionPage() {
 
   const layout = s ? getLayout(s.theatre.layoutKey) : null;
   const allowed: RankCategory | 'ALL' = user?.role === 'admin' ? 'ALL' : (user?.rankCategory ?? 'ALL');
-  const [category, setCategory] = useState<RankCategory | null>(null);
+  const [params] = useSearchParams();
+  const catParam = params.get('cat');
+  const [category, setCategory] = useState<RankCategory | null>(
+    catParam === 'OFFRS' || catParam === 'JCOS' || catParam === 'ORS' ? catParam : null,
+  );
   const [selected, setSelected] = useState<string[]>(() => (draft?.showId === showId ? draft.seats : []));
   const [holding, setHolding] = useState(false);
   const [blocker, setBlocker] = useState<AppError | null>(null);
@@ -120,7 +124,7 @@ export default function SeatSelectionPage() {
   if (!s || !layout || !catLayout)
     return (
       <div className="container-page py-10">
-        <EmptyState title="Show not available" message="This show may have ended or been cancelled." action={<ButtonLink to="/movies">Browse movies</ButtonLink>} />
+        <EmptyState title="Show not available" message="This show may have ended or been cancelled." action={<ButtonLink to="/#book">Book tickets</ButtonLink>} />
       </div>
     );
 
@@ -129,7 +133,7 @@ export default function SeatSelectionPage() {
       <div className="container-page py-5 sm:py-8">
         <Stepper current={1} />
         <div className="mt-5 flex items-start gap-3">
-          <Link to={`/book/${s.movie.slug}?date=${s.date}`} className="grid size-10 shrink-0 place-items-center rounded-xl ring-1 ring-white/10 hover:bg-white/5" aria-label="Back to show selection">
+          <Link to="/#book" className="grid size-10 shrink-0 place-items-center rounded-xl ring-1 ring-white/10 hover:bg-white/5" aria-label="Back to show selection">
             <ArrowLeft className="size-4" />
           </Link>
           <div className="min-w-0">

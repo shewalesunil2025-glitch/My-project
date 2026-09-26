@@ -31,7 +31,7 @@ export default function CheckoutSummaryPage() {
 
   if (loading && !b) return <LoadingState className="min-h-[60vh]" />;
   if (error) return <div className="container-page py-10"><ErrorState error={error} onRetry={reload} /></div>;
-  if (!b) return <div className="container-page py-10"><EmptyState title="Booking not found" action={<ButtonLink to="/movies">Browse movies</ButtonLink>} /></div>;
+  if (!b) return <div className="container-page py-10"><EmptyState title="Booking not found" action={<ButtonLink to="/#book">Book tickets</ButtonLink>} /></div>;
   if (b.status === 'confirmed') return <Navigate to={`/booking/${b.id}`} replace />;
   if (b.status !== 'held' || expired) {
     return (

@@ -1,6 +1,6 @@
 import { MotionConfig } from 'framer-motion';
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
+import { createBrowserRouter, createMemoryRouter, Navigate, RouterProvider, type RouteObject } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { BookingProvider } from '@/context/BookingContext';
 import { ToastProvider } from '@/context/ToastContext';
@@ -11,11 +11,6 @@ import { LoadingState } from '@/components/ui/States';
 import HomePage from '@/pages/HomePage';
 
 // Route-level code splitting: only the home page ships in the first bundle.
-const MoviesPage = lazy(() => import('@/pages/MoviesPage'));
-const MovieDetailsPage = lazy(() => import('@/pages/MovieDetailsPage'));
-const TheatresPage = lazy(() => import('@/pages/TheatresPage'));
-const TheatreDetailsPage = lazy(() => import('@/pages/TheatreDetailsPage'));
-const SelectShowPage = lazy(() => import('@/pages/SelectShowPage'));
 const SeatSelectionPage = lazy(() => import('@/pages/SeatSelectionPage'));
 const CheckoutSummaryPage = lazy(() => import('@/pages/CheckoutSummaryPage'));
 const PaymentPage = lazy(() => import('@/pages/PaymentPage'));
@@ -41,11 +36,8 @@ const routes: RouteObject[] = [
     element: <AppLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'movies', element: <MoviesPage /> },
-      { path: 'movies/:slug', element: <MovieDetailsPage /> },
-      { path: 'theatres', element: <TheatresPage /> },
-      { path: 'theatres/:slug', element: <TheatreDetailsPage /> },
-      { path: 'book/:slug', element: <SelectShowPage /> },
+      // Single-auditorium site: old catalogue URLs lead back to the booking page.
+      ...['movies', 'movies/:slug', 'theatres', 'theatres/:slug', 'book/:slug'].map((path) => ({ path, element: <Navigate to="/#book" replace /> })),
       { path: 'book/show/:showId/seats', element: <SeatSelectionPage /> },
       { path: 'checkout/:bookingId/summary', element: auth(<CheckoutSummaryPage />) },
       { path: 'checkout/:bookingId/pay', element: auth(<PaymentPage />) },

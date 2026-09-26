@@ -1,6 +1,6 @@
 # Veer Cinema — movie tickets for Army personnel
 
-A mobile-first movie ticket booking platform for serving Army personnel and their families at station / garrison theatres.
+A mobile-first movie ticket booking site for **Kerketta Auditorium**, for serving Army personnel and their families. "Veer Cinema" is the platform brand; the site is built around the one auditorium.
 
 > **Prototype notice.** Service verification uses a **mock registry** and payments are **simulated**. The platform is independent and is not affiliated with, or endorsed by, the Indian Army, the Ministry of Defence or any government body. It uses no official logos.
 
@@ -8,7 +8,7 @@ The booking rules and the Kerketta Auditorium data follow the reference site (`k
 
 ## Booking flow
 
-Login / registration → service verification → browse movies → movie → date → theatre → show time → seats (held for 10 minutes) → booking summary → payment → e-ticket with QR code.
+Everything starts on one page, like the reference: the Kerketta Auditorium heading and the movie now showing → choose a day → show time → enclosure (OFFRs / JCOs / ORs) → seats (held for 10 minutes) → booking summary → payment or pay at counter → e-ticket with QR code. Login and service verification are required to confirm.
 
 ## Project structure
 
@@ -33,15 +33,14 @@ army-cinema/
    ├─ hooks/                  useAsync (live reload), useCountdown, useMediaQuery
    ├─ lib/                    dates (Fri–Thu week), formatting, validation, sanitising, SEO
    ├─ components/
-   │  ├─ ui/                  Button, Field (Input/Select/Textarea), Modal, Badge, States, Poster, Stepper, Logo
+   │  ├─ ui/                  Button, Field, Modal, Badge, States, Poster, Stepper, Logo, KerkettaSign
    │  ├─ layout/              Navbar + mobile tab bar, Footer, DemoBanner, Guards, AppLayout
-   │  ├─ home/                Hero, QuickBook
-   │  ├─ movies/              MovieCard, MovieGrid, SearchBar, FilterPanel, TrailerModal
-   │  ├─ booking/             DateSelector, ShowTimeSelector, TheatreCard, SeatMap/Seat, BookingSummary, HoldTimer
+   │  ├─ home/                Hero (Kerketta heading)
+   │  ├─ movies/              TrailerModal
+   │  ├─ booking/             DateSelector, ShowTimeSelector, SeatMap/Seat, BookingSummary, HoldTimer
    │  ├─ ticket/              TicketCard, QRCode, ticketImage (PNG download)
    │  └─ admin/               AdminLayout/Sidebar, DashboardCard, Charts, DataTable, ConfirmDialog
-   └─ pages/                  Home, Movies, MovieDetails, Theatres, TheatreDetails, SelectShow,
-                              SeatSelection, CheckoutSummary, Payment, BookingConfirmation,
+   └─ pages/                  Home (booking), SeatSelection, CheckoutSummary, Payment, BookingConfirmation,
                               Login, Register, ForgotPassword, MyBookings, Profile, NotFound, admin/*
 ```
 
@@ -108,11 +107,11 @@ How the database protects bookings:
 
 ## Implemented features
 
-- **Public:** premium home (hero, now showing, featured spotlight, coming soon, theatres, how it works, booking rules, tribute band); movie search, genre and language filters, sorting and category tabs; movie details (trailer modal, cast, theatres, dates, timings); theatres list and details with weekly schedule and enclosure capacities.
+- **Home = booking page:** large Kerketta Auditorium heading over the hero photo, the Kerketta sign in the header corner, now-showing movie card (genre, duration, language, director, cast, trailer), day strip (Thursday shows *Closed*), show times with live seats left, enclosure cards with free seats and price, booking rules, recently screened movies, tribute band.
 - **Booking:** date strip → theatre → show-time cards with live availability; enclosure picker; seat map with screen indicator, VIP row, family/single markers, booked / reserved / media / selected states, arrow-key navigation, touch-sized seats with "fit hall" overview on phones; 4-seat cap; live occupancy refresh; 10-minute seat hold with countdown; summary; UPI / card / pay-at-counter; failed-payment retry; confirmation with QR ticket (`BOOKING-ID: ARM-2026-000123`, no personal data), PNG download and print.
 - **Rules:** one booking per mobile number per Fri–Thu week, enforced at hold and again at confirmation, with an early warning on show selection. Rank-category enclosures (Officers / JCOs / Other Ranks). Cancelling a booking releases the seats and frees the weekly slot.
 - **Accounts:** login with password or one-time code (by Service ID, mobile or email); two-step registration with demo service verification (verified / pending / rejected); forgot password; profile (edit, masked Service ID, this week's status, history); My Bookings (upcoming / previous, view ticket, cancel); 2-hour sliding session with expiry notice.
-- **Admin:** dashboard (bookings, today, users, revenue, movies, theatres, busiest day, most popular movie, bookings-per-day chart with a table view, tickets by enclosure, upcoming-show occupancy); movie CRUD with poster upload (resized to WebP); theatre CRUD with layout and weekly-schedule editor; show create / edit / cancel plus "generate from schedule"; bookings search / filter / cancel; user verification approvals.
+- **Admin:** dashboard (bookings, today, users, revenue, movies, theatres, busiest day, most popular movie, bookings-per-day chart with a table view, tickets by enclosure, upcoming-show occupancy); movie CRUD with poster upload (resized to WebP); auditorium settings with the weekly-schedule editor; show create / edit / cancel plus "generate from schedule"; bookings search / filter / cancel; user verification approvals.
 - **Quality:** friendly error, empty, loading and skeleton states; offline detection; protected routes; input validation and sanitising; accessible labels, focus rings, skip link, focus-trapped modals, reduced-motion support; per-page titles, descriptions and Open Graph tags; route-level code splitting.
 
 ## Remaining limitations
@@ -123,3 +122,4 @@ How the database protects bookings:
 - **The Supabase adapter hasn't been run against a live project** in this build. The SQL and client were written and type-checked against the schema, but no live project was connected.
 - `resolve_login_email` (login by Service ID or mobile) should be rate-limited before production. Phone OTP needs an SMS provider in Supabase Auth; this build sends email codes.
 - **Posters are generated placeholders** until real artwork is uploaded. The hero photograph must be added at `public/images/hero/hero.jpg`.
+- **The Kerketta sign is an original placeholder badge** (`src/components/ui/KerkettaSign.tsx`); replace it with the auditorium's own sign if one is available.

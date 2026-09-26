@@ -39,7 +39,7 @@ export interface DemoDb {
 }
 
 const DB_KEY = 'vc:db';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 export const CHANGE_EVENT = 'vc:db-changed';
 
 let cache: DemoDb | null = null;
@@ -236,15 +236,13 @@ function seedUserBookings(db: DemoDb) {
     list.filter((s) => s.date >= today && weekStartKey(s.date) === thisWeek && new Date(`${s.date}T${s.time}`) > nowIso);
 
   const kerketta = byTheatre('th-kerketta');
-  const sudarshan = byTheatre('th-sudarshan');
-  const paramvir = byTheatre('th-paramvir');
 
   make('u-arjun', past(kerketta).at(-2), 2, 'upi');
-  make('u-arjun', past(paramvir).at(-6), 3, 'card');
-  make('u-manoj', past(sudarshan).at(-3), 4, 'counter');
+  make('u-arjun', past(kerketta).at(-7), 3, 'card');
+  make('u-manoj', past(kerketta).at(-3), 4, 'counter');
   make('u-manoj', past(kerketta).at(-5), 2, 'upi', 'cancelled');
   // Rakesh already has a ticket this week → demonstrates the weekly limit
-  make('u-rakesh', upcoming(kerketta)[0] ?? upcoming(sudarshan)[0], 3, 'upi');
+  make('u-rakesh', upcoming(kerketta)[0], 3, 'upi');
   make('u-rakesh', past(kerketta).at(-1), 2, 'card');
 }
 

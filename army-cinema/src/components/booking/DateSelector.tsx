@@ -5,6 +5,8 @@ import { cn } from '@/lib/cn';
 export interface DateOption {
   key: string;
   shows: number;
+  /** Label for a day without shows, e.g. "Closed" */
+  emptyLabel?: string;
 }
 
 export function DateSelector({ dates, value, onChange }: { dates: DateOption[]; value: string; onChange: (key: string) => void }) {
@@ -39,7 +41,7 @@ export function DateSelector({ dates, value, onChange }: { dates: DateOption[]; 
             </span>
             <span className="relative font-display text-2xl font-bold leading-tight">{date.getDate()}</span>
             <span className={cn('relative text-[0.7rem]', active ? 'text-ink-950/80' : 'text-fg-subtle')}>
-              {closed ? 'No shows' : MONTH_SHORT[date.getMonth()]}
+              {closed ? (d.emptyLabel ?? 'No shows') : MONTH_SHORT[date.getMonth()]}
             </span>
           </button>
         );

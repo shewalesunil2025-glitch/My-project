@@ -1,6 +1,5 @@
 import { CalendarDays, Clock, MapPin, Ticket, XCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useToast } from '@/context/ToastContext';
 import { seatLabel } from '@/data/layouts';
 import { useAsync } from '@/hooks/useAsync';
@@ -115,7 +114,7 @@ export default function MyBookingsPage() {
             icon={<Ticket className="size-6" />}
             title={tab === 'upcoming' ? 'No upcoming bookings' : 'No previous bookings'}
             message={tab === 'upcoming' ? 'Your next movie night is a few taps away.' : 'Bookings you’ve watched or cancelled will appear here.'}
-            action={tab === 'upcoming' && <ButtonLink to="/movies">Browse movies</ButtonLink>}
+            action={tab === 'upcoming' && <ButtonLink to="/#book">Book tickets</ButtonLink>}
           />
         ) : (
           <ul className="space-y-3">
@@ -126,7 +125,7 @@ export default function MyBookingsPage() {
         )}
       </div>
       <p className="mt-6 text-sm text-fg-subtle">
-        Need help? Visit the theatre counter with your booking ID. <Link to="/theatres" className="text-saffron-soft hover:underline">Theatre details</Link>
+        Need help? Visit the Kerketta Auditorium counter with your booking ID.
       </p>
       <Modal
         open={!!cancelling}
