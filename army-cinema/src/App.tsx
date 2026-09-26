@@ -1,6 +1,6 @@
 import { MotionConfig } from 'framer-motion';
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { BookingProvider } from '@/context/BookingContext';
 import { ToastProvider } from '@/context/ToastContext';
@@ -36,7 +36,7 @@ const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
 
 const auth = (el: React.ReactNode) => <RequireAuth>{el}</RequireAuth>;
 
-const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     element: <AppLayout />,
     children: [
@@ -83,7 +83,11 @@ const router = createBrowserRouter([
       { path: 'users', element: <AdminUsersPage /> },
     ],
   },
-]);
+];
+
+// VITE_ROUTER=memory builds a self-contained preview that doesn't depend on the page URL
+// (used for sandboxed hosting); normal builds use real, shareable URLs.
+const router = import.meta.env.VITE_ROUTER === 'memory' ? createMemoryRouter(routes) : createBrowserRouter(routes);
 
 export default function App() {
   return (

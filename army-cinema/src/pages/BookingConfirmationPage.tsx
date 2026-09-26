@@ -63,7 +63,10 @@ export default function BookingConfirmationPage({ fresh = true }: { fresh?: bool
       <div className="mt-8">
         <TicketCard booking={b} />
       </div>
-      <div className="no-print mx-auto mt-6 grid max-w-md gap-3 sm:grid-cols-3">
+      {import.meta.env.VITE_PREVIEW === '1' && (
+        <p className="no-print mx-auto mt-6 max-w-md text-center text-xs text-fg-subtle">Download and Print work on the deployed site; this preview blocks them.</p>
+      )}
+      <div className={`no-print mx-auto mt-6 grid max-w-md gap-3 ${import.meta.env.VITE_PREVIEW === '1' ? 'hidden' : 'sm:grid-cols-3'}`}>
         <Button onClick={download} loading={downloading} disabled={b.status !== 'confirmed'}>
           <Download className="size-4" aria-hidden /> Download
         </Button>
@@ -74,6 +77,13 @@ export default function BookingConfirmationPage({ fresh = true }: { fresh?: bool
           <Home className="size-4" aria-hidden /> Home
         </ButtonLink>
       </div>
+      {import.meta.env.VITE_PREVIEW === '1' && (
+        <div className="no-print mx-auto mt-4 max-w-md">
+          <ButtonLink to="/" variant="secondary" block>
+            <Home className="size-4" aria-hidden /> Back to Home
+          </ButtonLink>
+        </div>
+      )}
     </div>
   );
 }
