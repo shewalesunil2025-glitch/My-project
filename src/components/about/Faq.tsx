@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { Scramble } from "@/components/effects/Scramble";
 import { faqs } from "@/content/faq";
 import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
@@ -9,7 +10,7 @@ export function Faq() {
     <section id="faq" aria-labelledby="faq-title" className="relative py-24 md:py-32">
       <div className="container-x max-w-4xl">
         <Reveal className="text-center">
-          <p className="badge">FAQ</p>
+          <p className="badge"><span aria-hidden className="text-flow-soft/80">09 //</span> <Scramble text="FAQ" /></p>
           <h2 id="faq-title" className="display mt-5 text-[clamp(2rem,4.4vw,3.4rem)]">
             <RevealWords text="Frequently asked questions" />
           </h2>

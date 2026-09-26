@@ -9,7 +9,7 @@ export function SolutionInfo({ id, onClose, headingId }: { id: SolutionId; onClo
   const s = solutions.find((x) => x.id === id);
   if (!s) return null;
   return (
-    <div className="relative rounded-2xl border border-flow/30 bg-ink-850/95 p-5 text-left shadow-[0_30px_80px_-20px_rgb(0_0_0/0.9),0_0_40px_-12px_rgb(255_90_31/0.45)] backdrop-blur-xl">
+    <div className="relative rounded-2xl border border-flow/30 bg-ink-850/95 p-5 text-left shadow-[0_30px_80px_-20px_rgb(0_0_0/0.9),0_0_40px_-12px_rgb(139_92_246/0.45)] backdrop-blur-xl">
       <button
         type="button"
         onClick={onClose}

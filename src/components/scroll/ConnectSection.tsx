@@ -1,5 +1,6 @@
 "use client";
 
+import { Scramble } from "@/components/effects/Scramble";
 import { motion } from "framer-motion";
 import { customerFlow, fragmentedTools } from "@/content/flow";
 import { RevealWords } from "@/components/effects/RevealWords";
@@ -18,17 +19,17 @@ export function ConnectSection() {
     >
       <div className="container-x">
         <Reveal className="text-center">
-          <p className="badge">The problem</p>
+          <p className="badge"><span aria-hidden className="text-flow-soft/80">01 //</span> <Scramble text="The problem" /></p>
           <h2 id="connect-title" className="display mx-auto mt-5 max-w-4xl text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
             <RevealWords text="Your business shouldn’t need five different tools to talk to one customer." />
           </h2>
         </Reveal>
 
         <div className="mt-12 grid gap-5 lg:mt-16 lg:grid-cols-12">
-          {/* Ember visual card */}
+          {/* Neural visual card */}
           <Reveal className="lg:col-span-5">
             <div className="relative h-full min-h-[22rem] overflow-hidden rounded-[1.75rem] bg-ink-950 p-7 text-fg md:min-h-[28rem]">
-              <div aria-hidden className="absolute -top-24 -left-20 h-[30rem] w-[14rem] rotate-[28deg] bg-[linear-gradient(180deg,rgb(255_120_60/0.9),rgb(255_90_31/0.35)_45%,transparent)] blur-2xl" />
+              <div aria-hidden className="absolute -top-24 -left-20 h-[30rem] w-[14rem] rotate-[28deg] bg-[linear-gradient(180deg,rgb(34_211_238/0.9),rgb(139_92_246/0.35)_45%,transparent)] blur-2xl" />
               <div aria-hidden className="absolute top-10 right-16 h-40 w-px bg-gradient-to-b from-flow-soft to-transparent" />
               <div className="relative flex h-full flex-col justify-end">
                 <ul className="mb-8 flex flex-wrap gap-2" aria-label="Disconnected tools">

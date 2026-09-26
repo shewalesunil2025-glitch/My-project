@@ -28,7 +28,7 @@ export function StepsPreview({ title, steps }: { title: string; steps: PreviewSt
               <span
                 className={cn(
                   "relative z-10 grid size-9 shrink-0 place-items-center rounded-xl border transition-all duration-500",
-                  done ? "border-flow/50 bg-ink-800 text-flow-soft shadow-[0_0_24px_-6px_rgb(255_90_31/0.7)]" : "border-white/10 bg-ink-900 text-fg-subtle",
+                  done ? "border-flow/50 bg-ink-800 text-flow-soft shadow-[0_0_24px_-6px_rgb(139_92_246/0.7)]" : "border-white/10 bg-ink-900 text-fg-subtle",
                 )}
               >
                 {done && i === steps.length - 1 ? <Check className="size-4 text-live" aria-hidden /> : <s.icon className="size-4" aria-hidden />}

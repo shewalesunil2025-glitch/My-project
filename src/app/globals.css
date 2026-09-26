@@ -2,36 +2,37 @@
 
 /* ─────────────────────────────────────────────
    NEXA FLOW AI — Design tokens
-   Near-black canvas and warm off-white "paper"
-   sections, one ember-orange accent.
+   Deep space-black canvas, cool frosted "paper"
+   sections, a violet → cyan neural accent.
    ───────────────────────────────────────────── */
 @theme {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-grotesk), var(--font-jakarta), ui-sans-serif, sans-serif;
 
   /* Dark canvas */
-  --color-ink-950: #0a0a0b;
-  --color-ink-900: #111113;
-  --color-ink-850: #161618;
-  --color-ink-800: #1c1c1f;
-  --color-ink-700: #2a2a2e;
+  --color-ink-950: #06060c;
+  --color-ink-900: #0c0c15;
+  --color-ink-850: #11111c;
+  --color-ink-800: #171724;
+  --color-ink-700: #262638;
 
   --color-fg: #f5f5f4;
-  --color-fg-muted: #a6a6ad;
-  --color-fg-subtle: #8c8c94;
+  --color-fg-muted: #a8a8ba;
+  --color-fg-subtle: #8b8ba0;
 
-  /* Ember accent */
-  --color-flow: #ff5a1f;
-  --color-flow-strong: #e8480f;
-  --color-flow-soft: #ff9a6b;
-  --color-live: #ffb48a;
+  /* Neural accent: violet core, cyan edge */
+  --color-flow: #8b5cf6;
+  --color-flow-strong: #7c3aed;
+  --color-flow-soft: #22d3ee;
+  --color-live: #67e8f9;
 
   /* Paper (light) sections */
-  --color-paper: #f6f4f1;
+  --color-paper: #f3f2fa;
   --color-paper-card: #ffffff;
-  --color-paper-line: #e8e4de;
+  --color-paper-line: #e3e1f0;
   --color-ink: #111111;
-  --color-ink-muted: #5c5c63;
+  --color-ink-muted: #5a5a6e;
 
   --radius-panel: 1.25rem;
 
@@ -42,6 +43,10 @@
   --animate-float: float 7s ease-in-out infinite;
   --animate-dash: dash 1.6s linear infinite;
   --animate-beam: beam 7s ease-in-out infinite;
+  --animate-orb: orb 6s linear infinite;
+  --animate-caret: caret 1.05s steps(1) infinite;
+  --animate-scan: scan 6s linear infinite;
+  --animate-aurora: aurora 18s ease-in-out infinite alternate;
 }
 
 @keyframes pulse-soft {
@@ -59,6 +64,19 @@
   0%, 100% { opacity: 0.85; }
   50% { opacity: 1; }
 }
+@keyframes orb {
+  0% { transform: rotate(0deg) scale(1); border-radius: 48% 52% 46% 54% / 52% 46% 54% 48%; }
+  50% { transform: rotate(180deg) scale(1.06); border-radius: 54% 46% 52% 48% / 46% 54% 48% 52%; }
+  100% { transform: rotate(360deg) scale(1); border-radius: 48% 52% 46% 54% / 52% 46% 54% 48%; }
+}
+@keyframes caret { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes scan { from { transform: translateY(-100%); } to { transform: translateY(100vh); } }
+@keyframes aurora {
+  0% { transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1); }
+  100% { transform: translate3d(6%, 5%, 0) rotate(25deg) scale(1.15); }
+}
+@keyframes holo { to { background-position: -220% 0; } }
+@keyframes beam-spin { to { --beam-angle: 360deg; } }
 @keyframes dialog-in {
   from { opacity: 0; transform: translateY(16px) scale(0.98); }
   to { opacity: 1; transform: none; }
@@ -138,22 +156,27 @@ body {
     align-items: center;
     gap: 0.5rem;
     border-radius: 999px;
-    padding: 0.35rem 0.8rem 0.35rem 0.55rem;
-    font-size: 0.75rem;
+    padding: 0.4rem 0.85rem 0.4rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
     font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--color-fg-muted);
-    background: rgb(255 255 255 / 0.05);
-    border: 1px solid rgb(255 255 255 / 0.08);
+    background: linear-gradient(90deg, rgb(139 92 246 / 0.12), rgb(34 211 238 / 0.05));
+    border: 1px solid rgb(139 92 246 / 0.25);
   }
   .badge::before {
     content: "";
     width: 0.4rem;
     height: 0.4rem;
     border-radius: 999px;
-    background: var(--color-flow);
-    box-shadow: 0 0 10px 1px color-mix(in oklab, var(--color-flow) 70%, transparent);
+    background: var(--color-flow-soft);
+    box-shadow: 0 0 10px 1px color-mix(in oklab, var(--color-flow-soft) 70%, transparent);
+    animation: pulse-soft 2.4s ease-in-out infinite;
   }
   .paper .badge {
+    --color-flow-soft: #7c3aed;
     color: var(--color-ink-muted);
     background: #fff;
     border-color: var(--color-paper-line);
@@ -168,6 +191,7 @@ body {
   }
 
   .display {
+    font-family: var(--font-display);
     font-weight: 600;
     letter-spacing: -0.035em;
     line-height: 1.05;
@@ -181,8 +205,11 @@ body {
     color: transparent;
   }
 
+  /* Holographic accent text: a slow cyan → violet shimmer. */
   .text-flow {
-    background: linear-gradient(90deg, var(--color-flow-soft), var(--color-flow));
+    background: linear-gradient(90deg, #67e8f9, #a78bfa 35%, #8b5cf6 55%, #22d3ee 85%, #67e8f9);
+    background-size: 220% 100%;
+    animation: holo 7s linear infinite;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -240,12 +267,12 @@ body {
 .intro-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(30% 30% at 50% 50%, rgb(255 90 31 / 0.22), transparent 70%);
+  background: radial-gradient(30% 30% at 50% 50%, rgb(139 92 246 / 0.22), transparent 70%);
   animation: intro-fade 1s ease-out both;
 }
 .intro-mark {
   position: relative;
-  filter: drop-shadow(0 0 24px rgb(255 90 31 / 0.55));
+  filter: drop-shadow(0 0 24px rgb(139 92 246 / 0.55));
   animation: intro-mark 0.9s var(--ease-out-expo) both;
 }
 .intro-name {
@@ -285,6 +312,62 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .intro { display: none; }
+  .glass::before, [data-spotlight]::before, .beam::before { animation: none; }
+}
+
+/* ── AI surfaces ─────────────────────────────── */
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+/* A light that travels around the card border (after 21st.dev "Border Beam"). */
+.glass::before,
+[data-spotlight]::before,
+.beam::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(from var(--beam-angle), transparent 0 70%, rgb(34 211 238 / 0.9) 82%, rgb(139 92 246 / 0.95) 90%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s;
+  animation: beam-spin 3.2s linear infinite paused;
+}
+.glass:hover::before,
+[data-spotlight]:hover::before,
+.beam::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+.beam { position: relative; }
+
+/* The AI core used by the orb and the hero chip. */
+.ai-orb {
+  position: absolute;
+  inset: 2px;
+  background:
+    radial-gradient(circle at 30% 30%, rgb(255 255 255 / 0.9), transparent 28%),
+    conic-gradient(from 0deg, #7c3aed, #22d3ee, #a78bfa, #06b6d4, #7c3aed);
+  filter: saturate(1.2);
+  box-shadow: 0 0 22px rgb(139 92 246 / 0.7), 0 0 44px rgb(34 211 238 / 0.25);
+  border-radius: 50%;
+}
+
+/* Perspective grid floor with a slow scanning light. */
+.grid-floor {
+  background-image:
+    linear-gradient(rgb(139 92 246 / 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(139 92 246 / 0.22) 1px, transparent 1px);
+  background-size: 64px 64px;
+  transform: perspective(600px) rotateX(62deg);
+  transform-origin: 50% 0%;
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 55%, transparent 95%);
 }
 
 /* ── Card spotlight + lift ───────────────────── */
@@ -304,7 +387,7 @@ body {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.4s;
-  background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 50%), rgb(255 90 31 / 0.12), transparent 60%);
+  background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 50%), rgb(139 92 246 / 0.16), rgb(34 211 238 / 0.05) 35%, transparent 60%);
 }
 .glass:hover::after,
 [data-spotlight]:hover::after { opacity: 1; }
@@ -312,8 +395,8 @@ body {
   .glass:hover,
   [data-spotlight]:hover {
     transform: translateY(-4px);
-    border-color: rgb(255 90 31 / 0.28);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 30px 60px -30px rgb(255 90 31 / 0.35);
+    border-color: rgb(139 92 246 / 0.28);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 30px 60px -30px rgb(139 92 246 / 0.35);
   }
 }
 

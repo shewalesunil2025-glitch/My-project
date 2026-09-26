@@ -29,7 +29,7 @@ const columns = [
 export function Footer() {
   return (
     <footer className="relative mt-4 overflow-hidden">
-      <div aria-hidden className="absolute top-0 right-[10%] h-72 w-[40rem] rotate-[-20deg] bg-[linear-gradient(90deg,transparent,rgb(255_90_31/0.12),transparent)] blur-3xl" />
+      <div aria-hidden className="absolute top-0 right-[10%] h-72 w-[40rem] rotate-[-20deg] bg-[linear-gradient(90deg,transparent,rgb(139_92_246/0.12),transparent)] blur-3xl" />
       <div className="container-x relative grid gap-12 py-16 md:grid-cols-12 md:py-20">
         <div className="md:col-span-4">
           <Logo />

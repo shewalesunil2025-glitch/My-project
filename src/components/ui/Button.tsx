@@ -13,9 +13,9 @@ const base =
   "active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none";
 
 const variants: Record<Variant, string> = {
-  /** Ember pill — the main call to action. */
+  /** Violet pill — the main call to action. */
   primary:
-    "btn-shine bg-flow text-white shadow-[0_10px_30px_-10px_rgb(255_90_31/0.8)] hover:bg-flow-strong hover:shadow-[0_14px_40px_-8px_rgb(255_90_31/0.9)]",
+    "btn-shine bg-flow text-white shadow-[0_10px_30px_-10px_rgb(139_92_246/0.8)] hover:bg-flow-strong hover:shadow-[0_14px_40px_-8px_rgb(139_92_246/0.9)]",
   /** Transparent on dark. */
   ghost: "border border-white/12 bg-white/[0.04] text-fg hover:border-white/25 hover:bg-white/[0.08]",
   /** White pill on dark (used in the floating nav and final CTA). */

@@ -1,5 +1,6 @@
 "use client";
 
+import { Scramble } from "@/components/effects/Scramble";
 import { useRef, useState } from "react";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { ArrowUpRight, Bot, CalendarCheck, Globe, MessageCircle, PhoneCall, Sparkles, Star } from "lucide-react";
@@ -30,7 +31,7 @@ export function Demos() {
     <section id="work" aria-labelledby="work-title" className="paper relative z-10 mx-2 rounded-[2rem] py-20 md:mx-4 md:rounded-[3rem] md:py-28">
       <div className="container-x">
         <Reveal className="text-center">
-          <p className="badge">Work / Demos</p>
+          <p className="badge"><span aria-hidden className="text-flow-soft/80">05 //</span> <Scramble text="Work / Demos" /></p>
           <h2 id="work-title" className="display mt-5 text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
             <RevealWords text="Experience it now" />
           </h2>
@@ -53,7 +54,7 @@ export function Demos() {
             {/* Sky dome */}
             <div aria-hidden className="absolute top-6 left-1/2 h-48 w-80 -translate-x-1/2 rounded-t-full bg-[linear-gradient(180deg,#cfe1f3,rgb(207_225_243/0))] md:h-56 md:w-[26rem]" />
             <div className="relative text-center">
-              <span className="mx-auto grid size-11 place-items-center rounded-xl bg-flow text-white shadow-[0_10px_24px_-8px_rgb(255_90_31/0.8)]">
+              <span className="mx-auto grid size-11 place-items-center rounded-xl bg-flow text-white shadow-[0_10px_24px_-8px_rgb(139_92_246/0.8)]">
                 <Sparkles className="size-5" aria-hidden />
               </span>
               <h3 className="mt-4 text-2xl font-semibold tracking-tight text-ink md:text-3xl">Explore a live system</h3>
@@ -73,7 +74,7 @@ export function Demos() {
                     className={cn(
                       "rounded-2xl border p-4 text-left transition-[border-color,background-color,box-shadow] duration-300",
                       selected
-                        ? "border-flow/50 bg-flow/[0.06] shadow-[0_0_0_3px_rgb(255_90_31/0.12)]"
+                        ? "border-flow/50 bg-flow/[0.06] shadow-[0_0_0_3px_rgb(139_92_246/0.12)]"
                         : "border-paper-line bg-paper hover:border-ink/15",
                     )}
                   >

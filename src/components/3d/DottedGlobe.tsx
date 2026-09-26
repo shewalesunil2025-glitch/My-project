@@ -27,7 +27,7 @@ const rotY = ([x, y, z]: Vec, a: number): Vec => [x * Math.cos(a) + z * Math.sin
 const rotX = ([x, y, z]: Vec, a: number): Vec => [x, y * Math.cos(a) - z * Math.sin(a), y * Math.sin(a) + z * Math.cos(a)];
 
 /**
- * Ember dotted globe on canvas (adapted from 21st.dev "Interactive Globe"):
+ * Violet dotted globe on canvas (adapted from 21st.dev "Interactive Globe"):
  * Fibonacci dot sphere, glowing rim, labelled markers and travelling arcs.
  * Pauses off-screen; draws a single still frame with reduced motion.
  */
@@ -142,7 +142,7 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
         ctx.beginPath();
         ctx.arc(x, y, 5 + pulse * 5, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.fillStyle = "#ff5a1f";
+        ctx.fillStyle = "#8b5cf6";
         ctx.beginPath();
         ctx.arc(x, y, 3.2, 0, Math.PI * 2);
         ctx.fill();

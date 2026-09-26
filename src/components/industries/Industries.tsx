@@ -1,5 +1,6 @@
 "use client";
 
+import { Scramble } from "@/components/effects/Scramble";
 import { MapPin } from "lucide-react";
 import { industries } from "@/content/industries";
 import { RevealWords } from "@/components/effects/RevealWords";
@@ -20,7 +21,7 @@ export function Industries() {
     >
       <div className="container-x">
         <Reveal className="text-center">
-          <p className="badge">Industries</p>
+          <p className="badge"><span aria-hidden className="text-flow-soft/80">06 //</span> <Scramble text="Industries" /></p>
           <h2 id="industries-title" className="display mx-auto mt-5 max-w-3xl text-[clamp(2rem,4.6vw,3.6rem)] text-ink">
             <RevealWords text="A flexible solution for businesses that talk to customers" />
           </h2>

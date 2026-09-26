@@ -1,5 +1,6 @@
 "use client";
 
+import { Scramble } from "@/components/effects/Scramble";
 import { Reveal } from "@/components/effects/Reveal";
 import { ScrollWords } from "@/components/effects/ScrollWords";
 
@@ -14,7 +15,7 @@ export function Philosophy() {
     <section aria-labelledby="why-title" className="relative py-24 md:py-36">
       <div className="container-x">
         <Reveal className="text-center">
-          <p className="badge">Why Nexa Flow AI</p>
+          <p className="badge"><span aria-hidden className="text-flow-soft/80">03 //</span> <Scramble text="Why Nexa Flow AI" /></p>
         </Reveal>
         <ScrollWords
           id="why-title"

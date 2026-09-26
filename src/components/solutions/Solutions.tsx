@@ -1,5 +1,6 @@
 "use client";
 
+import { Scramble } from "@/components/effects/Scramble";
 import type { ReactNode } from "react";
 import { ArrowUpRight, Bell, CalendarCheck, CheckCircle2, Inbox, MessageSquareHeart, Star } from "lucide-react";
 import { solutions, type SolutionId } from "@/content/solutions";
@@ -59,11 +60,11 @@ export function Solutions() {
 
   return (
     <section id="solutions" aria-labelledby="solutions-title" className="relative py-24 md:py-36">
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[30rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(255_90_31/0.08),transparent_70%)]" />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[30rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(139_92_246/0.08),transparent_70%)]" />
       <div className="container-x relative">
         <div className="text-center">
           <Reveal>
-            <p className="badge">Solutions</p>
+            <p className="badge"><span aria-hidden className="text-flow-soft/80">02 //</span> <Scramble text="Solutions" /></p>
           </Reveal>
           <ScrollWords
             id="solutions-title"

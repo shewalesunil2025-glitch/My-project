@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { Scramble } from "@/components/effects/Scramble";
 import { pillars, promises } from "@/content/pillars";
 import { cn } from "@/lib/cn";
 import { Reveal } from "@/components/effects/Reveal";
@@ -9,11 +10,11 @@ import { BookDemoButton } from "@/components/cta/BookDemoButton";
 export function Pillars() {
   return (
     <section id="services" aria-labelledby="services-title" className="relative py-24 md:py-36">
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(255_90_31/0.08),transparent_70%)]" />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(139_92_246/0.08),transparent_70%)]" />
       <div className="container-x relative">
         <div className="text-center">
           <Reveal>
-            <p className="badge">Services</p>
+            <p className="badge"><span aria-hidden className="text-flow-soft/80">07 //</span> <Scramble text="Services" /></p>
           </Reveal>
           <ScrollWords
             id="services-title"
@@ -35,7 +36,7 @@ export function Pillars() {
                 className={cn(
                   "flex h-full flex-col rounded-[1.5rem] border p-6 transition-[border-color] duration-300",
                   p.featured
-                    ? "border-flow/40 bg-[linear-gradient(180deg,rgb(255_90_31/0.12),rgb(255_90_31/0.02)_40%),var(--color-ink-850)]"
+                    ? "beam border-flow/40 bg-[linear-gradient(180deg,rgb(139_92_246/0.12),rgb(139_92_246/0.02)_40%),var(--color-ink-850)]"
                     : "glass hover:border-white/15",
                 )}
               >

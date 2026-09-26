@@ -127,22 +127,22 @@ export function HeroCircuit({ delay = 0 }: { delay?: number }) {
               <path
                 d={n.path}
                 fill="none"
-                stroke="#ff5a1f"
+                stroke="#8b5cf6"
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeDasharray="3 60"
                 vectorEffect="non-scaling-stroke"
                 className="animate-dash"
-                style={{ animationDuration: `${2.4 + i * 0.3}s`, filter: "drop-shadow(0 0 4px #ff5a1f)" }}
+                style={{ animationDuration: `${2.4 + i * 0.3}s`, filter: "drop-shadow(0 0 4px #8b5cf6)" }}
               />
             </g>
           ))}
         </svg>
 
-        {/* Ember glow behind the character — the "chip" */}
+        {/* Violet glow behind the character — the "chip" */}
         <div
           aria-hidden
-          className="absolute bottom-0 left-1/2 h-[90%] w-[46%] -translate-x-1/2 bg-[radial-gradient(50%_50%_at_50%_45%,rgb(255_90_31/0.32),rgb(255_90_31/0.08)_55%,transparent_75%)] max-sm:w-[95%]"
+          className="absolute bottom-0 left-1/2 h-[90%] w-[46%] -translate-x-1/2 bg-[radial-gradient(50%_50%_at_50%_45%,rgb(139_92_246/0.32),rgb(139_92_246/0.08)_55%,transparent_75%)] max-sm:w-[95%]"
         />
 
         {hasCharacter && (
@@ -195,7 +195,7 @@ function NodeTile({ node, open, onToggle, delay }: { node: NodeDef; open: boolea
           "group flex items-center gap-3 rounded-2xl border bg-ink-850/95 p-2 pr-4 text-left shadow-[0_20px_40px_-20px_rgb(0_0_0/0.9)] backdrop-blur transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5",
           right && "flex-row-reverse pr-2 pl-4 text-right",
           open
-            ? "border-flow/60 shadow-[0_0_40px_-10px_rgb(255_90_31/0.6)]"
+            ? "border-flow/60 shadow-[0_0_40px_-10px_rgb(139_92_246/0.6)]"
             : "border-white/10 hover:border-flow/40",
         )}
       >

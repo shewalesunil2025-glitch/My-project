@@ -12,7 +12,7 @@ export function Founder() {
 
   return (
     <section id="about" aria-labelledby="founder-title" className="relative py-28 md:py-40">
-      <div className="absolute inset-0 bg-[radial-gradient(40%_50%_at_20%_50%,rgb(255_90_31/0.10),transparent_70%)]" aria-hidden />
+      <div className="absolute inset-0 bg-[radial-gradient(40%_50%_at_20%_50%,rgb(139_92_246/0.10),transparent_70%)]" aria-hidden />
       <div className="container-x relative grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
         <Reveal className="lg:col-span-5">
           <figure className="relative mx-auto max-w-md">
@@ -27,7 +27,7 @@ export function Founder() {
                   className="object-cover object-top"
                 />
               ) : (
-                <div className="grid size-full place-items-center bg-[radial-gradient(circle_at_50%_35%,rgb(255_90_31/0.18),transparent_60%)]">
+                <div className="grid size-full place-items-center bg-[radial-gradient(circle_at_50%_35%,rgb(139_92_246/0.18),transparent_60%)]">
                   <span className="display text-flow text-[7rem]" aria-hidden>
                     {initials}
                   </span>
