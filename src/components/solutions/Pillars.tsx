@@ -36,7 +36,7 @@ export function Pillars() {
                 className={cn(
                   "flex h-full flex-col rounded-[1.5rem] border p-6 transition-[border-color] duration-300",
                   p.featured
-                    ? "beam border-flow/40 bg-[linear-gradient(180deg,rgb(125_255_58/0.12),rgb(125_255_58/0.02)_40%),var(--color-ink-850)]"
+                    ? "beam border-flow/40 [background:linear-gradient(180deg,rgb(125_255_58/0.12),rgb(125_255_58/0.02)_40%),var(--color-ink-850)]"
                     : "glass hover:border-white/15",
                 )}
               >

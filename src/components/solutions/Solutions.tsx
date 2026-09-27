@@ -70,12 +70,13 @@ export function Solutions() {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const headOpacity = useTransform(p, [0, 0.05, 0.14, 0.2], [0.3, 1, 1, 0]);
-  const headBlur = useTransform(p, [0, 0.05], ["blur(12px)", "blur(0px)"]);
-  const helixOpacity = useTransform(p, [0, 0.08, 0.92, 1], [0.35, 1, 1, 0.4]);
+  // Function transforms (not range maps) keep these on the main thread, where values
+  // outside a range clamp reliably instead of snapping back on the compositor.
+  const headOpacity = useTransform(p, (v) => (v < 0.05 ? 0.3 + (v / 0.05) * 0.7 : v < 0.12 ? 1 : Math.max(0, 1 - (v - 0.12) / 0.06)));
+  const helixOpacity = useTransform(p, (v) => (v < 0.08 ? 0.35 + (v / 0.08) * 0.65 : v > 0.92 ? 1 - ((v - 0.92) / 0.08) * 0.6 : 1));
   // The ring of cards arrives as the heading leaves. (Perspective lives on each card,
   // so the list adds no stacking context and cards can pass in front of the helix.)
-  const ringOpacity = useTransform(p, [0.13, 0.21], [0, 1]);
+  const ringOpacity = useTransform(p, (v) => Math.min(1, Math.max(0, (v - 0.13) / 0.06)));
   const pinned = desktop && !reduce;
 
   return (
@@ -87,12 +88,12 @@ export function Solutions() {
       style={{ height: pinned ? `${100 + solutions.length * 55}vh` : undefined }}
     >
       <div className={cn(pinned ? "sticky top-0 h-svh overflow-hidden" : "relative py-24")}>
-        <motion.div aria-hidden style={{ opacity: helixOpacity }} className="absolute inset-0 z-20">
+        <motion.div aria-hidden style={{ opacity: helixOpacity }} className="absolute inset-0 z-0">
           <PointCloud shape="helix" size={1.05} interactive={false} />
         </motion.div>
 
         <motion.div
-          style={pinned ? { opacity: headOpacity, filter: headBlur } : undefined}
+          style={pinned ? { opacity: headOpacity } : undefined}
           className={cn("container-x text-center", pinned ? "absolute inset-x-0 top-1/2 -translate-y-1/2" : "relative")}
         >
           <p className="font-mono text-[0.68rem] tracking-[0.18em] text-flow uppercase">
@@ -109,7 +110,7 @@ export function Solutions() {
 
         <motion.ul
           style={pinned ? { opacity: ringOpacity } : undefined}
-          className={cn(pinned ? "absolute inset-0" : "container-x relative mt-14 grid gap-5 md:grid-cols-2")}>
+          className={cn(pinned ? "absolute inset-0 z-30" : "container-x relative mt-14 grid gap-5 md:grid-cols-2")}>
           {solutions.map((s, i) =>
             pinned ? (
               <FloatingCard key={s.id} solution={s} index={i} progress={p} />
@@ -129,27 +130,39 @@ export function Solutions() {
 const STEP = 1.05;
 
 /**
- * The cards sit on a ring around the helix and the ring turns as you scroll, so each
- * card swings round to the front (above the helix) and away again (behind it).
+ * The cards sit on a ring around the helix and the ring turns as you scroll. Each
+ * card rests at the front — sharp and fully lit — for most of its share of the
+ * scroll, then the ring turns quickly to the next one. Side cards stay small, dim
+ * and clear of the front card; nothing is blurred.
  */
 function FloatingCard({ solution, index, progress }: { solution: Solution; index: number; progress: MotionValue<number> }) {
   const n = solutions.length;
   const angle = useTransform(progress, (v) => {
-    const t = Math.min(1, Math.max(0, (v - 0.17) / 0.78));
-    return (index - t * (n - 1)) * STEP;
+    const t = Math.min(1, Math.max(0, (v - 0.17) / 0.78)) * (n - 1);
+    const k = Math.floor(t);
+    const f = t - k;
+    // Hold at the front, then turn: only the middle 35% of each step moves the ring.
+    const m = Math.min(1, Math.max(0, (f - 0.325) / 0.35));
+    const turned = k + m * m * (3 - 2 * m);
+    // Clamp so cards far round the ring park out of sight instead of wrapping back to the front.
+    return Math.max(-1.6, Math.min(1.6, (index - turned) * STEP));
   });
-  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 30}vw)`);
-  const y = useTransform(angle, (a) => `calc(-46% + ${Math.sin(a) * 6 - (1 - Math.cos(a)) * 5}vh)`);
-  const rotateY = useTransform(angle, (a) => `${(-a * 180) / Math.PI * 0.75}deg`);
-  const scale = useTransform(angle, (a) => 0.55 + 0.45 * Math.max(0, Math.cos(a)));
-  const opacity = useTransform(angle, (a) => Math.min(1, Math.max(0, (Math.cos(a) + 0.05) / 0.5)));
-  const filter = useTransform(angle, (a) => `blur(${((1 - Math.max(0, Math.cos(a))) * 3).toFixed(2)}px)`);
-  const zIndex = useTransform(angle, (a) => (Math.cos(a) > 0.9 ? 30 : 5 + Math.round(Math.cos(a) * 10)));
+  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 36}vw)`);
+  const y = useTransform(angle, (a) => `calc(-48% + ${(1 - Math.cos(a)) * -3}vh)`);
+  const rotateY = useTransform(angle, (a) => `${((-a * 180) / Math.PI) * 0.6}deg`);
+  const scale = useTransform(angle, (a) => 0.62 + 0.38 * Math.max(0, Math.cos(a)) ** 2);
+  const opacity = useTransform(angle, (a) => {
+    if (Math.abs(a) > 1.5) return 0;
+    const c = Math.cos(a);
+    const side = Math.max(0, Math.min(0.3, (c - 0.1) * 0.6));
+    const front = Math.min(1, Math.max(0, (c - 0.82) / 0.16));
+    return side + (1 - side) * front;
+  });
 
   return (
     <motion.li
-      style={{ x, y, rotateY, scale, opacity, filter, zIndex, transformPerspective: 1600 }}
-      className="absolute top-1/2 left-1/2 w-[28rem] [transform-style:preserve-3d]"
+      style={{ x, y, rotateY, scale, opacity, transformPerspective: 1600 }}
+      className="absolute top-1/2 left-1/2 z-30 w-[28rem] [transform-style:preserve-3d]"
     >
       <SolutionCard solution={solution} number={index + 1} />
     </motion.li>
@@ -174,7 +187,7 @@ function SolutionCard({ solution: s, number }: { solution: Solution; number: num
     <article
       id={`solution-${s.id}`}
       aria-labelledby={`solution-${s.id}-title`}
-      className="group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-white/15 bg-[linear-gradient(160deg,rgb(255_255_255/0.07),rgb(255_255_255/0.015)_45%),rgb(6_14_7/0.86)] shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_30px_80px_-30px_rgb(0_0_0/0.9)] backdrop-blur-md"
+      className="group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-white/15 [background:linear-gradient(160deg,rgb(255_255_255/0.07),rgb(255_255_255/0.015)_45%),rgb(6_14_7/0.96)] shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_30px_80px_-30px_rgb(0_0_0/0.9)] "
     >
       {/* Smoky green light in the corner, like the reference's card imagery */}
       <div aria-hidden className="absolute -top-20 -right-16 size-72 rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.22),rgb(40_140_30/0.1)_45%,transparent_70%)] blur-2xl" />
