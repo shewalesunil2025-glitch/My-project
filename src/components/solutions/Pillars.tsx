@@ -10,11 +10,11 @@ import { BookDemoButton } from "@/components/cta/BookDemoButton";
 export function Pillars() {
   return (
     <section id="services" aria-labelledby="services-title" className="relative py-24 md:py-36">
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(139_92_246/0.08),transparent_70%)]" />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(125_255_58/0.08),transparent_70%)]" />
       <div className="container-x relative">
         <div className="text-center">
           <Reveal>
-            <p className="badge"><span aria-hidden className="text-flow-soft/80">07 //</span> <Scramble text="Services" /></p>
+            <p className="badge"><Scramble text="Services" /></p>
           </Reveal>
           <ScrollWords
             id="services-title"
@@ -36,14 +36,14 @@ export function Pillars() {
                 className={cn(
                   "flex h-full flex-col rounded-[1.5rem] border p-6 transition-[border-color] duration-300",
                   p.featured
-                    ? "beam border-flow/40 bg-[linear-gradient(180deg,rgb(139_92_246/0.12),rgb(139_92_246/0.02)_40%),var(--color-ink-850)]"
+                    ? "beam border-flow/40 bg-[linear-gradient(180deg,rgb(125_255_58/0.12),rgb(125_255_58/0.02)_40%),var(--color-ink-850)]"
                     : "glass hover:border-white/15",
                 )}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold tracking-wide text-fg-muted uppercase">{p.lead}</span>
                   {p.featured && (
-                    <span className="rounded-full bg-flow px-2 py-0.5 text-xs font-semibold text-white">Popular</span>
+                    <span className="rounded-full bg-flow px-2 py-0.5 text-xs font-semibold text-ink-950">Popular</span>
                   )}
                 </div>
                 <div className="mt-5 flex items-baseline gap-2">

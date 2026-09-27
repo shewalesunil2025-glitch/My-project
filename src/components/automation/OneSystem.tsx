@@ -29,7 +29,7 @@ export function OneSystem() {
     <section id="ecosystem" aria-labelledby="one-title" className="relative overflow-hidden pt-24 md:pt-36">
       <div className="container-x relative z-10 text-center">
         <Reveal>
-          <p className="badge"><span aria-hidden className="text-flow-soft/80">04 //</span> <Scramble text="One system" /></p>
+          <p className="badge"><Scramble text="One system" /></p>
         </Reveal>
         <ScrollWords
           id="one-title"

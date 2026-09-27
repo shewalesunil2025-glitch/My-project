@@ -15,7 +15,6 @@ import { Founder } from "@/components/about/Founder";
 import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
 import { ScrollPanel } from "@/components/effects/ScrollPanel";
-import { AiOrb } from "@/components/effects/AiOrb";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -43,12 +42,8 @@ export default function HomePage() {
       <Navbar />
       <main id="main">
         <Hero />
-        <ScrollPanel variant="paper">
-          <ConnectSection />
-        </ScrollPanel>
-        <ScrollPanel>
-          <Solutions />
-        </ScrollPanel>
+        <ConnectSection />
+        <Solutions />
         <ScrollPanel>
           <Philosophy />
         </ScrollPanel>
@@ -78,7 +73,6 @@ export default function HomePage() {
         </ScrollPanel>
       </main>
       <Footer />
-      <AiOrb />
     </DemoProvider>
   );
 }

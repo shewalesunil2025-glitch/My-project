@@ -142,7 +142,7 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
         ctx.beginPath();
         ctx.arc(x, y, 5 + pulse * 5, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.fillStyle = "#8b5cf6";
+        ctx.fillStyle = "#7dff3a";
         ctx.beginPath();
         ctx.arc(x, y, 3.2, 0, Math.PI * 2);
         ctx.fill();

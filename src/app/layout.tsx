@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter_Tight } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { MotionConfig } from "framer-motion";
 import { siteConfig } from "@/config/site";
@@ -7,11 +7,10 @@ import { SmoothScroll } from "@/components/effects/SmoothScroll";
 import { IntroLoader } from "@/components/effects/IntroLoader";
 import { ScrollProgress } from "@/components/effects/ScrollProgress";
 import { Spotlight } from "@/components/effects/Spotlight";
-import { CursorAura } from "@/components/effects/CursorAura";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
-const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", display: "swap" });
+const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", weight: ["300", "400", "500"], display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -43,20 +42,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#06060c",
+  themeColor: "#030703",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${grotesk.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${jakarta.variable} ${tight.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body>
         <IntroLoader />
         <MotionConfig reducedMotion="user">
           <SmoothScroll />
           <ScrollProgress />
           <Spotlight />
-          <CursorAura />
           {children}
         </MotionConfig>
       </body>
