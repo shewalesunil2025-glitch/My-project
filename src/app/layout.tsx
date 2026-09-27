@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${jakarta.variable} ${tight.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body>
         <IntroLoader />
-        <MotionConfig reducedMotion="user">
+        <MotionConfig reducedMotion="never">
           <SmoothScroll />
           <ScrollProgress />
           <Spotlight />

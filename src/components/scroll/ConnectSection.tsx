@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { customerFlow, fragmentedTools } from "@/content/flow";
 import { heroCharacterConfig } from "@/config/site";
 import { HeroCharacter } from "@/components/hero/HeroCharacter";

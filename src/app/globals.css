@@ -300,11 +300,6 @@ body {
   from { clip-path: inset(0 0 0 0); }
   to { clip-path: inset(0 0 100% 0); visibility: hidden; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .intro { display: none; }
-  .swirl::before, .stars, .orbit { animation: none; }
-  .glass::before, [data-spotlight]::before, .beam::before { animation: none; }
-}
 
 /* ── AI surfaces ─────────────────────────────── */
 @property --beam-angle {
@@ -469,10 +464,5 @@ body {
   .no-scrollbar::-webkit-scrollbar { display: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
-}
+/* Animations run on every device, including phones with "reduce motion" /
+   battery saver on — the site owner's choice (see src/hooks/useReducedMotion.ts). */

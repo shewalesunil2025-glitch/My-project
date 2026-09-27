@@ -1,5 +1,6 @@
 "use client";
 
+import { prefersReducedMotion } from "@/hooks/useReducedMotion";
 import { useEffect, useRef } from "react";
 import type { MotionValue } from "framer-motion";
 import { cn } from "@/lib/cn";
@@ -177,7 +178,7 @@ export function PointCloud({ shape, disperse, interactive = true, size = 0.8, cl
     const canvas = ref.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
     const small = window.matchMedia("(max-width: 768px)").matches;
     const base = shape === "brain" ? 22000 : shape === "helix" ? 4200 : 4800;
     const n = Math.round(base * (small ? 0.45 : 1));

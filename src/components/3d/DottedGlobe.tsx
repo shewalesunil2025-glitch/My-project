@@ -1,5 +1,6 @@
 "use client";
 
+import { prefersReducedMotion } from "@/hooks/useReducedMotion";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
 
@@ -46,7 +47,7 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
     const canvas = ref.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
 
     const N = 2600;
     const golden = (1 + Math.sqrt(5)) / 2;

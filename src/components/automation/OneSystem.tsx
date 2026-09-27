@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ecosystem } from "@/content/flow";
 import { DottedGlobe, type GlobeMarker } from "@/components/3d/DottedGlobe";
 import { Scramble } from "@/components/effects/Scramble";

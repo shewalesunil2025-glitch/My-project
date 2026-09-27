@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import type { PointerEvent, ReactNode } from "react";
 import { useFinePointer } from "@/hooks/useMediaQuery";
 
