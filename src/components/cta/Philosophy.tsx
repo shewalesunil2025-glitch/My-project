@@ -343,24 +343,32 @@ function WatchfulEye() {
   const ref = useRef<SVGSVGElement>(null);
   const [look, setLook] = useState({ x: 0, y: 0 });
   useEffect(() => {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
     let raf = 0;
-    const onMove = (e: PointerEvent) => {
+    const lookAt = (clientX: number, clientY: number) => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
         const r = ref.current?.getBoundingClientRect();
         if (!r) return;
-        const dx = e.clientX - (r.left + r.width / 2);
-        const dy = e.clientY - (r.top + r.height / 2);
+        const dx = clientX - (r.left + r.width / 2);
+        const dy = clientY - (r.top + r.height / 2);
         const d = Math.hypot(dx, dy) || 1;
         const k = Math.min(1, d / 300);
         setLook({ x: (dx / d) * 9 * k, y: (dy / d) * 5 * k });
       });
     };
+    const onMove = (e: PointerEvent) => lookAt(e.clientX, e.clientY);
+    const onTouch = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) lookAt(t.clientX, t.clientY);
+    };
     window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("touchstart", onTouch, { passive: true });
+    window.addEventListener("touchmove", onTouch, { passive: true });
     return () => {
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("touchstart", onTouch);
+      window.removeEventListener("touchmove", onTouch);
       cancelAnimationFrame(raf);
     };
   }, []);

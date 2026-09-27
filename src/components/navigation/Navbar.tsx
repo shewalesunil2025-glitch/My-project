@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/cn";
@@ -16,6 +17,16 @@ const sectionIds = links.map((n) => n.href.slice(1));
  */
 export function Navbar() {
   const active = useActiveSection(sectionIds);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // On narrow screens the pill scrolls sideways: keep the current section's link centred in it.
+  useEffect(() => {
+    const list = listRef.current;
+    const link = list?.querySelector<HTMLElement>('[aria-current="true"]');
+    if (!list || !link || list.scrollWidth <= list.clientWidth) return;
+    const left = link.offsetLeft - (list.clientWidth - link.offsetWidth) / 2;
+    list.scrollTo({ left, behavior: "smooth" });
+  }, [active]);
 
   return (
     <>
@@ -42,10 +53,11 @@ export function Navbar() {
         className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-3 md:bottom-6"
       >
         <motion.ul
+          ref={listRef}
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.6, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="no-scrollbar flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-white/10 bg-ink-900/70 p-1 shadow-[0_20px_50px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl"
+          className="no-scrollbar relative flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-white/10 bg-ink-900/70 p-1 shadow-[0_20px_50px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl"
         >
           {links.map((item) => {
             const isActive = active === item.href.slice(1) || (!active && item.href === "#top");
@@ -55,7 +67,7 @@ export function Navbar() {
                   href={item.href}
                   aria-current={isActive ? "true" : undefined}
                   className={cn(
-                    "relative block rounded-full px-3 py-1.5 text-[0.75rem] font-medium whitespace-nowrap transition-colors md:px-3.5",
+                    "relative block rounded-full px-2.5 py-1.5 text-[0.72rem] font-medium whitespace-nowrap transition-colors md:px-3.5 md:text-[0.75rem]",
                     isActive ? "text-fg" : "text-fg-muted hover:text-fg",
                   )}
                 >

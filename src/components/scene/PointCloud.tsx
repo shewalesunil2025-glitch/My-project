@@ -359,13 +359,19 @@ export function PointCloud({ shape, disperse, interactive = true, size = 0.8, cl
       raf = visible && !reduce ? requestAnimationFrame(frame) : 0;
     };
 
-    const onMove = (e: PointerEvent) => {
+    const aim = (clientX: number, clientY: number) => {
       const r = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
+      mouse.x = clientX - r.left;
+      mouse.y = clientY - r.top;
       mouse.nx = Math.max(-1, Math.min(1, (mouse.x - r.width / 2) / (r.width / 2)));
       mouse.ny = Math.max(-1, Math.min(1, (mouse.y - r.height / 2) / (r.height / 2)));
-      mouse.active = e.pointerType === "mouse";
+      mouse.active = true;
+    };
+    const onMove = (e: PointerEvent) => aim(e.clientX, e.clientY);
+    // Phones: a finger works like the cursor — dots scatter under it, the form turns to it.
+    const onTouch = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) aim(t.clientX, t.clientY);
     };
     const onLeave = () => {
       mouse.x = mouse.y = -1e4;
@@ -388,6 +394,9 @@ export function PointCloud({ shape, disperse, interactive = true, size = 0.8, cl
     io.observe(canvas);
     if (interactive) {
       window.addEventListener("pointermove", onMove, { passive: true });
+      window.addEventListener("touchstart", onTouch, { passive: true });
+      window.addEventListener("touchmove", onTouch, { passive: true });
+      window.addEventListener("touchend", onLeave, { passive: true });
       document.documentElement.addEventListener("pointerleave", onLeave);
     }
     return () => {
@@ -395,6 +404,9 @@ export function PointCloud({ shape, disperse, interactive = true, size = 0.8, cl
       ro.disconnect();
       io.disconnect();
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("touchstart", onTouch);
+      window.removeEventListener("touchmove", onTouch);
+      window.removeEventListener("touchend", onLeave);
       document.documentElement.removeEventListener("pointerleave", onLeave);
     };
   }, [shape, disperse, interactive, size]);

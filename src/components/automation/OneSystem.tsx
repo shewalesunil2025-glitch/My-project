@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ecosystem } from "@/content/flow";
 import { DottedGlobe, type GlobeMarker } from "@/components/3d/DottedGlobe";
 import { Scramble } from "@/components/effects/Scramble";
 import { ScrollWords } from "@/components/effects/ScrollWords";
 import { cn } from "@/lib/cn";
+import { useFinePointer } from "@/hooks/useMediaQuery";
 
 const markers: GlobeMarker[] = [
   { lat: 22, lng: 74, label: "Website" },
@@ -36,6 +37,15 @@ export function OneSystem() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const [active, setActive] = useState<number | null>(null);
+  const fine = useFinePointer();
+  const inView = useInView(ref, { margin: "-20% 0px" });
+
+  // Phones have no hover: tour the six systems on the globe one by one instead.
+  useEffect(() => {
+    if (fine || reduce || !inView) return;
+    const id = setInterval(() => setActive((cur) => (cur === null ? 0 : (cur + 1) % markers.length)), 2600);
+    return () => clearInterval(id);
+  }, [fine, reduce, inView]);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
   const globeY = useTransform(scrollYProgress, (v) => `${reduce ? 0 : (1 - Math.min(1, v)) * 30}%`);
   const globeScale = useTransform(scrollYProgress, (v) => (reduce ? 1 : 0.8 + Math.min(1, v) * 0.2));

@@ -4,7 +4,6 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/cn";
-import { useFinePointer } from "@/hooks/useMediaQuery";
 import type { CharacterEyes } from "@/config/site";
 
 export type HeroCharacterProps = {
@@ -40,7 +39,8 @@ const pct = (v: number) => `${v * 100}%`;
  * toward the cursor. Both ease with requestAnimationFrame and write transforms
  * straight to the DOM, so moving the mouse never re-renders React. The character
  * keeps looking at the last cursor position when the mouse stops. Touch devices
- * and reduced motion get the neutral, front-facing pose.
+ * don't track the finger; the character glances around on its own instead.
+ * Reduced motion gets the neutral, front-facing pose.
  */
 export function HeroCharacter({
   src,
@@ -58,7 +58,6 @@ export function HeroCharacter({
   const headRef = useRef<HTMLDivElement>(null);
   const irisRef = useRef<HTMLDivElement>(null);
   const lidRef = useRef<HTMLDivElement>(null);
-  const fine = useFinePointer();
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -77,7 +76,7 @@ export function HeroCharacter({
       iris.style.transform = `translate3d(${sx * 100}%, ${sy * 100}%, 0)`;
     };
 
-    if (!fine || reduce) {
+    if (reduce) {
       apply(0, 0, 0, 0);
       return;
     }
@@ -107,10 +106,10 @@ export function HeroCharacter({
       raf = moving ? requestAnimationFrame(tick) : 0;
     };
 
-    const onMove = (e: PointerEvent) => {
+    const lookAt = (clientX: number, clientY: number) => {
       const r = root.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width * face.x);
-      const dy = e.clientY - (r.top + r.height * face.y);
+      const dx = clientX - (r.left + r.width * face.x);
+      const dy = clientY - (r.top + r.height * face.y);
       const d = Math.hypot(dx, dy) || 1;
       // Direction toward the cursor, scaled down when the cursor is close to the face.
       const reach = Math.min(d / REACH, 1);
@@ -121,6 +120,34 @@ export function HeroCharacter({
         raf = requestAnimationFrame(tick);
       }
     };
+
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") lookAt(e.clientX, e.clientY);
+    };
+
+    // Touch screens: no finger tracking (by request) — the character glances
+    // around on its own every couple of seconds instead.
+    let glance: ReturnType<typeof setInterval> | undefined;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      const spots: [number, number][] = [
+        [0.7, -0.2],
+        [0, 0],
+        [-0.65, -0.3],
+        [-0.3, 0.45],
+        [0, 0],
+        [0.55, 0.35],
+      ];
+      let k = 0;
+      glance = setInterval(() => {
+        const [gx, gy] = spots[k++ % spots.length];
+        tx = gx;
+        ty = gy;
+        if (!raf) {
+          last = performance.now();
+          raf = requestAnimationFrame(tick);
+        }
+      }, 1800);
+    }
 
     let blinkTimer: ReturnType<typeof setTimeout> | undefined;
     const lid = lidRef.current;
@@ -138,10 +165,11 @@ export function HeroCharacter({
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => {
       window.removeEventListener("pointermove", onMove);
+      clearInterval(glance);
       cancelAnimationFrame(raf);
       clearTimeout(blinkTimer);
     };
-  }, [fine, reduce, face.x, face.y, maxHeadTurn.yaw, maxHeadTurn.pitch, eyes, blink]);
+  }, [reduce, face.x, face.y, maxHeadTurn.yaw, maxHeadTurn.pitch, eyes, blink]);
 
   if (!src) return null;
 

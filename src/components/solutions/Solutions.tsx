@@ -77,7 +77,7 @@ export function Solutions() {
   // The ring of cards arrives as the heading leaves. (Perspective lives on each card,
   // so the list adds no stacking context and cards can pass in front of the helix.)
   const ringOpacity = useTransform(p, (v) => Math.min(1, Math.max(0, (v - 0.13) / 0.06)));
-  const pinned = desktop && !reduce;
+  const pinned = !reduce;
 
   return (
     <section
@@ -113,7 +113,7 @@ export function Solutions() {
           className={cn(pinned ? "absolute inset-0 z-30" : "container-x relative mt-14 grid gap-5 md:grid-cols-2")}>
           {solutions.map((s, i) =>
             pinned ? (
-              <FloatingCard key={s.id} solution={s} index={i} progress={p} />
+              <FloatingCard key={s.id} solution={s} index={i} progress={p} spread={desktop ? 30 : 74} />
             ) : (
               <Reveal as="li" key={s.id} delay={(i % 2) * 0.08}>
                 <SolutionCard solution={s} number={i + 1} />
@@ -134,14 +134,25 @@ const STEP = 1.05;
  * scroll, exactly as before. Every card stays crisp — no blur, solid glass — and the
  * one nearest the front is drawn on top, so its text is never covered.
  */
-function FloatingCard({ solution, index, progress }: { solution: Solution; index: number; progress: MotionValue<number> }) {
+function FloatingCard({
+  solution,
+  index,
+  progress,
+  spread,
+}: {
+  solution: Solution;
+  index: number;
+  progress: MotionValue<number>;
+  /** How far (vw) side cards swing out — wider on phones so they only peek in. */
+  spread: number;
+}) {
   const n = solutions.length;
   const angle = useTransform(progress, (v) => {
     const t = Math.min(1, Math.max(0, (v - 0.17) / 0.78)) * (n - 1);
     // Clamp so cards far round the ring park out of sight instead of wrapping back to the front.
     return Math.max(-1.6, Math.min(1.6, (index - t) * STEP));
   });
-  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 30}vw)`);
+  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * spread}vw)`);
   const y = useTransform(angle, (a) => `calc(-46% + ${Math.sin(a) * 6 - (1 - Math.cos(a)) * 5}vh)`);
   const rotateY = useTransform(angle, (a) => `${((-a * 180) / Math.PI) * 0.75}deg`);
   const scale = useTransform(angle, (a) => 0.55 + 0.45 * Math.max(0, Math.cos(a)));
@@ -151,7 +162,7 @@ function FloatingCard({ solution, index, progress }: { solution: Solution; index
   return (
     <motion.li
       style={{ x, y, rotateY, scale, opacity, zIndex, transformPerspective: 1600 }}
-      className="absolute top-1/2 left-1/2 w-[28rem] [transform-style:preserve-3d]"
+      className="absolute top-1/2 left-1/2 w-[min(28rem,86vw)] [transform-style:preserve-3d]"
     >
       <SolutionCard solution={solution} number={index + 1} />
     </motion.li>
