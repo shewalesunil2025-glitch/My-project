@@ -131,8 +131,8 @@ const STEP = 1.05;
 
 /**
  * The cards sit on a ring around the helix and the ring turns smoothly with the
- * scroll. Every card stays crisp — no blur, solid glass — and the one nearest the
- * front is drawn on top, so its text is never covered.
+ * scroll, exactly as before. Every card stays crisp — no blur, solid glass — and the
+ * one nearest the front is drawn on top, so its text is never covered.
  */
 function FloatingCard({ solution, index, progress }: { solution: Solution; index: number; progress: MotionValue<number> }) {
   const n = solutions.length;
@@ -141,10 +141,10 @@ function FloatingCard({ solution, index, progress }: { solution: Solution; index
     // Clamp so cards far round the ring park out of sight instead of wrapping back to the front.
     return Math.max(-1.6, Math.min(1.6, (index - t) * STEP));
   });
-  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 34}vw)`);
-  const y = useTransform(angle, (a) => `calc(-48% + ${Math.sin(a) * 5 - (1 - Math.cos(a)) * 3}vh)`);
-  const rotateY = useTransform(angle, (a) => `${((-a * 180) / Math.PI) * 0.7}deg`);
-  const scale = useTransform(angle, (a) => 0.6 + 0.4 * Math.max(0, Math.cos(a)));
+  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 30}vw)`);
+  const y = useTransform(angle, (a) => `calc(-46% + ${Math.sin(a) * 6 - (1 - Math.cos(a)) * 5}vh)`);
+  const rotateY = useTransform(angle, (a) => `${((-a * 180) / Math.PI) * 0.75}deg`);
+  const scale = useTransform(angle, (a) => 0.55 + 0.45 * Math.max(0, Math.cos(a)));
   const opacity = useTransform(angle, (a) => (Math.abs(a) > 1.5 ? 0 : Math.min(1, Math.max(0, (Math.cos(a) + 0.05) / 0.5))));
   const zIndex = useTransform(angle, (a) => 10 + Math.round(Math.cos(a) * 10));
 
