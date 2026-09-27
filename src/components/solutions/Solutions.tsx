@@ -2,7 +2,21 @@
 
 import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { ArrowUpRight, Bell, CalendarCheck, CheckCircle2, Inbox, MessageSquareHeart, Star } from "lucide-react";
+import {
+  ArrowUpRight,
+  Bell,
+  Bot,
+  CalendarCheck,
+  CheckCircle2,
+  Globe,
+  Inbox,
+  MessageCircle,
+  MessageSquareHeart,
+  PhoneCall,
+  Star,
+  Workflow,
+  type LucideIcon,
+} from "lucide-react";
 import { solutions, type Solution, type SolutionId } from "@/content/solutions";
 import { cn } from "@/lib/cn";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -59,6 +73,9 @@ export function Solutions() {
   const headOpacity = useTransform(p, [0, 0.05, 0.14, 0.2], [0.3, 1, 1, 0]);
   const headBlur = useTransform(p, [0, 0.05], ["blur(12px)", "blur(0px)"]);
   const helixOpacity = useTransform(p, [0, 0.08, 0.92, 1], [0.35, 1, 1, 0.4]);
+  // The ring of cards arrives as the heading leaves. (Perspective lives on each card,
+  // so the list adds no stacking context and cards can pass in front of the helix.)
+  const ringOpacity = useTransform(p, [0.13, 0.21], [0, 1]);
   const pinned = desktop && !reduce;
 
   return (
@@ -70,7 +87,7 @@ export function Solutions() {
       style={{ height: pinned ? `${100 + solutions.length * 55}vh` : undefined }}
     >
       <div className={cn(pinned ? "sticky top-0 h-svh overflow-hidden" : "relative py-24")}>
-        <motion.div aria-hidden style={{ opacity: helixOpacity }} className="absolute inset-0">
+        <motion.div aria-hidden style={{ opacity: helixOpacity }} className="absolute inset-0 z-20">
           <PointCloud shape="helix" size={1.05} interactive={false} />
         </motion.div>
 
@@ -90,74 +107,105 @@ export function Solutions() {
           <p className="mx-auto mt-5 max-w-xl text-fg-muted">Seven systems. Use one, or connect them all.</p>
         </motion.div>
 
-        <ul className={cn(pinned ? "absolute inset-0 [perspective:1400px]" : "container-x relative mt-14 grid gap-5 md:grid-cols-2")}>
+        <motion.ul
+          style={pinned ? { opacity: ringOpacity } : undefined}
+          className={cn(pinned ? "absolute inset-0" : "container-x relative mt-14 grid gap-5 md:grid-cols-2")}>
           {solutions.map((s, i) =>
             pinned ? (
               <FloatingCard key={s.id} solution={s} index={i} progress={p} />
             ) : (
               <Reveal as="li" key={s.id} delay={(i % 2) * 0.08}>
-                <SolutionCard solution={s} />
+                <SolutionCard solution={s} number={i + 1} />
               </Reveal>
             ),
           )}
-        </ul>
+        </motion.ul>
       </div>
     </section>
   );
 }
 
-/** One card's flight past the helix: in from below and far away, out above. */
+/** Angle between neighbouring cards on the ring around the helix (radians). */
+const STEP = 1.05;
+
+/**
+ * The cards sit on a ring around the helix and the ring turns as you scroll, so each
+ * card swings round to the front (above the helix) and away again (behind it).
+ */
 function FloatingCard({ solution, index, progress }: { solution: Solution; index: number; progress: MotionValue<number> }) {
-  // Each card owns a window of the scroll; windows overlap so two or three cards are
-  // in flight at once. Every offset stays inside 0…1 (scroll-linked animations
-  // can run on the compositor, which rejects offsets outside that range).
   const n = solutions.length;
-  const len = 0.3;
-  const step = (0.98 - 0.16 - len) / (n - 1);
-  const start = 0.16 + index * step;
-  const end = start + len;
-  const side = index % 2 ? 1 : -1;
-  const y = useTransform(progress, [start, end], ["70vh", "-80vh"]);
-  const x = useTransform(progress, [start, end], [`${side * 20}vw`, `${side * 26}vw`]);
-  const rotateY = useTransform(progress, [start, end], [side * -24, side * -8]);
-  const rotateZ = useTransform(progress, [start, end], [side * 4, side * -2]);
-  const scale = useTransform(progress, [start, (start + end) / 2, end], [0.78, 1, 0.9]);
-  const opacity = useTransform(progress, [start, start + 0.03, end - 0.04, end], [0, 1, 1, 0]);
+  const angle = useTransform(progress, (v) => {
+    const t = Math.min(1, Math.max(0, (v - 0.17) / 0.78));
+    return (index - t * (n - 1)) * STEP;
+  });
+  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 30}vw)`);
+  const y = useTransform(angle, (a) => `calc(-46% + ${Math.sin(a) * 6 - (1 - Math.cos(a)) * 5}vh)`);
+  const rotateY = useTransform(angle, (a) => `${(-a * 180) / Math.PI * 0.75}deg`);
+  const scale = useTransform(angle, (a) => 0.55 + 0.45 * Math.max(0, Math.cos(a)));
+  const opacity = useTransform(angle, (a) => Math.min(1, Math.max(0, (Math.cos(a) + 0.05) / 0.5)));
+  const filter = useTransform(angle, (a) => `blur(${((1 - Math.max(0, Math.cos(a))) * 3).toFixed(2)}px)`);
+  const zIndex = useTransform(angle, (a) => (Math.cos(a) > 0.9 ? 30 : 5 + Math.round(Math.cos(a) * 10)));
 
   return (
     <motion.li
-      style={{ y, x, rotateY, rotateZ, scale, opacity }}
-      className="absolute top-1/2 left-1/2 w-[27rem] -translate-x-1/2 -translate-y-1/2 [transform-style:preserve-3d]"
+      style={{ x, y, rotateY, scale, opacity, filter, zIndex, transformPerspective: 1600 }}
+      className="absolute top-1/2 left-1/2 w-[28rem] [transform-style:preserve-3d]"
     >
-      <SolutionCard solution={solution} />
+      <SolutionCard solution={solution} number={index + 1} />
     </motion.li>
   );
 }
 
-function SolutionCard({ solution: s }: { solution: Solution }) {
+const icons: Record<SolutionId, LucideIcon> = {
+  websites: Globe,
+  whatsapp: MessageCircle,
+  voice: PhoneCall,
+  chatbots: Bot,
+  booking: CalendarCheck,
+  reviews: Star,
+  workflows: Workflow,
+};
+
+/** Reference glass card: icon and [ n.0 ] on top, a big title, short copy, the live preview. */
+function SolutionCard({ solution: s, number }: { solution: Solution; number: number }) {
   const { openDemo } = useDemo();
+  const Icon = icons[s.id];
   return (
     <article
       id={`solution-${s.id}`}
       aria-labelledby={`solution-${s.id}-title`}
-      className="glass group flex flex-col overflow-hidden rounded-[1.5rem] bg-ink-900/60 backdrop-blur-xl"
+      className="group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-white/15 bg-[linear-gradient(160deg,rgb(255_255_255/0.07),rgb(255_255_255/0.015)_45%),rgb(6_14_7/0.86)] shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_30px_80px_-30px_rgb(0_0_0/0.9)] backdrop-blur-md"
     >
-      <div className="p-6 pb-4">
-        <p className="font-mono text-[0.65rem] tracking-[0.14em] text-flow uppercase">
-          {s.index} · {s.title}
-        </p>
-        <h3 id={`solution-${s.id}-title`} className="mt-2 text-xl leading-snug tracking-tight">
+      {/* Smoky green light in the corner, like the reference's card imagery */}
+      <div aria-hidden className="absolute -top-20 -right-16 size-72 rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.22),rgb(40_140_30/0.1)_45%,transparent_70%)] blur-2xl" />
+      <div className="relative flex items-start justify-between p-6 pb-0">
+        <span className="grid size-9 place-items-center rounded-full border border-white/15 text-flow">
+          <Icon className="size-4" aria-hidden />
+        </span>
+        <span className="font-mono text-[0.65rem] text-fg-muted">[ {number}.0 ]</span>
+      </div>
+      <div className="relative p-6 pt-8">
+        <p className="font-mono text-[0.62rem] tracking-[0.14em] text-flow uppercase">{s.title}</p>
+        <h3 id={`solution-${s.id}-title`} className="mt-2 text-[1.55rem] leading-[1.1] tracking-tight">
           {s.headline}
         </h3>
-        <p className="mt-2 text-sm leading-relaxed text-fg-muted">{s.summary}</p>
+        <p className="mt-3 text-[0.8rem] leading-relaxed text-fg-muted">{s.summary}</p>
+        <p className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-[0.7rem] text-fg-subtle">
+          {s.steps.map((step, i) => (
+            <span key={step}>
+              {step}
+              {i < s.steps.length - 1 && <span className="ml-2 text-flow/70">→</span>}
+            </span>
+          ))}
+        </p>
       </div>
-      <div className="relative mx-4 mb-4 h-[13rem] overflow-hidden rounded-2xl" aria-hidden>
+      <div className="relative mx-4 mb-4 h-[8.5rem] overflow-hidden rounded-2xl opacity-90" aria-hidden>
         {previews[s.id]()}
       </div>
       <button
         type="button"
         onClick={() => openDemo(s.title)}
-        className="mx-6 mb-6 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-fg transition-colors hover:text-flow"
+        className="relative mx-6 mb-6 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-fg transition-colors hover:text-flow"
       >
         See this for my business
         <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ElementType } from "react";
+import { useRef, type ElementType, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { cn } from "@/lib/cn";
 
@@ -13,17 +13,20 @@ type ScrollWordsProps = {
   accentFrom?: number;
   /** Starting opacity of words that have not been reached yet. */
   dim?: number;
+  /** Drawn in place of a "*" word — e.g. an animated icon between words. */
+  glyph?: ReactNode;
 };
 
 /** Heading whose words light up one by one as it scrolls into view. */
-export function ScrollWords({ text, as: Tag = "h2", id, className, accentFrom, dim = 0.18 }: ScrollWordsProps) {
+export function ScrollWords({ text, as: Tag = "h2", id, className, accentFrom, dim = 0.18, glyph }: ScrollWordsProps) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 88%", "start 38%"] });
   const words = text.split(" ");
+  const label = text.replace(/ \* /g, " ");
 
   return (
-    <Tag ref={ref} id={id} className={className} aria-label={text}>
+    <Tag ref={ref} id={id} className={className} aria-label={label}>
       {words.map((w, i) => (
         <Word
           key={i}
@@ -32,7 +35,7 @@ export function ScrollWords({ text, as: Tag = "h2", id, className, accentFrom, d
           dim={reduce ? 1 : dim}
           className={accentFrom !== undefined && i >= accentFrom ? "text-flow" : undefined}
         >
-          {w}
+          {w === "*" && glyph ? glyph : w}
         </Word>
       ))}
     </Tag>
@@ -46,7 +49,7 @@ function Word({
   dim,
   className,
 }: {
-  children: string;
+  children: ReactNode;
   progress: MotionValue<number>;
   range: [number, number];
   dim: number;
