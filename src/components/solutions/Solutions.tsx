@@ -130,39 +130,28 @@ export function Solutions() {
 const STEP = 1.05;
 
 /**
- * The cards sit on a ring around the helix and the ring turns as you scroll. Each
- * card rests at the front — sharp and fully lit — for most of its share of the
- * scroll, then the ring turns quickly to the next one. Side cards stay small, dim
- * and clear of the front card; nothing is blurred.
+ * The cards sit on a ring around the helix and the ring turns smoothly with the
+ * scroll. Every card stays crisp — no blur, solid glass — and the one nearest the
+ * front is drawn on top, so its text is never covered.
  */
 function FloatingCard({ solution, index, progress }: { solution: Solution; index: number; progress: MotionValue<number> }) {
   const n = solutions.length;
   const angle = useTransform(progress, (v) => {
     const t = Math.min(1, Math.max(0, (v - 0.17) / 0.78)) * (n - 1);
-    const k = Math.floor(t);
-    const f = t - k;
-    // Hold at the front, then turn: only the middle 35% of each step moves the ring.
-    const m = Math.min(1, Math.max(0, (f - 0.325) / 0.35));
-    const turned = k + m * m * (3 - 2 * m);
     // Clamp so cards far round the ring park out of sight instead of wrapping back to the front.
-    return Math.max(-1.6, Math.min(1.6, (index - turned) * STEP));
+    return Math.max(-1.6, Math.min(1.6, (index - t) * STEP));
   });
-  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 36}vw)`);
-  const y = useTransform(angle, (a) => `calc(-48% + ${(1 - Math.cos(a)) * -3}vh)`);
-  const rotateY = useTransform(angle, (a) => `${((-a * 180) / Math.PI) * 0.6}deg`);
-  const scale = useTransform(angle, (a) => 0.62 + 0.38 * Math.max(0, Math.cos(a)) ** 2);
-  const opacity = useTransform(angle, (a) => {
-    if (Math.abs(a) > 1.5) return 0;
-    const c = Math.cos(a);
-    const side = Math.max(0, Math.min(0.3, (c - 0.1) * 0.6));
-    const front = Math.min(1, Math.max(0, (c - 0.82) / 0.16));
-    return side + (1 - side) * front;
-  });
+  const x = useTransform(angle, (a) => `calc(-50% + ${Math.sin(a) * 34}vw)`);
+  const y = useTransform(angle, (a) => `calc(-48% + ${Math.sin(a) * 5 - (1 - Math.cos(a)) * 3}vh)`);
+  const rotateY = useTransform(angle, (a) => `${((-a * 180) / Math.PI) * 0.7}deg`);
+  const scale = useTransform(angle, (a) => 0.6 + 0.4 * Math.max(0, Math.cos(a)));
+  const opacity = useTransform(angle, (a) => (Math.abs(a) > 1.5 ? 0 : Math.min(1, Math.max(0, (Math.cos(a) + 0.05) / 0.5))));
+  const zIndex = useTransform(angle, (a) => 10 + Math.round(Math.cos(a) * 10));
 
   return (
     <motion.li
-      style={{ x, y, rotateY, scale, opacity, transformPerspective: 1600 }}
-      className="absolute top-1/2 left-1/2 z-30 w-[28rem] [transform-style:preserve-3d]"
+      style={{ x, y, rotateY, scale, opacity, zIndex, transformPerspective: 1600 }}
+      className="absolute top-1/2 left-1/2 w-[28rem] [transform-style:preserve-3d]"
     >
       <SolutionCard solution={solution} number={index + 1} />
     </motion.li>
