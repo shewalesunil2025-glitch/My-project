@@ -39,7 +39,7 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 
 The layout, colours and motion follow a reference landing page supplied as a screen recording: a black-green canvas lit by one neon lime accent, light thin display type, "// LABEL //" mono eyebrows, the logo and a "Contact us" pill on top and the section links in a pill floating at the bottom, particle forms made of green dots, and scroll-pinned scenes. All content is Nexa Flow AI's own.
 
-1. **Hero** — "The business that never sleeps." split around a brain made of ~22k green dots (`PointCloud shape="brain"`). The brain turns toward the cursor and its dots scatter around it. One screen tall: scrolling on lifts the copy away and loosens the brain, straight into the next section.
+1. **Hero** *(pinned)* — "The business that never sleeps." split around a brain made of ~22k green dots (`PointCloud shape="brain"`). The brain turns toward the cursor and its dots scatter around it. Scrolling makes the headline grow and fly apart while the brain bursts into dust and a green nebula.
 2. **The problem** — "Your business shouldn't need five different tools…" beside a glowing light pillar, the answer, then a scan card: the mascot as a green hologram inside face-scan brackets (still watching the cursor) and the eight-step customer journey.
 3. **Solutions** *(pinned)* — dust gathers into a turning DNA helix, the heading forms, then the seven solution cards (each with its live mini-demo) float past in 3D. Stacked cards on phones.
 4. **Why Nexa Flow AI** — scroll-lit statement and a green bento: two feature tiles and the three principles.

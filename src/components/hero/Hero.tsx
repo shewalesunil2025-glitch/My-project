@@ -12,20 +12,24 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
  * Reference hero: a brain of green dots under a spotlight, the headline split to
- * either side of it. One screen tall — as you scroll on, the copy lifts away and
- * the brain loosens a little, straight into the next section.
+ * either side of it. Scrolling pins the scene — the headline grows and flies apart
+ * while the brain bursts into drifting dust and a green nebula.
  */
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const [d] = useState(introDelay);
-  const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
-  const textY = useTransform(p, [0, 1], ["0vh", reduce ? "0vh" : "-12vh"]);
-  const textOpacity = useTransform(p, [0, 0.7], [1, 0]);
-  const disperse = useTransform(p, [0.1, 1], [0, 0.35]);
-  const spot = useTransform(p, [0, 0.8], [1, 0.3]);
-  const hint = useTransform(p, [0, 0.12], [1, 0]);
+  const leftX = useTransform(p, [0, 0.5], ["0vw", reduce ? "0vw" : "-38vw"]);
+  const rightX = useTransform(p, [0, 0.5], ["0vw", reduce ? "0vw" : "38vw"]);
+  const textScale = useTransform(p, [0, 0.5], [1, reduce ? 1 : 1.9]);
+  const textOpacity = useTransform(p, [0.18, 0.45], [1, 0]);
+  const disperse = useTransform(p, [0.12, 0.85], [0, 1]);
+  const brainScale = useTransform(p, [0, 0.6], [1, reduce ? 1 : 1.35]);
+  const nebula = useTransform(p, [0.3, 0.75], [0, 1]);
+  const spot = useTransform(p, [0, 0.5], [1, 0.25]);
+  const hint = useTransform(p, [0, 0.08], [1, 0]);
 
   const rise = (delay: number) => ({
     initial: reduce ? { opacity: 0 } : { opacity: 0, y: 30, filter: "blur(10px)" },
@@ -34,16 +38,24 @@ export function Hero() {
   });
 
   return (
-    <section ref={ref} id="top" aria-labelledby="hero-title" className="relative h-svh min-h-[40rem]">
-      <div className="absolute inset-0 overflow-hidden">
+    <section ref={ref} id="top" aria-labelledby="hero-title" className="relative h-[260vh]">
+      <div className="sticky top-0 h-svh overflow-hidden">
         {/* Spotlight from above */}
         <motion.div aria-hidden style={{ opacity: spot }} className="pointer-events-none absolute inset-0">
           <div className="absolute -top-[30vh] left-1/2 h-[95vh] w-[70vw] -translate-x-1/2 bg-[radial-gradient(50%_55%_at_50%_30%,rgb(125_255_58/0.32),rgb(40_140_30/0.14)_45%,transparent_75%)] blur-2xl" />
           <div className="absolute inset-x-0 top-0 h-[70vh] bg-[linear-gradient(to_bottom,rgb(30_110_30/0.35),transparent)]" />
         </motion.div>
 
+        {/* Nebula the brain dissolves into */}
+        <motion.div aria-hidden style={{ opacity: nebula }} className="pointer-events-none absolute inset-0">
+          <div className="absolute top-[8%] left-[18%] h-[40vh] w-[46vw] animate-aurora rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.28),transparent_65%)] blur-3xl" />
+          <div className="absolute top-[30%] right-[8%] h-[36vh] w-[34vw] animate-aurora rounded-full bg-[radial-gradient(circle,rgb(60_200_60/0.22),transparent_65%)] blur-3xl [animation-delay:-8s]" />
+          <div className="stars absolute inset-0" />
+        </motion.div>
+
         {/* The brain */}
         <motion.div
+          style={{ scale: brainScale }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 2, delay: d + 0.2 }}
@@ -58,7 +70,7 @@ export function Hero() {
         {/* Headline, split around the brain */}
         <h1 id="hero-title" className="display pointer-events-none absolute inset-0 text-[clamp(2.8rem,7vw,6.6rem)] text-fg">
           <motion.span
-            style={{ y: textY, opacity: textOpacity }}
+            style={{ x: leftX, scale: textScale, opacity: textOpacity }}
             className="absolute top-[26%] left-[6%] origin-left md:top-[30%] md:left-[7%]"
           >
             <motion.span className="block" {...rise(0.1)}>
@@ -69,7 +81,7 @@ export function Hero() {
             </motion.span>
           </motion.span>
           <motion.span
-            style={{ y: textY, opacity: textOpacity }}
+            style={{ x: rightX, scale: textScale, opacity: textOpacity }}
             className="absolute right-[6%] bottom-[24%] origin-right text-right md:right-[8%] md:bottom-[22%]"
           >
             <motion.span className="block" {...rise(0.35)}>
@@ -79,7 +91,7 @@ export function Hero() {
         </h1>
 
         {/* Eyebrow + call to action on the left */}
-        <motion.div style={{ y: textY, opacity: textOpacity }} className="absolute top-[18%] left-[6%] md:top-[22%] md:left-[7%]">
+        <motion.div style={{ opacity: textOpacity }} className="absolute top-[18%] left-[6%] md:top-[22%] md:left-[7%]">
           <motion.p {...rise(0)} className="font-mono text-[0.68rem] tracking-[0.18em] text-flow uppercase">
             {"// "}
             <Scramble text="AI automation agency" delay={d + 0.3} />
@@ -87,7 +99,7 @@ export function Hero() {
           </motion.p>
         </motion.div>
         <motion.div
-          style={{ y: textY, opacity: textOpacity }}
+          style={{ opacity: textOpacity }}
           className="absolute top-[52%] left-[6%] md:top-[60%] md:left-[7%]"
         >
           <motion.div {...rise(0.5)} className="flex flex-col items-start gap-3">
@@ -98,7 +110,7 @@ export function Hero() {
 
         {/* Small copy beside "sleeps." */}
         <motion.p
-          style={{ y: textY, opacity: textOpacity }}
+          style={{ opacity: textOpacity }}
           className="absolute right-[6%] bottom-[12%] max-w-[17rem] text-right text-xs leading-relaxed text-fg-muted md:right-[8%] md:bottom-[14%] md:text-[0.8rem]"
         >
           <motion.span className="block" {...rise(0.6)}>
