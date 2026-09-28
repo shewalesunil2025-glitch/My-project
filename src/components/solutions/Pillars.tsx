@@ -6,7 +6,10 @@ import { Reveal } from "@/components/effects/Reveal";
 import { ScrollWords } from "@/components/effects/ScrollWords";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
 
-/** Services, laid out like the reference's pricing cards (no invented prices). */
+/**
+ * Services as pricing cards. Each shows a "Starting at" price (USD) — the final
+ * figure depends on scope — placed after the service list, just above the CTA.
+ */
 export function Pillars() {
   return (
     <section id="services" aria-labelledby="services-title" className="relative py-24 md:py-36">
@@ -34,7 +37,7 @@ export function Pillars() {
             <Reveal as="li" key={p.title} delay={i * 0.06}>
               <article
                 className={cn(
-                  "flex h-full flex-col rounded-[1.5rem] border p-6 transition-[border-color] duration-300",
+                  "group flex h-full flex-col rounded-[1.5rem] border p-6 transition-[border-color] duration-300",
                   p.featured
                     ? "beam border-flow/40 [background:linear-gradient(180deg,rgb(125_255_58/0.12),rgb(125_255_58/0.02)_40%),var(--color-ink-850)]"
                     : "glass hover:border-white/15",
@@ -49,7 +52,6 @@ export function Pillars() {
                 <div className="mt-5 flex items-baseline gap-2">
                   <p.icon className="size-6 self-center text-flow" aria-hidden />
                   <h3 className="text-2xl font-semibold tracking-tight xl:text-3xl">{p.title}</h3>
-                  <span className="text-sm whitespace-nowrap text-fg-muted">/ {p.terms}</span>
                 </div>
                 <div className="my-6 h-px bg-white/[0.08]" />
                 <ul className="space-y-3 text-sm">
@@ -63,12 +65,30 @@ export function Pillars() {
                   ))}
                 </ul>
                 <div className="mt-auto pt-8">
+                  <div className="border-t border-white/[0.08] pt-6">
+                    {/* Fixed height so "Starting at" lines up across all four cards */}
+                    <div className="flex h-5 items-center justify-between gap-3">
+                      <span className="font-mono text-[0.65rem] tracking-[0.16em] text-fg-subtle uppercase">Starting at</span>
+                      {p.billing === "monthly" && (
+                        <span className="rounded-full border border-white/10 px-2 py-0.5 font-mono text-[0.6rem] tracking-[0.12em] text-fg-muted uppercase">
+                          Monthly
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 flex items-baseline gap-1">
+                      <span className="display origin-left text-[2.4rem] leading-none text-fg transition-[color,transform] duration-500 ease-[var(--ease-out-expo)] group-hover:scale-[1.03] group-hover:text-flow-soft">
+                        {p.price}
+                      </span>
+                      {p.billing === "monthly" && <span className="text-base text-fg-muted">/mo</span>}
+                      <span className="sr-only">{p.billing === "monthly" ? " per month" : " per project"}</span>
+                    </p>
+                  </div>
                   <BookDemoButton
                     label={p.cta}
                     interest={p.interest}
                     variant={p.featured ? "primary" : "ghost"}
                     magnetic={false}
-                    className="w-full"
+                    className="mt-6 w-full"
                   />
                 </div>
               </article>

@@ -7,8 +7,10 @@ export type Pillar = {
   icon: LucideIcon;
   cta: string;
   interest: string;
-  /** How the engagement is billed — never a made-up number. */
-  terms: string;
+  /** Entry price in USD, e.g. "$499". Always shown as "Starting at" — the final price depends on scope. */
+  price: string;
+  /** "one-time" for projects, "monthly" for ongoing work (shown as "/mo"). */
+  billing: "one-time" | "monthly";
   featured?: boolean;
 };
 
@@ -21,7 +23,8 @@ export const pillars: Pillar[] = [
     icon: Blocks,
     cta: "Talk about a build",
     interest: "AI-powered website",
-    terms: "fixed price",
+    price: "$499",
+    billing: "one-time",
   },
   {
     title: "Automate",
@@ -30,7 +33,8 @@ export const pillars: Pillar[] = [
     icon: Workflow,
     cta: "Talk about automation",
     interest: "Workflow automation",
-    terms: "fixed price",
+    price: "$799",
+    billing: "one-time",
     featured: true,
   },
   {
@@ -40,7 +44,8 @@ export const pillars: Pillar[] = [
     icon: TrendingUp,
     cta: "Talk about growth",
     interest: "Growth & marketing",
-    terms: "fixed price",
+    price: "$999",
+    billing: "monthly",
   },
   {
     title: "Partner",
@@ -49,7 +54,8 @@ export const pillars: Pillar[] = [
     icon: Handshake,
     cta: "Talk about a partnership",
     interest: "Monthly partnership",
-    terms: "monthly",
+    price: "$1,499",
+    billing: "monthly",
   },
 ];
 
