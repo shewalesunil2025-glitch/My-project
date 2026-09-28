@@ -62,6 +62,6 @@ export const pillars: Pillar[] = [
 /** Commitments shown with the pillars. */
 export const promises = [
   { title: "Free 30-minute call", body: "We look at how your customers reach you today." },
-  { title: "Proposal within 24 hours", body: "Clear scope, timeline and a fixed price." },
-  { title: "Fixed price, no surprises", body: "No commitment until you say yes." },
+  { title: "Proposal within 24 hours", body: "Clear scope, timeline and a fixed quote." },
+  { title: "Fixed quote, no surprises", body: "No commitment until you say yes." },
 ];

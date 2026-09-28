@@ -2,7 +2,7 @@ export const processSteps = [
   {
     index: "01",
     title: "Discover",
-    body: "A free 30-minute call. Within 24 hours you get a clear scope, timeline and fixed-price proposal — no commitment.",
+    body: "A free 30-minute call. Within 24 hours you get a clear scope, timeline and a fixed quote — no commitment.",
   },
   {
     index: "02",

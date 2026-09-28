@@ -96,8 +96,14 @@ export function Pillars() {
           ))}
         </ul>
 
+        <Reveal delay={0.08}>
+          <p className="mt-6 text-center font-mono text-[0.65rem] tracking-[0.14em] text-fg-subtle uppercase">
+            Prices in USD · Final quote depends on scope
+          </p>
+        </Reveal>
+
         <Reveal delay={0.1}>
-          <ul className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-fg-muted">
+          <ul className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-fg-muted">
             {promises.map((p) => (
               <li key={p.title} className="flex items-center gap-2">
                 <span className="size-1.5 rounded-full bg-flow" aria-hidden />

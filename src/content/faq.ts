@@ -17,7 +17,7 @@ export const faqs = [
   },
   {
     q: "How is pricing decided?",
-    a: "Fixed price, no surprises. After a free 30-minute call you get a written scope, timeline and fixed-price proposal within 24 hours. Nothing starts until you say yes.",
+    a: "Every plan has a clear starting price in USD — Build from $499, Automate from $799, Grow from $999/mo and Partner from $1,499/mo. The final figure depends on your scope: after a free 30-minute call you get a written scope, timeline and a fixed quote within 24 hours. Nothing starts until you say yes.",
   },
   {
     q: "How long does a project take?",

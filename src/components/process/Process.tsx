@@ -25,7 +25,7 @@ export function Process() {
           />
           <Reveal delay={0.1}>
             <p className="mx-auto mt-5 max-w-xl text-fg-muted md:text-lg">
-              From first conversation to a live system — clear scope, fixed price.
+              From first conversation to a live system — clear scope, fixed quote.
             </p>
           </Reveal>
         </div>
