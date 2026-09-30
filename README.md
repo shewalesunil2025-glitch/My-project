@@ -32,8 +32,11 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap and robots |
 | `NEXT_PUBLIC_BOOKING_URL` | Optional Calendly / Cal.com link. When set, every "Book a Free Demo" opens it |
 | `LEAD_WEBHOOK_URL` | Optional n8n / Make / Zapier / CRM webhook that receives demo requests |
+| `ANTHROPIC_API_KEY` | Powers Shambhu, the voice assistant in the bottom-right corner (`/api/shambhu`, Claude). Without it, Shambhu politely points visitors to the contact form |
 
 **Honest by default:** if `LEAD_WEBHOOK_URL` is not set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
+
+**Shambhu voice assistant:** speech recognition and the child-like voice run in the visitor's browser (Web Speech API; Chrome and Android work best, Safari has partial support). Shambhu detects the visitor's language (English, Hindi, Marathi and other Indian languages) and replies in it. Its knowledge is built from the site's own content in `src/lib/shambhuAgent.ts`, so prices and FAQs never drift.
 
 ## Page structure
 

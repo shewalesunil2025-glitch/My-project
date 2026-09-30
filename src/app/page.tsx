@@ -12,6 +12,7 @@ import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
 import { Shambhu } from "@/components/shambhu/Shambhu";
 import { AutomationStore } from "@/components/shambhu/AutomationStore";
+import { ShambhuAgent } from "@/components/shambhu/ShambhuAgent";
 import { ScrollPanel } from "@/components/effects/ScrollPanel";
 
 const jsonLd = {
@@ -67,6 +68,7 @@ export default function HomePage() {
         </ScrollPanel>
       </main>
       <Footer />
+      <ShambhuAgent />
     </DemoProvider>
   );
 }
