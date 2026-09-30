@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight, Camera, Clapperboard, Check, MapPin, Megaphone, MessageCircle, Search, ThumbsUp } from "lucide-react";
+import { ArrowUpRight, Camera, Check, MapPin, Megaphone, MessageCircle, SquarePlay, Target, ThumbsUp } from "lucide-react";
 import { digitalMarketing, inclusions, marketingSteps } from "@/content/digitalMarketing";
 import { useDemo } from "@/components/cta/DemoProvider";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
@@ -17,10 +17,10 @@ const ease = [0.16, 1, 0.3, 1] as const;
 const channels = [
   { icon: Camera, label: "Instagram" },
   { icon: ThumbsUp, label: "Facebook" },
-  { icon: Clapperboard, label: "YouTube" },
-  { icon: Search, label: "Google" },
+  { icon: SquarePlay, label: "YouTube" },
+  { icon: Target, label: "Google Ads" },
   { icon: MessageCircle, label: "WhatsApp" },
-  { icon: MapPin, label: "Maps" },
+  { icon: MapPin, label: "Google Maps" },
 ];
 
 /**
@@ -132,21 +132,21 @@ export function DigitalMarketing() {
   );
 }
 
-/** A glowing megaphone with the marketing channels orbiting it. */
+/** A glowing megaphone with the marketing channels orbiting it; each label stays upright. */
 function ChannelOrbit() {
   const reduce = useReducedMotion();
   return (
     <Reveal delay={0.1} className="relative mx-auto aspect-square w-full max-w-[26rem]">
       <div aria-hidden className="absolute inset-[18%] rounded-full bg-[radial-gradient(closest-side,rgb(125_255_58/0.35),transparent)] blur-2xl" />
-      <div aria-hidden className="absolute inset-[6%] rounded-full border border-dashed border-flow/20" />
+      <div aria-hidden className="absolute inset-[13%] rounded-full border border-dashed border-flow/25" />
       <div aria-hidden className="absolute inset-[24%] rounded-full border border-flow/15" />
       <div className="absolute inset-[34%] grid place-items-center rounded-full bg-flow text-ink-950 shadow-[0_0_80px_-10px_rgb(125_255_58/0.9)]">
         <Megaphone className="size-[38%]" aria-hidden />
         <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flow/30 [animation-duration:2.6s]" />
       </div>
       <ul
-        aria-label="Channels"
-        className="absolute inset-[6%] animate-spin [animation-duration:28s]"
+        aria-label="Channels we run for you"
+        className="absolute inset-[13%] animate-spin [animation-duration:36s]"
         style={reduce ? { animation: "none" } : undefined}
       >
         {channels.map((c, i) => {
@@ -154,16 +154,17 @@ function ChannelOrbit() {
           return (
             <li
               key={c.label}
-              className="absolute size-14 -translate-1/2"
+              className="absolute -translate-1/2"
               style={{ left: `${50 + Math.sin(a) * 50}%`, top: `${50 - Math.cos(a) * 50}%` }}
             >
               <span
-                className="grid size-full animate-spin place-items-center rounded-2xl border border-flow/30 bg-ink-850 text-flow shadow-[0_10px_30px_-10px_rgb(125_255_58/0.6)] [animation-direction:reverse] [animation-duration:28s]"
+                className="flex animate-spin items-center gap-1.5 rounded-full border border-flow/35 bg-ink-850/95 py-1.5 pr-3 pl-1.5 text-[0.7rem] font-medium whitespace-nowrap text-fg shadow-[0_10px_30px_-10px_rgb(125_255_58/0.6)] backdrop-blur [animation-direction:reverse] [animation-duration:36s] md:text-xs"
                 style={reduce ? { animation: "none" } : undefined}
-                title={c.label}
               >
-                <c.icon className="size-5" aria-hidden />
-                <span className="sr-only">{c.label}</span>
+                <span className="grid size-6 place-items-center rounded-full bg-flow/15 text-flow">
+                  <c.icon className="size-3.5" aria-hidden />
+                </span>
+                {c.label}
               </span>
             </li>
           );
