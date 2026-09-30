@@ -29,7 +29,7 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-4 overflow-hidden">
+    <footer className="relative mt-4 overflow-hidden pb-28 md:pb-0">
       {/* Green glow rising from the floor, as in the reference */}
       <div aria-hidden className="absolute bottom-[-10rem] left-1/2 h-[26rem] w-[50rem] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(125_255_58/0.28),rgb(40_140_30/0.12)_55%,transparent)] blur-2xl" />
       <div className="container-x relative grid gap-12 pt-20 pb-12 md:grid-cols-12 md:pt-28">

@@ -7,6 +7,7 @@ import { useDemo } from "@/components/cta/DemoProvider";
 import { agentLanguages, type AgentLang, type AgentMessage, type AgentReply } from "@/lib/shambhuAgent";
 import { answerLocally } from "@/lib/shambhuLocal";
 import { cn } from "@/lib/cn";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 /* ── Browser speech types (not in the TS DOM lib) ───────────────────────── */
 type RecognitionResult = { isFinal: boolean; 0: { transcript: string } };
@@ -86,6 +87,7 @@ export function ShambhuAgent() {
   const [muted, setMuted] = useState(false);
   const canListen = useSyncExternalStore(noopSubscribe, () => Boolean(getRecognition()), () => false);
   const [hint, setHint] = useState(false);
+  const desktop = useMediaQuery("(min-width: 768px)");
 
   const recRef = useRef<Recognition | null>(null);
   /** Set once the AI endpoint is unavailable; Shambhu then answers from the site's content (free mode). */
@@ -250,9 +252,9 @@ export function ShambhuAgent() {
   return (
     <>
       {/* Launcher */}
-      <div className="fixed right-4 bottom-[5.25rem] z-[60] md:right-6 md:bottom-6">
+      <div className={cn("fixed right-4 bottom-[5.25rem] z-[60] md:right-6 md:bottom-6", open && "max-md:hidden")}>
         <AnimatePresence>
-          {hint && !open && (
+          {hint && !open && desktop && (
             <motion.button
               type="button"
               onClick={() => setOpen(true)}
@@ -272,7 +274,7 @@ export function ShambhuAgent() {
           aria-expanded={open}
           aria-controls="shambhu-agent"
           aria-label={open ? "Close Shambhu" : "Ask Shambhu, the voice assistant"}
-          className="group relative grid size-16 place-items-center rounded-full"
+          className="group relative grid size-14 place-items-center rounded-full md:size-16"
         >
           {!open && <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flow/30 [animation-duration:2.4s]" />}
           <span
@@ -292,6 +294,20 @@ export function ShambhuAgent() {
         </button>
       </div>
 
+      {/* Phones: dim the page behind the chat sheet; tapping it closes the chat */}
+      <AnimatePresence>
+        {open && !desktop && (
+          <motion.div
+            aria-hidden
+            onClick={close}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[65] bg-black/60 backdrop-blur-[2px]"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Chat panel */}
       <AnimatePresence>
         {open && (
@@ -304,7 +320,7 @@ export function ShambhuAgent() {
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             onAnimationComplete={() => inputRef.current?.focus({ preventScroll: true })}
-            className="fixed inset-x-3 bottom-[10rem] z-[60] flex h-[min(34rem,calc(100svh-12rem))] origin-bottom-right flex-col overflow-hidden rounded-[1.6rem] border border-flow/25 [background:linear-gradient(180deg,rgb(125_255_58/0.1),transparent_30%),var(--color-ink-900)] shadow-[0_40px_100px_-30px_rgb(0_0_0/0.95),0_0_60px_-30px_rgb(125_255_58/0.6)] md:inset-x-auto md:right-6 md:bottom-[6.5rem] md:w-[24rem]"
+            className="fixed inset-x-0 bottom-0 z-[70] flex h-[85dvh] origin-bottom flex-col overflow-hidden rounded-t-[1.6rem] border border-b-0 border-flow/25 pb-[env(safe-area-inset-bottom)] md:inset-x-auto md:h-[min(34rem,calc(100dvh-9rem))] md:origin-bottom-right md:rounded-[1.6rem] md:border-b md:pb-0 [background:linear-gradient(180deg,rgb(125_255_58/0.1),transparent_30%),var(--color-ink-900)] shadow-[0_40px_100px_-30px_rgb(0_0_0/0.95),0_0_60px_-30px_rgb(125_255_58/0.6)] md:right-6 md:bottom-[6.5rem] md:w-[24rem]"
           >
             {/* Header */}
             <header className="flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
