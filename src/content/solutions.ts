@@ -1,76 +1,70 @@
-export type SolutionId =
-  | "websites"
-  | "whatsapp"
-  | "voice"
-  | "chatbots"
-  | "booking"
-  | "reviews"
-  | "workflows";
+export type SolutionId = "website" | "whatsapp" | "voice" | "support" | "leads" | "reviews" | "social" | "email";
 
 export type Solution = {
   id: SolutionId;
-  index: string;
   title: string;
   headline: string;
   summary: string;
-  steps: string[];
+  /** "Starting at" price in USD, as shown on the pricing cards. */
+  price: string;
 };
 
+/** The services Shambhu runs. Prices match the pricing section (src/content/shambhu.ts). */
 export const solutions: Solution[] = [
   {
-    id: "websites",
-    index: "01",
-    title: "AI-Powered Websites",
-    headline: "Your website should do more than look good.",
-    summary: "Premium design that captures leads, answers questions and books appointments on its own.",
-    steps: ["Premium UI", "Lead capture", "Smart interactions", "Booking", "AI built in"],
+    id: "website",
+    title: "Website",
+    headline: "A website that works while you sleep.",
+    summary: "A fast, modern website that captures enquiries and hands them straight to Shambhu.",
+    price: "$299",
   },
   {
     id: "whatsapp",
-    index: "02",
-    title: "AI WhatsApp Automation",
-    headline: "Your customers are on WhatsApp. So is your AI.",
-    summary: "Instant replies that inform, qualify and book — then follow up automatically.",
-    steps: ["Customer message", "AI response", "Information", "Qualification", "Booking", "Follow-up"],
+    title: "WhatsApp Automation",
+    headline: "Every WhatsApp message answered.",
+    summary: "Instant replies, details and follow-ups on WhatsApp Business.",
+    price: "$49/mo",
   },
   {
     id: "voice",
-    index: "03",
-    title: "AI Voice Receptionist",
+    title: "AI Voice Assistant",
     headline: "Every call answered. Even at 2 a.m.",
-    summary: "A natural-sounding voice agent that understands, answers and books — then confirms by message.",
-    steps: ["Incoming call", "AI answers", "Understands", "Answers questions", "Books appointment", "Sends confirmation"],
+    summary: "Answers calls in a natural voice, takes enquiries and booking requests.",
+    price: "$79/mo",
   },
   {
-    id: "chatbots",
-    index: "04",
-    title: "AI Chatbots",
-    headline: "Conversations that actually convert.",
-    summary: "Trained on your business, your tone and your services — not a generic script.",
-    steps: ["Visitor asks", "AI understands", "Answers from your data", "Hands off to a human when needed"],
+    id: "support",
+    title: "Customer Support",
+    headline: "Answers from your business, not a script.",
+    summary: "Common questions answered on every channel. Tricky ones go to your team.",
+    price: "$49/mo",
   },
   {
-    id: "booking",
-    index: "05",
-    title: "Booking Automation",
-    headline: "From inquiry to confirmed — without a single call.",
-    summary: "Calendars, confirmations and reminders that run themselves.",
-    steps: ["Inquiry", "Appointment", "Confirmation", "Reminder"],
+    id: "leads",
+    title: "Lead Follow-up",
+    headline: "No lead goes cold again.",
+    summary: "Every enquiry followed up on time, until it becomes a customer.",
+    price: "$39/mo",
   },
   {
     id: "reviews",
-    index: "06",
-    title: "Review Automation",
-    headline: "Turn great service into great reputation.",
-    summary: "The right message, at the right moment, asking the right customers for a Google review.",
-    steps: ["Completed service", "Customer follow-up", "Google Review request"],
+    title: "Google Review Management",
+    headline: "Real reviews from real customers.",
+    summary: "Asks happy customers for a review and drafts replies for you. Never fake reviews.",
+    price: "$29/mo",
   },
   {
-    id: "workflows",
-    index: "07",
-    title: "Business Workflow Automation",
-    headline: "Let AI handle the repetitive work.",
-    summary: "Your CRM, calendar, sheets and messaging — connected, so data moves on its own.",
-    steps: ["Trigger", "AI decision", "Update CRM", "Notify team", "Done"],
+    id: "social",
+    title: "Instagram · Facebook · YouTube",
+    headline: "Your social media, on autopilot.",
+    summary: "Replies to DMs and comments, and plans posts in your brand voice.",
+    price: "$39/mo each",
+  },
+  {
+    id: "email",
+    title: "Email Automation",
+    headline: "An inbox that sorts itself.",
+    summary: "Sorts Gmail, drafts replies and sends the follow-ups you approve.",
+    price: "$29/mo",
   },
 ];

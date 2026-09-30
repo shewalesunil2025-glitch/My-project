@@ -4,17 +4,14 @@ import { Navbar } from "@/components/navigation/Navbar";
 import { Hero } from "@/components/hero/Hero";
 import { ConnectSection } from "@/components/scroll/ConnectSection";
 import { Solutions } from "@/components/solutions/Solutions";
-import { Pillars } from "@/components/solutions/Pillars";
 import { OneSystem } from "@/components/automation/OneSystem";
 import { Industries } from "@/components/industries/Industries";
-import { Demos } from "@/components/demos/Demos";
-import { Process } from "@/components/process/Process";
-import { Philosophy } from "@/components/cta/Philosophy";
 import { FinalCta } from "@/components/cta/FinalCta";
 import { Founder } from "@/components/about/Founder";
 import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
 import { Shambhu } from "@/components/shambhu/Shambhu";
+import { Pricing } from "@/components/shambhu/Pricing";
 import { ScrollPanel } from "@/components/effects/ScrollPanel";
 
 const jsonLd = {
@@ -26,14 +23,15 @@ const jsonLd = {
   founder: { "@type": "Person", name: founder.name, jobTitle: founder.role },
   description: siteConfig.description,
   serviceType: [
-    "AI-powered websites",
-    "AI WhatsApp automation",
-    "AI voice receptionist",
-    "AI chatbots",
-    "Booking automation",
-    "Review automation",
-    "Business workflow automation",
-    "Shambhu AI business assistant (in development)",
+    "Websites",
+    "AI voice assistant",
+    "WhatsApp automation",
+    "Customer support automation",
+    "Lead follow-up",
+    "Instagram, Facebook and YouTube automation",
+    "Email automation",
+    "Google review management",
+    "Digital marketing",
   ],
 };
 
@@ -47,25 +45,16 @@ export default function HomePage() {
         <ConnectSection />
         <Solutions />
         <ScrollPanel>
-          <Philosophy />
-        </ScrollPanel>
-        <ScrollPanel>
           <OneSystem />
         </ScrollPanel>
         <ScrollPanel>
           <Shambhu />
         </ScrollPanel>
-        <ScrollPanel variant="paper">
-          <Demos />
+        <ScrollPanel>
+          <Pricing />
         </ScrollPanel>
         <ScrollPanel variant="paper">
           <Industries />
-        </ScrollPanel>
-        <ScrollPanel>
-          <Pillars />
-        </ScrollPanel>
-        <ScrollPanel>
-          <Process />
         </ScrollPanel>
         <ScrollPanel>
           <Founder />

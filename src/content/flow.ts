@@ -2,11 +2,12 @@ import {
   Bell,
   Bot,
   CalendarCheck,
-  Database,
   Globe,
+  Mail,
   MessageCircle,
   PhoneCall,
   Repeat,
+  Share2,
   Star,
   UserPlus,
   type LucideIcon,
@@ -19,7 +20,7 @@ export type FlowNode = {
   icon: LucideIcon;
 };
 
-/** The customer journey Nexa Flow AI automates end-to-end. */
+/** The customer journey Shambhu automates end-to-end. */
 export const customerFlow: FlowNode[] = [
   { id: "website", label: "Website", detail: "A visitor lands on a site built to convert.", icon: Globe },
   { id: "conversation", label: "AI Conversation", detail: "AI answers questions instantly, 24/7.", icon: Bot },
@@ -39,7 +40,7 @@ export const ecosystem: { label: string; benefit: string; icon: LucideIcon }[] =
   { label: "Website", benefit: "Brings customers in", icon: Globe },
   { label: "WhatsApp", benefit: "Replies instantly", icon: MessageCircle },
   { label: "AI Voice", benefit: "Answers every call", icon: PhoneCall },
-  { label: "Booking", benefit: "Fills your calendar", icon: CalendarCheck },
-  { label: "CRM", benefit: "Remembers every customer", icon: Database },
+  { label: "Social Media", benefit: "Replies to DMs", icon: Share2 },
+  { label: "Email", benefit: "Sorts your inbox", icon: Mail },
   { label: "Reviews", benefit: "Grows your rating", icon: Star },
 ];

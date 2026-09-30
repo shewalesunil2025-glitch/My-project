@@ -55,12 +55,7 @@ function PillarStatement() {
           <Reveal>
             <p className="font-mono text-[0.68rem] tracking-[0.18em] text-fg-subtle uppercase">[ The answer ]</p>
             <p className="mt-4 text-lg leading-snug text-fg">
-              Nexa Flow AI connects your website, WhatsApp, calls, bookings, follow-ups and reviews into one intelligent
-              system.
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-fg-muted">
-              We don&apos;t just build a website. We build the system around the website — so every customer moves from
-              first visit to five-star review without anyone chasing them.
+              Shambhu connects your website, WhatsApp, calls, email, social media and reviews into one AI assistant.
             </p>
             <BookDemoButton size="md" className="mt-7" />
           </Reveal>

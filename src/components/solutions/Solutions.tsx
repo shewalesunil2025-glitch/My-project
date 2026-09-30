@@ -15,7 +15,9 @@ import {
   MessageSquareHeart,
   PhoneCall,
   Star,
-  Workflow,
+  Mail,
+  Share2,
+  UserRoundCheck,
   type LucideIcon,
 } from "lucide-react";
 import { solutions, type Solution, type SolutionId } from "@/content/solutions";
@@ -30,40 +32,58 @@ import { WhatsAppPreview } from "./previews/WhatsAppPreview";
 import { VoicePreview } from "./previews/VoicePreview";
 import { ChatbotPreview } from "./previews/ChatbotPreview";
 import { StepsPreview } from "./previews/StepsPreview";
-import { WorkflowPreview } from "./previews/WorkflowPreview";
 
 const previews: Record<SolutionId, () => ReactNode> = {
-  websites: () => <WebsitePreview />,
+  website: () => <WebsitePreview />,
   whatsapp: () => <WhatsAppPreview />,
   voice: () => <VoicePreview />,
-  chatbots: () => <ChatbotPreview />,
-  booking: () => (
+  support: () => <ChatbotPreview />,
+  leads: () => (
     <StepsPreview
-      title="Booking automation"
+      title="Lead follow-up"
       steps={[
-        { label: "Inquiry", meta: "Website · 10:02", icon: Inbox },
-        { label: "Appointment", meta: "Thu · 4:30 PM", icon: CalendarCheck },
-        { label: "Confirmation", meta: "Sent on WhatsApp + email", icon: CheckCircle2 },
-        { label: "Reminder", meta: "24h and 2h before", icon: Bell },
+        { label: "New enquiry", meta: "Website · 10:02", icon: Inbox },
+        { label: "Instant reply", meta: "Sent on WhatsApp", icon: MessageCircle },
+        { label: "Follow-up", meta: "Next day, if no answer", icon: Bell },
+        { label: "Booked", meta: "Added to your calendar", icon: CalendarCheck },
       ]}
     />
   ),
   reviews: () => (
     <StepsPreview
-      title="Review automation"
+      title="Google reviews"
       steps={[
-        { label: "Service completed", meta: "Marked done in your system", icon: CheckCircle2 },
-        { label: "Customer follow-up", meta: "“How was your visit?”", icon: MessageSquareHeart },
-        { label: "Google Review request", meta: "Sent to happy customers", icon: Star },
+        { label: "Visit completed", meta: "Marked done", icon: CheckCircle2 },
+        { label: "Review request", meta: "“How was your visit?”", icon: MessageSquareHeart },
+        { label: "Reply drafted", meta: "Waiting for your approval", icon: Star },
       ]}
     />
   ),
-  workflows: () => <WorkflowPreview />,
+  social: () => (
+    <StepsPreview
+      title="Social media"
+      steps={[
+        { label: "Post planned", meta: "Instagram · Facebook · YouTube", icon: CalendarCheck },
+        { label: "You approve", meta: "One tap in the app", icon: CheckCircle2 },
+        { label: "Published", meta: "Comments answered after", icon: Share2 },
+      ]}
+    />
+  ),
+  email: () => (
+    <StepsPreview
+      title="Email"
+      steps={[
+        { label: "New email", meta: "Gmail inbox", icon: Inbox },
+        { label: "Sorted", meta: "Enquiry · Invoice · Other", icon: Mail },
+        { label: "Reply drafted", meta: "Sent once you approve", icon: CheckCircle2 },
+      ]}
+    />
+  ),
 };
 
 /**
  * Reference "DNA" scene: dust gathers into a slowly turning helix, the heading forms
- * out of it, then the seven solution cards float past in 3D as you scroll — each
+ * out of it, then the eight service cards float past in 3D as you scroll — each
  * with its live preview. On small screens the cards simply stack over the helix.
  */
 export function Solutions() {
@@ -99,14 +119,14 @@ export function Solutions() {
         >
           <p className="font-mono text-[0.68rem] tracking-[0.18em] text-flow uppercase">
             {"// "}
-            <Scramble text="Solutions" />
+            <Scramble text="Services" />
             {" //"}
           </p>
           <h2 id="solutions-title" className="display mx-auto mt-5 max-w-3xl text-[clamp(2.2rem,4.6vw,4rem)]">
             Your customers are talking. <span className="text-fg-subtle">Your business</span>{" "}
             <span className="text-flow">⊙</span> should be ready.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-fg-muted">Seven systems. Use one, or connect them all.</p>
+          <p className="mx-auto mt-5 max-w-xl text-fg-muted">Eight services, one assistant. Buy only what you need.</p>
         </motion.div>
 
         <motion.ul
@@ -171,13 +191,14 @@ function FloatingCard({
 }
 
 const icons: Record<SolutionId, LucideIcon> = {
-  websites: Globe,
+  website: Globe,
   whatsapp: MessageCircle,
   voice: PhoneCall,
-  chatbots: Bot,
-  booking: CalendarCheck,
+  support: Bot,
+  leads: UserRoundCheck,
   reviews: Star,
-  workflows: Workflow,
+  social: Share2,
+  email: Mail,
 };
 
 /** Reference glass card: icon and [ n.0 ] on top, a big title, short copy, the live preview. */
@@ -204,13 +225,9 @@ function SolutionCard({ solution: s, number }: { solution: Solution; number: num
           {s.headline}
         </h3>
         <p className="mt-3 text-[0.8rem] leading-relaxed text-fg-muted">{s.summary}</p>
-        <p className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-[0.7rem] text-fg-subtle">
-          {s.steps.map((step, i) => (
-            <span key={step}>
-              {step}
-              {i < s.steps.length - 1 && <span className="ml-2 text-flow/70">→</span>}
-            </span>
-          ))}
+        <p className="mt-4 flex items-baseline gap-1.5">
+          <span className="font-mono text-[0.6rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
+          <span className="text-lg font-semibold text-flow-soft">{s.price}</span>
         </p>
       </div>
       <div className="relative mx-4 mb-4 h-[8.5rem] overflow-hidden rounded-2xl opacity-90" aria-hidden>
@@ -221,7 +238,7 @@ function SolutionCard({ solution: s, number }: { solution: Solution; number: num
         onClick={() => openDemo(s.title)}
         className="relative mx-6 mb-6 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-fg transition-colors hover:text-flow"
       >
-        See this for my business
+        Get started
         <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
       </button>
     </article>

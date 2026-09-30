@@ -1,15 +1,15 @@
 import { siteConfig } from "@/config/site";
-import { pillars } from "@/content/pillars";
+import { store } from "@/content/shambhu";
 import { Logo } from "@/components/navigation/Logo";
 
 const columns = [
   {
     title: "Explore",
     links: [
-      { label: "Solutions", href: "#solutions" },
-      { label: "How It Works", href: "#process" },
+      { label: "Services", href: "#solutions" },
+      { label: "Shambhu AI", href: "#shambhu" },
+      { label: "Pricing", href: "#pricing" },
       { label: "Industries", href: "#industries" },
-      { label: "Work / Demos", href: "#work" },
     ],
   },
   {
@@ -22,7 +22,7 @@ const columns = [
   },
   {
     title: "Services",
-    links: pillars.map((p) => ({ label: p.title, href: "#services" })),
+    links: store.slice(0, 5).map((s) => ({ label: s.title, href: "#pricing" })),
   },
 ];
 

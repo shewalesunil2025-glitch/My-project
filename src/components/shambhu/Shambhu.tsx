@@ -3,17 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useInView, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, BellRing, Bot, Check, Mic, PlayCircle, Search, Sparkles } from "lucide-react";
+import { BellRing, Check, Mic, PlayCircle, Search, Sparkles } from "lucide-react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import {
   appAreas,
   appNav,
-  capabilities,
   journey,
   safeguards,
   sampleActivity,
   shambhu,
-  store,
 } from "@/content/shambhu";
 import { heroCharacterConfig } from "@/config/site";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
@@ -26,9 +24,8 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
  * Shambhu — the AI Business Operating System app (in development).
- * An honest product showcase: what the assistant is being built to do, how a
- * business gets set up, the Automation Store and how data is kept safe. The app
- * preview is labelled as a preview and its activity as sample activity.
+ * An honest product showcase: the app preview (labelled as a preview, with
+ * sample activity), how a business goes live and how data is kept safe.
  */
 export function Shambhu() {
   return (
@@ -40,9 +37,7 @@ export function Shambhu() {
       <div className="container-x relative">
         <Intro />
         <AppPreview />
-        <Capabilities />
         <Journey />
-        <Store />
         <Safeguards />
       </div>
     </section>
@@ -64,8 +59,7 @@ function Intro() {
       <Reveal delay={0.1}>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-fg md:text-xl">{shambhu.positioning}</p>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-fg-muted md:text-base">
-          Shambhu — the face you just saw scanning — is the app we are building: one assistant that answers your calls,
-          WhatsApp, email and social media, follows up every lead and shows you everything it does.
+          One assistant for your calls, WhatsApp, email and social media — and one app to see everything it does.
         </p>
       </Reveal>
       <Reveal delay={0.18} className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -323,152 +317,50 @@ function AppPreview() {
   );
 }
 
-/* ───────────────────────────── Capabilities ───────────────────────────── */
-
-function Capabilities() {
-  return (
-    <div className="mt-28 md:mt-40">
-      <SubHead label="What Shambhu does" title="One assistant. Every channel your customers use." />
-      <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-        {capabilities.map((c, i) => (
-          <motion.li
-            key={c.title}
-            initial={{ opacity: 0, y: 40, rotateX: 30 }}
-            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "0px 0px -8% 0px" }}
-            transition={{ duration: 0.9, delay: (i % 5) * 0.07, ease }}
-            style={{ transformPerspective: 800 }}
-          >
-            <article className="glass group flex h-full flex-col gap-3 rounded-2xl p-4 md:p-5">
-              <span className="grid size-10 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
-                <c.icon className="size-4" aria-hidden />
-              </span>
-              <h4 className="text-sm font-semibold md:text-base">{c.title}</h4>
-              <p className="text-xs leading-relaxed text-fg-muted md:text-sm">{c.body}</p>
-              <span className="mt-auto font-mono text-[0.6rem] text-fg-subtle">[ {String(i + 1).padStart(2, "0")} ]</span>
-            </article>
-          </motion.li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-/* ───────────────────────────── Journey ───────────────────────────── */
+/* ───────────────────────────── How it works ───────────────────────────── */
 
 function Journey() {
   const ref = useRef<HTMLOListElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.75", "end 0.55"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.6"] });
   const fill = useTransform(scrollYProgress, (v) => Math.min(1, Math.max(0, v)));
 
   return (
     <div className="mt-28 md:mt-40">
-      <SubHead label="How it works" title="From sign-up to a working assistant — in ten steps." />
-      <div className="relative mx-auto mt-12 max-w-3xl">
-        {/* The line fills as you scroll through the steps */}
-        <div aria-hidden className="absolute top-2 bottom-2 left-[1.1rem] w-px bg-white/10 md:left-1/2">
+      <SubHead label="How it works" title="Live in five simple steps." />
+      <div className="relative mt-12">
+        {/* The line fills as you scroll: down the steps on phones, across them on desktop */}
+        <div aria-hidden className="absolute top-2 bottom-2 left-[1.1rem] w-px bg-white/10 md:top-[1.1rem] md:right-[10%] md:bottom-auto md:left-[10%] md:h-px md:w-auto">
           <motion.div
             style={{ scaleY: fill }}
-            className="absolute inset-0 origin-top bg-gradient-to-b from-flow-soft via-flow to-flow-strong shadow-[0_0_12px_rgb(125_255_58/0.8)]"
+            className="absolute inset-0 origin-top bg-flow shadow-[0_0_12px_rgb(125_255_58/0.8)] md:hidden"
+          />
+          <motion.div
+            style={{ scaleX: fill }}
+            className="absolute inset-0 origin-left bg-flow shadow-[0_0_12px_rgb(125_255_58/0.8)] max-md:hidden"
           />
         </div>
-        <ol ref={ref} className="space-y-6 md:space-y-4">
-          {journey.map((step, i) => {
-            const right = i % 2 === 1;
-            return (
-              <motion.li
-                key={step.title}
-                initial={{ opacity: 0, x: right ? 40 : -40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "0px 0px -15% 0px" }}
-                transition={{ duration: 0.8, ease }}
-                className={cn(
-                  "relative pl-12 md:w-1/2 md:pl-0",
-                  right ? "md:ml-auto md:pl-10" : "md:pr-10 md:text-right",
-                )}
-              >
-                <span
-                  className={cn(
-                    "absolute top-0.5 left-0 grid size-9 place-items-center rounded-full border border-flow/40 bg-ink-950 font-mono text-[0.7rem] text-flow shadow-[0_0_20px_-4px_rgb(125_255_58/0.8)]",
-                    right ? "md:-left-[1.125rem]" : "md:right-[-1.125rem] md:left-auto",
-                  )}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h4 className="text-base font-semibold md:text-lg">{step.title}</h4>
-                <p className="mt-1 text-sm text-fg-muted">{step.body}</p>
-              </motion.li>
-            );
-          })}
+        <ol ref={ref} className="grid gap-6 md:grid-cols-5 md:gap-4">
+          {journey.map((step, i) => (
+            <motion.li
+              key={step.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -12% 0px" }}
+              transition={{ duration: 0.8, delay: i * 0.08, ease }}
+              className="relative pl-12 md:pl-0 md:text-center"
+            >
+              <span className="absolute top-0 left-0 grid size-9 place-items-center rounded-full border border-flow/40 bg-ink-950 font-mono text-[0.7rem] text-flow shadow-[0_0_20px_-4px_rgb(125_255_58/0.8)] md:relative md:mx-auto">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h4 className="text-base font-semibold md:mt-4">{step.title}</h4>
+              <p className="mt-1 text-sm text-fg-muted">{step.body}</p>
+            </motion.li>
+          ))}
         </ol>
       </div>
-      <Reveal>
-        <p className="mx-auto mt-10 max-w-2xl rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-4 text-center text-sm leading-relaxed text-fg-muted">
-          <span className="font-semibold text-fg">Honest note:</span> activation is not instant. It depends on you
-          authorising each account, on platform approval (for example WhatsApp Business) and on the business details you
-          share. Shambhu shows you the status of every step.
-        </p>
-      </Reveal>
-    </div>
-  );
-}
-
-/* ───────────────────────────── Automation Store ───────────────────────────── */
-
-function Store() {
-  const regular = store.filter((s) => !s.premium);
-  const premium = store.find((s) => s.premium);
-  return (
-    <div id="store" className="mt-28 scroll-mt-24 md:mt-40">
-      <SubHead label="Automation Store" title="Buy only what you need. Add more any time." />
-      <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-        {regular.map((s, i) => (
-          <Reveal as="li" key={s.title} delay={(i % 4) * 0.05}>
-            <article className="glass group flex h-full flex-col rounded-2xl p-4 md:p-5">
-              <div className="flex items-center justify-between">
-                <span className="grid size-10 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow transition-transform duration-500 group-hover:scale-110">
-                  <s.icon className="size-4" aria-hidden />
-                </span>
-                <span className="font-mono text-[0.58rem] tracking-[0.12em] text-fg-subtle uppercase max-sm:hidden">
-                  Individual
-                </span>
-              </div>
-              <h4 className="mt-4 text-sm font-semibold md:text-base">{s.title}</h4>
-              <p className="mt-1 text-xs leading-relaxed text-fg-muted md:text-sm">{s.body}</p>
-              <p className="mt-auto flex items-center justify-between gap-2 pt-4 font-mono text-[0.6rem] tracking-[0.08em] whitespace-nowrap text-fg-subtle uppercase sm:tracking-[0.14em]">
-                Pricing at launch
-                <ArrowRight className="size-3.5 text-flow transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
-              </p>
-            </article>
-          </Reveal>
-        ))}
-      </ul>
-
-      {premium && (
-        <Reveal delay={0.1} className="mt-4">
-          <article className="beam relative grid items-center gap-6 overflow-hidden rounded-[1.5rem] border border-flow/40 p-6 [background:linear-gradient(120deg,rgb(125_255_58/0.14),rgb(125_255_58/0.02)_55%),var(--color-ink-850)] md:grid-cols-[1fr_auto] md:p-9">
-            <div className="flex items-start gap-4">
-              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-flow text-ink-950">
-                <premium.icon className="size-5" aria-hidden />
-              </span>
-              <div>
-                <p className="flex items-center gap-2">
-                  <span className="text-xl font-semibold tracking-tight md:text-2xl">{premium.title}</span>
-                  <span className="rounded-full bg-flow px-2 py-0.5 text-xs font-semibold text-ink-950">Premium</span>
-                </p>
-                <p className="mt-2 max-w-xl text-sm text-fg-muted md:text-base">{premium.body}</p>
-              </div>
-            </div>
-            <BookDemoButton label="Ask about this package" interest="Digital Marketing — premium package" icon className="w-fit" />
-          </article>
-        </Reveal>
-      )}
-      <p className="mt-5 text-center text-sm text-fg-muted">
-        Store prices will be announced at launch. Need it built today?{" "}
-        <a href="#services" className="text-flow underline-offset-4 hover:underline">
-          See our agency services
-        </a>
-        .
+      <p className="mx-auto mt-10 max-w-xl text-center text-sm text-fg-subtle">
+        Going live depends on each platform&apos;s approval (for example WhatsApp Business), so it isn&apos;t instant —
+        Shambhu shows you the status of every step.
       </p>
     </div>
   );
@@ -478,33 +370,23 @@ function Store() {
 
 function Safeguards() {
   return (
-    <div className="mt-28 md:mt-40">
-      <SubHead label="Security" title="Built so you stay in control." />
-      <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {safeguards.map((s, i) => (
-          <Reveal as="li" key={s.title} delay={i * 0.06}>
-            <div className="flex h-full items-start gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5">
-              <s.icon className="mt-0.5 size-5 shrink-0 text-flow" aria-hidden />
-              <span>
-                <span className="block font-semibold">{s.title}</span>
-                <span className="mt-1 block text-sm text-fg-muted">{s.body}</span>
-              </span>
-            </div>
-          </Reveal>
-        ))}
-      </ul>
-      <Reveal delay={0.1} className="mt-12 flex flex-col items-center gap-4 text-center">
-        <p className="flex items-center gap-2 text-lg">
-          <Bot className="size-5 text-flow" aria-hidden />
-          Be one of the first businesses on Shambhu.
-        </p>
-        <BookDemoButton label="Join early access" interest={shambhu.interest} icon />
-      </Reveal>
-    </div>
+    <ul className="mt-20 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Security">
+      {safeguards.map((s, i) => (
+        <Reveal as="li" key={s.title} delay={i * 0.06}>
+          <div className="flex h-full items-start gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5">
+            <s.icon className="mt-0.5 size-5 shrink-0 text-flow" aria-hidden />
+            <span>
+              <span className="block font-semibold">{s.title}</span>
+              <span className="mt-1 block text-sm text-fg-muted">{s.body}</span>
+            </span>
+          </div>
+        </Reveal>
+      ))}
+    </ul>
   );
 }
 
-function SubHead({ label, title }: { label: string; title: string }) {
+export function SubHead({ label, title }: { label: string; title: string }) {
   return (
     <Reveal className="text-center">
       <p className="font-mono text-[0.68rem] tracking-[0.18em] text-flow uppercase">[ {label} ]</p>
