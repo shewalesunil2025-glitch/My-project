@@ -8,6 +8,7 @@ import { agentLanguages, type AgentLang, type AgentMessage, type AgentReply } fr
 import { answerLocally } from "@/lib/shambhuLocal";
 import { cn } from "@/lib/cn";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { ShambhuAvatar } from "./ShambhuAvatar";
 
 /* ── Browser speech types (not in the TS DOM lib) ───────────────────────── */
 type RecognitionResult = { isFinal: boolean; 0: { transcript: string } };
@@ -34,7 +35,6 @@ function getRecognition(): RecognitionCtor | null {
 type Status = "idle" | "listening" | "thinking" | "speaking";
 type ChatLine = AgentMessage & { lang?: AgentLang };
 
-const AVATAR = "/images/character/front.webp";
 
 /** A child's voice: a higher pitch and a slightly quicker pace. */
 const CHILD_PITCH = 1.65;
@@ -288,7 +288,7 @@ export function ShambhuAgent() {
             {open ? (
               <X className="size-6 text-fg" aria-hidden />
             ) : (
-              <Avatar className="size-full" />
+              <ShambhuAvatar className="size-full" />
             )}
           </span>
         </button>
@@ -325,7 +325,7 @@ export function ShambhuAgent() {
             {/* Header */}
             <header className="flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
               <span className="relative size-11 shrink-0">
-                <Avatar className="size-full rounded-full border border-flow/40" />
+                <ShambhuAvatar className="size-full rounded-full border border-flow/40" />
                 <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">
@@ -482,22 +482,6 @@ export function ShambhuAgent() {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-/** Shambhu's face, cropped from the mascot image. */
-function Avatar({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={cn("block bg-no-repeat", className)}
-      style={{
-        // Head (turban to chin) fills the circle: sized and centred from the mascot image.
-        backgroundImage: `url(${AVATAR}), radial-gradient(circle at 50% 40%, #2c4d20, #0a130b 75%)`,
-        backgroundSize: "116%, 100%",
-        backgroundPosition: "62% 30%, center",
-      }}
-    />
   );
 }
 

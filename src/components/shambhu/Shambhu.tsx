@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion, useInView, useScroll, useTransform } from "framer-motion";
 import { BellRing, Check, Mic, PlayCircle, Search, Sparkles } from "lucide-react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -13,12 +12,12 @@ import {
   sampleActivity,
   shambhu,
 } from "@/content/shambhu";
-import { heroCharacterConfig } from "@/config/site";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
 import { Scramble } from "@/components/effects/Scramble";
 import { ScrollWords } from "@/components/effects/ScrollWords";
 import { Reveal } from "@/components/effects/Reveal";
 import { cn } from "@/lib/cn";
+import { ShambhuAvatar } from "./ShambhuAvatar";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -267,20 +266,12 @@ function AppPreview() {
       {/* Phone, rising a little faster than the dashboard */}
       <motion.div
         style={{ y: phoneY }}
-        className="relative z-10 mx-auto -mt-16 w-[15.5rem] sm:absolute sm:right-[-1rem] sm:bottom-[-4rem] sm:mt-0 lg:right-[-5rem] lg:bottom-[-6rem]"
+        className="relative z-10 mx-auto mt-8 w-[17rem] sm:absolute sm:right-[-1rem] sm:bottom-[-4rem] sm:mt-0 lg:right-[-5rem] lg:bottom-[-6rem]"
       >
         <div className="rounded-[2.2rem] border border-white/15 bg-ink-950 p-2 shadow-[0_40px_80px_-20px_rgb(0_0_0/0.9),0_0_60px_-20px_rgb(125_255_58/0.5)]">
           <div className="overflow-hidden rounded-[1.8rem] border border-white/[0.06] [background:linear-gradient(180deg,rgb(125_255_58/0.1),transparent_40%),var(--color-ink-900)]">
             <div className="flex items-center gap-2.5 px-4 pt-5">
-              <span className="relative size-10 overflow-hidden rounded-full border border-flow/40 bg-ink-800">
-                <Image
-                  src={heroCharacterConfig.src}
-                  alt=""
-                  width={80}
-                  height={100}
-                  className="absolute -top-0.5 left-1/2 w-[140%] max-w-none -translate-x-1/2"
-                />
-              </span>
+              <ShambhuAvatar className="size-11 shrink-0 rounded-full border border-flow/40" />
               <span>
                 <span className="block text-sm font-semibold">Shambhu</span>
                 <span className="flex items-center gap-1 text-[0.65rem] text-flow">
@@ -303,7 +294,10 @@ function AppPreview() {
               {appNav.map((item, i) => (
                 <li
                   key={item.label}
-                  className={cn("flex flex-col items-center gap-1 text-[0.55rem]", i === 1 ? "text-flow" : "text-fg-subtle")}
+                  className={cn(
+                    "flex min-w-0 flex-col items-center gap-1 text-[0.58rem] leading-none tracking-tight",
+                    i === 1 ? "text-flow" : "text-fg-subtle",
+                  )}
                 >
                   <item.icon className="size-4" aria-hidden />
                   {item.label}
