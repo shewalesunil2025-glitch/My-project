@@ -474,8 +474,13 @@ function Avatar({ className }: { className?: string }) {
   return (
     <span
       aria-hidden
-      className={cn("block bg-ink-800 bg-no-repeat", className)}
-      style={{ backgroundImage: `url(${AVATAR})`, backgroundSize: "175%", backgroundPosition: "50% 38%" }}
+      className={cn("block bg-no-repeat", className)}
+      style={{
+        // Head (turban to chin) fills the circle: sized and centred from the mascot image.
+        backgroundImage: `url(${AVATAR}), radial-gradient(circle at 50% 40%, #2c4d20, #0a130b 75%)`,
+        backgroundSize: "116%, 100%",
+        backgroundPosition: "62% 30%, center",
+      }}
     />
   );
 }
