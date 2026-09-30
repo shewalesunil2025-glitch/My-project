@@ -5,11 +5,11 @@ export type Solution = {
   title: string;
   headline: string;
   summary: string;
-  /** "Starting at" price in USD, as shown on the pricing cards. */
+  /** "Starting at" price in USD, as shown in the Automation Store. */
   price: string;
 };
 
-/** The services Shambhu runs. Prices match the pricing section (src/content/shambhu.ts). */
+/** The services Shambhu runs. Prices match the Automation Store (src/content/shambhu.ts). */
 export const solutions: Solution[] = [
   {
     id: "website",

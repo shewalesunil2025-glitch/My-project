@@ -9,7 +9,7 @@ export const faqs = [
   },
   {
     q: "How much does it cost?",
-    a: "Each service has a clear starting price in USD, shown in the Pricing section — for example Email Automation from $29/mo, WhatsApp Automation from $49/mo and a Website from $299 one-time.",
+    a: "Each service has a clear starting price in USD, shown in the Automation Store — for example Email Automation from $29/mo, WhatsApp Automation from $49/mo and a Website from $299 one-time.",
   },
   {
     q: "How fast can I go live?",

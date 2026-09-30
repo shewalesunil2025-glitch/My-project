@@ -8,7 +8,7 @@ const columns = [
     links: [
       { label: "Services", href: "#solutions" },
       { label: "Shambhu AI", href: "#shambhu" },
-      { label: "Pricing", href: "#pricing" },
+      { label: "Automation Store", href: "#store" },
       { label: "Industries", href: "#industries" },
     ],
   },
@@ -22,7 +22,7 @@ const columns = [
   },
   {
     title: "Services",
-    links: store.slice(0, 5).map((s) => ({ label: s.title, href: "#pricing" })),
+    links: store.slice(0, 5).map((s) => ({ label: s.title, href: "#store" })),
   },
 ];
 

@@ -57,7 +57,7 @@ export type StoreItem = {
   premium?: boolean;
 };
 
-/** Pricing: every service can be bought on its own. */
+/** The Automation Store: every service can be bought on its own. */
 export const store: StoreItem[] = [
   { title: "Website", body: "A fast, modern website with Shambhu built in.", icon: Globe, price: "$299", billing: "one-time" },
   { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "$79", billing: "monthly" },

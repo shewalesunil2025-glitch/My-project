@@ -16,7 +16,7 @@ export const siteConfig = {
   nav: [
     { label: "Services", href: "#solutions" },
     { label: "Shambhu AI", href: "#shambhu" },
-    { label: "Pricing", href: "#pricing" },
+    { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },
     { label: "About", href: "#about" },
     { label: "FAQ", href: "#faq" },
@@ -24,7 +24,7 @@ export const siteConfig = {
   footerNav: [
     { label: "Services", href: "#solutions" },
     { label: "Shambhu AI", href: "#shambhu" },
-    { label: "Pricing", href: "#pricing" },
+    { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },
     { label: "About", href: "#about" },
     { label: "FAQ", href: "#faq" },

@@ -8,19 +8,19 @@ import { cn } from "@/lib/cn";
 import { SubHead } from "./Shambhu";
 
 /**
- * Pricing: every Shambhu service can be bought on its own, each with a
+ * Automation Store: every Shambhu service can be bought on its own, each with a
  * "Starting at" price in USD. Digital Marketing is the premium package.
  */
-export function Pricing() {
+export function AutomationStore() {
   const { openDemo } = useDemo();
   const regular = store.filter((s) => !s.premium);
   const premium = store.find((s) => s.premium);
 
   return (
-    <section id="pricing" aria-label="Pricing" className="relative py-24 md:py-32">
+    <section id="store" aria-label="Automation Store" className="relative py-24 md:py-32">
       <div aria-hidden className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(125_255_58/0.08),transparent_70%)]" />
       <div className="container-x relative">
-        <SubHead label="Pricing" title="Pick only what you need." />
+        <SubHead label="Automation Store" title="Pick only what you need." />
         <Reveal delay={0.1}>
           <p className="mx-auto mt-4 max-w-md text-center text-fg-muted">Every service works on its own. Add more any time.</p>
         </Reveal>

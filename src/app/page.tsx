@@ -11,7 +11,7 @@ import { Founder } from "@/components/about/Founder";
 import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
 import { Shambhu } from "@/components/shambhu/Shambhu";
-import { Pricing } from "@/components/shambhu/Pricing";
+import { AutomationStore } from "@/components/shambhu/AutomationStore";
 import { ScrollPanel } from "@/components/effects/ScrollPanel";
 
 const jsonLd = {
@@ -45,13 +45,13 @@ export default function HomePage() {
         <ConnectSection />
         <Solutions />
         <ScrollPanel>
+          <AutomationStore />
+        </ScrollPanel>
+        <ScrollPanel>
           <OneSystem />
         </ScrollPanel>
         <ScrollPanel>
           <Shambhu />
-        </ScrollPanel>
-        <ScrollPanel>
-          <Pricing />
         </ScrollPanel>
         <ScrollPanel variant="paper">
           <Industries />
