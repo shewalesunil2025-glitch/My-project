@@ -12,6 +12,7 @@ import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
 import { Shambhu } from "@/components/shambhu/Shambhu";
 import { AutomationStore } from "@/components/shambhu/AutomationStore";
+import { DigitalMarketing } from "@/components/marketing/DigitalMarketing";
 import { ShambhuAgent } from "@/components/shambhu/ShambhuAgent";
 import { ScrollPanel } from "@/components/effects/ScrollPanel";
 
@@ -47,6 +48,9 @@ export default function HomePage() {
         <Solutions />
         <ScrollPanel>
           <AutomationStore />
+        </ScrollPanel>
+        <ScrollPanel>
+          <DigitalMarketing />
         </ScrollPanel>
         <ScrollPanel>
           <OneSystem />

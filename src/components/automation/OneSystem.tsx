@@ -14,7 +14,7 @@ const markers: GlobeMarker[] = [
   { lat: 22, lng: 74, label: "Website" },
   { lat: 48, lng: 10, label: "WhatsApp" },
   { lat: 38, lng: -98, label: "AI Voice" },
-  { lat: -12, lng: 30, label: "Social Media" },
+  { lat: -12, lng: 30, label: "Marketing" },
   { lat: 2, lng: 112, label: "Email" },
   { lat: -24, lng: -52, label: "Reviews" },
 ];
@@ -73,8 +73,8 @@ export function OneSystem() {
           transition={{ duration: 0.9, delay: 0.1, ease }}
           className="mx-auto mt-5 max-w-xl text-sm text-fg-muted md:text-base"
         >
-          Shambhu sits in the middle and runs all six — your website, WhatsApp, calls, social media, email and
-          reviews.
+          Shambhu sits in the middle and runs all six — your website, WhatsApp, calls, digital marketing, email
+          and reviews.
         </motion.p>
       </div>
 

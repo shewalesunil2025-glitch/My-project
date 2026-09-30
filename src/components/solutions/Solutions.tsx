@@ -15,7 +15,9 @@ import {
   MessageSquareHeart,
   PhoneCall,
   Star,
+  BarChart3,
   Mail,
+  Megaphone,
   Share2,
   UserRoundCheck,
   type LucideIcon,
@@ -34,6 +36,17 @@ import { ChatbotPreview } from "./previews/ChatbotPreview";
 import { StepsPreview } from "./previews/StepsPreview";
 
 const previews: Record<SolutionId, () => ReactNode> = {
+  marketing: () => (
+    <StepsPreview
+      title="Digital marketing"
+      steps={[
+        { label: "Month planned", meta: "Posts · reels · ads", icon: CalendarCheck },
+        { label: "You approve", meta: "One tap in the app", icon: CheckCircle2 },
+        { label: "Published & promoted", meta: "Instagram · Facebook · Google", icon: Megaphone },
+        { label: "Monthly report", meta: "What worked, what's next", icon: BarChart3 },
+      ]}
+    />
+  ),
   website: () => <WebsitePreview />,
   whatsapp: () => <WhatsAppPreview />,
   voice: () => <VoicePreview />,
@@ -83,7 +96,7 @@ const previews: Record<SolutionId, () => ReactNode> = {
 
 /**
  * Reference "DNA" scene: dust gathers into a slowly turning helix, the heading forms
- * out of it, then the eight service cards float past in 3D as you scroll — each
+ * out of it, then the nine service cards float past in 3D as you scroll — each
  * with its live preview. On small screens the cards simply stack over the helix.
  */
 export function Solutions() {
@@ -126,7 +139,7 @@ export function Solutions() {
             Your customers are talking. <span className="text-fg-subtle">Your business</span>{" "}
             <span className="text-flow">⊙</span> should be ready.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-fg-muted">Eight services, one assistant. Buy only what you need.</p>
+          <p className="mx-auto mt-5 max-w-xl text-fg-muted">Digital Marketing plus eight services. Buy only what you need.</p>
         </motion.div>
 
         <motion.ul
@@ -191,6 +204,7 @@ function FloatingCard({
 }
 
 const icons: Record<SolutionId, LucideIcon> = {
+  marketing: Megaphone,
   website: Globe,
   whatsapp: MessageCircle,
   voice: PhoneCall,
@@ -205,11 +219,15 @@ const icons: Record<SolutionId, LucideIcon> = {
 function SolutionCard({ solution: s, number }: { solution: Solution; number: number }) {
   const { openDemo } = useDemo();
   const Icon = icons[s.id];
+  const premium = s.id === "marketing";
   return (
     <article
       id={`solution-${s.id}`}
       aria-labelledby={`solution-${s.id}-title`}
-      className="group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-white/15 [background:linear-gradient(160deg,rgb(255_255_255/0.07),rgb(255_255_255/0.015)_45%),rgb(6_14_7/0.96)] shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_30px_80px_-30px_rgb(0_0_0/0.9)] "
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-[1.4rem] border [background:linear-gradient(160deg,rgb(255_255_255/0.07),rgb(255_255_255/0.015)_45%),rgb(6_14_7/0.96)] shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_30px_80px_-30px_rgb(0_0_0/0.9)]",
+        premium ? "border-flow/60 shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_60px_-15px_rgb(125_255_58/0.6)]" : "border-white/15",
+      )}
     >
       {/* Smoky green light in the corner, like the reference's card imagery */}
       <div aria-hidden className="absolute -top-20 -right-16 size-72 rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.22),rgb(40_140_30/0.1)_45%,transparent_70%)] blur-2xl" />
@@ -217,7 +235,11 @@ function SolutionCard({ solution: s, number }: { solution: Solution; number: num
         <span className="grid size-9 place-items-center rounded-full border border-white/15 text-flow">
           <Icon className="size-4" aria-hidden />
         </span>
-        <span className="font-mono text-[0.65rem] text-fg-muted">[ {number}.0 ]</span>
+        {premium ? (
+          <span className="rounded-full bg-flow px-2 py-0.5 text-[0.65rem] font-semibold text-ink-950">Premium</span>
+        ) : (
+          <span className="font-mono text-[0.65rem] text-fg-muted">[ {number}.0 ]</span>
+        )}
       </div>
       <div className="relative p-6 pt-8">
         <p className="font-mono text-[0.62rem] tracking-[0.14em] text-flow uppercase">{s.title}</p>
@@ -233,14 +255,24 @@ function SolutionCard({ solution: s, number }: { solution: Solution; number: num
       <div className="relative mx-4 mb-4 h-[8.5rem] overflow-hidden rounded-2xl opacity-90" aria-hidden>
         {previews[s.id]()}
       </div>
-      <button
-        type="button"
-        onClick={() => openDemo(s.title)}
-        className="relative mx-6 mb-6 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-fg transition-colors hover:text-flow"
-      >
-        Get started
-        <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
-      </button>
+      {premium ? (
+        <a
+          href="#digital-marketing"
+          className="relative mx-6 mb-6 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-flow transition-colors hover:text-flow-soft"
+        >
+          See what&apos;s included
+          <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+        </a>
+      ) : (
+        <button
+          type="button"
+          onClick={() => openDemo(s.title)}
+          className="relative mx-6 mb-6 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-fg transition-colors hover:text-flow"
+        >
+          Get started
+          <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+        </button>
+      )}
     </article>
   );
 }

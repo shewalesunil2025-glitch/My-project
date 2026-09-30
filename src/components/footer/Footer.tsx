@@ -7,6 +7,7 @@ const columns = [
     title: "Explore",
     links: [
       { label: "Services", href: "#solutions" },
+      { label: "Digital Marketing", href: "#digital-marketing" },
       { label: "Shambhu AI", href: "#shambhu" },
       { label: "Automation Store", href: "#store" },
       { label: "Industries", href: "#industries" },

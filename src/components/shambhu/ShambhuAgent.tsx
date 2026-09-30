@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Mic, MicOff, Send, Volume2, VolumeX, X } from "lucide-react";
 import { useDemo } from "@/components/cta/DemoProvider";
 import { agentLanguages, type AgentLang, type AgentMessage, type AgentReply } from "@/lib/shambhuAgent";
+import { answerLocally } from "@/lib/shambhuLocal";
 import { cn } from "@/lib/cn";
 
 /* ── Browser speech types (not in the TS DOM lib) ───────────────────────── */
@@ -41,11 +42,6 @@ const CHILD_RATE = 1.04;
 const GREETING =
   "Namaste! Main Shambhu hoon. English, हिंदी, मराठी — kisi bhi bhasha mein poochhiye, main usi bhasha mein jawab dunga.";
 
-const OFFLINE: Record<"en" | "hi" | "mr", string> = {
-  en: "Sorry, I can't answer right now. Please use the Contact us button and our team will reply.",
-  hi: "माफ़ कीजिए, मैं अभी जवाब नहीं दे पा रहा हूँ। कृपया Contact us बटन दबाइए, हमारी टीम आपसे बात करेगी।",
-  mr: "माफ करा, मी आत्ता उत्तर देऊ शकत नाही. कृपया Contact us बटण दाबा, आमची टीम तुमच्याशी बोलेल.",
-};
 
 const SUGGESTIONS = ["What does it cost?", "Shambhu kya karta hai?", "हे कसं काम करतं?"];
 
@@ -92,6 +88,8 @@ export function ShambhuAgent() {
   const [hint, setHint] = useState(false);
 
   const recRef = useRef<Recognition | null>(null);
+  /** Set once the AI endpoint is unavailable; Shambhu then answers from the site's content (free mode). */
+  const localRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const linesRef = useRef(lines);
@@ -171,23 +169,27 @@ export function ShambhuAgent() {
       setInput("");
       setInterim("");
       setStatus("thinking");
+      let data: AgentReply | null = null;
       try {
+        if (localRef.current) throw new Error("local");
         const res = await fetch("/api/shambhu", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           // The greeting is local only; send the real conversation.
           body: JSON.stringify({ messages: history.slice(1).map(({ role, content }) => ({ role, content })) }),
         });
+        if (res.status === 503 || res.status === 404) localRef.current = true;
         if (!res.ok) throw new Error(String(res.status));
-        const data = (await res.json()) as AgentReply;
-        setLines((l) => [...l, { role: "assistant", content: data.reply, lang: data.lang }]);
-        setLang(data.lang);
-        speak(data.reply, data.lang);
+        data = (await res.json()) as AgentReply;
       } catch {
-        const fallbackLang = lang === "hi" || lang === "mr" ? lang : "en";
-        setLines((l) => [...l, { role: "assistant", content: OFFLINE[fallbackLang], lang: fallbackLang }]);
-        speak(OFFLINE[fallbackLang], fallbackLang);
+        // Free mode: answer from the site's own content, right here in the browser.
+        await new Promise((resolve) => setTimeout(resolve, 450));
+        data = answerLocally(text, lang);
       }
+      const reply = data;
+      setLines((l) => [...l, { role: "assistant", content: reply.reply, lang: reply.lang }]);
+      setLang(reply.lang);
+      speak(reply.reply, reply.lang);
     },
     [busy, lang, muted, speak],
   );

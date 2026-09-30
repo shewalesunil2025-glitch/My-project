@@ -1,6 +1,7 @@
 import { siteConfig, founder } from "@/config/site";
 import { store, businessCategories, journey, safeguards } from "@/content/shambhu";
 import { faqs } from "@/content/faq";
+import { digitalMarketing, inclusions, marketingSteps } from "@/content/digitalMarketing";
 
 /** Languages Shambhu can detect and speak. `lang` drives speech recognition and the voice. */
 export const agentLanguages = {
@@ -60,6 +61,13 @@ Shambhu is "Your AI Business Operating System — One AI. One Platform. Your Ent
 
 # Services and prices (USD, every service can be bought on its own)
 ${prices}
+
+# Digital Marketing (premium package — highlight it when it fits the visitor's need)
+${digitalMarketing.tagline} Starting at ${digitalMarketing.price}${digitalMarketing.billing}.
+Included:
+${inclusions.map((x) => `- ${x.title}: ${x.body}`).join("\n")}
+How a month works: ${marketingSteps.map((x) => `${x.title} (${x.body})`).join(" → ")}
+${digitalMarketing.notes.join(". ")}.
 
 # How a business goes live
 ${journey.map((j, i) => `${i + 1}. ${j.title}: ${j.body}`).join("\n")}

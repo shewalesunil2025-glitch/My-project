@@ -15,6 +15,7 @@ export const siteConfig = {
   },
   nav: [
     { label: "Services", href: "#solutions" },
+    { label: "Digital Marketing", href: "#digital-marketing" },
     { label: "Shambhu AI", href: "#shambhu" },
     { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },
@@ -23,6 +24,7 @@ export const siteConfig = {
   ],
   footerNav: [
     { label: "Services", href: "#solutions" },
+    { label: "Digital Marketing", href: "#digital-marketing" },
     { label: "Shambhu AI", href: "#shambhu" },
     { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },

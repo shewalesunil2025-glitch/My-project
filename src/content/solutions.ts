@@ -1,4 +1,4 @@
-export type SolutionId = "website" | "whatsapp" | "voice" | "support" | "leads" | "reviews" | "social" | "email";
+export type SolutionId = "marketing" | "website" | "whatsapp" | "voice" | "support" | "leads" | "reviews" | "social" | "email";
 
 export type Solution = {
   id: SolutionId;
@@ -11,6 +11,13 @@ export type Solution = {
 
 /** The services Shambhu runs. Prices match the Automation Store (src/content/shambhu.ts). */
 export const solutions: Solution[] = [
+  {
+    id: "marketing",
+    title: "Digital Marketing · Premium",
+    headline: "More of the right customers finding you.",
+    summary: "Social media, content, ads, local SEO and a monthly report — one package.",
+    price: "$299/mo",
+  },
   {
     id: "website",
     title: "Website",

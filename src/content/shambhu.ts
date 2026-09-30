@@ -95,6 +95,7 @@ export const sampleActivity: { icon: LucideIcon; channel: string; text: string }
   { icon: UserRoundCheck, channel: "Leads", text: "Scheduled a follow-up for a new enquiry" },
   { icon: Mail, channel: "Gmail", text: "Sorted the inbox and drafted two replies" },
   { icon: Camera, channel: "Instagram", text: "Answered a DM about prices" },
+  { icon: Megaphone, channel: "Marketing", text: "This week's posts are ready for your approval" },
 ];
 
 export const appNav: { label: string; icon: LucideIcon }[] = [

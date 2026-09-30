@@ -1,4 +1,3 @@
-import { siteConfig } from "@/config/site";
 import { Scramble } from "@/components/effects/Scramble";
 import { ButtonLink } from "@/components/ui/Button";
 import { RevealWords } from "@/components/effects/RevealWords";
@@ -31,8 +30,8 @@ export function FinalCta() {
         <Reveal delay={0.18}>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <BookDemoButton size="lg" />
-            <ButtonLink href={`mailto:${siteConfig.email}`} variant="ghost" size="lg">
-              Talk to Nexa Flow AI
+            <ButtonLink href="#digital-marketing" variant="ghost" size="lg">
+              Explore Digital Marketing
             </ButtonLink>
           </div>
         </Reveal>

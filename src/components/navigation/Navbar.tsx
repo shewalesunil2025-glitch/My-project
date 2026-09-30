@@ -78,7 +78,12 @@ export function Navbar() {
                       transition={{ type: "spring", stiffness: 380, damping: 32 }}
                     />
                   )}
-                  <span className="relative">{item.label}</span>
+                  <span className={cn("relative flex items-center gap-1.5", item.href === "#digital-marketing" && "text-flow")}>
+                    {item.href === "#digital-marketing" && (
+                      <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-flow shadow-[0_0_8px_#7dff3a]" />
+                    )}
+                    {item.label}
+                  </span>
                 </a>
               </li>
             );

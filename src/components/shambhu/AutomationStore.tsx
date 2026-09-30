@@ -1,6 +1,7 @@
 "use client";
 
 import { store } from "@/content/shambhu";
+import { digitalMarketing } from "@/content/digitalMarketing";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
 import { Reveal } from "@/components/effects/Reveal";
 import { useDemo } from "@/components/cta/DemoProvider";
@@ -80,7 +81,12 @@ export function AutomationStore() {
                 <span className="display text-[2.4rem] leading-none">{premium.price}</span>
                 <span className="text-sm text-fg-muted">/mo</span>
               </p>
-              <BookDemoButton label="Get started" interest={premium.title} icon className="w-fit" />
+              <div className="flex flex-col items-start gap-2">
+                <BookDemoButton label="Get started" interest={premium.title} icon className="w-fit" />
+                <a href={digitalMarketing.href} className="text-sm text-flow underline-offset-4 hover:underline">
+                  See what&apos;s included →
+                </a>
+              </div>
             </article>
           </Reveal>
         )}

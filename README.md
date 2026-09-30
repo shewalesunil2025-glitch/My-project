@@ -32,7 +32,7 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap and robots |
 | `NEXT_PUBLIC_BOOKING_URL` | Optional Calendly / Cal.com link. When set, every "Book a Free Demo" opens it |
 | `LEAD_WEBHOOK_URL` | Optional n8n / Make / Zapier / CRM webhook that receives demo requests |
-| `ANTHROPIC_API_KEY` | Powers Shambhu, the voice assistant in the bottom-right corner (`/api/shambhu`, Claude). Without it, Shambhu politely points visitors to the contact form |
+| `ANTHROPIC_API_KEY` | Powers Shambhu, the voice assistant in the bottom-right corner (`/api/shambhu`, Claude). Optional: without it Shambhu runs in free mode, answering common questions from the site content in English, Hindi and Marathi |
 
 **Honest by default:** if `LEAD_WEBHOOK_URL` is not set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
 

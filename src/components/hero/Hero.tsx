@@ -106,6 +106,16 @@ export function Hero() {
           <motion.div {...rise(0.5)} className="flex flex-col items-start gap-3">
             <BookDemoButton size="md" />
             <p className="max-w-[16rem] text-xs text-fg-subtle">Free 30-minute AI automation call — proposal within 24 hours.</p>
+            <a
+              href="#digital-marketing"
+              className="group mt-1 inline-flex items-center gap-2 rounded-full border border-flow/40 bg-flow/10 py-1 pr-3 pl-1 text-xs text-fg backdrop-blur transition-colors hover:border-flow hover:bg-flow/20"
+            >
+              <span className="rounded-full bg-flow px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-ink-950 uppercase">
+                New
+              </span>
+              Digital Marketing — see what&apos;s included
+              <span aria-hidden className="text-flow transition-transform group-hover:translate-x-0.5">→</span>
+            </a>
           </motion.div>
         </motion.div>
 
