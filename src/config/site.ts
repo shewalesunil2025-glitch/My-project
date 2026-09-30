@@ -15,6 +15,7 @@ export const siteConfig = {
   },
   nav: [
     { label: "Solutions", href: "#solutions" },
+    { label: "Shambhu AI", href: "#shambhu" },
     { label: "Services", href: "#services" },
     { label: "How It Works", href: "#process" },
     { label: "Industries", href: "#industries" },
@@ -23,6 +24,7 @@ export const siteConfig = {
   ],
   footerNav: [
     { label: "Solutions", href: "#solutions" },
+    { label: "Shambhu AI", href: "#shambhu" },
     { label: "Services", href: "#services" },
     { label: "Industries", href: "#industries" },
     { label: "Work", href: "#work" },
@@ -60,7 +62,7 @@ export type CharacterEyes = {
  */
 export const heroCharacterConfig = {
   src: "/images/character/front.webp",
-  alt: "Nexa Flow AI mascot — a little boy in a turban with a painted moustache, watching your cursor",
+  alt: "Shambhu, the Nexa Flow AI assistant — a little boy in a turban with a painted moustache, watching your cursor",
   width: 640,
   height: 804,
   /** Point between the eyes (fractions of the image) — the aim is measured from here. */

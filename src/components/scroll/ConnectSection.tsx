@@ -13,7 +13,7 @@ import { Reveal } from "@/components/effects/Reveal";
 
 /**
  * The problem and the answer, in the reference's "light pillar" layout, followed by
- * a scanning hologram card of the Nexa mascot and the connected customer journey.
+ * a scanning hologram card of Shambhu, the AI assistant, and the connected customer journey.
  */
 export function ConnectSection() {
   return (
@@ -82,7 +82,7 @@ function LightPillar() {
   );
 }
 
-/** A hologram of the mascot inside face-scan brackets, then the connected journey. */
+/** A hologram of Shambhu inside face-scan brackets, then the connected journey. */
 function ScanCard() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -104,14 +104,20 @@ function ScanCard() {
         <div className="relative grid min-h-[34rem] items-center gap-8 p-6 md:grid-cols-12 md:p-12">
           <div className="order-2 md:order-1 md:col-span-4">
             <p className="font-mono text-[0.68rem] tracking-[0.18em] text-flow uppercase">
-              <Scramble text="Face of your front desk" />
+              <Scramble text="Meet Shambhu" />
             </p>
             <p className="mt-3 text-2xl leading-tight tracking-tight">
-              One AI, awake for every customer — on your site, on WhatsApp and on the phone.
+              One AI, awake for every customer — on your site, on WhatsApp, on email, on social media and on the phone.
             </p>
             <p className="mt-6 font-mono text-[0.7rem] tracking-[0.14em] text-fg-subtle uppercase">
-              Nexa AI <span className="text-flow">●</span> Watching your cursor
+              Shambhu <span className="text-flow">●</span> Watching your cursor
             </p>
+            <a
+              href="#shambhu"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm text-flow underline-offset-4 hover:underline"
+            >
+              What Shambhu will do for you →
+            </a>
           </div>
 
           <div className="relative order-1 mx-auto h-[26rem] w-full max-w-[22rem] md:order-2 md:col-span-4 md:h-[30rem]">

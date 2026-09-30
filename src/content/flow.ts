@@ -34,7 +34,7 @@ export const customerFlow: FlowNode[] = [
 /** The fragmented tools most businesses juggle today. */
 export const fragmentedTools = ["Website", "WhatsApp", "Phone", "Bookings", "Follow-ups", "Reviews"] as const;
 
-/** The six connected systems around the central Nexa AI, each with the job it does. */
+/** The six connected systems around Shambhu, the central AI, each with the job it does. */
 export const ecosystem: { label: string; benefit: string; icon: LucideIcon }[] = [
   { label: "Website", benefit: "Brings customers in", icon: Globe },
   { label: "WhatsApp", benefit: "Replies instantly", icon: MessageCircle },

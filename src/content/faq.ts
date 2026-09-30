@@ -1,5 +1,21 @@
 export const faqs = [
   {
+    q: "What is Shambhu?",
+    a: "Shambhu is the AI Business Operating System we are building: one app where a business connects its calls, WhatsApp, email, Instagram, Facebook, YouTube and Google reviews, and one assistant handles replies, follow-ups and support — with every action shown in an Activity Centre.",
+  },
+  {
+    q: "Is Shambhu available today?",
+    a: "Not yet — it is in development. Join early access and we'll contact you when it opens. If you need automation today, our agency services build it for you now.",
+  },
+  {
+    q: "How is my data kept safe in Shambhu?",
+    a: "Each business's data is kept separate, connected accounts use encrypted access that you can remove at any time, and every action is written to an audit log you can see. Nothing goes live without your approval.",
+  },
+  {
+    q: "What is the difference between Shambhu and your agency services?",
+    a: "With the agency, we design and build a custom system for you. With Shambhu, you pick services from the Automation Store and set them up yourself in the app — Shambhu guides you through each step.",
+  },
+  {
     q: "Do I need every system, or can I start with one?",
     a: "Start with the one that removes the most work today — often WhatsApp replies or booking. Every system we build is designed to connect to the rest later, so nothing gets thrown away.",
   },

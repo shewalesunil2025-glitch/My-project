@@ -3,6 +3,7 @@
 import { Scramble } from "@/components/effects/Scramble";
 import { MapPin } from "lucide-react";
 import { industries } from "@/content/industries";
+import { businessCategories } from "@/content/shambhu";
 import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
@@ -72,6 +73,25 @@ export function Industries() {
             </div>
           </Reveal>
         </ul>
+
+        <Reveal className="mt-14 text-center">
+          <p className="font-mono text-[0.68rem] tracking-[0.18em] text-ink-muted uppercase">
+            [ Shambhu is being built for ]
+          </p>
+          <ul className="mx-auto mt-5 flex max-w-4xl flex-wrap justify-center gap-2" aria-label="Business categories">
+            {businessCategories.map((c) => (
+              <li
+                key={c}
+                className="rounded-full border border-paper-line bg-paper-card px-3.5 py-1.5 text-sm text-ink transition-colors duration-300 hover:border-flow/50 hover:text-flow"
+              >
+                {c}
+              </li>
+            ))}
+            <li className="rounded-full border border-dashed border-paper-line px-3.5 py-1.5 text-sm text-ink-muted">
+              + Other
+            </li>
+          </ul>
+        </Reveal>
       </div>
     </section>
   );

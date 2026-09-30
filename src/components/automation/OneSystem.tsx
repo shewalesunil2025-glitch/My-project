@@ -138,7 +138,7 @@ export function OneSystem() {
           transition={{ duration: 0.9, delay: 0.5 }}
           className="mt-6 text-center text-sm text-fg-muted"
         >
-          <span className="font-semibold text-fg">Nexa AI</span> connects everything in the middle — hover a system to find
+          <span className="font-semibold text-fg">Shambhu</span> connects everything in the middle — hover a system to find
           it on the globe.
         </motion.p>
       </div>

@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 
 const interests = [
   "Complete AI system",
+  "Shambhu AI — early access",
   "AI-powered website",
   "WhatsApp automation",
   "AI voice receptionist",

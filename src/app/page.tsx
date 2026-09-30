@@ -14,6 +14,7 @@ import { FinalCta } from "@/components/cta/FinalCta";
 import { Founder } from "@/components/about/Founder";
 import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
+import { Shambhu } from "@/components/shambhu/Shambhu";
 import { ScrollPanel } from "@/components/effects/ScrollPanel";
 
 const jsonLd = {
@@ -32,6 +33,7 @@ const jsonLd = {
     "Booking automation",
     "Review automation",
     "Business workflow automation",
+    "Shambhu AI business assistant (in development)",
   ],
 };
 
@@ -49,6 +51,9 @@ export default function HomePage() {
         </ScrollPanel>
         <ScrollPanel>
           <OneSystem />
+        </ScrollPanel>
+        <ScrollPanel>
+          <Shambhu />
         </ScrollPanel>
         <ScrollPanel variant="paper">
           <Demos />
