@@ -138,8 +138,8 @@ export function OneSystem() {
           transition={{ duration: 0.9, delay: 0.5 }}
           className="mt-6 text-center text-sm text-fg-muted"
         >
-          <span className="font-semibold text-fg">Shambhu</span> connects everything in the middle — hover a system to find
-          it on the globe.
+          <span className="font-semibold text-fg">Shambhu</span> connects everything in the middle —{" "}
+          {fine ? "hover a system to find it on the globe." : "watch each system light up on the globe."}
         </motion.p>
       </div>
     </section>

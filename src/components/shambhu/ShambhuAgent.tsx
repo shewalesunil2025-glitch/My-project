@@ -8,7 +8,7 @@ import { agentLanguages, type AgentLang, type AgentMessage, type AgentReply } fr
 import { answerLocally } from "@/lib/shambhuLocal";
 import { cn } from "@/lib/cn";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { ShambhuAvatar } from "./ShambhuAvatar";
+import { ShambhuBot } from "./ShambhuBot";
 
 /* ── Browser speech types (not in the TS DOM lib) ───────────────────────── */
 type RecognitionResult = { isFinal: boolean; 0: { transcript: string } };
@@ -252,7 +252,7 @@ export function ShambhuAgent() {
   return (
     <>
       {/* Launcher */}
-      <div className={cn("fixed right-4 bottom-[5.25rem] z-[60] md:right-6 md:bottom-6", open && "max-md:hidden")}>
+      <div className={cn("fixed right-3 bottom-[5rem] z-[60] md:right-6 md:bottom-6", open && "max-md:hidden")}>
         <AnimatePresence>
           {hint && !open && desktop && (
             <motion.button
@@ -274,7 +274,7 @@ export function ShambhuAgent() {
           aria-expanded={open}
           aria-controls="shambhu-agent"
           aria-label={open ? "Close Shambhu" : "Ask Shambhu, the voice assistant"}
-          className="group relative grid size-14 place-items-center rounded-full md:size-16"
+          className="group relative grid size-[3.25rem] place-items-center rounded-full md:size-16"
         >
           {!open && <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flow/30 [animation-duration:2.4s]" />}
           <span
@@ -288,7 +288,7 @@ export function ShambhuAgent() {
             {open ? (
               <X className="size-6 text-fg" aria-hidden />
             ) : (
-              <ShambhuAvatar image="robot" mood={status} className="size-full" />
+              <ShambhuBot mood={status} className="size-full" />
             )}
           </span>
         </button>
@@ -325,7 +325,7 @@ export function ShambhuAgent() {
             {/* Header */}
             <header className="flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
               <span className="relative size-11 shrink-0">
-                <ShambhuAvatar image="robot" mood={status} className="size-full rounded-full border border-flow/40" />
+                <ShambhuBot mood={status} className="size-full overflow-hidden rounded-full border border-flow/40" />
                 <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">

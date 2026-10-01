@@ -41,11 +41,11 @@ export function AutomationStore() {
                 <span className="mt-1 block text-xs leading-relaxed text-fg-muted md:text-sm">{s.body}</span>
                 <span className="mt-auto block pt-5">
                   <span className="block font-mono text-[0.58rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
-                  <span className="mt-1 flex items-baseline gap-1">
+                  <span className="mt-1 flex flex-wrap items-baseline gap-x-1">
                     <span className="display text-[1.9rem] leading-none text-fg transition-colors duration-300 group-hover:text-flow-soft">
                       {s.price}
                     </span>
-                    <span className="text-xs text-fg-muted">{s.billing === "monthly" ? "/mo" : "one-time"}</span>
+                    <span className="text-xs whitespace-nowrap text-fg-muted">{s.billing === "monthly" ? "/mo" : "one-time"}</span>
                   </span>
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-flow">
                     Get started <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { customerFlow, fragmentedTools } from "@/content/flow";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
@@ -142,56 +142,14 @@ function ScanCard() {
   );
 }
 
-/**
- * The scanned print: Shambhu's fingerprint. It leans toward the cursor on desktop and
- * drifts slowly on its own on touch screens.
- */
+/** The scanned print: Shambhu's fingerprint, held still inside the card. */
 function ScanImage() {
-  const reduce = useReducedMotion();
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const x = useSpring(px, { stiffness: 60, damping: 18 });
-  const y = useSpring(py, { stiffness: 60, damping: 18 });
-  const rotateY = useTransform(x, (v) => v * 6);
-  const rotateX = useTransform(y, (v) => v * -6);
-  const shiftX = useTransform(x, (v) => `${v * -2.5}%`);
-  const shiftY = useTransform(y, (v) => `${v * -2.5}%`);
-
-  useEffect(() => {
-    if (reduce) return;
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return;
-      px.set((e.clientX / innerWidth - 0.5) * 2);
-      py.set((e.clientY / innerHeight - 0.5) * 2);
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    // Touch screens: a slow figure-eight drift instead of following a finger.
-    let raf = 0;
-    if (!matchMedia("(hover: hover) and (pointer: fine)").matches) {
-      const tick = (t: number) => {
-        px.set(Math.sin(t / 2200) * 0.6);
-        py.set(Math.sin(t / 1600) * 0.4);
-        raf = requestAnimationFrame(tick);
-      };
-      raf = requestAnimationFrame(tick);
-    }
-    return () => {
-      window.removeEventListener("pointermove", onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, [reduce, px, py]);
-
   return (
-    <motion.div
-      style={{ rotateX, rotateY, transformPerspective: 900 }}
-      className="absolute inset-0 overflow-hidden rounded-[1.6rem] border border-flow/20 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.9),0_0_60px_-25px_rgb(125_255_58/0.6)]"
-    >
-      <motion.div style={{ x: shiftX, y: shiftY }} className="absolute -inset-[4%]">
-        <FingerprintScan className="size-full" />
-      </motion.div>
+    <div className="absolute inset-0 overflow-hidden rounded-[1.6rem] border border-flow/20 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.9),0_0_60px_-25px_rgb(125_255_58/0.6)]">
+      <FingerprintScan className="absolute -inset-[4%] size-[108%]" />
       {/* Edge fade into the card */}
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgb(7_13_7/0.85))]" />
-    </motion.div>
+    </div>
   );
 }
 

@@ -138,7 +138,7 @@ function ChannelOrbit() {
   return (
     <Reveal delay={0.1} className="relative mx-auto aspect-square w-full max-w-[26rem]">
       <div aria-hidden className="absolute inset-[18%] rounded-full bg-[radial-gradient(closest-side,rgb(125_255_58/0.35),transparent)] blur-2xl" />
-      <div aria-hidden className="absolute inset-[13%] rounded-full border border-dashed border-flow/25" />
+      <div aria-hidden className="absolute inset-[17%] rounded-full border border-dashed sm:inset-[13%] border-flow/25" />
       <div aria-hidden className="absolute inset-[24%] rounded-full border border-flow/15" />
       <div className="absolute inset-[34%] grid place-items-center rounded-full bg-flow text-ink-950 shadow-[0_0_80px_-10px_rgb(125_255_58/0.9)]">
         <Megaphone className="size-[38%]" aria-hidden />
@@ -146,7 +146,7 @@ function ChannelOrbit() {
       </div>
       <ul
         aria-label="Channels we run for you"
-        className="absolute inset-[13%] animate-spin [animation-duration:36s]"
+        className="absolute inset-[17%] animate-spin [animation-duration:36s] sm:inset-[13%]"
         style={reduce ? { animation: "none" } : undefined}
       >
         {channels.map((c, i) => {
@@ -158,10 +158,10 @@ function ChannelOrbit() {
               style={{ left: `${50 + Math.sin(a) * 50}%`, top: `${50 - Math.cos(a) * 50}%` }}
             >
               <span
-                className="flex animate-spin items-center gap-1.5 rounded-full border border-flow/35 bg-ink-850/95 py-1.5 pr-3 pl-1.5 text-[0.7rem] font-medium whitespace-nowrap text-fg shadow-[0_10px_30px_-10px_rgb(125_255_58/0.6)] backdrop-blur [animation-direction:reverse] [animation-duration:36s] md:text-xs"
+                className="flex animate-spin items-center gap-1 rounded-full border border-flow/35 bg-ink-850/95 py-1 pr-2 pl-1 text-[0.6rem] sm:gap-1.5 sm:py-1.5 sm:pr-3 sm:pl-1.5 sm:text-[0.7rem] font-medium whitespace-nowrap text-fg shadow-[0_10px_30px_-10px_rgb(125_255_58/0.6)] backdrop-blur [animation-direction:reverse] [animation-duration:36s] md:text-xs"
                 style={reduce ? { animation: "none" } : undefined}
               >
-                <span className="grid size-6 place-items-center rounded-full bg-flow/15 text-flow">
+                <span className="grid size-5 place-items-center rounded-full bg-flow/15 text-flow sm:size-6">
                   <c.icon className="size-3.5" aria-hidden />
                 </span>
                 {c.label}

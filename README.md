@@ -43,7 +43,7 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 The layout, colours and motion follow a reference landing page supplied as a screen recording: a black-green canvas lit by one neon lime accent, light thin display type, "// LABEL //" mono eyebrows, the logo and a "Contact us" pill on top and the section links in a pill floating at the bottom, particle forms made of green dots, and scroll-pinned scenes. All content is Nexa Flow AI's own.
 
 1. **Hero** *(pinned)* — "The business that never sleeps." split around a brain made of ~22k green dots (`PointCloud shape="brain"`). The brain turns toward the cursor and its dots scatter around it. Scrolling makes the headline grow and fly apart while the brain bursts into dust and a green nebula.
-2. **The problem** — "Your business shouldn't need five different tools…" beside a glowing light pillar, the answer, then a scan card: the mascot as a green hologram inside face-scan brackets (still watching the cursor) and the eight-step customer journey.
+2. **The problem** — "Your business shouldn't need five different tools…" beside a glowing light pillar, the answer, then a scan card: Shambhu's glowing fingerprint inside scan brackets and the eight-step customer journey.
 3. **Solutions** *(pinned)* — dust gathers into a turning DNA helix, the heading forms, then the seven solution cards (each with its live mini-demo) float past in 3D. Stacked cards on phones.
 4. **Why Nexa Flow AI** — scroll-lit statement and a green bento: two feature tiles and the three principles.
 5. **One system** — dotted globe (canvas, adapted from 21st.dev "Interactive Globe") with the six connected systems and their jobs.
@@ -60,13 +60,13 @@ The layout, colours and motion follow a reference landing page supplied as a scr
 ```
 src/
   app/                  layout (metadata, fonts, MotionConfig), page, sitemap, robots, OG image, /api/lead
-  config/site.ts        brand, nav, CTAs, contact, hero character config
+  config/site.ts        brand, nav, CTAs, contact, founder
   content/              all copy & data (flow, solutions, industries, demos, process)
   hooks/                useMediaQuery / useFinePointer, useSequence
   lib/                  cn(), lead validation + client submit
   components/
     navigation/         Navbar (top logo + contact, floating bottom pill), Logo
-    hero/               Hero (pinned brain scene), HeroCharacter (cursor-watching mascot)
+    hero/               Hero (pinned brain scene)
     scene/              PointCloud (brain / helix / morph particle forms, canvas 2D)
     scroll/             ConnectSection (light pillar, hologram scan card, customer journey)
     automation/         OneSystem (dotted globe)
@@ -94,17 +94,10 @@ Checked against the UI UX Pro Max skill (`.claude/skills/ui-ux-pro-max`): text c
 - **Surfaces:** `.glass` dark cards with a travelling border beam on hover, `.badge` "// LABEL //" eyebrows, `.hologram` + `.scanlines`, `.stars`, `.swirl`
 - **Motion:** Framer Motion — pinned scroll scenes, scroll-lit headings (`ScrollWords`), word reveals, cipher-decoding labels (`Scramble`), section panels that grow in and ease away
 
-## The mascot (scan card)
+## Shambhu's visuals (all original SVG)
 
-The mascot is **one front-facing image** (upscaled 4× with Real-ESRGAN, background removed) in `public/images/character/front.webp`. It stays exactly where it is and watches the cursor:
-
-- **Body fixed:** the image is split at the neck with CSS masks. The body layer never moves.
-- **Eyes:** the irises (`eyes-iris.webp`) sit on their own layer over clean eye whites (`eyes-plate.webp`), clipped to the eyelid opening, and slide toward the cursor. They can never leave the eye.
-- **Head:** turns and tilts at most 4° / 3° toward the cursor, trailing slightly behind the eyes.
-
-`<HeroCharacter />` measures the cursor from between the eyes, normalises the direction and eases the eyes (lerp 0.12) and head (0.06) with `requestAnimationFrame`, writing transforms directly to the DOM (no React re-renders). When the mouse stops it keeps looking at the last cursor position. Touch devices and reduced motion show the neutral front pose. An optional soft blink is behind `blink` in `heroCharacterConfig`.
-
-To swap the character, replace the three files and update `face`, `neckY` and the `eyes` box in `heroCharacterConfig` (`src/config/site.ts`). Set `src` to `""` to hide it.
+- **Fingerprint scan card** (`src/components/scroll/FingerprintScan.tsx`): a loop-pattern fingerprint generated from a procedural ridge field (path data in `fingerprintPath.ts`), with a scanner HUD (grid, tick ring, crosshair, labelled minutiae) and a scan band that lights the ridges as it sweeps down. It stays still; only the scan moves.
+- **Shambhu robot** (`src/components/shambhu/ShambhuBot.tsx`): the chatbot face used by the bottom-right assistant and the app preview. Its eyes blink and glance around, and react to the chat: listening, thinking, speaking.
 
 ## Demos
 

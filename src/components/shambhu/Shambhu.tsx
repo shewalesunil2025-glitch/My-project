@@ -17,7 +17,7 @@ import { Scramble } from "@/components/effects/Scramble";
 import { ScrollWords } from "@/components/effects/ScrollWords";
 import { Reveal } from "@/components/effects/Reveal";
 import { cn } from "@/lib/cn";
-import { ShambhuAvatar } from "./ShambhuAvatar";
+import { ShambhuBot } from "./ShambhuBot";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -271,7 +271,7 @@ function AppPreview() {
         <div className="rounded-[2.2rem] border border-white/15 bg-ink-950 p-2 shadow-[0_40px_80px_-20px_rgb(0_0_0/0.9),0_0_60px_-20px_rgb(125_255_58/0.5)]">
           <div className="overflow-hidden rounded-[1.8rem] border border-white/[0.06] [background:linear-gradient(180deg,rgb(125_255_58/0.1),transparent_40%),var(--color-ink-900)]">
             <div className="flex items-center gap-2.5 px-4 pt-5">
-              <ShambhuAvatar className="size-11 shrink-0 rounded-full border border-flow/40" />
+              <ShambhuBot className="size-11 shrink-0 overflow-hidden rounded-full border border-flow/40" />
               <span>
                 <span className="block text-sm font-semibold">Shambhu</span>
                 <span className="flex items-center gap-1 text-[0.65rem] text-flow">

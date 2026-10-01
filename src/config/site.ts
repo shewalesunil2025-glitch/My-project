@@ -41,46 +41,6 @@ export const siteConfig = {
   ],
 } as const;
 
-/** Movable irises, drawn over the character's own eyes. */
-export type CharacterEyes = {
-  /** Eye whites with the irises removed; its alpha is the eyelid opening. */
-  plate: string;
-  /** The irises alone, at their resting position. */
-  iris: string;
-  /** Where both images sit: [x, y, width, height] as fractions of the character image. */
-  box: [number, number, number, number];
-  /** Furthest iris shift: [sideways (of image width), up, down (of image height)]. */
-  shift: [number, number, number];
-};
-
-/**
- * Hero character — one front-facing image (upscaled 4× with Real-ESRGAN, background
- * removed) that watches the cursor. The body never moves: the irises follow the
- * cursor inside the eyelids and the head turns a few degrees after them.
- * To swap the character, replace the three files in /public/images/character and
- * update `face`, `neckY` and `eyes`. Set `src` to "" to hide it.
- */
-export const heroCharacterConfig = {
-  src: "/images/character/front.webp",
-  alt: "Shambhu, the Nexa Flow AI assistant — a little boy in a turban with a painted moustache, watching your cursor",
-  width: 640,
-  height: 804,
-  /** Point between the eyes (fractions of the image) — the aim is measured from here. */
-  face: { x: 0.5, y: 0.51 },
-  /** Height of the neck (fraction of the image): the head turns above it, the body stays below. */
-  neckY: 0.715,
-  /** Largest head rotation toward the cursor, in degrees. */
-  maxHeadTurn: { yaw: 4, pitch: 3 },
-  eyes: {
-    plate: "/images/character/eyes-plate.webp",
-    iris: "/images/character/eyes-iris.webp",
-    box: [0.3521, 0.4686, 0.3521, 0.0807],
-    shift: [0.0155, 0.0056, 0.0045],
-  } as CharacterEyes,
-  /** A soft blink every few seconds. Off by default. */
-  blink: false,
-};
-
 /**
  * Founder profile for the About section.
  * Put the portrait in /public/images/founder/ and set `photo` (e.g. "/images/founder/sunil.webp").
