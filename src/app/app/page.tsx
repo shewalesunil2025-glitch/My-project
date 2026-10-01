@@ -16,7 +16,7 @@ export default function WelcomePage() {
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[36rem] bg-[radial-gradient(ellipse_at_50%_0%,rgb(255_90_31/0.22),transparent_65%)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[36rem] bg-[radial-gradient(ellipse_at_50%_0%,rgb(125_255_58/0.22),transparent_65%)]" />
       <div aria-hidden className="grid-backdrop pointer-events-none absolute inset-0" />
 
       <header className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">

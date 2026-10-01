@@ -66,13 +66,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (!ready || !user || !workspace?.business || !workspace.assistant) return <FullScreenLoader />;
 
-  const assistantName = workspace.assistant.name;
   const unread = workspace.notifications.filter((n) => !n.read).length;
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   const bottom = [
     { href: "/app/home", label: "Home", icon: House },
-    { href: "/app/assistant", label: assistantName, icon: Bot, lumi: true },
+    { href: "/app/assistant", label: product.name, icon: Bot, lumi: true },
     { href: "/app/services", label: "Services", icon: LayoutGrid },
     { href: "/app/activity", label: "Activity", icon: Activity },
     { href: "/app/more", label: "More", icon: Ellipsis },
@@ -80,6 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh lg:pl-64">
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(ellipse_at_50%_-20%,rgb(125_255_58/0.14),transparent_70%)]" />
       <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-ink-950">
         Skip to content
       </a>
@@ -103,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   <item.icon className={cn("size-[1.05rem]", isActive(item.href) && "text-flow")} aria-hidden />
-                  {item.href === "/app/assistant" ? `Ask ${assistantName}` : item.label}
+                  {item.href === "/app/assistant" ? `Ask ${product.name}` : item.label}
                 </Link>
               </li>
             ))}
@@ -159,7 +159,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <Bell className="size-[1.15rem]" aria-hidden />
               {unread > 0 && (
-                <span className="absolute top-1.5 right-1.5 grid min-w-4 place-items-center rounded-full bg-flow px-1 text-[0.6rem] leading-4 font-bold text-white">{unread > 9 ? "9+" : unread}</span>
+                <span className="absolute top-1.5 right-1.5 grid min-w-4 place-items-center rounded-full bg-flow px-1 text-[0.6rem] leading-4 font-bold text-ink-950">{unread > 9 ? "9+" : unread}</span>
               )}
             </Link>
           </div>

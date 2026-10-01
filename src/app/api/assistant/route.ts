@@ -11,7 +11,6 @@ import { product } from "@/config/product";
 type Body = {
   question?: unknown;
   context?: unknown;
-  assistantName?: unknown;
   history?: unknown;
 };
 
@@ -31,7 +30,6 @@ export async function POST(request: Request) {
 
   const question = typeof body.question === "string" ? body.question.trim().slice(0, MAX) : "";
   const context = typeof body.context === "string" ? body.context.slice(0, MAX * 2) : "";
-  const assistantName = typeof body.assistantName === "string" ? body.assistantName.slice(0, 40) : product.name;
   if (!question) return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
 
   const history: Anthropic.Beta.BetaMessageParam[] = Array.isArray(body.history)
@@ -47,7 +45,7 @@ export async function POST(request: Request) {
   while (history.length && history[0].role !== "user") history.shift();
 
   const system = [
-    `You are ${assistantName}, the AI business assistant inside ${product.name}, an app that runs a small business's website, AI call and WhatsApp assistants, social media, reviews, content and leads.`,
+    `You are ${product.name}, the AI business assistant and app that runs a small business's website, AI call and WhatsApp assistants, social media, reviews, content and leads.`,
     "You speak to the business owner, who is not technical. Be warm, short and concrete. Use plain words, no jargon (never mention n8n, APIs, webhooks or backend tools).",
     "Answer from the workspace data below. Never invent numbers, customers, reviews or results that are not in the data — say what you don't know instead.",
     "Never write fake reviews or suggest manipulating ratings.",

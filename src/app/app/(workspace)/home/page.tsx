@@ -1,5 +1,6 @@
 "use client";
 
+import { product } from "@/config/product";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -19,7 +20,7 @@ function Dashboard() {
   const params = useSearchParams();
   if (!ws?.business || !ws.assistant) return null;
 
-  const name = ws.assistant.name;
+  const name = product.name;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const first = ws.business.ownerName.split(" ")[0] || "there";
@@ -88,7 +89,7 @@ function Dashboard() {
           <ol className="space-y-2">
             {[
               { done: true, label: "Create your account and business profile", href: "/app/settings" },
-              { done: true, label: `Name your assistant — ${name}`, href: "/app/settings#assistant" },
+              { done: true, label: `Set up ${name}, your AI assistant`, href: "/app/settings#assistant" },
               { done: !!ws.website, label: ws.business.websiteUrl ? "Website connected" : "Build your website", href: "/app/website" },
               { done: false, label: "Choose your first service", href: "/app/services" },
               { done: Object.keys(ws.connections).length > 1, label: "Connect your accounts", href: "/app/settings#accounts" },

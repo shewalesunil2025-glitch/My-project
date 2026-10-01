@@ -1,3 +1,4 @@
+import { product } from "@/config/product";
 import { serviceById, services } from "@/content/app/services";
 import type { ChatMessage, ContentItem, Workspace } from "./types";
 import { logActivity, nowIso, uid } from "./store";
@@ -292,7 +293,7 @@ export function workspaceContext(ws: Workspace) {
   const today = ws.activity.filter((e) => isToday(e.at));
   return [
     b ? `Business: ${b.name} (${b.category}) in ${b.city}, ${b.country}. ${b.description} Hours: ${b.hours}. Offers: ${b.services}.` : "Business profile not completed yet.",
-    `Assistant name: ${ws.assistant?.name ?? "Lumi"}; tone: ${ws.assistant?.tone ?? "Warm & friendly"}; language: ${ws.assistant?.language ?? "English"}.`,
+    `Assistant name: ${product.name}; tone: ${ws.assistant?.tone ?? "Warm & friendly"}; language: ${ws.assistant?.language ?? "English"}.`,
     `Active services: ${ws.automations.map((a) => `${serviceById(a.serviceId)?.name} (${a.status})`).join(", ") || "none"}.`,
     `Today's activity: ${today.map((e) => `${time(e.at)} ${e.title}`).join("; ") || "none"}.`,
     `Leads: ${ws.leads.length} total, ${ws.leads.filter((l) => l.status === "follow_up").length} need follow-up.`,

@@ -12,7 +12,7 @@ import { BtnLink, Btn, Card, Field, Input, Notice, PageHeader, Pill, Segmented, 
 import { cn } from "@/lib/cn";
 
 const allPages = ["Home", "About", "Services", "Products / Menu", "Gallery", "Reviews", "Contact", "Booking / Enquiry"];
-const accents = ["#ff5a1f", "#e11d48", "#7c3aed", "#2563eb", "#059669", "#ca8a04", "#111111"];
+const accents = ["#15803d", "#e11d48", "#7c3aed", "#2563eb", "#059669", "#ca8a04", "#111111"];
 
 export default function WebsitePage() {
   const ws = useWorkspace();
@@ -29,7 +29,7 @@ export default function WebsitePage() {
       pages: ["Home", "About", "Services", "Gallery", "Reviews", "Contact"],
       headline: b.name,
       about: b.description,
-      accent: "#ff5a1f",
+      accent: "#15803d",
       updatedAt: nowIso(),
     };
   const set = (p: Partial<WebsiteProject>) => setDraft({ ...site, ...p });

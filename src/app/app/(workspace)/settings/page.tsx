@@ -171,11 +171,8 @@ export default function SettingsPage() {
         </Btn>
       </Section>
 
-      <Section id="assistant" title={`${product.name} settings`} subtitle="Your assistant's name, language, tone and personality.">
+      <Section id="assistant" title={`${product.name} settings`} subtitle={`How ${product.name} talks — language, tone and personality.`}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Assistant name" htmlFor="s-aname">
-            <Input id="s-aname" value={asst.name} maxLength={30} onChange={setA("name")} />
-          </Field>
           <Field label="Language" htmlFor="s-alang">
             <Input id="s-alang" value={asst.language} onChange={setA("language")} />
           </Field>
@@ -190,10 +187,9 @@ export default function SettingsPage() {
           <TextArea id="s-awel" value={asst.welcome} onChange={setA("welcome")} />
         </Field>
         <Btn
-          disabled={!asst.name.trim()}
           onClick={() => {
             updateWorkspace((w) => {
-              w.assistant = { ...asst, name: asst.name.trim() };
+              w.assistant = { ...asst, name: product.name };
               audit(w, "Assistant settings updated");
             });
             flash("Assistant settings saved");

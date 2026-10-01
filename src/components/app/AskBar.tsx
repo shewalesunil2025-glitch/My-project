@@ -30,7 +30,7 @@ export function AskBar({ name, examples }: { name: string; examples: string[] })
           className="min-w-0 flex-1 bg-transparent px-1 text-[0.95rem] text-fg placeholder:text-fg-subtle focus:outline-none focus-visible:outline-none"
           autoComplete="off"
         />
-        <button type="submit" aria-label="Ask" className="grid size-10 shrink-0 place-items-center rounded-full bg-flow text-white disabled:opacity-40" disabled={!q.trim()}>
+        <button type="submit" aria-label="Ask" className="grid size-10 shrink-0 place-items-center rounded-full bg-flow text-ink-950 disabled:opacity-40" disabled={!q.trim()}>
           <ArrowUp className="size-4" aria-hidden />
         </button>
       </form>

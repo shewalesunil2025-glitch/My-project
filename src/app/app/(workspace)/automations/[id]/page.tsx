@@ -85,7 +85,6 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
   const [testLog, setTestLog] = useState<{ q: string; a: string }[]>([]);
   const step = steps[i];
   const missing = missingConnections(ws, svc);
-  const assistantName = ws.assistant?.name ?? product.name;
 
   function save(nextStep: number) {
     updateWorkspace((w) => {
@@ -150,7 +149,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
         {step === "connect" && (
           <>
             <p className="text-sm text-fg-muted">
-              {svc.name} works through your own account. You sign in with the platform and choose what {assistantName} may do — you can disconnect at any time.
+              {svc.name} works through your own account. You sign in with the platform and choose what {product.name} may do — you can disconnect at any time.
             </p>
             {svc.connect.map((p) => (
               <ConnectAccount key={p} ws={ws} provider={p} />
@@ -179,11 +178,11 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
           <>
             {chatTest && (
               <Card>
-                <p className="mb-4 text-sm text-fg-muted">Ask a question the way a customer would. {assistantName} answers from what you just set up.</p>
+                <p className="mb-4 text-sm text-fg-muted">Ask a question the way a customer would. {product.name} answers from what you just set up.</p>
                 <div className="space-y-3">
                   {testLog.map((t, k) => (
                     <div key={k} className="space-y-2">
-                      <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-tr-sm bg-flow px-3.5 py-2 text-sm text-white">{t.q}</p>
+                      <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-tr-sm bg-flow px-3.5 py-2 text-sm text-ink-950">{t.q}</p>
                       <div className="flex items-start gap-2">
                         <LumiMark className="size-7 shrink-0" glow={false} />
                         <p className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white/[0.07] px-3.5 py-2 text-sm whitespace-pre-line">{t.a}</p>
@@ -204,7 +203,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
             )}
             {contentTest && (
               <Card>
-                <p className="mb-3 text-sm text-fg-muted">Here&apos;s a sample of what {assistantName} will create:</p>
+                <p className="mb-3 text-sm text-fg-muted">Here&apos;s a sample of what {product.name} will create:</p>
                 {(() => {
                   const idea = contentIdea(ws, svc.id === "youtube" ? "youtube" : svc.id === "facebook" ? "facebook" : "instagram");
                   return (
@@ -239,7 +238,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
             )}
             {!chatTest && !contentTest && svc.id !== "reviews" && (
               <Card>
-                <p className="text-sm text-fg-muted">{assistantName} checks that everything needed is in place:</p>
+                <p className="text-sm text-fg-muted">{product.name} checks that everything needed is in place:</p>
                 <ul className="mt-3 space-y-2 text-sm">
                   {[...svc.info, ...svc.configure].map((f) => (
                     <li key={f.key} className="flex gap-2">
@@ -324,7 +323,7 @@ function Detail({ ws, a, svc }: { ws: Workspace; a: Automation; svc: ServiceDef 
     <div className="space-y-6">
       {params.get("activated") && (
         <Notice className="flex items-center gap-2">
-          <CircleCheck className="size-4" aria-hidden /> {svc.name} is active. {a.note ?? `${ws.assistant?.name} is on it.`}
+          <CircleCheck className="size-4" aria-hidden /> {svc.name} is active. {a.note ?? `${product.name} is on it.`}
         </Notice>
       )}
       <div className="flex flex-wrap items-center gap-2">

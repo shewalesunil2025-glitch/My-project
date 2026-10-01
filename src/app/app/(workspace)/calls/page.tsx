@@ -1,5 +1,6 @@
 "use client";
 
+import { product } from "@/config/product";
 import { PhoneCall } from "lucide-react";
 import type { Call } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -21,7 +22,7 @@ export default function CallsPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="AI Voice & Call Assistant" title="Calls" subtitle={`Every call ${ws.assistant?.name} answered, with a short summary.`} />
+      <PageHeader eyebrow="AI Voice & Call Assistant" title="Calls" subtitle={`Every call ${product.name} answered, with a short summary.`} />
       {ws.calls.length === 0 ? (
         <EmptyState
           icon={<PhoneCall className="size-5" aria-hidden />}

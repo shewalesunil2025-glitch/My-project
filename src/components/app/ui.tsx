@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
+import { useId, type ComponentProps, type ReactNode } from "react";
 import {
   Bell,
   CircleDot,
@@ -24,20 +24,22 @@ import { cn } from "@/lib/cn";
 
 /* ── Brand mark: a friendly glowing face ── */
 export function LumiMark({ className, glow = true }: { className?: string; glow?: boolean }) {
+  // Unique per instance: a shared id breaks when its first copy sits in a hidden element.
+  const gid = `lumi-g${useId().replace(/:/g, "")}`;
   return (
     <svg viewBox="0 0 40 40" className={cn("size-9", className)} aria-hidden>
       <defs>
-        <radialGradient id="lumi-g" cx="35%" cy="30%" r="80%">
-          <stop offset="0" stopColor="#ffc9a8" />
-          <stop offset="0.45" stopColor="#ff7a3d" />
-          <stop offset="1" stopColor="#e8480f" />
+        <radialGradient id={gid} cx="35%" cy="30%" r="80%">
+          <stop offset="0" stopColor="#eaffd9" />
+          <stop offset="0.45" stopColor="#7dff3a" />
+          <stop offset="1" stopColor="#3fae12" />
         </radialGradient>
       </defs>
-      {glow && <circle cx="20" cy="20" r="19" fill="#ff5a1f" opacity="0.18" />}
-      <circle cx="20" cy="20" r="15.5" fill="url(#lumi-g)" />
-      <ellipse cx="15.2" cy="18.2" rx="1.9" ry="2.5" fill="#fff" />
-      <ellipse cx="24.8" cy="18.2" rx="1.9" ry="2.5" fill="#fff" />
-      <path d="M15 24.2c2.9 2.6 7.1 2.6 10 0" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+      {glow && <circle cx="20" cy="20" r="19" fill="#7dff3a" opacity="0.2" />}
+      <circle cx="20" cy="20" r="15.5" fill={`url(#${gid})`} />
+      <ellipse cx="15.2" cy="18.2" rx="1.9" ry="2.5" fill="#052405" />
+      <ellipse cx="24.8" cy="18.2" rx="1.9" ry="2.5" fill="#052405" />
+      <path d="M15 24.2c2.9 2.6 7.1 2.6 10 0" fill="none" stroke="#052405" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -68,7 +70,7 @@ type BtnVariant = "primary" | "ghost" | "light" | "danger" | "subtle";
 const btnBase =
   "inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-tight whitespace-nowrap transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none";
 const btnVariants: Record<BtnVariant, string> = {
-  primary: "bg-flow text-white hover:bg-flow-strong shadow-[0_10px_30px_-12px_rgb(255_90_31/0.8)]",
+  primary: "bg-flow text-ink-950 hover:bg-flow-soft shadow-[0_0_28px_-6px_rgb(125_255_58/0.7)]",
   ghost: "border border-white/12 bg-white/[0.04] text-fg hover:border-white/25 hover:bg-white/[0.08]",
   light: "bg-white text-ink-950 hover:bg-white/90",
   danger: "border border-red-400/30 bg-red-500/10 text-red-200 hover:bg-red-500/20",

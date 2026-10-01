@@ -2,7 +2,7 @@
 
 **Lumi** is the AI Business Operating System built by Nexa Flow AI. Business owners run their website, AI assistants, WhatsApp, calls, social media, reviews, content, leads and automations from one app. They never touch n8n, APIs, webhooks or video tools: Lumi handles those in the background.
 
-> The brand name lives in one place: `src/config/product.ts`. Every customer can still rename their own assistant (Riya, Alex, Emma…) during setup.
+> The brand name lives in one place: `src/config/product.ts`. The app and the assistant inside it are both called **Lumi**; customers choose its language, tone and personality. The `/app` routes use the live Nexa Flow AI look (deep green-black, neon lime `#7dff3a`, Inter Tight), set under `.theme-lumi` in `src/app/globals.css`. On iPhone, Safari → Share → "Add to Home Screen" installs it full-screen (`public/lumi.webmanifest`, icons in `public/lumi/`).
 
 ## What is in this repository today
 

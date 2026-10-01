@@ -14,9 +14,8 @@ import { cn } from "@/lib/cn";
 const languages = ["English", "Spanish", "French", "German", "Portuguese", "Arabic", "Hindi", "Italian", "Japanese", "Mandarin", "Multilingual (match the customer)"];
 const tones = ["Warm & friendly", "Professional", "Short & direct", "Fun & playful", "Luxury & elegant"];
 const personalities = ["Helpful host", "Expert advisor", "Caring receptionist", "Energetic salesperson", "Calm concierge"];
-const nameIdeas = [product.name, "Riya", "Alex", "Emma", "Business Assistant"];
 
-const steps = ["Business type", "Business details", "What you offer", "Your assistant"];
+const steps = ["Business type", "Business details", "What you offer", product.name];
 
 export default function SetupPage() {
   const { ready, user, workspace } = useSession();
@@ -58,7 +57,7 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
   const [assistant, setAssistant] = useState<AssistantProfile>({ name: product.name, language: "English", tone: tones[0], personality: personalities[0], welcome: "" });
 
   const set = (k: keyof Business) => (e: { target: { value: string } }) => setBiz((b) => ({ ...b, [k]: e.target.value }));
-  const welcome = assistant.welcome || `Hi! I'm ${assistant.name || product.name} from ${biz.name || "our business"}. How can I help you today?`;
+  const welcome = assistant.welcome || `Hi! I'm ${product.name} from ${biz.name || "our business"}. How can I help you today?`;
 
   function next() {
     setError("");
@@ -71,16 +70,15 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
   }
 
   function finish() {
-    if (!assistant.name.trim()) return setError("Give your assistant a name.");
     onFinish();
     updateWorkspace((ws) => {
       ws.business = { ...biz, websiteUrl: hasSite === "yes" ? biz.websiteUrl : "" };
-      ws.assistant = { ...assistant, name: assistant.name.trim(), welcome };
+      ws.assistant = { ...assistant, name: product.name, welcome };
       if (hasSite === "yes" && biz.websiteUrl) {
         ws.connections.website = { provider: "website", account: biz.websiteUrl, status: "connected", connectedAt: nowIso(), simulated: true };
-        ws.website = { status: "live", template: "classic", pages: [], headline: "", about: "", accent: "#ff5a1f", connectedUrl: biz.websiteUrl, updatedAt: nowIso() };
+        ws.website = { status: "live", template: "classic", pages: [], headline: "", about: "", accent: "#15803d", connectedUrl: biz.websiteUrl, updatedAt: nowIso() };
       }
-      logActivity(ws, { kind: "system", title: `${ws.assistant.name} is ready for ${biz.name}` });
+      logActivity(ws, { kind: "system", title: `${product.name} is ready for ${biz.name}` });
       audit(ws, "Business profile and assistant created");
     });
     router.push(hasSite === "no" ? "/app/home?welcome=website" : "/app/home?welcome=1");
@@ -213,23 +211,13 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
 
           {step === 3 && (
             <section className="space-y-5">
-              <h1 className="display text-3xl">What would you like to call your AI Assistant?</h1>
-              <div className="flex flex-wrap gap-2">
-                {nameIdeas.map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    aria-pressed={assistant.name === n}
-                    onClick={() => setAssistant((a) => ({ ...a, name: n }))}
-                    className={cn("h-9 rounded-full border px-4 text-sm", assistant.name === n ? "border-flow/60 bg-flow/12" : "border-white/10 text-fg-muted hover:text-fg")}
-                  >
-                    {n}
-                  </button>
-                ))}
+              <div className="flex items-center gap-4">
+                <LumiMark className="size-16 shrink-0" />
+                <div>
+                  <h1 className="display text-3xl">Meet {product.name}, your AI assistant</h1>
+                  <p className="mt-1 text-sm text-fg-muted">Choose how {product.name} talks to you and your customers.</p>
+                </div>
               </div>
-              <Field label="Or type your own name" htmlFor="a-name">
-                <Input id="a-name" value={assistant.name} maxLength={30} onChange={(e) => setAssistant((a) => ({ ...a, name: e.target.value }))} />
-              </Field>
               <div className="grid gap-4 sm:grid-cols-3">
                 <Field label="Language" htmlFor="a-lang">
                   <Select id="a-lang" value={assistant.language} onChange={(e) => setAssistant((a) => ({ ...a, language: e.target.value }))}>
@@ -261,7 +249,7 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
                 <div className="flex items-start gap-2.5">
                   <LumiMark className="size-8 shrink-0" glow={false} />
                   <div className="rounded-2xl rounded-tl-sm bg-white/[0.07] px-3.5 py-2.5 text-sm">
-                    <p className="mb-0.5 text-xs font-semibold text-flow-soft">{assistant.name || product.name}</p>
+                    <p className="mb-0.5 text-xs font-semibold text-flow-soft">{product.name}</p>
                     {welcome}
                   </div>
                 </div>
@@ -281,7 +269,7 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
             <ArrowLeft className="size-4" aria-hidden /> Back
           </Btn>
           <Btn onClick={next}>
-            {step === steps.length - 1 ? `Create ${assistant.name || "assistant"}` : "Continue"} <ArrowRight className="size-4" aria-hidden />
+            {step === steps.length - 1 ? `Start ${product.name}` : "Continue"} <ArrowRight className="size-4" aria-hidden />
           </Btn>
         </div>
       </div>

@@ -249,3 +249,60 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ─────────────────────────────────────────────
+   LUMI app theme — matches the live Nexa Flow AI site:
+   deep green-black canvas, neon lime accent, Inter Tight headings.
+   Applied while a `.theme-lumi` element is on the page (the /app routes).
+   ───────────────────────────────────────────── */
+:root:has(.theme-lumi) {
+  --color-ink-950: #030703;
+  --color-ink-900: #070d07;
+  --color-ink-850: #0a130b;
+  --color-ink-800: #0f1b10;
+  --color-ink-700: #1a2b1c;
+
+  --color-fg: #f2f5f0;
+  --color-fg-muted: #9aa89a;
+  --color-fg-subtle: #7d8c7e;
+
+  --color-flow: #7dff3a;
+  --color-flow-strong: #5fe01c;
+  --color-flow-soft: #b6ff8a;
+  --color-live: #d4ffb8;
+}
+:root:has(.theme-lumi),
+:root:has(.theme-lumi) body {
+  background: #030703 !important;
+}
+
+@layer components {
+  .theme-lumi .display {
+    font-family: var(--font-tight), var(--font-sans);
+    font-weight: 500;
+    letter-spacing: -0.045em;
+  }
+  .theme-lumi .eyebrow {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--color-flow);
+  }
+  .theme-lumi .eyebrow::before { content: "// "; }
+  .theme-lumi .eyebrow::after { content: " //"; }
+  .theme-lumi .glass {
+    background: linear-gradient(180deg, rgb(125 255 58 / 0.045), rgb(255 255 255 / 0.01)), var(--color-ink-850);
+    border-color: rgb(125 255 58 / 0.1);
+    box-shadow: inset 0 1px 0 rgb(190 255 160 / 0.05), 0 24px 60px -30px rgb(0 0 0 / 0.9);
+  }
+  .theme-lumi .text-metal {
+    background: linear-gradient(180deg, #ffffff 35%, #b9c9b6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .theme-lumi .grid-backdrop {
+    background-image:
+      linear-gradient(rgb(125 255 58 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(125 255 58 / 0.05) 1px, transparent 1px);
+  }
+}

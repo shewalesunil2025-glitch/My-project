@@ -1,5 +1,6 @@
 "use client";
 
+import { product } from "@/config/product";
 import { useState } from "react";
 import { CalendarDays, Check, Eye, Pencil, Plus, Send, Trash2, X } from "lucide-react";
 import { contentIdea } from "@/lib/app/assistant";
@@ -90,7 +91,7 @@ export default function ContentPage() {
         subtitle="AI videos, reels, shorts, images, captions, posts and scripts — preview, edit, approve, schedule and publish."
         action={
           <Btn size="sm" onClick={create}>
-            <Plus className="size-4" aria-hidden /> Create with {ws.assistant?.name}
+            <Plus className="size-4" aria-hidden /> Create with {product.name}
           </Btn>
         }
       />

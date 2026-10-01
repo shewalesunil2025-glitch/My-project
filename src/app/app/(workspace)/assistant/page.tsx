@@ -1,5 +1,6 @@
 "use client";
 
+import { product } from "@/config/product";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState, type FormEvent } from "react";
@@ -34,7 +35,7 @@ function Chat() {
   }, [ws?.chat.length, thinking]);
 
   if (!ws?.assistant) return null;
-  const name = ws.assistant.name;
+  const name = product.name;
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -77,7 +78,7 @@ function Chat() {
             <div
               className={cn(
                 "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line",
-                m.role === "user" ? "rounded-tr-sm bg-flow text-white" : "rounded-tl-sm bg-white/[0.07]",
+                m.role === "user" ? "rounded-tr-sm bg-flow text-ink-950" : "rounded-tl-sm bg-white/[0.07]",
               )}
             >
               {m.text}
@@ -127,7 +128,7 @@ function Chat() {
             className="min-w-0 flex-1 bg-transparent text-[0.95rem] placeholder:text-fg-subtle focus:outline-none focus-visible:outline-none"
             autoComplete="off"
           />
-          <button type="submit" aria-label="Send" disabled={!q.trim() || thinking} className="grid size-10 place-items-center rounded-full bg-flow text-white disabled:opacity-40">
+          <button type="submit" aria-label="Send" disabled={!q.trim() || thinking} className="grid size-10 place-items-center rounded-full bg-flow text-ink-950 disabled:opacity-40">
             <ArrowUp className="size-4" aria-hidden />
           </button>
         </form>

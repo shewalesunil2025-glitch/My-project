@@ -16,7 +16,7 @@ function Row({ children, className }: { children: ReactNode; className?: string 
   return <div className={cn("rounded-xl bg-white/[0.06] px-3 py-2 text-[0.72rem]", className)}>{children}</div>;
 }
 function Bubble({ me, children }: { me?: boolean; children: ReactNode }) {
-  return <div className={cn("max-w-[85%] rounded-2xl px-3 py-2 text-[0.72rem] leading-snug", me ? "ml-auto bg-flow text-white" : "bg-white/[0.08]")}>{children}</div>;
+  return <div className={cn("max-w-[85%] rounded-2xl px-3 py-2 text-[0.72rem] leading-snug", me ? "ml-auto bg-flow text-ink-950" : "bg-white/[0.08]")}>{children}</div>;
 }
 
 const steps: { title: string; text: string; screen: ReactNode }[] = [
@@ -41,7 +41,7 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
         {["Full name", "Email", "Mobile number", "Password", "Country"].map((f) => (
           <Row key={f} className="text-fg-muted">{f}</Row>
         ))}
-        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-white">Create Account</div>
+        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-ink-950">Create Account</div>
       </div>
     ),
   },
@@ -51,20 +51,20 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
     screen: (
       <div className="grid grid-cols-2 gap-2">
         {["Restaurant", "Hotel", "Clinic", "Salon", "Clothing Store", "Real Estate", "Gym", "Other"].map((c, i) => (
-          <Row key={c} className={i === 0 ? "bg-flow/25 text-white" : "text-fg-muted"}>{c}</Row>
+          <Row key={c} className={i === 0 ? "bg-flow/25 text-fg" : "text-fg-muted"}>{c}</Row>
         ))}
       </div>
     ),
   },
   {
-    title: "3. Name your assistant",
-    text: `Keep the name ${N} or choose your own — Riya, Alex, Emma… Pick its language, tone and welcome message. It becomes your personal AI business assistant.`,
+    title: `3. Meet ${N}`,
+    text: `${N} becomes your personal AI business assistant. Choose its language, tone and welcome message — it talks to your customers the way you would.`,
     screen: (
       <div className="space-y-2">
-        <Row>Name: <b>Emma</b></Row>
+        <Row>Assistant: <b>{N}</b></Row>
         <Row>Language: English</Row>
         <Row>Tone: Warm & friendly</Row>
-        <Bubble>Hi! I&apos;m Emma from Sunrise Bistro. How can I help?</Bubble>
+        <Bubble>Hi! I&apos;m {N} from Sunrise Bistro. How can I help?</Bubble>
       </div>
     ),
   },
@@ -86,7 +86,7 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
       <div className="space-y-2">
         <Row>YouTube Automation — Monthly</Row>
         <Row className="flex justify-between"><span>Total</span><b>$59.00</b></Row>
-        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-white">Pay securely</div>
+        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-ink-950">Pay securely</div>
         <p className="text-center text-[0.65rem] text-emerald-300">✓ Payment confirmed</p>
       </div>
     ),
@@ -110,7 +110,7 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
         <Row>Every day at 7:00 PM</Row>
         <Row>Style: Menu showcase</Row>
         <Row className="text-emerald-300">✓ Test video ready</Row>
-        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-white">Activate</div>
+        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-ink-950">Activate</div>
       </div>
     ),
   },
@@ -242,7 +242,7 @@ export default function DemoPage() {
         </section>
 
         {/* Phone frame */}
-        <div className="mx-auto w-[17rem] shrink-0 rounded-[2.4rem] border border-white/12 bg-ink-900 p-3 shadow-[0_40px_120px_-40px_rgb(255_90_31/0.5)]">
+        <div className="mx-auto w-[17rem] shrink-0 rounded-[2.4rem] border border-white/12 bg-ink-900 p-3 shadow-[0_40px_120px_-40px_rgb(125_255_58/0.5)]">
           <div className="mx-auto mb-2 h-1.5 w-16 rounded-full bg-white/10" />
           <div className="h-[26rem] overflow-hidden rounded-[1.8rem] bg-ink-950 p-4">
             <div className="mb-3 flex items-center gap-2">

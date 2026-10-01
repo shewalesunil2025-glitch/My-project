@@ -1,5 +1,6 @@
 "use client";
 
+import { product } from "@/config/product";
 import { useState, type FormEvent } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import { nowIso, updateWorkspace } from "@/lib/app/store";
@@ -39,7 +40,7 @@ export default function InboxPage() {
       <PageHeader
         eyebrow="Inbox"
         title="Messages"
-        subtitle={`WhatsApp, Instagram, Messenger and email conversations — answered by ${ws.assistant?.name}, readable right here.`}
+        subtitle={`WhatsApp, Instagram, Messenger and email conversations — answered by ${product.name}, readable right here.`}
       />
       <div className="mb-5">
         <Segmented
@@ -95,11 +96,11 @@ export default function InboxPage() {
               <div className="flex-1 space-y-3">
                 {open.messages.map((m, i) => (
                   <div key={i} className={cn("max-w-[85%]", m.from === "customer" ? "" : "ml-auto text-right")}>
-                    <p className={cn("inline-block rounded-2xl px-3.5 py-2 text-left text-sm", m.from === "customer" ? "rounded-tl-sm bg-white/[0.07]" : m.from === "owner" ? "rounded-tr-sm bg-sky-500/80 text-white" : "rounded-tr-sm bg-flow text-white")}>
+                    <p className={cn("inline-block rounded-2xl px-3.5 py-2 text-left text-sm", m.from === "customer" ? "rounded-tl-sm bg-white/[0.07]" : m.from === "owner" ? "rounded-tr-sm bg-sky-500/80 text-white" : "rounded-tr-sm bg-flow text-ink-950")}>
                       {m.text}
                     </p>
                     <p className="mt-1 text-[0.65rem] text-fg-subtle">
-                      {m.from === "assistant" ? ws.assistant?.name : m.from === "owner" ? "You" : open.contact} · {fmtTime(m.at)}
+                      {m.from === "assistant" ? product.name : m.from === "owner" ? "You" : open.contact} · {fmtTime(m.at)}
                     </p>
                   </div>
                 ))}
@@ -109,7 +110,7 @@ export default function InboxPage() {
                   Reply
                 </label>
                 <Input id="reply" value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Reply yourself…" />
-                <button type="submit" aria-label="Send reply" disabled={!reply.trim()} className="grid size-11 shrink-0 place-items-center rounded-full bg-flow text-white disabled:opacity-40">
+                <button type="submit" aria-label="Send reply" disabled={!reply.trim()} className="grid size-11 shrink-0 place-items-center rounded-full bg-flow text-ink-950 disabled:opacity-40">
                   <Send className="size-4" aria-hidden />
                 </button>
               </form>

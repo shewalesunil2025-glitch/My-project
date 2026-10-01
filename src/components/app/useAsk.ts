@@ -34,7 +34,6 @@ export function useAsk(ws: Workspace | null) {
             body: JSON.stringify({
               question: text,
               context: workspaceContext(ws),
-              assistantName: ws.assistant?.name,
               history: ws.chat.slice(-8).map((m) => ({ role: m.role, text: m.text })),
             }),
           });
