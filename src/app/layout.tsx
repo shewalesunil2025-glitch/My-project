@@ -3,7 +3,6 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { MotionConfig } from "framer-motion";
 import { siteConfig } from "@/config/site";
-import { SmoothScroll } from "@/components/effects/SmoothScroll";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
@@ -47,7 +46,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${jakarta.variable} ${GeistMono.variable}`}>
       <body>
         <MotionConfig reducedMotion="user">
-          <SmoothScroll />
           {children}
         </MotionConfig>
       </body>

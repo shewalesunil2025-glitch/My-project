@@ -14,6 +14,7 @@ import { FinalCta } from "@/components/cta/FinalCta";
 import { Founder } from "@/components/about/Founder";
 import { Faq } from "@/components/about/Faq";
 import { Footer } from "@/components/footer/Footer";
+import { SmoothScroll } from "@/components/effects/SmoothScroll";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -37,6 +38,7 @@ const jsonLd = {
 export default function HomePage() {
   return (
     <DemoProvider>
+      <SmoothScroll />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
       <main id="main">

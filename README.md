@@ -4,6 +4,17 @@ The flagship website for **Nexa Flow AI**, an AI automation agency. The site is 
 
 > **Design idea:** 2035 technology, today's simplicity.
 
+## Lumi — the business app (`/app`)
+
+This repo also contains **Lumi**, the AI Business Operating System: an app where a restaurant, hotel, clinic, salon, store or real-estate owner manages their website, AI call and WhatsApp assistants, Instagram, Facebook, YouTube, email, Google reviews, digital marketing, content, leads and analytics in one place.
+
+- `/app`: welcome · `/app/demo`: guided demo · `/app/signup` → `/app/setup` (business + name your assistant) → `/app/home`
+- Automation Store → plan → payment → connect account → business info → configure → test → activate
+- Mobile-first: bottom navigation Home · *assistant* · Services · Activity · More
+- **Preview mode:** accounts, payments and connections run on the device and are labelled as such. Try "Explore a sample restaurant" for a full workspace.
+- Brand name: `src/config/product.ts`. Services and placeholder prices: `src/content/app/services.ts`
+- Backend, multi-tenancy, security and scaling plan: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
 ## Stack
 
 | Layer | Choice | Why |
@@ -32,6 +43,7 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap and robots |
 | `NEXT_PUBLIC_BOOKING_URL` | Optional Calendly / Cal.com link. When set, every "Book a Free Demo" opens it |
 | `LEAD_WEBHOOK_URL` | Optional n8n / Make / Zapier / CRM webhook that receives demo requests |
+| `ANTHROPIC_API_KEY` | Optional. Lets the Lumi assistant answer open questions with Claude (`/api/assistant`) |
 
 **Honest by default:** if `LEAD_WEBHOOK_URL` is not set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
 

@@ -10,6 +10,7 @@ const columns = [
       { label: "How It Works", href: "#process" },
       { label: "Industries", href: "#industries" },
       { label: "Work / Demos", href: "#work" },
+      { label: "Lumi — the business app", href: "/app" },
     ],
   },
   {
