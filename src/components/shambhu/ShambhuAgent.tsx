@@ -288,7 +288,7 @@ export function ShambhuAgent() {
             {open ? (
               <X className="size-6 text-fg" aria-hidden />
             ) : (
-              <ShambhuAvatar image="robot" className="size-full" />
+              <ShambhuAvatar image="robot" mood={status} className="size-full" />
             )}
           </span>
         </button>
@@ -325,7 +325,7 @@ export function ShambhuAgent() {
             {/* Header */}
             <header className="flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
               <span className="relative size-11 shrink-0">
-                <ShambhuAvatar image="robot" className="size-full rounded-full border border-flow/40" />
+                <ShambhuAvatar image="robot" mood={status} className="size-full rounded-full border border-flow/40" />
                 <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">

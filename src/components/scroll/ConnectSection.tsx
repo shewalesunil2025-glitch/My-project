@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { customerFlow, fragmentedTools } from "@/content/flow";
@@ -9,10 +8,11 @@ import { BookDemoButton } from "@/components/cta/BookDemoButton";
 import { Scramble } from "@/components/effects/Scramble";
 import { ScrollWords } from "@/components/effects/ScrollWords";
 import { Reveal } from "@/components/effects/Reveal";
+import { FingerprintScan } from "./FingerprintScan";
 
 /**
  * The problem and the answer, in the reference's "light pillar" layout, followed by
- * a scanning card of Shambhu's eye, and the connected customer journey.
+ * a scanning card of Shambhu's fingerprint, and the connected customer journey.
  */
 export function ConnectSection() {
   return (
@@ -76,7 +76,7 @@ function LightPillar() {
   );
 }
 
-/** Shambhu's eye inside scan brackets, then the connected journey. */
+/** Shambhu's fingerprint inside scan brackets, then the connected journey. */
 function ScanCard() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -143,7 +143,7 @@ function ScanCard() {
 }
 
 /**
- * The scanned image: Shambhu's eye. It leans toward the cursor on desktop and
+ * The scanned print: Shambhu's fingerprint. It leans toward the cursor on desktop and
  * drifts slowly on its own on touch screens.
  */
 function ScanImage() {
@@ -186,14 +186,8 @@ function ScanImage() {
       style={{ rotateX, rotateY, transformPerspective: 900 }}
       className="absolute inset-0 overflow-hidden rounded-[1.6rem] border border-flow/20 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.9),0_0_60px_-25px_rgb(125_255_58/0.6)]"
     >
-      <motion.div style={{ x: shiftX, y: shiftY }} className="absolute -inset-[6%]">
-        <Image
-          src="/images/shambhu/scan-eye.webp"
-          alt="Shambhu's digital eye scanning a business"
-          fill
-          sizes="(min-width: 768px) 22rem, 90vw"
-          className="object-cover object-[50%_45%]"
-        />
+      <motion.div style={{ x: shiftX, y: shiftY }} className="absolute -inset-[4%]">
+        <FingerprintScan className="size-full" />
       </motion.div>
       {/* Edge fade into the card */}
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgb(7_13_7/0.85))]" />
@@ -201,7 +195,7 @@ function ScanImage() {
   );
 }
 
-/** Corner brackets that lock onto the eye, with a scanning bar between them. */
+/** Corner brackets that lock onto the fingerprint. */
 function ScanBrackets() {
   const corner = "absolute size-12 border-flow md:size-14";
   return (
@@ -211,13 +205,12 @@ function ScanBrackets() {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: "-20%" }}
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-      className="pointer-events-none absolute top-[30%] left-1/2 h-[32%] w-[72%] -translate-x-1/2 drop-shadow-[0_0_8px_rgb(125_255_58/0.9)]"
+      className="pointer-events-none absolute top-[12%] left-1/2 h-[74%] w-[78%] -translate-x-1/2 drop-shadow-[0_0_8px_rgb(125_255_58/0.9)]"
     >
       <span className={`${corner} top-0 left-0 rounded-tl-2xl border-t-[3px] border-l-[3px]`} />
       <span className={`${corner} top-0 right-0 rounded-tr-2xl border-t-[3px] border-r-[3px]`} />
       <span className={`${corner} bottom-0 left-0 rounded-bl-2xl border-b-[3px] border-l-[3px]`} />
       <span className={`${corner} right-0 bottom-0 rounded-br-2xl border-r-[3px] border-b-[3px]`} />
-      <span className="absolute inset-x-2 h-[3px] animate-scanbar rounded-full bg-flow-soft shadow-[0_0_14px_rgb(125_255_58/1)]" />
     </motion.div>
   );
 }
