@@ -22,6 +22,7 @@ const tabs: { value: Tab; label: string }[] = [
   { value: "script", label: "Scripts" },
   { value: "calendar", label: "Calendar" },
 ];
+const platformLabel: Record<ContentItem["platform"], string> = { youtube: "YouTube", instagram: "Instagram", facebook: "Facebook", website: "Website", email: "Email" };
 const typeEmoji: Record<ContentType, string> = { video: "🎬", reel: "🎞️", short: "📱", image: "🖼️", caption: "✍️", post: "📝", script: "📜" };
 
 function toLocalInput(iso?: string) {
@@ -181,8 +182,8 @@ export default function ContentPage() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-snug">{c.title}</p>
-                    <p className="mt-0.5 text-xs text-fg-subtle capitalize">
-                      {c.type} · {c.platform}
+                    <p className="mt-0.5 text-xs text-fg-subtle">
+                      <span className="capitalize">{c.type}</span> · {platformLabel[c.platform]}
                       {c.status === "scheduled" && c.scheduledAt && ` · ${fmtDateTime(c.scheduledAt)}`}
                       {c.status === "approval" && c.scheduledAt && ` · planned ${fmtDateTime(c.scheduledAt)}`}
                       {c.status === "published" && c.publishedAt && ` · ${fmtDateTime(c.publishedAt)}`}
