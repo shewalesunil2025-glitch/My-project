@@ -492,3 +492,10 @@ body {
   from { transform: scaleY(0.3); }
   to { transform: scaleY(1); }
 }
+
+/* Phones: large decorative glows use a lighter blur. Big blur radii on big
+   elements are among the most expensive things a mobile GPU draws. */
+@media (max-width: 767px) {
+  .blur-3xl { --tw-blur: blur(28px); }
+  .blur-2xl { --tw-blur: blur(20px); }
+}

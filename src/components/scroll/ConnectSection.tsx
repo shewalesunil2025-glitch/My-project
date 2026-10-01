@@ -68,7 +68,7 @@ function PillarStatement() {
 function LightPillar() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-y-0 left-[58%] w-0 max-md:left-[80%]">
-      <div className="absolute inset-y-0 left-0 w-[14rem] -translate-x-1/2 animate-pillar bg-[radial-gradient(50%_100%_at_50%_50%,rgb(125_255_58/0.35),transparent_70%)] blur-2xl" />
+      <div className="absolute inset-y-0 left-0 w-[14rem] -translate-x-1/2 md:animate-pillar bg-[radial-gradient(50%_100%_at_50%_50%,rgb(125_255_58/0.35),transparent_70%)] blur-2xl" />
       <div className="absolute inset-y-0 left-0 w-10 -translate-x-1/2 bg-[linear-gradient(to_bottom,rgb(125_255_58/0),rgb(160_255_100/0.8)_45%,rgb(200_255_150/0.95)_80%,rgb(125_255_58/0.3))] blur-md" />
       <div className="absolute inset-y-0 left-0 w-[3px] -translate-x-1/2 bg-[linear-gradient(to_bottom,transparent,#eaffd9_50%,#b6ff8a)]" />
       <div className="absolute bottom-[4%] left-0 h-24 w-[36rem] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(200_255_150/0.9),rgb(125_255_58/0.35)_45%,transparent)] blur-lg" />

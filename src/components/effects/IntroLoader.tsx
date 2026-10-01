@@ -5,23 +5,24 @@ const HERO_CUE_MS = 1350;
 
 /**
  * Opening screen: the logo lights up, a line fills, then the curtain lifts off the
- * hero. Pure CSS, so it never waits on JavaScript. Shown once per visit; skipped
- * for reduced motion.
+ * hero. Pure CSS, so it never waits on JavaScript. Shown once per visit on larger
+ * screens; skipped on phones and for reduced motion.
  */
 export function IntroLoader() {
   return (
     <>
       <script
-        // Runs before paint: skip the intro if it was already seen this session.
+        // Runs before paint: skip the intro if it was already seen this session, and
+        // always on phones, where it would run alongside every hero entrance at once.
         dangerouslySetInnerHTML={{
           __html:
-            "try{if(sessionStorage.getItem('nx-intro'))document.documentElement.classList.add('intro-seen');else sessionStorage.setItem('nx-intro','1')}catch(e){}",
+            "try{if(sessionStorage.getItem('nx-intro')||matchMedia('(max-width: 767px)').matches)document.documentElement.classList.add('intro-seen');else sessionStorage.setItem('nx-intro','1')}catch(e){}",
         }}
       />
       <div aria-hidden className="intro">
         <div className="intro-glow" />
         <div className="intro-mark">
-          <LogoMark className="size-14" />
+          <LogoMark className="size-14" gradientId="nx-mark-intro" />
         </div>
         <p className="intro-name">Nexa Flow AI</p>
         <div className="intro-line">

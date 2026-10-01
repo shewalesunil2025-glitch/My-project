@@ -49,8 +49,8 @@ export function Hero() {
 
         {/* Nebula the brain dissolves into */}
         <motion.div aria-hidden style={{ opacity: nebula }} className="pointer-events-none absolute inset-0">
-          <div className="absolute top-[8%] left-[18%] h-[40vh] w-[46vw] animate-aurora rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.28),transparent_65%)] blur-3xl" />
-          <div className="absolute top-[30%] right-[8%] h-[36vh] w-[34vw] animate-aurora rounded-full bg-[radial-gradient(circle,rgb(60_200_60/0.22),transparent_65%)] blur-3xl [animation-delay:-8s]" />
+          <div className="absolute top-[8%] left-[18%] h-[40vh] w-[46vw] md:animate-aurora rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.28),transparent_65%)] blur-3xl" />
+          <div className="absolute top-[30%] right-[8%] h-[36vh] w-[34vw] md:animate-aurora rounded-full bg-[radial-gradient(circle,rgb(60_200_60/0.22),transparent_65%)] blur-3xl [animation-delay:-8s]" />
           <div className="stars absolute inset-0" />
         </motion.div>
 

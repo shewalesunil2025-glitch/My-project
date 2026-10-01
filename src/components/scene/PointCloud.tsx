@@ -228,7 +228,8 @@ export function PointCloud({ shape, disperse, interactive = true, size = 0.8, cl
 
     const resize = () => {
       const r = canvas.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Phones: a lower canvas resolution keeps memory down; the points still look sharp.
+      dpr = Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2);
       w = r.width;
       h = r.height;
       canvas.width = Math.round(w * dpr);

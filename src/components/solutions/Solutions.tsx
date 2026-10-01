@@ -192,10 +192,12 @@ function FloatingCard({
   const scale = useTransform(angle, (a) => 0.55 + 0.45 * Math.max(0, Math.cos(a)));
   const opacity = useTransform(angle, (a) => (Math.abs(a) > 1.5 ? 0 : Math.min(1, Math.max(0, (Math.cos(a) + 0.05) / 0.5))));
   const zIndex = useTransform(angle, (a) => 10 + Math.round(Math.cos(a) * 10));
+  // Cards parked out of sight are hidden, so the browser doesn't keep a layer for each one.
+  const visibility = useTransform(opacity, (o) => (o < 0.01 ? "hidden" : "visible"));
 
   return (
     <motion.li
-      style={{ x, y, rotateY, scale, opacity, zIndex, transformPerspective: 1600 }}
+      style={{ x, y, rotateY, scale, opacity, zIndex, visibility, transformPerspective: 1600 }}
       className="absolute top-1/2 left-1/2 w-[min(28rem,86vw)] [transform-style:preserve-3d]"
     >
       <SolutionCard solution={solution} number={index + 1} />

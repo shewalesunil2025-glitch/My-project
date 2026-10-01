@@ -4,6 +4,7 @@ import { useRef, type ReactNode } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/cn";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 type ScrollPanelProps = {
   children: ReactNode;
@@ -20,6 +21,9 @@ type ScrollPanelProps = {
 export function ScrollPanel({ children, variant = "dark", className }: ScrollPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // Phones skip the panel effect: scaling a whole tall section creates a huge
+  // GPU layer, which is enough to crash mobile browsers on first load.
+  const desktop = useMediaQuery("(min-width: 768px)");
   const { scrollYProgress: enter } = useScroll({ target: ref, offset: ["start 0.98", "start 0.3"] });
   const { scrollYProgress: exit } = useScroll({ target: ref, offset: ["end 0.75", "end 0.05"] });
 
@@ -34,7 +38,7 @@ export function ScrollPanel({ children, variant = "dark", className }: ScrollPan
     e >= 0.999 ? "none" : `circle(${(3 + e * 147).toFixed(2)}% at 50% 14%)`,
   );
 
-  if (reduce) return <div className={className}>{children}</div>;
+  if (reduce || !desktop) return <div className={className}>{children}</div>;
 
   return (
     <motion.div

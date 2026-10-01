@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import { FINGERPRINT_RIDGES } from "./fingerprintPath";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 /** Minutiae the scanner "finds": ridge features marked on the print, with labels. */
 const MARKERS = [
@@ -37,6 +38,9 @@ export function FingerprintScan({ className }: { className?: string }) {
   const uid = useId().replace(/:/g, "");
   const id = (n: string) => `${n}-${uid}`;
   const url = (n: string) => `url(#${id(n)})`;
+  // Phones draw the print without the blur glow and the re-lit copy under the
+  // scan band: both repaint a large, detailed path every frame.
+  const full = useMediaQuery("(min-width: 768px)");
 
   return (
     <svg
@@ -128,17 +132,14 @@ export function FingerprintScan({ className }: { className?: string }) {
             d={FINGERPRINT_RIDGES}
             fill={url("ink")}
             fillRule="evenodd"
-            opacity="0.62"
-            filter={url("glow")}
+            opacity={full ? 0.62 : 0.85}
+            filter={full ? url("glow") : undefined}
           />
-          <g mask={url("scan")}>
-            <path
-              d={FINGERPRINT_RIDGES}
-              fill="#f2ffe9"
-              fillRule="evenodd"
-              filter={url("glow")}
-            />
-          </g>
+          {full && (
+            <g mask={url("scan")}>
+              <path d={FINGERPRINT_RIDGES} fill="#f2ffe9" fillRule="evenodd" filter={url("glow")} />
+            </g>
+          )}
         </g>
 
         {/* Crosshair on the core */}
