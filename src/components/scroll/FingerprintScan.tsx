@@ -16,13 +16,13 @@ const MARKERS = [
 const TICKS = Array.from({ length: 72 }, (_, i) => {
   const a = (i / 72) * Math.PI * 2;
   const long = i % 6 === 0;
-  const r1 = 168;
-  const r2 = long ? 160 : 164;
+  const r1 = 142;
+  const r2 = long ? 134 : 138;
   return {
     x1: +(150 + Math.cos(a) * r1 * 0.78).toFixed(2),
-    y1: +(188 + Math.sin(a) * r1).toFixed(2),
+    y1: +(192 + Math.sin(a) * r1).toFixed(2),
     x2: +(150 + Math.cos(a) * r2 * 0.78).toFixed(2),
-    y2: +(188 + Math.sin(a) * r2).toFixed(2),
+    y2: +(192 + Math.sin(a) * r2).toFixed(2),
     long,
   };
 });
@@ -78,11 +78,27 @@ export function FingerprintScan({ className }: { className?: string }) {
         </linearGradient>
         <mask id={id("scan")}>
           <rect x="0" y="-110" width="300" height="110" fill={url("band")}>
-            <animate attributeName="y" values="-110;400" dur="3.6s" repeatCount="indefinite" />
+            <animate
+              attributeName="y"
+              values="-110;400"
+              dur="3.6s"
+              repeatCount="indefinite"
+            />
           </rect>
         </mask>
-        <pattern id={id("grid")} width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M20 0H0V20" fill="none" stroke="#7dff3a" strokeOpacity="0.07" strokeWidth="1" />
+        <pattern
+          id={id("grid")}
+          width="20"
+          height="20"
+          patternUnits="userSpaceOnUse"
+        >
+          <path
+            d="M20 0H0V20"
+            fill="none"
+            stroke="#7dff3a"
+            strokeOpacity="0.07"
+            strokeWidth="1"
+          />
         </pattern>
       </defs>
 
@@ -92,61 +108,129 @@ export function FingerprintScan({ className }: { className?: string }) {
       {/* HUD ring with ticks around the print */}
       <g stroke="#7dff3a">
         {TICKS.map((t, i) => (
-          <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} strokeOpacity={t.long ? 0.55 : 0.22} strokeWidth={t.long ? 1.4 : 1} />
+          <line
+            key={i}
+            x1={t.x1}
+            y1={t.y1}
+            x2={t.x2}
+            y2={t.y2}
+            strokeOpacity={t.long ? 0.55 : 0.22}
+            strokeWidth={t.long ? 1.4 : 1}
+          />
         ))}
       </g>
 
-      {/* The print: dim base, then full brightness under the scan band */}
-      <g mask={url("fade")}>
-        <path d={FINGERPRINT_RIDGES} fill={url("ink")} fillRule="evenodd" opacity="0.62" filter={url("glow")} />
-        <g mask={url("scan")}>
-          <path d={FINGERPRINT_RIDGES} fill="#f2ffe9" fillRule="evenodd" filter={url("glow")} />
+      {/* Everything on the print is scaled so the whole finger fits inside the card */}
+      <g transform="translate(150 192) scale(0.78) translate(-150 -168)">
+        {/* The print: dim base, then full brightness under the scan band */}
+        <g mask={url("fade")}>
+          <path
+            d={FINGERPRINT_RIDGES}
+            fill={url("ink")}
+            fillRule="evenodd"
+            opacity="0.62"
+            filter={url("glow")}
+          />
+          <g mask={url("scan")}>
+            <path
+              d={FINGERPRINT_RIDGES}
+              fill="#f2ffe9"
+              fillRule="evenodd"
+              filter={url("glow")}
+            />
+          </g>
         </g>
-      </g>
 
-      {/* Crosshair on the core */}
-      <g stroke="#d4ffb8" strokeWidth="1" opacity="0.8">
-        <line x1="160" y1="140" x2="160" y2="156" />
-        <line x1="160" y1="184" x2="160" y2="200" />
-        <line x1="130" y1="170" x2="146" y2="170" />
-        <line x1="174" y1="170" x2="190" y2="170" />
-      </g>
+        {/* Crosshair on the core */}
+        <g stroke="#d4ffb8" strokeWidth="1" opacity="0.8">
+          <line x1="160" y1="140" x2="160" y2="156" />
+          <line x1="160" y1="184" x2="160" y2="200" />
+          <line x1="130" y1="170" x2="146" y2="170" />
+          <line x1="174" y1="170" x2="190" y2="170" />
+        </g>
 
-      {/* Minutiae markers */}
-      <g fontFamily="ui-monospace, monospace" fontSize="7.5" letterSpacing="1">
-        {MARKERS.map((m) => {
-          const dir = m.side === "right" ? 1 : -1;
-          const lx = m.x + 34 * dir;
-          return (
-            <g key={m.label}>
-              {m.ring ? (
-                <circle cx={m.x} cy={m.y} r="7" fill="none" stroke="#d4ffb8" strokeWidth="1.4" />
-              ) : (
-                <rect x={m.x - 4.5} y={m.y - 4.5} width="9" height="9" fill="none" stroke="#d4ffb8" strokeWidth="1.3" />
-              )}
-              <circle cx={m.x} cy={m.y} r="1.6" fill="#d4ffb8" />
-              <polyline
-                points={`${m.x + 6 * dir},${m.y - 4} ${lx},${m.y - 14} ${lx + 26 * dir},${m.y - 14}`}
-                fill="none"
-                stroke="#7dff3a"
-                strokeOpacity="0.7"
-                strokeWidth="0.8"
-              />
-              <text x={lx + 2 * dir} y={m.y - 17} fill="#b6ff8a" textAnchor={dir === 1 ? "start" : "end"}>
-                {m.label}
-              </text>
-            </g>
-          );
-        })}
-      </g>
+        {/* Minutiae markers */}
+        <g
+          fontFamily="ui-monospace, monospace"
+          fontSize="9.5"
+          letterSpacing="1"
+        >
+          {MARKERS.map((m) => {
+            const dir = m.side === "right" ? 1 : -1;
+            const lx = m.x + 34 * dir;
+            return (
+              <g key={m.label}>
+                {m.ring ? (
+                  <circle
+                    cx={m.x}
+                    cy={m.y}
+                    r="7"
+                    fill="none"
+                    stroke="#d4ffb8"
+                    strokeWidth="1.4"
+                  />
+                ) : (
+                  <rect
+                    x={m.x - 4.5}
+                    y={m.y - 4.5}
+                    width="9"
+                    height="9"
+                    fill="none"
+                    stroke="#d4ffb8"
+                    strokeWidth="1.3"
+                  />
+                )}
+                <circle cx={m.x} cy={m.y} r="1.6" fill="#d4ffb8" />
+                <polyline
+                  points={`${m.x + 6 * dir},${m.y - 4} ${lx},${m.y - 14} ${lx + 26 * dir},${m.y - 14}`}
+                  fill="none"
+                  stroke="#7dff3a"
+                  strokeOpacity="0.7"
+                  strokeWidth="0.8"
+                />
+                <text
+                  x={lx + 2 * dir}
+                  y={m.y - 17}
+                  fill="#b6ff8a"
+                  textAnchor={dir === 1 ? "start" : "end"}
+                >
+                  {m.label}
+                </text>
+              </g>
+            );
+          })}
+        </g>
 
-      {/* Scan line, travelling with the bright band */}
-      <rect x="20" y="-28" width="260" height="2.5" rx="1.25" fill="#eaffd9" filter={url("glow")}>
-        <animate attributeName="y" values="-28;482" dur="3.6s" repeatCount="indefinite" />
-      </rect>
+        {/* Scan line, travelling with the bright band */}
+        <rect
+          x="20"
+          y="-28"
+          width="260"
+          height="2.5"
+          rx="1.25"
+          fill="#eaffd9"
+          filter={url("glow")}
+        >
+          <animate
+            attributeName="y"
+            values="-28;482"
+            dur="3.6s"
+            repeatCount="indefinite"
+          />
+        </rect>
+      </g>
 
       {/* Readout */}
-      <text x="150" y="364" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="8" letterSpacing="2" fill="#7dff3a" opacity="0.85">
+      <text
+        x="150"
+        y="364"
+        textAnchor="middle"
+        fontFamily="ui-monospace, monospace"
+        fontSize="8"
+        letterSpacing="2"
+        fill="#7dff3a"
+        opacity="0.85"
+      >
         BIOMETRIC ID · SCANNING
       </text>
     </svg>
