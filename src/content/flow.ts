@@ -2,8 +2,9 @@ import {
   Bell,
   Bot,
   CalendarCheck,
-  Database,
   Globe,
+  Mail,
+  Megaphone,
   MessageCircle,
   PhoneCall,
   Repeat,
@@ -19,7 +20,7 @@ export type FlowNode = {
   icon: LucideIcon;
 };
 
-/** The customer journey Nexa Flow AI automates end-to-end. */
+/** The customer journey Lumi automates end-to-end. */
 export const customerFlow: FlowNode[] = [
   { id: "website", label: "Website", detail: "A visitor lands on a site built to convert.", icon: Globe },
   { id: "conversation", label: "AI Conversation", detail: "AI answers questions instantly, 24/7.", icon: Bot },
@@ -34,12 +35,12 @@ export const customerFlow: FlowNode[] = [
 /** The fragmented tools most businesses juggle today. */
 export const fragmentedTools = ["Website", "WhatsApp", "Phone", "Bookings", "Follow-ups", "Reviews"] as const;
 
-/** The six connected systems around the central Nexa AI, each with the job it does. */
+/** The six connected systems around Lumi, the central AI, each with the job it does. */
 export const ecosystem: { label: string; benefit: string; icon: LucideIcon }[] = [
   { label: "Website", benefit: "Brings customers in", icon: Globe },
   { label: "WhatsApp", benefit: "Replies instantly", icon: MessageCircle },
   { label: "AI Voice", benefit: "Answers every call", icon: PhoneCall },
-  { label: "Booking", benefit: "Fills your calendar", icon: CalendarCheck },
-  { label: "CRM", benefit: "Remembers every customer", icon: Database },
+  { label: "Digital Marketing", benefit: "Grows your reach", icon: Megaphone },
+  { label: "Email", benefit: "Sorts your inbox", icon: Mail },
   { label: "Reviews", benefit: "Grows your rating", icon: Star },
 ];

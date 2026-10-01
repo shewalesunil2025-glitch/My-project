@@ -1,0 +1,16 @@
+{
+  "name": "Lumi — AI Business Operating System",
+  "short_name": "Lumi",
+  "description": "Run your website, AI assistants, WhatsApp, calls, social media, reviews and leads from one app.",
+  "start_url": "/app",
+  "scope": "/app",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#030703",
+  "theme_color": "#030703",
+  "icons": [
+    { "src": "/lumi/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/lumi/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/lumi/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -7,15 +7,16 @@ import { submitLead, validateLead } from "@/lib/leads";
 import { siteConfig } from "@/config/site";
 
 const interests = [
-  "Complete AI system",
-  "AI-powered website",
-  "WhatsApp automation",
-  "AI voice receptionist",
-  "AI chatbot",
-  "Booking & reviews",
-  "Workflow automation",
-  "Growth & marketing",
-  "Monthly partnership",
+  "Lumi AI — early access",
+  "Website",
+  "AI Voice Assistant",
+  "WhatsApp Automation",
+  "Customer Support",
+  "Lead Follow-up",
+  "Instagram · Facebook · YouTube",
+  "Email Automation",
+  "Google Review Management",
+  "Digital Marketing",
 ];
 
 type Status =

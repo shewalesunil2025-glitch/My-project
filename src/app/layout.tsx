@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter_Tight } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { MotionConfig } from "framer-motion";
 import { siteConfig } from "@/config/site";
-import { SmoothScroll } from "@/components/effects/SmoothScroll";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
+const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", weight: ["300", "400", "500"], display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -38,16 +38,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0b",
+  themeColor: "#030703",
   colorScheme: "dark",
+  // Phones: the on-screen keyboard shrinks the layout, so the Lumi chat input stays visible.
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${jakarta.variable} ${tight.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body>
-        <MotionConfig reducedMotion="user">
-          <SmoothScroll />
+        <MotionConfig reducedMotion="never">
           {children}
         </MotionConfig>
       </body>
