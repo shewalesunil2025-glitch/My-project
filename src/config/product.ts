@@ -2,8 +2,8 @@
  * The business app's brand. Change `name` here and it updates everywhere in the app.
  *
  * "Lumi" — two syllables, easy to say in every language, no regional meaning that
- * gets in the way, and warm (it comes from "light"). Each customer can still give
- * their own assistant any name during setup; "Lumi" is only the default.
+ * gets in the way, and warm (it comes from "light"). The assistant inside the app
+ * is Lumi too — one name everywhere.
  */
 export const product = {
   name: "Lumi",
