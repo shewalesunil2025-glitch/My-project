@@ -1,42 +1,30 @@
 export const faqs = [
   {
-    q: "Do I need every system, or can I start with one?",
-    a: "Start with the one that removes the most work today — often WhatsApp replies or booking. Every system we build is designed to connect to the rest later, so nothing gets thrown away.",
+    q: "What is Lumi?",
+    a: "Lumi is your AI business assistant. It answers calls, WhatsApp, email and social media, follows up every lead and handles Google reviews — and shows you everything it does in one app.",
   },
   {
-    q: "Will it work with the tools I already use?",
-    a: "Usually, yes. We connect to your existing calendar, CRM, sheets, email and WhatsApp Business account instead of asking you to switch.",
+    q: "What do I get with Digital Marketing?",
+    a: "Social media management for Instagram, Facebook and YouTube, content creation with a monthly calendar, Meta and Google ad campaigns, local SEO and Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report — starting at $299/mo. Ad spend is paid separately to the platforms.",
   },
   {
-    q: "Does the AI replace my team?",
-    a: "No. It handles the repetitive questions, follow-ups and reminders, and hands a conversation to a person whenever it needs a human touch.",
+    q: "Do I have to buy every service?",
+    a: "No. Every service works on its own. Start with one — often WhatsApp or the AI Voice Assistant — and add more any time.",
   },
   {
-    q: "What kind of businesses do you work with?",
-    a: "Businesses that talk to customers every day: clinics, salons, restaurants, real estate, insurance, local services, professional services and e-commerce.",
+    q: "How much does it cost?",
+    a: "Each service has a clear starting price in USD, shown in the Automation Store — for example Email Automation from $29/mo, WhatsApp Automation from $49/mo and a Website from $299 one-time.",
   },
   {
-    q: "How is pricing decided?",
-    a: "Fixed price, no surprises. After a free 30-minute call you get a written scope, timeline and fixed-price proposal within 24 hours. Nothing starts until you say yes.",
+    q: "How fast can I go live?",
+    a: "It isn't instant. You connect each account yourself and some platforms, like WhatsApp Business, need their own approval. Lumi shows you the status of every step.",
   },
   {
-    q: "How long does a project take?",
-    a: "It depends on how many systems you connect. The timeline is written into your proposal before any work starts.",
+    q: "Is my data safe?",
+    a: "Each business's data is kept separate, connected accounts use encrypted access you can remove at any time, and every action is written to an audit log you can see.",
   },
   {
-    q: "Should I build custom or use existing tools?",
-    a: "Use existing tools when they cover most of what you need. Build custom when the workflow is what makes your business different. We'll tell you honestly which one fits.",
-  },
-  {
-    q: "n8n or Zapier — what do you use?",
-    a: "Zapier is fine for simple, step-by-step flows. For complex branching, AI steps and predictable costs as you grow, we usually build on n8n.",
-  },
-  {
-    q: "What happens after launch?",
-    a: "We monitor the system, improve the conversations based on real customer questions, and keep optimising the flow as your business grows.",
-  },
-  {
-    q: "Is the demo call really free?",
-    a: "Yes. It's a free 30-minute call where we look at how your customers reach you today and show what we would build. You get a proposal within 24 hours, with no commitment.",
+    q: "Will Lumi post or reply without asking me?",
+    a: "Only when you allow it. You test everything first, and nothing goes live until you approve it.",
   },
 ];
