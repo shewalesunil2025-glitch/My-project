@@ -128,7 +128,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
   }
 
   const chatTest = ["whatsapp", "voice", "email"].includes(svc.id);
-  const contentTest = ["youtube", "instagram", "facebook", "social", "digital-marketing"].includes(svc.id);
+  const contentTest = ["youtube", "instagram", "facebook", "digital-marketing"].includes(svc.id);
 
   return (
     <div className="mx-auto max-w-2xl">

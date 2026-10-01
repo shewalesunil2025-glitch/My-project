@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import type { PlanPeriod } from "@/lib/app/types";
 import { ArrowLeft, Check, Clock, Info, Link2 } from "lucide-react";
 import { formatPrice } from "@/config/product";
 import { annualPrice, providerInfo, serviceById, services } from "@/content/app/services";
@@ -17,7 +18,7 @@ export default function ServiceDetailPage() {
   const ws = useWorkspace();
   const router = useRouter();
   const svc = serviceById(id);
-  const [period, setPeriod] = useState<"monthly" | "annual">("monthly");
+  const [period, setPeriod] = useState<PlanPeriod>(svc?.billing === "one-time" ? "one-time" : "monthly");
   const [request, setRequest] = useState("");
   const [sent, setSent] = useState(false);
 
@@ -138,8 +139,8 @@ export default function ServiceDetailPage() {
                 <fieldset>
                   <legend className="mb-2 text-sm font-semibold">Choose a plan</legend>
                   <div className="space-y-2">
-                    {(["monthly", "annual"] as const).map((p) => {
-                      const amount = p === "monthly" ? svc.price! : annualPrice(svc.price!);
+                    {(svc.billing === "one-time" ? (["one-time"] as const) : (["monthly", "annual"] as const)).map((p) => {
+                      const amount = p === "annual" ? annualPrice(svc.price!) : svc.price!;
                       return (
                         <label
                           key={p}
@@ -151,13 +152,13 @@ export default function ServiceDetailPage() {
                           <span className="flex items-center gap-3">
                             <input type="radio" name="period" value={p} checked={period === p} onChange={() => setPeriod(p)} className="accent-[var(--color-flow)]" />
                             <span>
-                              <span className="font-medium capitalize">{p}</span>
+                              <span className="font-medium capitalize">{p === "one-time" ? "One-time payment" : p}</span>
                               {p === "annual" && <span className="ml-2 text-xs text-emerald-300">2 months free</span>}
                             </span>
                           </span>
                           <span className="font-semibold">
                             {formatPrice(amount)}
-                            <span className="text-xs font-normal text-fg-muted">/{p === "monthly" ? "mo" : "yr"}</span>
+                            {p !== "one-time" && <span className="text-xs font-normal text-fg-muted">/{p === "monthly" ? "mo" : "yr"}</span>}
                           </span>
                         </label>
                       );
@@ -167,7 +168,7 @@ export default function ServiceDetailPage() {
                 <Btn className="w-full" size="lg" onClick={() => router.push(`/app/services/${svc.id}/checkout?period=${period}`)}>
                   Buy {svc.name}
                 </Btn>
-                <p className="text-center text-xs text-fg-subtle">Cancel anytime from Billing.</p>
+                <p className="text-center text-xs text-fg-subtle">{svc.billing === "one-time" ? "Paid once — no monthly fee." : "Cancel anytime from Billing."}</p>
               </>
             )}
           </Card>

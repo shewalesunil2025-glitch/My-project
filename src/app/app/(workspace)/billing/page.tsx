@@ -17,9 +17,11 @@ export default function BillingPage() {
   if (!ws?.business) return null;
 
   const active = ws.subscriptions.filter((s) => s.status === "active");
-  const monthly = active.reduce((s, x) => s + (x.period === "monthly" ? x.price : x.price / 12), 0);
-  const nextRenewal = [...active].sort((a, b) => a.renewsAt.localeCompare(b.renewsAt))[0];
+  const recurring = active.filter((s) => s.period !== "one-time");
+  const monthly = recurring.reduce((s, x) => s + (x.period === "monthly" ? x.price : x.price / 12), 0);
+  const nextRenewal = [...recurring].sort((a, b) => a.renewsAt.localeCompare(b.renewsAt))[0];
   const dm = active.find((s) => s.serviceId === "digital-marketing");
+  const covered = active.filter((s) => serviceById("digital-marketing")!.includes!.includes(s.serviceId));
 
   function switchPeriod(id: string) {
     updateWorkspace((w) => {
@@ -57,13 +59,17 @@ export default function BillingPage() {
 
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Active services" value={active.length} />
-        <Stat label="Monthly total" value={formatPrice(monthly)} hint="Annual plans spread per month" />
+        <Stat label="Monthly total" value={formatPrice(monthly)} hint="Recurring plans; annual spread per month" />
         <Stat label="Next renewal" value={nextRenewal ? fmtDate(nextRenewal.renewsAt) : "—"} hint={nextRenewal && serviceById(nextRenewal.serviceId)?.name} />
       </div>
 
-      {!dm && active.length >= 3 && (
+      {!dm && covered.length >= 2 && (
         <Notice className="mb-6">
-          You have {active.length} separate services. <Link href="/app/services/digital-marketing" className="font-semibold underline">Digital Marketing</Link> covers all of them in one plan for {formatPrice(serviceById("digital-marketing")!.price!)}/month.
+          {covered.map((s) => serviceById(s.serviceId)?.name).join(", ")} {covered.length === 1 ? "is" : "are"} included in{" "}
+          <Link href="/app/services/digital-marketing" className="font-semibold underline">
+            Digital Marketing
+          </Link>{" "}
+          — together with ads, SEO, content and a monthly report — for {formatPrice(serviceById("digital-marketing")!.price!)}/month.
         </Notice>
       )}
 
@@ -83,12 +89,12 @@ export default function BillingPage() {
                         {svc.name} {s.serviceId === "digital-marketing" && <Pill tone="ember">Package</Pill>}
                       </p>
                       <p className="text-xs text-fg-subtle">
-                        {formatPrice(s.price)} / {s.period === "monthly" ? "month" : "year"} · {s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}
+                        {s.period === "one-time" ? `${formatPrice(s.price)} · paid once on ${fmtDate(s.startedAt)}` : `${formatPrice(s.price)} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
                       </p>
                     </div>
-                    <Pill tone={s.status === "active" ? "green" : "gray"}>{s.status === "active" ? "Active" : "Cancelled"}</Pill>
+                    <Pill tone={s.status === "active" ? "green" : "gray"}>{s.period === "one-time" ? "Paid" : s.status === "active" ? "Active" : "Cancelled"}</Pill>
                   </div>
-                  {s.status === "active" && (
+                  {s.status === "active" && s.period !== "one-time" && (
                     <div className="mt-3 flex flex-wrap gap-2 border-t border-white/[0.06] pt-3">
                       <Btn size="sm" variant="ghost" onClick={() => switchPeriod(s.id)}>
                         {s.period === "monthly" ? "Upgrade to annual (2 months free)" : "Switch to monthly"}

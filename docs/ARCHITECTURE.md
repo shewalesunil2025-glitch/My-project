@@ -47,7 +47,7 @@ Nothing in preview mode pretends to be real. Test payments, simulated connection
 | 28 Demo | `/app/demo` (11-step walkthrough, always visible on mobile) |
 | 29 Mobile navigation | Bottom bar: Home · *assistant name* · Services · Activity · More |
 
-Services, prices, setup questions and connection requirements are data in `src/content/app/services.ts`. Prices are **placeholders in USD**: set your own there.
+Services, prices, setup questions and connection requirements are data in `src/content/app/services.ts`. Prices are USD "starting at" amounts and match the website Automation Store (`src/content/shambhu.ts`): Website $299 one-time; AI Voice $79/mo; WhatsApp and Customer Support $49/mo; Lead Follow-up, Instagram, Facebook and YouTube $39/mo; Email and Google Reviews $29/mo; Digital Marketing $299/mo. Change both files together.
 
 ## Production backend
 

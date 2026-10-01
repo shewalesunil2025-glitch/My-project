@@ -90,7 +90,7 @@ export default function ServicesPage() {
                     ) : (
                       <>
                         <span className="font-semibold">{formatPrice(s.price)}</span>
-                        <span className="text-fg-muted"> / mo</span>
+                        <span className="text-fg-muted">{s.billing === "one-time" ? " one-time" : " / mo"}</span>
                       </>
                     )}
                   </p>

@@ -18,17 +18,17 @@ function Checkout() {
   const ws = useWorkspace();
   const [paying, setPaying] = useState(false);
   const svc = serviceById(id);
-  const period: PlanPeriod = params.get("period") === "annual" ? "annual" : "monthly";
+  const period: PlanPeriod = svc?.billing === "one-time" ? "one-time" : params.get("period") === "annual" ? "annual" : "monthly";
 
   if (!ws) return null;
   if (!svc || svc.price === null) return <EmptyState title="This service can't be bought online" action={<BtnLink href="/app/services">Back to services</BtnLink>} />;
   const existing = ws.automations.find((a) => a.serviceId === svc.id);
   if (existing) return <EmptyState title={`You already have ${svc.name}`} action={<BtnLink href={`/app/automations/${existing.id}`}>Manage it</BtnLink>} />;
 
-  const amount = period === "monthly" ? svc.price : annualPrice(svc.price);
+  const amount = period === "annual" ? annualPrice(svc.price) : svc.price;
   const renews = new Date();
   if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
-  else renews.setFullYear(renews.getFullYear() + 1);
+  else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
 
   function pay() {
     setPaying(true);
@@ -82,20 +82,23 @@ function Checkout() {
           </span>
           <div>
             <p className="font-semibold">{svc.name}</p>
-            <p className="text-xs text-fg-muted capitalize">{period} plan</p>
+            <p className="text-xs text-fg-muted capitalize">{period === "one-time" ? "One-time payment" : `${period} plan`}</p>
           </div>
         </div>
         <dl className="space-y-2 border-t border-white/[0.06] pt-4 text-sm">
           <div className="flex justify-between">
             <dt className="text-fg-muted">Plan</dt>
             <dd>
-              {formatPrice(amount)} / {period === "monthly" ? "month" : "year"}
+              {formatPrice(amount)}
+              {period !== "one-time" && ` / ${period === "monthly" ? "month" : "year"}`}
             </dd>
           </div>
-          <div className="flex justify-between">
-            <dt className="text-fg-muted">Renews on</dt>
-            <dd>{renews.toLocaleDateString([], { year: "numeric", month: "long", day: "numeric" })}</dd>
-          </div>
+          {period !== "one-time" && (
+            <div className="flex justify-between">
+              <dt className="text-fg-muted">Renews on</dt>
+              <dd>{renews.toLocaleDateString([], { year: "numeric", month: "long", day: "numeric" })}</dd>
+            </div>
+          )}
           <div className="flex justify-between border-t border-white/[0.06] pt-3 text-base font-semibold">
             <dt>Due today</dt>
             <dd>{formatPrice(amount)}</dd>

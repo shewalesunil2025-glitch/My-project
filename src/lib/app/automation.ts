@@ -69,7 +69,6 @@ function firstRun(ws: Workspace, a: Automation, svc: ServiceDef) {
     youtube: ["youtube"],
     instagram: ["instagram"],
     facebook: ["facebook"],
-    social: ["instagram", "facebook"],
     "digital-marketing": ["instagram", "facebook", "youtube"],
   };
   const needsApproval = a.config.approval !== "Publish automatically";

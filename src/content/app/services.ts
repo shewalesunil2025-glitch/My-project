@@ -2,8 +2,9 @@ import type { ProviderId } from "@/lib/app/types";
 
 /**
  * Everything sold in the Automation Store, and what each activation wizard asks.
- * Prices are placeholders in USD per month — set your real prices here.
- * The annual plan is charged as 10 months (2 months free).
+ * Prices are "starting at" USD and match the website's Automation Store
+ * (src/content/shambhu.ts). Monthly services can also be paid yearly as 10 months
+ * (2 months free); one-time services are paid once.
  */
 
 export type FieldDef = {
@@ -27,8 +28,9 @@ export type ServiceDef = {
   icon: string; // lucide icon name, mapped in components/app/icons.tsx
   description: string;
   features: string[];
-  /** USD / month. null = custom quote. */
+  /** USD — per month, or once when `billing` is "one-time". null = custom quote. */
   price: number | null;
+  billing?: "monthly" | "one-time";
   setupTime: string;
   /** Accounts the customer must authorise before activation. */
   connect: ProviderId[];
@@ -100,8 +102,9 @@ export const services: ServiceDef[] = [
     icon: "Globe",
     description:
       "Lumi builds your website from the details you already gave — pages, menu or services, gallery, reviews, map, WhatsApp button and enquiry form — with SEO basics in place. Already have a site? Connect it instead.",
-    features: ["Home, About, Services/Menu, Gallery, Reviews, Contact", "WhatsApp button & enquiry form", "Google Maps & SEO basics", "Hosting, SSL and updates", "Edit text and photos from Lumi"],
-    price: 29,
+    features: ["Home, About, Services/Menu, Gallery, Reviews, Contact", "WhatsApp button & enquiry form", "Google Maps & SEO basics", "Lumi built in — every enquiry answered", "Edit text and photos from Lumi"],
+    price: 299,
+    billing: "one-time",
     setupTime: "3–5 working days after you submit your details",
     connect: [],
     info: [
@@ -150,7 +153,7 @@ export const services: ServiceDef[] = [
     description:
       "Answers customer questions, shares product and service details, captures leads, handles appointment and order enquiries and follows up — all on your WhatsApp Business number. Conversations appear inside Lumi.",
     features: ["Instant answers & FAQs", "Product / service information", "Lead capture", "Appointment & order enquiries", "Follow-ups", "Conversations inside Lumi"],
-    price: 39,
+    price: 49,
     setupTime: "Same day after WhatsApp approval",
     connect: ["whatsapp"],
     info: [
@@ -172,7 +175,7 @@ export const services: ServiceDef[] = [
     description:
       "Lumi plans your content, writes captions and hashtags, schedules posts and reels, helps with comments and replies to DMs where Instagram allows it — with your approval or automatically.",
     features: ["Content ideas & captions", "Hashtag suggestions", "Post & reel scheduling", "Comment assistance", "DM replies where supported", "Lead capture & analytics"],
-    price: 29,
+    price: 39,
     setupTime: "Same day",
     connect: ["instagram"],
     info: [{ key: "about", label: "What should your posts show?", type: "textarea", fromBusiness: "services", required: true }],
@@ -187,7 +190,7 @@ export const services: ServiceDef[] = [
     icon: "Facebook",
     description: "Posts and reels for your Facebook Page, scheduled content, comment help and Messenger replies where supported, with lead handling and analytics.",
     features: ["Page posts & reels", "Content scheduling", "Comment assistance", "Messenger replies where supported", "Lead handling", "Analytics"],
-    price: 29,
+    price: 39,
     setupTime: "Same day",
     connect: ["facebook"],
     info: [{ key: "about", label: "What should your posts show?", type: "textarea", fromBusiness: "services", required: true }],
@@ -202,7 +205,7 @@ export const services: ServiceDef[] = [
     description:
       "Tell Lumi “every day at 7 PM upload one Short about my restaurant.” Lumi turns your business into ideas, scripts, AI video, voice, thumbnail, title and description, checks quality, schedules and publishes — and shows views, likes and comments in Lumi.",
     features: ["AI content ideas & scripts", "AI video & voice-over", "Thumbnail, title & description", "Quality check before publishing", "Scheduled publishing", "Views, likes & comments in Lumi"],
-    price: 59,
+    price: 39,
     setupTime: "Same day — first video within 24 hours",
     connect: ["youtube"],
     info: [
@@ -219,7 +222,7 @@ export const services: ServiceDef[] = [
     icon: "Mail",
     description: "With your permission Lumi reads your business inbox, sorts enquiries, drafts replies for you to approve, follows up with leads and customers and sends campaigns you authorise.",
     features: ["Reads only the inbox you authorise", "Sorts enquiries", "Drafts replies", "Customer & lead follow-up", "Notifications", "Email campaigns you approve"],
-    price: 25,
+    price: 29,
     setupTime: "Same day",
     connect: ["gmail"],
     info: [{ key: "signature", label: "Email signature", type: "textarea", placeholder: "Team at My Business\n+1 555 0100" }, faq],
@@ -237,7 +240,7 @@ export const services: ServiceDef[] = [
     icon: "Star",
     description: "Monitors your Google reviews, alerts you to new ones, suggests replies, runs review-request campaigns to real customers and tracks your rating. Lumi never writes fake reviews or manipulates ratings.",
     features: ["New-review alerts", "Suggested replies", "Review requests to real customers", "Rating analytics", "Google Business Profile help"],
-    price: 19,
+    price: 29,
     setupTime: "Same day",
     connect: ["google"],
     info: [{ key: "reviewLink", label: "Your Google review link (if you have it)", type: "text", placeholder: "https://g.page/r/..." }],
@@ -254,7 +257,7 @@ export const services: ServiceDef[] = [
     icon: "UserCheck",
     description: "Every new lead from calls, WhatsApp, social media or your website gets a timely, personal follow-up. Lumi tells you who needs a call today.",
     features: ["Leads from every channel in one list", "Automatic follow-up sequence", "Daily follow-up list", "Status tracking to conversion"],
-    price: 29,
+    price: 39,
     setupTime: "Same day",
     connect: [],
     info: [{ key: "offer", label: "What do you offer new customers?", type: "textarea", placeholder: "10% off the first visit" }],
@@ -264,18 +267,24 @@ export const services: ServiceDef[] = [
     ],
   },
   {
-    id: "social",
-    name: "Social Media Automation",
-    short: "Instagram + Facebook + content calendar in one plan.",
-    group: "social",
-    icon: "Share2",
-    description: "One content calendar for Instagram and Facebook: ideas, captions, AI images, scheduling and publishing across both.",
-    features: ["Instagram & Facebook together", "AI images & captions", "One content calendar", "Cross-posting", "Engagement analytics"],
+    id: "support",
+    name: "Customer Support Assistant",
+    short: "Common questions answered on every channel, day and night.",
+    group: "assistant",
+    icon: "MessageCircle",
+    description:
+      "Lumi answers your customers' common questions — timings, prices, location, orders, bookings — on your website chat, WhatsApp, Instagram, Facebook and email, and hands anything tricky to you.",
+    features: ["Answers on every connected channel", "Your FAQs, prices and policies", "Order and booking status questions", "Hands complaints to a person", "Every conversation visible in Lumi"],
     price: 49,
     setupTime: "Same day",
-    connect: ["instagram", "facebook"],
-    info: [{ key: "about", label: "What should your posts show?", type: "textarea", fromBusiness: "services", required: true }],
-    configure: [contentStyle, frequency, postTime, approval],
+    connect: [],
+    info: [
+      { key: "about", label: "About your business", type: "textarea", fromBusiness: "description", required: true },
+      { key: "hours", label: "Working hours", type: "text", fromBusiness: "hours" },
+      faq,
+      { key: "policies", label: "Policies (returns, cancellations, delivery)", type: "textarea" },
+    ],
+    configure: [tone, handoff],
   },
   {
     id: "digital-marketing",
@@ -284,20 +293,19 @@ export const services: ServiceDef[] = [
     group: "premium",
     icon: "Rocket",
     description:
-      "Our most complete service. Website, SEO, Google Business Profile, reviews, Instagram, Facebook, YouTube, WhatsApp and email marketing, AI images and video, lead generation and follow-up, retention, local marketing, campaigns, paid ads support and monthly reporting — managed together.",
+      "Your complete digital marketing team — run by Lumi, guided by people. Social media, content, a monthly calendar, Meta and Google ads, local SEO and your Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report, managed together. Ad spend is paid separately, straight to Meta or Google, and nothing is posted without your approval.",
     features: [
-      "Website + SEO + Google Business Profile",
-      "Review & reputation management",
-      "Instagram, Facebook & YouTube marketing",
-      "WhatsApp & email marketing",
-      "AI image & video creation",
-      "Content calendar & scheduling",
-      "Lead generation & follow-up",
-      "Customer retention & local marketing",
-      "Campaign management & paid ads support",
-      "Analytics & monthly reporting",
+      "Social media management — Instagram, Facebook & YouTube",
+      "Content creation in your brand voice",
+      "Monthly content calendar",
+      "Meta & Google ad campaigns",
+      "Local SEO & Google Business Profile",
+      "Website SEO basics",
+      "WhatsApp campaigns to opted-in customers",
+      "Lead follow-up by Lumi",
+      "Monthly report",
     ],
-    includes: ["website", "reviews", "instagram", "facebook", "youtube", "whatsapp", "email", "followup", "social"],
+    includes: ["instagram", "facebook", "youtube", "followup"],
     price: 299,
     setupTime: "Kick-off call within 2 working days",
     connect: ["google", "instagram", "facebook", "youtube"],

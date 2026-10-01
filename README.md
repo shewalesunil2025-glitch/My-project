@@ -12,7 +12,7 @@ This repo also contains **Lumi**, the AI Business Operating System: an app where
 - Automation Store → plan → payment → connect account → business info → configure → test → activate
 - Mobile-first: bottom navigation Home · *assistant* · Services · Activity · More
 - **Preview mode:** accounts, payments and connections run on the device and are labelled as such. Try "Explore a sample restaurant" for a full workspace.
-- Brand name: `src/config/product.ts`. Services and placeholder prices: `src/content/app/services.ts`
+- Brand name: `src/config/product.ts`. Services and prices (USD, matching the website Automation Store): `src/content/app/services.ts`
 - Backend, multi-tenancy, security and scaling plan: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 ## Stack

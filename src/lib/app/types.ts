@@ -38,7 +38,7 @@ export type AssistantProfile = {
   welcome: string;
 };
 
-export type PlanPeriod = "monthly" | "annual";
+export type PlanPeriod = "monthly" | "annual" | "one-time";
 
 export type Subscription = {
   id: string;
