@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef } from "react";
+import Image from "next/image";
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { customerFlow, fragmentedTools } from "@/content/flow";
-import { heroCharacterConfig } from "@/config/site";
-import { HeroCharacter } from "@/components/hero/HeroCharacter";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
 import { Scramble } from "@/components/effects/Scramble";
 import { ScrollWords } from "@/components/effects/ScrollWords";
@@ -13,7 +12,7 @@ import { Reveal } from "@/components/effects/Reveal";
 
 /**
  * The problem and the answer, in the reference's "light pillar" layout, followed by
- * a scanning hologram card of Shambhu, the AI assistant, and the connected customer journey.
+ * a scanning card of Shambhu's eye, and the connected customer journey.
  */
 export function ConnectSection() {
   return (
@@ -77,7 +76,7 @@ function LightPillar() {
   );
 }
 
-/** A hologram of Shambhu inside face-scan brackets, then the connected journey. */
+/** Shambhu's eye inside scan brackets, then the connected journey. */
 function ScanCard() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -105,7 +104,7 @@ function ScanCard() {
               One AI, awake for every customer — on your site, on WhatsApp, on email, on social media and on the phone.
             </p>
             <p className="mt-6 font-mono text-[0.7rem] tracking-[0.14em] text-fg-subtle uppercase">
-              Shambhu <span className="text-flow">●</span> Watching your cursor
+              Shambhu <span className="text-flow">●</span> Scanning your business
             </p>
             <a
               href="#shambhu"
@@ -116,10 +115,8 @@ function ScanCard() {
           </div>
 
           <div className="relative order-1 mx-auto h-[26rem] w-full max-w-[22rem] md:order-2 md:col-span-4 md:h-[30rem]">
-            <div className="hologram absolute inset-x-0 bottom-0 flex h-full justify-center">
-              <HeroCharacter {...heroCharacterConfig} className="h-full" />
-            </div>
-            <div aria-hidden className="scanlines pointer-events-none absolute inset-0" />
+            <ScanImage />
+            <div aria-hidden className="scanlines pointer-events-none absolute inset-0 rounded-[1.6rem]" />
             <ScanBrackets />
           </div>
 
@@ -145,7 +142,66 @@ function ScanCard() {
   );
 }
 
-/** Corner brackets that lock onto the face, with a scanning bar between them. */
+/**
+ * The scanned image: Shambhu's eye. It leans toward the cursor on desktop and
+ * drifts slowly on its own on touch screens.
+ */
+function ScanImage() {
+  const reduce = useReducedMotion();
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const x = useSpring(px, { stiffness: 60, damping: 18 });
+  const y = useSpring(py, { stiffness: 60, damping: 18 });
+  const rotateY = useTransform(x, (v) => v * 6);
+  const rotateX = useTransform(y, (v) => v * -6);
+  const shiftX = useTransform(x, (v) => `${v * -2.5}%`);
+  const shiftY = useTransform(y, (v) => `${v * -2.5}%`);
+
+  useEffect(() => {
+    if (reduce) return;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      px.set((e.clientX / innerWidth - 0.5) * 2);
+      py.set((e.clientY / innerHeight - 0.5) * 2);
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    // Touch screens: a slow figure-eight drift instead of following a finger.
+    let raf = 0;
+    if (!matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      const tick = (t: number) => {
+        px.set(Math.sin(t / 2200) * 0.6);
+        py.set(Math.sin(t / 1600) * 0.4);
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      cancelAnimationFrame(raf);
+    };
+  }, [reduce, px, py]);
+
+  return (
+    <motion.div
+      style={{ rotateX, rotateY, transformPerspective: 900 }}
+      className="absolute inset-0 overflow-hidden rounded-[1.6rem] border border-flow/20 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.9),0_0_60px_-25px_rgb(125_255_58/0.6)]"
+    >
+      <motion.div style={{ x: shiftX, y: shiftY }} className="absolute -inset-[6%]">
+        <Image
+          src="/images/shambhu/scan-eye.webp"
+          alt="Shambhu's digital eye scanning a business"
+          fill
+          sizes="(min-width: 768px) 22rem, 90vw"
+          className="object-cover object-[50%_45%]"
+        />
+      </motion.div>
+      {/* Edge fade into the card */}
+      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgb(7_13_7/0.85))]" />
+    </motion.div>
+  );
+}
+
+/** Corner brackets that lock onto the eye, with a scanning bar between them. */
 function ScanBrackets() {
   const corner = "absolute size-12 border-flow md:size-14";
   return (
@@ -155,7 +211,7 @@ function ScanBrackets() {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: "-20%" }}
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-      className="pointer-events-none absolute top-[22%] left-1/2 h-[42%] w-[62%] -translate-x-1/2 drop-shadow-[0_0_8px_rgb(125_255_58/0.9)]"
+      className="pointer-events-none absolute top-[30%] left-1/2 h-[32%] w-[72%] -translate-x-1/2 drop-shadow-[0_0_8px_rgb(125_255_58/0.9)]"
     >
       <span className={`${corner} top-0 left-0 rounded-tl-2xl border-t-[3px] border-l-[3px]`} />
       <span className={`${corner} top-0 right-0 rounded-tr-2xl border-t-[3px] border-r-[3px]`} />
