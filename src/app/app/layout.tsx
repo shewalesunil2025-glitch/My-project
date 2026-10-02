@@ -5,7 +5,7 @@ import { product } from "@/config/product";
 const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: `${product.name} — ${product.tagline}`, template: `%s · ${product.name}` },
+  title: { absolute: `${product.name} — ${product.tagline}`, template: `%s · ${product.name}` },
   description: product.description,
   applicationName: product.name,
   robots: { index: true, follow: true },

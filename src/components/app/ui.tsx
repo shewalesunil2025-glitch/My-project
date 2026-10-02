@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, type ComponentProps, type ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import {
   Bell,
   CircleDot,
@@ -21,26 +21,21 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
 
-/* ── Brand mark: a friendly glowing face ── */
+/* ── Brand mark: Lumi's robot, the same one as the website chat assistant ── */
 export function LumiMark({ className, glow = true }: { className?: string; glow?: boolean }) {
-  // Unique per instance: a shared id breaks when its first copy sits in a hidden element.
-  const gid = `lumi-g${useId().replace(/:/g, "")}`;
   return (
-    <svg viewBox="0 0 40 40" className={cn("size-9", className)} aria-hidden>
-      <defs>
-        <radialGradient id={gid} cx="35%" cy="30%" r="80%">
-          <stop offset="0" stopColor="#eaffd9" />
-          <stop offset="0.45" stopColor="#7dff3a" />
-          <stop offset="1" stopColor="#3fae12" />
-        </radialGradient>
-      </defs>
-      {glow && <circle cx="20" cy="20" r="19" fill="#7dff3a" opacity="0.2" />}
-      <circle cx="20" cy="20" r="15.5" fill={`url(#${gid})`} />
-      <ellipse cx="15.2" cy="18.2" rx="1.9" ry="2.5" fill="#052405" />
-      <ellipse cx="24.8" cy="18.2" rx="1.9" ry="2.5" fill="#052405" />
-      <path d="M15 24.2c2.9 2.6 7.1 2.6 10 0" fill="none" stroke="#052405" strokeWidth="2" strokeLinecap="round" />
-    </svg>
+    <span
+      aria-hidden
+      className={cn(
+        "inline-block size-9 shrink-0 overflow-hidden rounded-full border border-flow/40 bg-ink-950",
+        glow && "shadow-[0_0_18px_-4px_rgb(125_255_58/0.6)]",
+        className,
+      )}
+    >
+      <ShambhuBot className="size-full" />
+    </span>
   );
 }
 
