@@ -22,9 +22,9 @@ export function IntroLoader() {
       <div aria-hidden className="intro">
         <div className="intro-glow" />
         <div className="intro-mark">
-          <LogoMark className="size-14" gradientId="nx-mark-intro" />
+          <LogoMark className="size-20 rounded-[22px]" />
         </div>
-        <p className="intro-name">Munna AI</p>
+        <p className="intro-name">Munna Ai</p>
         <div className="intro-line">
           <span />
         </div>

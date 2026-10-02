@@ -1,10 +1,10 @@
 export const siteConfig = {
-  name: "Munna AI",
-  wordmark: "MUNNA AI",
+  name: "Munna Ai",
+  wordmark: "Munna Ai",
   tagline: "AI Automation • Websites • Intelligent Business Systems",
-  title: "Munna AI — AI Automation & Intelligent Business Systems",
+  title: "Munna Ai — AI Automation & Intelligent Business Systems",
   description:
-    "Munna AI and Shambhu, your AI business assistant: websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
+    "Munna Ai and Shambhu, your AI business assistant: websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://nexaflow.ai",
   email: "hello@nexaflow.ai",
   /** External booking page (Calendly, Cal.com…). When empty, the in-page demo form is used. */
@@ -50,12 +50,12 @@ export const founder = {
   name: "Sunil S.",
   role: "Founder & AI Automation Strategist",
   photo: "/images/founder/shewale-sunil.webp",
-  photoAlt: "Sunil S., founder of Munna AI",
+  photoAlt: "Sunil S., founder of Munna Ai",
   headline:
     "Building next-generation digital systems that combine AI, automation, websites, WhatsApp, voice technology, and intelligent business workflows.",
   bio: [
     "Sunil focuses on creating premium digital experiences and automation systems that help businesses simplify operations, improve customer communication, capture leads, manage bookings, and automate repetitive tasks.",
-    "Munna AI is built with a vision to go beyond traditional website development — creating an intelligent technology ecosystem where websites, AI agents, conversations, and business workflows work together as one connected system.",
+    "Munna Ai is built with a vision to go beyond traditional website development — creating an intelligent technology ecosystem where websites, AI agents, conversations, and business workflows work together as one connected system.",
   ],
   vision: "Building smarter businesses for the next generation.",
   focus: ["AI agents", "Automation", "Websites", "WhatsApp", "Voice AI", "Business workflows"],

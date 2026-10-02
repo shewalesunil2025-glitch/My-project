@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   MUNNA AI — Design tokens
+   Munna Ai — Design tokens
    Black-green canvas lit by one neon lime accent;
    "paper" sections are deep green glass, not white.
    ───────────────────────────────────────────── */
@@ -268,9 +268,8 @@ body {
 .intro-name {
   position: relative;
   font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  font-size: 0.95rem;
   color: var(--color-fg-muted);
   animation: intro-fade 0.8s ease-out 0.2s both;
 }
