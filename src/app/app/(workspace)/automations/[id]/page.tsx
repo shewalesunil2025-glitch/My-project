@@ -149,7 +149,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
         {step === "connect" && (
           <>
             <p className="text-sm text-fg-muted">
-              {svc.name} works through your own account. You sign in with the platform and choose what {product.name} may do — you can disconnect at any time.
+              {svc.name} works through your own account. You sign in with the platform and choose what {product.assistantName} may do — you can disconnect at any time.
             </p>
             {svc.connect.map((p) => (
               <ConnectAccount key={p} ws={ws} provider={p} />
@@ -178,7 +178,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
           <>
             {chatTest && (
               <Card>
-                <p className="mb-4 text-sm text-fg-muted">Ask a question the way a customer would. {product.name} answers from what you just set up.</p>
+                <p className="mb-4 text-sm text-fg-muted">Ask a question the way a customer would. {product.assistantName} answers from what you just set up.</p>
                 <div className="space-y-3">
                   {testLog.map((t, k) => (
                     <div key={k} className="space-y-2">
@@ -203,7 +203,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
             )}
             {contentTest && (
               <Card>
-                <p className="mb-3 text-sm text-fg-muted">Here&apos;s a sample of what {product.name} will create:</p>
+                <p className="mb-3 text-sm text-fg-muted">Here&apos;s a sample of what {product.assistantName} will create:</p>
                 {(() => {
                   const idea = contentIdea(ws, svc.id === "youtube" ? "youtube" : svc.id === "facebook" ? "facebook" : "instagram");
                   return (
@@ -238,7 +238,7 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
             )}
             {!chatTest && !contentTest && svc.id !== "reviews" && (
               <Card>
-                <p className="text-sm text-fg-muted">{product.name} checks that everything needed is in place:</p>
+                <p className="text-sm text-fg-muted">{product.assistantName} checks that everything needed is in place:</p>
                 <ul className="mt-3 space-y-2 text-sm">
                   {[...svc.info, ...svc.configure].map((f) => (
                     <li key={f.key} className="flex gap-2">
@@ -323,7 +323,7 @@ function Detail({ ws, a, svc }: { ws: Workspace; a: Automation; svc: ServiceDef 
     <div className="space-y-6">
       {params.get("activated") && (
         <Notice className="flex items-center gap-2">
-          <CircleCheck className="size-4" aria-hidden /> {svc.name} is active. {a.note ?? `${product.name} is on it.`}
+          <CircleCheck className="size-4" aria-hidden /> {svc.name} is active. {a.note ?? `${product.assistantName} is on it.`}
         </Notice>
       )}
       <div className="flex flex-wrap items-center gap-2">

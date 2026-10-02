@@ -71,7 +71,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const bottom = [
     { href: "/app/home", label: "Home", icon: House },
-    { href: "/app/assistant", label: product.name, icon: Bot, lumi: true },
+    { href: "/app/assistant", label: product.assistantName, icon: Bot, lumi: true },
     { href: "/app/services", label: "Services", icon: LayoutGrid },
     { href: "/app/activity", label: "Activity", icon: Activity },
     { href: "/app/more", label: "More", icon: Ellipsis },
@@ -103,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   <item.icon className={cn("size-[1.05rem]", isActive(item.href) && "text-flow")} aria-hidden />
-                  {item.href === "/app/assistant" ? `Ask ${product.name}` : item.label}
+                  {item.href === "/app/assistant" ? `Ask ${product.assistantName}` : item.label}
                 </Link>
               </li>
             ))}

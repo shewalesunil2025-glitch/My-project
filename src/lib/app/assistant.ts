@@ -79,7 +79,7 @@ export function localAnswer(ws: Workspace, raw: string): Reply {
     const p = (["whatsapp", "instagram", "youtube", "facebook", "google", "gmail", "email"] as const).find((w) => q.includes(w))!;
     return {
       matched: true,
-      text: `To connect ${cap(p)}:\n\n1. Go to Settings → Connected accounts (or start the service that needs it).\n2. Press Connect next to ${cap(p)}.\n3. Sign in on ${cap(p)}'s own page and allow access.\n4. You're sent back to ${"Lumi"} and the account shows as Connected.\n\nYou can disconnect at any time, and I only use the permissions you grant.`,
+      text: `To connect ${cap(p)}:\n\n1. Go to Settings → Connected accounts (or start the service that needs it).\n2. Press Connect next to ${cap(p)}.\n3. Sign in on ${cap(p)}'s own page and allow access.\n4. You're sent back to ${"Munna AI"} and the account shows as Connected.\n\nYou can disconnect at any time, and I only use the permissions you grant.`,
       links: [{ label: "Connected accounts", href: "/app/settings#accounts" }],
     };
   }
@@ -293,7 +293,7 @@ export function workspaceContext(ws: Workspace) {
   const today = ws.activity.filter((e) => isToday(e.at));
   return [
     b ? `Business: ${b.name} (${b.category}) in ${b.city}, ${b.country}. ${b.description} Hours: ${b.hours}. Offers: ${b.services}.` : "Business profile not completed yet.",
-    `Assistant name: ${product.name}; tone: ${ws.assistant?.tone ?? "Warm & friendly"}; language: ${ws.assistant?.language ?? "English"}.`,
+    `Assistant name: ${product.assistantName}; tone: ${ws.assistant?.tone ?? "Warm & friendly"}; language: ${ws.assistant?.language ?? "English"}.`,
     `Active services: ${ws.automations.map((a) => `${serviceById(a.serviceId)?.name} (${a.status})`).join(", ") || "none"}.`,
     `Today's activity: ${today.map((e) => `${time(e.at)} ${e.title}`).join("; ") || "none"}.`,
     `Leads: ${ws.leads.length} total, ${ws.leads.filter((l) => l.status === "follow_up").length} need follow-up.`,

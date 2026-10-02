@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/cn";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
 
-/* ── Brand mark: Lumi's robot, the same one as the website chat assistant ── */
+/* ── Brand mark: Munna AI's robot, the same one as the website chat assistant ── */
 export function LumiMark({ className, glow = true }: { className?: string; glow?: boolean }) {
   return (
     <span

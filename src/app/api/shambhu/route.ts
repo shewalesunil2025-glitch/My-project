@@ -10,7 +10,7 @@ import {
 } from "@/lib/shambhuAgent";
 
 /**
- * Lumi, the website voice assistant. The browser sends the conversation as
+ * Munna AI, the website voice assistant. The browser sends the conversation as
  * text (speech is recognised and spoken in the browser); Claude answers in the
  * visitor's language and says which language that is, so the right voice reads it.
  * Needs ANTHROPIC_API_KEY. Nothing is stored.
@@ -107,9 +107,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "busy" }, { status: 429 });
     }
     if (err instanceof Anthropic.APIError) {
-      console.error("Lumi API error", err.status, err.message);
+      console.error("Munna AI API error", err.status, err.message);
     } else {
-      console.error("Lumi error", err);
+      console.error("Munna AI error", err);
     }
     return NextResponse.json({ error: "upstream" }, { status: 502 });
   }

@@ -7,7 +7,7 @@ import { submitLead, validateLead } from "@/lib/leads";
 import { siteConfig } from "@/config/site";
 
 const interests = [
-  "Lumi AI — early access",
+  "Munna AI — early access",
   "Website",
   "AI Voice Assistant",
   "WhatsApp Automation",

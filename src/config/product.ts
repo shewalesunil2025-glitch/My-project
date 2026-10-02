@@ -1,16 +1,17 @@
 /**
  * The business app's brand. Change `name` here and it updates everywhere in the app.
  *
- * "Lumi" — two syllables, easy to say in every language, no regional meaning that
- * gets in the way, and warm (it comes from "light"). The assistant inside the app
- * is Lumi too — one name everywhere.
+ * "Munna AI" — the brand and its domain, www.munnaai.com. The assistant inside the
+ * app and on the website is called Munna.
  */
 export const product = {
-  name: "Lumi",
+  name: "Munna AI",
+  /** The chatbot / assistant inside the app and on the website. */
+  assistantName: "Munna",
   tagline: "Your AI Business Operating System",
   positioning: "One AI. One Platform. Your Entire Business.",
   description:
-    "Lumi runs your website, AI assistants, WhatsApp, calls, social media, reviews, content and leads from one app — you give the instructions, Lumi handles the technology.",
+    "Munna AI runs your website, AI assistants, WhatsApp, calls, social media, reviews, content and leads from one app — you give the instructions, Munna AI handles the technology.",
   /** Currency for the placeholder prices in src/content/app/services.ts. */
   currency: "USD",
   supportEmail: "support@nexaflow.ai",

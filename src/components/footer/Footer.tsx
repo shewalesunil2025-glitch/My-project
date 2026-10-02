@@ -8,10 +8,10 @@ const columns = [
     links: [
       { label: "Services", href: "#solutions" },
       { label: "Digital Marketing", href: "#digital-marketing" },
-      { label: "Lumi AI", href: "#shambhu" },
+      { label: "Munna AI", href: "#shambhu" },
       { label: "Automation Store", href: "#store" },
       { label: "Industries", href: "#industries" },
-      { label: "Lumi — the business app", href: "/app" },
+      { label: "Munna AI — the business app", href: "/app" },
     ],
   },
   {

@@ -171,7 +171,7 @@ export default function SettingsPage() {
         </Btn>
       </Section>
 
-      <Section id="assistant" title={`${product.name} settings`} subtitle={`How ${product.name} talks — language, tone and personality.`}>
+      <Section id="assistant" title={`${product.assistantName} settings`} subtitle={`How ${product.assistantName} talks — language, tone and personality.`}>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Language" htmlFor="s-alang">
             <Input id="s-alang" value={asst.language} onChange={setA("language")} />
@@ -189,7 +189,7 @@ export default function SettingsPage() {
         <Btn
           onClick={() => {
             updateWorkspace((w) => {
-              w.assistant = { ...asst, name: product.name };
+              w.assistant = { ...asst, name: product.assistantName };
               audit(w, "Assistant settings updated");
             });
             flash("Assistant settings saved");

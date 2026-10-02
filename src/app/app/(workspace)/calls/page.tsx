@@ -22,7 +22,7 @@ export default function CallsPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="AI Voice & Call Assistant" title="Calls" subtitle={`Every call ${product.name} answered, with a short summary.`} />
+      <PageHeader eyebrow="AI Voice & Call Assistant" title="Calls" subtitle={`Every call ${product.assistantName} answered, with a short summary.`} />
       {ws.calls.length === 0 ? (
         <EmptyState
           icon={<PhoneCall className="size-5" aria-hidden />}

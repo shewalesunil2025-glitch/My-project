@@ -36,7 +36,7 @@ export default function HelpPage() {
   const ws = useWorkspace();
   const [sent, setSent] = useState<string | null>(null);
   if (!ws) return null;
-  const name = product.name;
+  const name = product.assistantName;
 
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();

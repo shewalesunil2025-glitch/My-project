@@ -20,7 +20,7 @@ function Dashboard() {
   const params = useSearchParams();
   if (!ws?.business || !ws.assistant) return null;
 
-  const name = product.name;
+  const name = product.assistantName;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const first = ws.business.ownerName.split(" ")[0] || "there";

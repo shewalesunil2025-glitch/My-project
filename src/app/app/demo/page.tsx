@@ -11,6 +11,7 @@ import { Btn, BtnLink, LumiMark } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
 
 const N = product.name;
+const A = product.assistantName;
 
 function Row({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cn("rounded-xl bg-white/[0.06] px-3 py-2 text-[0.72rem]", className)}>{children}</div>;
@@ -57,14 +58,14 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
     ),
   },
   {
-    title: `3. Meet ${N}`,
-    text: `${N} becomes your personal AI business assistant. Choose its language, tone and welcome message — it talks to your customers the way you would.`,
+    title: `3. Meet ${A}`,
+    text: `${A} becomes your personal AI business assistant. Choose its language, tone and welcome message — it talks to your customers the way you would.`,
     screen: (
       <div className="space-y-2">
-        <Row>Assistant: <b>{N}</b></Row>
+        <Row>Assistant: <b>{A}</b></Row>
         <Row>Language: English</Row>
         <Row>Tone: Warm & friendly</Row>
-        <Bubble>Hi! I&apos;m {N} from Sunrise Bistro. How can I help?</Bubble>
+        <Bubble>Hi! I&apos;m {A} from Sunrise Bistro. How can I help?</Bubble>
       </div>
     ),
   },
@@ -116,7 +117,7 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
   },
   {
     title: "8. Your dashboard",
-    text: `Everything in one place — calls, WhatsApp, leads, videos, reviews. Just ask ${N}: “What happened today?”, “How many leads came today?”, “Create tomorrow's Instagram post.”`,
+    text: `Everything in one place — calls, WhatsApp, leads, videos, reviews. Just ask ${A}: “What happened today?”, “How many leads came today?”, “Create tomorrow's Instagram post.”`,
     screen: (
       <div className="space-y-2">
         <Bubble me>What happened today?</Bubble>

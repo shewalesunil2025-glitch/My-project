@@ -78,7 +78,7 @@ export default function LeadsPage() {
         <Notice className="mb-5 flex items-center gap-2">
           <Sparkles className="size-4 shrink-0" aria-hidden />
           <span>
-            <b className="text-fg">{due} lead{due > 1 ? "s" : ""} need follow-up today.</b> {product.name} can message them for you once Lead Follow-up is active.
+            <b className="text-fg">{due} lead{due > 1 ? "s" : ""} need follow-up today.</b> {product.assistantName} can message them for you once Lead Follow-up is active.
           </span>
         </Notice>
       )}
