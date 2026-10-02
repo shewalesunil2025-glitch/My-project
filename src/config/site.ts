@@ -4,8 +4,8 @@ export const siteConfig = {
   tagline: "AI Automation • Websites • Intelligent Business Systems",
   title: "Nexa Flow AI — AI Automation & Intelligent Business Systems",
   description:
-    "Nexa Flow AI and Lumi, your AI business assistant: websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://nexaflow.ai",
+    "Nexa Flow AI and Munna AI, your AI business assistant: websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.munnaai.com",
   email: "hello@nexaflow.ai",
   /** External booking page (Calendly, Cal.com…). When empty, the in-page demo form is used. */
   bookingUrl: process.env.NEXT_PUBLIC_BOOKING_URL || "",
@@ -16,7 +16,7 @@ export const siteConfig = {
   nav: [
     { label: "Services", href: "#solutions" },
     { label: "Digital Marketing", href: "#digital-marketing" },
-    { label: "Lumi AI", href: "#shambhu" },
+    { label: "Munna AI", href: "#shambhu" },
     { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },
     { label: "About", href: "#about" },
@@ -25,7 +25,7 @@ export const siteConfig = {
   footerNav: [
     { label: "Services", href: "#solutions" },
     { label: "Digital Marketing", href: "#digital-marketing" },
-    { label: "Lumi AI", href: "#shambhu" },
+    { label: "Munna AI", href: "#shambhu" },
     { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },
     { label: "About", href: "#about" },

@@ -91,7 +91,7 @@ export default function ContentPage() {
         subtitle="AI videos, reels, shorts, images, captions, posts and scripts — preview, edit, approve, schedule and publish."
         action={
           <Btn size="sm" onClick={create}>
-            <Plus className="size-4" aria-hidden /> Create with {product.name}
+            <Plus className="size-4" aria-hidden /> Create with {product.assistantName}
           </Btn>
         }
       />

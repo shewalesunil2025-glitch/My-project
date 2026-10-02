@@ -35,7 +35,7 @@ function Chat() {
   }, [ws?.chat.length, thinking]);
 
   if (!ws?.assistant) return null;
-  const name = product.name;
+  const name = product.assistantName;
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();

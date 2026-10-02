@@ -40,7 +40,7 @@ export default function InboxPage() {
       <PageHeader
         eyebrow="Inbox"
         title="Messages"
-        subtitle={`WhatsApp, Instagram, Messenger and email conversations — answered by ${product.name}, readable right here.`}
+        subtitle={`WhatsApp, Instagram, Messenger and email conversations — answered by ${product.assistantName}, readable right here.`}
       />
       <div className="mb-5">
         <Segmented
@@ -100,7 +100,7 @@ export default function InboxPage() {
                       {m.text}
                     </p>
                     <p className="mt-1 text-[0.65rem] text-fg-subtle">
-                      {m.from === "assistant" ? product.name : m.from === "owner" ? "You" : open.contact} · {fmtTime(m.at)}
+                      {m.from === "assistant" ? product.assistantName : m.from === "owner" ? "You" : open.contact} · {fmtTime(m.at)}
                     </p>
                   </div>
                 ))}

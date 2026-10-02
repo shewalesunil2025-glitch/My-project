@@ -6,7 +6,7 @@ import { RevealWords } from "@/components/effects/RevealWords";
 import { Reveal } from "@/components/effects/Reveal";
 import { BookDemoButton } from "@/components/cta/BookDemoButton";
 
-/** The businesses Lumi is built for, as one light panel of categories. */
+/** The businesses Munna AI is built for, as one light panel of categories. */
 export function Industries() {
   return (
     <section
@@ -33,7 +33,7 @@ export function Industries() {
         </ul>
 
         <Reveal delay={0.1} className="mt-10 flex flex-col items-center gap-4 text-center">
-          <p className="text-ink-muted">Don&apos;t see yours? If your customers call, message or book — Lumi can help.</p>
+          <p className="text-ink-muted">Don&apos;t see yours? If your customers call, message or book — Munna AI can help.</p>
           <BookDemoButton label="Talk to us" interest="Other business type" icon className="w-fit" />
         </Reveal>
       </div>
