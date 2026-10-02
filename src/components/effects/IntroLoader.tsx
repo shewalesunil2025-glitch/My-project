@@ -24,7 +24,7 @@ export function IntroLoader() {
         <div className="intro-mark">
           <LogoMark className="size-14" gradientId="nx-mark-intro" />
         </div>
-        <p className="intro-name">Nexa Flow AI</p>
+        <p className="intro-name">Munna AI</p>
         <div className="intro-line">
           <span />
         </div>

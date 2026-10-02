@@ -7,8 +7,8 @@ export type BotMood = "idle" | "listening" | "thinking" | "speaking";
 
 /**
  * Shambhu's own chatbot face, drawn in SVG: a glossy white helmet with a dark
- * glass visor, glowing lime dot-matrix eyes, ear lights, an antenna and a chest
- * light. The eyes blink and glance around; `mood` changes them:
+ * glass visor, glowing lime dot-matrix eyes, ear lights, an antenna and the brand
+ * logo on its chest. The eyes blink and glance around; `mood` changes them:
  * listening — eyes widen and the antenna pulses faster, thinking — eyes look
  * up to one side, speaking — a little equaliser mouth talks under the eyes.
  */
@@ -33,6 +33,10 @@ export function ShambhuBot({ mood = "idle", className }: { mood?: BotMood; class
           <stop offset="55%" stopColor="#e7eee4" />
           <stop offset="100%" stopColor="#aebbab" />
         </linearGradient>
+        <linearGradient id={id("logo")} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#b6ff8a" />
+          <stop offset="1" stopColor="#4fd11c" />
+        </linearGradient>
         <linearGradient id={id("visor")} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#12201a" />
           <stop offset="100%" stopColor="#020604" />
@@ -56,11 +60,17 @@ export function ShambhuBot({ mood = "idle", className }: { mood?: BotMood; class
       <rect width="200" height="200" fill={url("bg")} />
       <circle cx="100" cy="96" r="72" fill="#7dff3a" opacity="0.08" />
 
-      {/* Body and chest light */}
+      {/* Body with the brand logo glowing on the chest */}
       <path d="M48 200 C50 168 66 152 100 152 C134 152 150 168 152 200 Z" fill={url("shell")} />
       <path d="M62 200 C64 176 76 166 100 166 C124 166 136 176 138 200 Z" fill="#000" opacity="0.06" />
-      <circle cx="100" cy="182" r="9" fill="#0c1a0e" />
-      <circle cx="100" cy="182" r="5.5" fill="#7dff3a" filter={url("glow")} className="bot-pulse" />
+      <rect x="84" y="164" width="32" height="32" rx="10" fill="#7dff3a" opacity="0.35" filter={url("glow")} className="bot-pulse" />
+      <svg x="86" y="166" width="28" height="28" viewBox="0 0 32 32">
+        <rect width="32" height="32" rx="9" fill={url("logo")} />
+        <path d="M8 21c4 0 4-10 8-10s4 10 8 10" fill="none" stroke="#030703" strokeWidth="2.6" strokeLinecap="round" />
+        <circle cx="8" cy="21" r="2.4" fill="#030703" />
+        <circle cx="16" cy="11" r="2.4" fill="#030703" />
+        <circle cx="24" cy="21" r="2.4" fill="#030703" />
+      </svg>
 
       {/* Neck */}
       <rect x="84" y="142" width="32" height="14" rx="6" fill="#26332a" />
