@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 import { siteConfig } from "@/config/site";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
 
-/** The brand mark: Shambhu, the chatbot robot, in a rounded tile. */
+/** The brand mark: IBAX, the chatbot robot, in a rounded tile. */
 export function LogoMark({ className }: { className?: string }) {
   return <ShambhuBot className={cn("size-8 overflow-hidden rounded-[9px]", className)} />;
 }

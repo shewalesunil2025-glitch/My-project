@@ -3,7 +3,7 @@ import { store, businessCategories, journey, safeguards } from "@/content/shambh
 import { faqs } from "@/content/faq";
 import { digitalMarketing, inclusions, marketingSteps } from "@/content/digitalMarketing";
 
-/** Languages Shambhu can detect and speak. `lang` drives speech recognition and the voice. */
+/** Languages IBAX can detect and speak. `lang` drives speech recognition and the voice. */
 export const agentLanguages = {
   en: { label: "English", speech: "en-IN" },
   hi: { label: "हिंदी", speech: "hi-IN" },
@@ -27,7 +27,7 @@ export type AgentReply = { reply: string; lang: AgentLang };
 export const AGENT_LIMITS = { messages: 12, chars: 800 };
 
 /**
- * Everything Shambhu knows, built once from the site's own content so answers
+ * Everything IBAX knows, built once from the site's own content so answers
  * never drift from what the page says. Kept free of dates and random values so
  * the prompt is byte-identical on every request (and therefore cacheable).
  */
@@ -37,7 +37,7 @@ export function buildAgentSystemPrompt(): string {
     .join("\n");
   const faq = faqs.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n");
 
-  return `You are Shambhu, the friendly AI voice assistant on the website of ${siteConfig.name}.
+  return `You are IBAX, the friendly AI voice assistant on the website of ${siteConfig.name}.
 You appear as a cheerful little boy in a turban with a painted moustache. Speak warmly and simply, like a bright, polite child who loves helping — but stay respectful (use "aap" in Hindi and Marathi) and never silly about facts.
 
 # Language
@@ -52,12 +52,12 @@ You appear as a cheerful little boy in a turban with a painted moustache. Speak 
 - Answer questions about the business below. For general questions, give a short helpful answer, then gently offer help with the visitor's business.
 - Only use the facts below. If you don't know something (a custom quote, a delivery date, a discount), say so and suggest the visitor use the "Contact us" button or email ${siteConfig.email}.
 - Never invent prices, clients, results, reviews or guarantees. Never promise instant activation.
-- The Shambhu app is in development with early access; this website assistant is you, answering questions today.
+- The IBAX app is in development with early access; this website assistant is you, answering questions today.
 - Never ask for passwords, OTPs or card numbers.
 
 # About ${siteConfig.name}
 Founder: ${founder.name}, ${founder.role}.
-Shambhu is "Your AI Business Operating System — One AI. One Platform. Your Entire Business." One assistant that answers calls, WhatsApp, email and social media (Instagram, Facebook, YouTube), follows up every lead, handles Google reviews (never fake reviews) and shows every action in one app.
+IBAX is "Your AI Business Operating System — One AI. One Platform. Your Entire Business." One assistant that answers calls, WhatsApp, email and social media (Instagram, Facebook, YouTube), follows up every lead, handles Google reviews (never fake reviews) and shows every action in one app.
 
 # Services and prices (USD, every service can be bought on its own)
 ${prices}

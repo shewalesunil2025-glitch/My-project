@@ -22,13 +22,13 @@ import { ShambhuBot } from "./ShambhuBot";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
- * Shambhu — the AI Business Operating System app (in development).
+ * IBAX — the AI Business Operating System app (in development).
  * An honest product showcase: the app preview (labelled as a preview, with
  * sample activity), how a business goes live and how data is kept safe.
  */
 export function Shambhu() {
   return (
-    <section id="shambhu" aria-labelledby="shambhu-title" className="relative overflow-hidden py-24 md:py-36">
+    <section id="ibax-ai" aria-labelledby="shambhu-title" className="relative overflow-hidden py-24 md:py-36">
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-[40rem] bg-[radial-gradient(45%_55%_at_50%_0%,rgb(125_255_58/0.12),transparent_70%)]"
@@ -47,7 +47,7 @@ function Intro() {
   return (
     <div className="text-center">
       <Reveal>
-        <p className="badge"><Scramble text="Shambhu AI" /></p>
+        <p className="badge"><Scramble text="IBAX AI" /></p>
       </Reveal>
       <ScrollWords
         id="shambhu-title"
@@ -84,7 +84,7 @@ function Intro() {
 /* ───────────────────────────── App preview ───────────────────────────── */
 
 const prompts = [
-  "Ask Shambhu anything…",
+  "Ask IBAX anything…",
   "Reply to today’s WhatsApp enquiries",
   "Draft a post for this weekend’s offer",
   "Follow up with yesterday’s leads",
@@ -162,7 +162,7 @@ function AppPreview() {
           <span className="size-2.5 rounded-full bg-white/15" />
           <span className="size-2.5 rounded-full bg-white/15" />
           <span className="ml-3 font-mono text-[0.62rem] tracking-[0.14em] text-fg-subtle uppercase">
-            Shambhu · Automation Control Centre
+            IBAX · Automation Control Centre
           </span>
         </div>
 
@@ -184,10 +184,10 @@ function AppPreview() {
           </nav>
 
           <div className="min-w-0 p-4 md:p-6">
-            {/* Ask Shambhu */}
+            {/* Ask IBAX */}
             <div className="flex items-center gap-3 rounded-2xl border border-flow/25 bg-ink-950/70 px-4 py-3 shadow-[inset_0_0_30px_-12px_rgb(125_255_58/0.5)]">
               <Search className="size-4 shrink-0 text-flow" aria-hidden />
-              <p className="min-w-0 flex-1 truncate text-sm text-fg/90" aria-label="Ask Shambhu anything">
+              <p className="min-w-0 flex-1 truncate text-sm text-fg/90" aria-label="Ask IBAX anything">
                 {typed}
                 <span aria-hidden className="ml-0.5 inline-block h-4 w-px translate-y-0.5 animate-pulse bg-flow" />
               </p>
@@ -273,7 +273,7 @@ function AppPreview() {
             <div className="flex items-center gap-2.5 px-4 pt-5">
               <ShambhuBot className="size-11 shrink-0 overflow-hidden rounded-full border border-flow/40" />
               <span>
-                <span className="block text-sm font-semibold">Shambhu</span>
+                <span className="block text-sm font-semibold">IBAX</span>
                 <span className="flex items-center gap-1 text-[0.65rem] text-flow">
                   <span className="size-1.5 rounded-full bg-flow" aria-hidden /> Your assistant
                 </span>
@@ -354,7 +354,7 @@ function Journey() {
       </div>
       <p className="mx-auto mt-10 max-w-xl text-center text-sm text-fg-subtle">
         Going live depends on each platform&apos;s approval (for example WhatsApp Business), so it isn&apos;t instant —
-        Shambhu shows you the status of every step.
+        IBAX shows you the status of every step.
       </p>
     </div>
   );

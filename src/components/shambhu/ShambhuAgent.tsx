@@ -41,10 +41,10 @@ const CHILD_PITCH = 1.65;
 const CHILD_RATE = 1.04;
 
 const GREETING =
-  "Namaste! Main Shambhu hoon. English, हिंदी, मराठी — kisi bhi bhasha mein poochhiye, main usi bhasha mein jawab dunga.";
+  "Namaste! Main IBAX hoon. English, हिंदी, मराठी — kisi bhi bhasha mein poochhiye, main usi bhasha mein jawab dunga.";
 
 
-const SUGGESTIONS = ["What does it cost?", "Shambhu kya karta hai?", "हे कसं काम करतं?"];
+const SUGGESTIONS = ["What does it cost?", "IBAX kya karta hai?", "हे कसं काम करतं?"];
 
 const PICKER: AgentLang[] = ["en", "hi", "mr"];
 
@@ -70,8 +70,8 @@ function pickVoice(lang: AgentLang): SpeechSynthesisVoice | undefined {
 }
 
 /**
- * Shambhu, the website's voice assistant: a round button in the bottom-right
- * corner that opens a chat. Visitors can type or tap the mic and speak; Shambhu
+ * IBAX, the website's voice assistant: a round button in the bottom-right
+ * corner that opens a chat. Visitors can type or tap the mic and speak; IBAX
  * works out their language, answers in it and reads the answer aloud in a
  * child's voice. Speech runs in the browser (Web Speech API); answers come from
  * /api/shambhu. Where speech isn't supported, typing still works.
@@ -90,7 +90,7 @@ export function ShambhuAgent() {
   const desktop = useMediaQuery("(min-width: 768px)");
 
   const recRef = useRef<Recognition | null>(null);
-  /** Set once the AI endpoint is unavailable; Shambhu then answers from the site's content (free mode). */
+  /** Set once the AI endpoint is unavailable; IBAX then answers from the site's content (free mode). */
   const localRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -263,7 +263,7 @@ export function ShambhuAgent() {
               exit={{ opacity: 0, x: 10 }}
               className="absolute top-1/2 right-[calc(100%+0.75rem)] -translate-y-1/2 rounded-2xl rounded-br-sm border border-flow/30 bg-ink-900/95 px-3.5 py-2 text-left text-sm whitespace-nowrap shadow-[0_10px_40px_-10px_rgb(125_255_58/0.5)] backdrop-blur"
             >
-              <span className="block font-semibold">Ask Shambhu</span>
+              <span className="block font-semibold">Ask IBAX</span>
               <span className="block text-xs text-fg-muted">Any doubt? Just ask</span>
             </motion.button>
           )}
@@ -273,7 +273,7 @@ export function ShambhuAgent() {
           onClick={() => (open ? close() : setOpen(true))}
           aria-expanded={open}
           aria-controls="shambhu-agent"
-          aria-label={open ? "Close Shambhu" : "Ask Shambhu, the voice assistant"}
+          aria-label={open ? "Close IBAX" : "Ask IBAX, the voice assistant"}
           className="group relative grid size-[3.25rem] place-items-center rounded-full md:size-16"
         >
           {!open && <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flow/30 [animation-duration:2.4s]" />}
@@ -314,7 +314,7 @@ export function ShambhuAgent() {
           <motion.section
             id="shambhu-agent"
             role="dialog"
-            aria-label="Shambhu voice assistant"
+            aria-label="IBAX voice assistant"
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
@@ -329,7 +329,7 @@ export function ShambhuAgent() {
                 <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-semibold">Shambhu</span>
+                <span className="block font-semibold">IBAX</span>
                 <span className="flex items-center gap-1.5 text-xs text-flow" aria-live="polite">
                   {(status === "speaking" || status === "listening") && <Bars />}
                   {statusText}
@@ -396,7 +396,7 @@ export function ShambhuAgent() {
                 </div>
               )}
               {status === "thinking" && (
-                <div className="flex w-fit gap-1 rounded-2xl rounded-bl-sm bg-white/[0.05] px-4 py-3" aria-label="Shambhu is thinking">
+                <div className="flex w-fit gap-1 rounded-2xl rounded-bl-sm bg-white/[0.05] px-4 py-3" aria-label="IBAX is thinking">
                   {[0, 1, 2].map((d) => (
                     <span key={d} className="size-1.5 animate-bounce rounded-full bg-flow" style={{ animationDelay: `${d * 0.15}s` }} />
                   ))}
@@ -436,7 +436,7 @@ export function ShambhuAgent() {
                   </button>
                 ))}
               </span>
-              <button type="button" onClick={() => openDemo("Question from Shambhu chat")} className="hover:text-flow">
+              <button type="button" onClick={() => openDemo("Question from IBAX chat")} className="hover:text-flow">
                 Talk to a human →
               </button>
             </div>
@@ -448,7 +448,7 @@ export function ShambhuAgent() {
                   type="button"
                   onClick={toggleMic}
                   disabled={busy}
-                  aria-label={status === "listening" ? "Stop listening" : "Speak to Shambhu"}
+                  aria-label={status === "listening" ? "Stop listening" : "Speak to IBAX"}
                   className={cn(
                     "relative grid size-11 shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
                     status === "listening" ? "bg-flow text-ink-950" : "border border-flow/40 text-flow hover:bg-flow/10",
@@ -485,7 +485,7 @@ export function ShambhuAgent() {
   );
 }
 
-/** Little equaliser bars while Shambhu listens or speaks. */
+/** Little equaliser bars while IBAX listens or speaks. */
 function Bars() {
   return (
     <span className="flex h-3 items-end gap-[2px]" aria-hidden>

@@ -1,6 +1,6 @@
-# Munna Ai — Website
+# IBAX AI — Website
 
-The flagship website for **Munna Ai**, an AI automation agency. The site is meant to show what the agency builds: a website, AI conversations and automation working as one system.
+The flagship website for **IBAX AI**, an AI automation agency. The site is meant to show what the agency builds: a website, AI conversations and automation working as one system.
 
 > **Design idea:** 2035 technology, today's simplicity.
 
@@ -32,20 +32,20 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap and robots |
 | `NEXT_PUBLIC_BOOKING_URL` | Optional Calendly / Cal.com link. When set, every "Book a Free Demo" opens it |
 | `LEAD_WEBHOOK_URL` | Optional n8n / Make / Zapier / CRM webhook that receives demo requests |
-| `ANTHROPIC_API_KEY` | Powers Shambhu, the voice assistant in the bottom-right corner (`/api/shambhu`, Claude). Optional: without it Shambhu runs in free mode, answering common questions from the site content in English, Hindi and Marathi |
+| `ANTHROPIC_API_KEY` | Powers IBAX, the voice assistant in the bottom-right corner (`/api/shambhu`, Claude). Optional: without it IBAX runs in free mode, answering common questions from the site content in English, Hindi and Marathi |
 
 **Honest by default:** if `LEAD_WEBHOOK_URL` is not set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
 
-**Shambhu voice assistant:** speech recognition and the child-like voice run in the visitor's browser (Web Speech API; Chrome and Android work best, Safari has partial support). Shambhu detects the visitor's language (English, Hindi, Marathi and other Indian languages) and replies in it. Its knowledge is built from the site's own content in `src/lib/shambhuAgent.ts`, so prices and FAQs never drift.
+**IBAX voice assistant:** speech recognition and the child-like voice run in the visitor's browser (Web Speech API; Chrome and Android work best, Safari has partial support). IBAX detects the visitor's language (English, Hindi, Marathi and other Indian languages) and replies in it. Its knowledge is built from the site's own content in `src/lib/shambhuAgent.ts`, so prices and FAQs never drift.
 
 ## Page structure
 
-The layout, colours and motion follow a reference landing page supplied as a screen recording: a black-green canvas lit by one neon lime accent, light thin display type, "// LABEL //" mono eyebrows, the logo and a "Contact us" pill on top and the section links in a pill floating at the bottom, particle forms made of green dots, and scroll-pinned scenes. All content is Munna Ai's own.
+The layout, colours and motion follow a reference landing page supplied as a screen recording: a black-green canvas lit by one neon lime accent, light thin display type, "// LABEL //" mono eyebrows, the logo and a "Contact us" pill on top and the section links in a pill floating at the bottom, particle forms made of green dots, and scroll-pinned scenes. All content is IBAX AI's own.
 
 1. **Hero** *(pinned)* — "The business that never sleeps." split around a brain made of ~22k green dots (`PointCloud shape="brain"`). The brain turns toward the cursor and its dots scatter around it. Scrolling makes the headline grow and fly apart while the brain bursts into dust and a green nebula.
-2. **The problem** — "Your business shouldn't need five different tools…" beside a glowing light pillar, the answer, then a scan card: Shambhu's glowing fingerprint inside scan brackets and the eight-step customer journey.
+2. **The problem** — "Your business shouldn't need five different tools…" beside a glowing light pillar, the answer, then a scan card: IBAX's glowing fingerprint inside scan brackets and the eight-step customer journey.
 3. **Solutions** *(pinned)* — dust gathers into a turning DNA helix, the heading forms, then the seven solution cards (each with its live mini-demo) float past in 3D. Stacked cards on phones.
-4. **Why Munna Ai** — scroll-lit statement and a green bento: two feature tiles and the three principles.
+4. **Why IBAX AI** — scroll-lit statement and a green bento: two feature tiles and the three principles.
 5. **One system** — dotted globe (canvas, adapted from 21st.dev "Interactive Globe") with the six connected systems and their jobs.
 6. **Work / Demos** — "Experience it now": pick a demo and watch its sample flow run.
 7. **Industries** — ten industries with outcome and flow, plus a custom-industry CTA.
@@ -94,10 +94,10 @@ Checked against the UI UX Pro Max skill (`.claude/skills/ui-ux-pro-max`): text c
 - **Surfaces:** `.glass` dark cards with a travelling border beam on hover, `.badge` "// LABEL //" eyebrows, `.hologram` + `.scanlines`, `.stars`, `.swirl`
 - **Motion:** Framer Motion — pinned scroll scenes, scroll-lit headings (`ScrollWords`), word reveals, cipher-decoding labels (`Scramble`), section panels that grow in and ease away
 
-## Shambhu's visuals (all original SVG)
+## IBAX's visuals (all original SVG)
 
 - **Fingerprint scan card** (`src/components/scroll/FingerprintScan.tsx`): a loop-pattern fingerprint generated from a procedural ridge field (path data in `fingerprintPath.ts`), with a scanner HUD (grid, tick ring, crosshair, labelled minutiae) and a scan band that lights the ridges as it sweeps down. It stays still; only the scan moves.
-- **Shambhu robot** (`src/components/shambhu/ShambhuBot.tsx`): the chatbot face used by the bottom-right assistant and the app preview. Its eyes blink and glance around, and react to the chat: listening, thinking, speaking.
+- **IBAX robot** (`src/components/shambhu/ShambhuBot.tsx`): the chatbot face used by the bottom-right assistant and the app preview. Its eyes blink and glance around, and react to the chat: listening, thinking, speaking.
 
 ## Demos
 

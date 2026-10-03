@@ -24,7 +24,7 @@ export function IntroLoader() {
         <div className="intro-mark">
           <LogoMark className="size-20 rounded-[22px]" />
         </div>
-        <p className="intro-name">Munna Ai</p>
+        <p className="intro-name">IBAX AI</p>
         <div className="intro-line">
           <span />
         </div>

@@ -12,7 +12,7 @@ import { FingerprintScan } from "./FingerprintScan";
 
 /**
  * The problem and the answer, in the reference's "light pillar" layout, followed by
- * a scanning card of Shambhu's fingerprint, and the connected customer journey.
+ * a scanning card of IBAX's fingerprint, and the connected customer journey.
  */
 export function ConnectSection() {
   return (
@@ -54,7 +54,7 @@ function PillarStatement() {
           <Reveal>
             <p className="font-mono text-[0.68rem] tracking-[0.18em] text-fg-subtle uppercase">[ The answer ]</p>
             <p className="mt-4 text-lg leading-snug text-fg">
-              Shambhu connects your website, WhatsApp, calls, email, social media and reviews into one AI assistant.
+              IBAX connects your website, WhatsApp, calls, email, social media and reviews into one AI assistant.
             </p>
             <BookDemoButton size="md" className="mt-7" />
           </Reveal>
@@ -76,7 +76,7 @@ function LightPillar() {
   );
 }
 
-/** Shambhu's fingerprint inside scan brackets, then the connected journey. */
+/** IBAX's fingerprint inside scan brackets, then the connected journey. */
 function ScanCard() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -98,19 +98,19 @@ function ScanCard() {
         <div className="relative grid min-h-[34rem] items-center gap-8 p-6 md:grid-cols-12 md:p-12">
           <div className="order-2 md:order-1 md:col-span-4">
             <p className="font-mono text-[0.68rem] tracking-[0.18em] text-flow uppercase">
-              <Scramble text="Meet Shambhu" />
+              <Scramble text="Meet IBAX" />
             </p>
             <p className="mt-3 text-2xl leading-tight tracking-tight">
               One AI, awake for every customer — on your site, on WhatsApp, on email, on social media and on the phone.
             </p>
             <p className="mt-6 font-mono text-[0.7rem] tracking-[0.14em] text-fg-subtle uppercase">
-              Shambhu <span className="text-flow">●</span> Scanning your business
+              IBAX <span className="text-flow">●</span> Scanning your business
             </p>
             <a
-              href="#shambhu"
+              href="#ibax-ai"
               className="mt-4 inline-flex items-center gap-1.5 text-sm text-flow underline-offset-4 hover:underline"
             >
-              What Shambhu will do for you →
+              What IBAX will do for you →
             </a>
           </div>
 
@@ -142,7 +142,7 @@ function ScanCard() {
   );
 }
 
-/** The scanned print: Shambhu's fingerprint, held still inside the card. */
+/** The scanned print: IBAX's fingerprint, held still inside the card. */
 function ScanImage() {
   return (
     <div className="absolute inset-0 overflow-hidden rounded-[1.6rem] border border-flow/20 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.9),0_0_60px_-25px_rgb(125_255_58/0.6)]">

@@ -7,7 +7,7 @@ export default function NotFound() {
         <p className="eyebrow">404</p>
         <h1 className="display text-metal mt-4 text-6xl">This flow doesn&apos;t exist.</h1>
         <Link href="/" className="link-underline mt-8 inline-block text-fg-muted hover:text-fg">
-          Back to Munna Ai
+          Back to IBAX AI
         </Link>
       </div>
     </main>

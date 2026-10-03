@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 export type BotMood = "idle" | "listening" | "thinking" | "speaking";
 
 /**
- * Shambhu's own chatbot face, drawn in SVG: a glossy white helmet with a dark
+ * IBAX's own chatbot face, drawn in SVG: a glossy white helmet with a dark
  * glass visor, glowing lime dot-matrix eyes, ear lights, an antenna and the brand
  * logo on its chest. The eyes blink and glance around; `mood` changes them:
  * listening — eyes widen and the antenna pulses faster, thinking — eyes look

@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: "#030703",
   colorScheme: "dark",
-  // Phones: the on-screen keyboard shrinks the layout, so the Shambhu chat input stays visible.
+  // Phones: the on-screen keyboard shrinks the layout, so the IBAX chat input stays visible.
   interactiveWidget: "resizes-content",
 };
 

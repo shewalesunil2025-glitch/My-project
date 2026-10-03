@@ -29,7 +29,7 @@ const TICKS = Array.from({ length: 72 }, (_, i) => {
 });
 
 /**
- * Shambhu's fingerprint, drawn in SVG: an original loop-pattern print whose
+ * IBAX's fingerprint, drawn in SVG: an original loop-pattern print whose
  * filled ridges glow lime to teal and fade out toward the edge, set in a
  * scanner HUD — grid, crosshair on the core, labelled minutiae, a tick ring and
  * a scan band that sweeps down and lights the ridges up as it passes.
@@ -48,7 +48,7 @@ export function FingerprintScan({ className }: { className?: string }) {
       preserveAspectRatio="xMidYMid slice"
       className={className}
       role="img"
-      aria-label="Shambhu's glowing fingerprint being scanned"
+      aria-label="IBAX's glowing fingerprint being scanned"
     >
       <defs>
         <radialGradient id={id("bg")} cx="50%" cy="46%" r="70%">
