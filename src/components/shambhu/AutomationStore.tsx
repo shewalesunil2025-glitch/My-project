@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 import { SubHead } from "./Shambhu";
 
 /**
- * Automation Store: every Munna AI service can be bought on its own, each with a
+ * Automation Store: every IBAX AI service can be bought on its own, each with a
  * "Starting at" price in USD. Digital Marketing is the premium package.
  */
 export function AutomationStore() {

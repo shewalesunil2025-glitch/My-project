@@ -4,7 +4,7 @@ import { siteConfig } from "@/config/site";
 import type { AgentReply } from "@/lib/shambhuAgent";
 
 /**
- * Munna AI's free mode: answers common questions from the site's own content,
+ * IBAX AI's free mode: answers common questions from the site's own content,
  * entirely in the browser — no API key and no cost. It detects English, Hindi
  * and Marathi (Devanagari or Roman letters) and answers in that language.
  * When ANTHROPIC_API_KEY is set, /api/shambhu (Claude) answers instead.
@@ -69,7 +69,7 @@ const intents: Intent[] = [
   {
     keys: /(website|web site|\bsite\b|वेबसाइट|वेबसाईट)/i,
     answers: {
-      en: `We build a fast, modern website with Munna AI built in, so every enquiry is answered — starting at ${P.web} one-time.`,
+      en: `We build a fast, modern website with IBAX AI built in, so every enquiry is answered — starting at ${P.web} one-time.`,
       hi: `हम तेज़ और मॉडर्न वेबसाइट बनाते हैं जिसमें शंभू पहले से होता है, ताकि हर पूछताछ का जवाब मिले — ${P.web} एक बार से शुरू।`,
       mr: `आम्ही वेगवान, आधुनिक वेबसाईट बनवतो ज्यात शंभू आधीच असतो, म्हणजे प्रत्येक चौकशीला उत्तर मिळतं — ${P.web} एकदाच, पासून.`,
     },
@@ -77,7 +77,7 @@ const intents: Intent[] = [
   {
     keys: /(instagram|insta|facebook|youtube|social|इंस्टाग्राम|इन्स्टाग्राम|फेसबुक|यूट्यूब|युट्यूब|सोशल)/i,
     answers: {
-      en: `Munna AI replies to DMs and comments and plans posts for Instagram, Facebook and YouTube — ${P.social} per channel. For everything together, choose Digital Marketing at ${P.dm}.`,
+      en: `IBAX AI replies to DMs and comments and plans posts for Instagram, Facebook and YouTube — ${P.social} per channel. For everything together, choose Digital Marketing at ${P.dm}.`,
       hi: `शंभू Instagram, Facebook और YouTube पर DM और कमेंट का जवाब देता है और पोस्ट प्लान करता है — हर चैनल ${P.social}। सब कुछ एक साथ चाहिए तो डिजिटल मार्केटिंग ${P.dm} लीजिए।`,
       mr: `शंभू Instagram, Facebook आणि YouTube वर DM आणि कमेंटला उत्तर देतो आणि पोस्ट प्लॅन करतो — प्रत्येक चॅनेल ${P.social}. सगळं एकत्र हवं असेल तर डिजिटल मार्केटिंग ${P.dm} घ्या.`,
     },
@@ -141,7 +141,7 @@ const intents: Intent[] = [
   {
     keys: /(restaurant|hotel|clinic|hospital|doctor|dentist|salon|spa|gym|shop|store|school|college|real estate|travel|business type|रेस्टोरेंट|होटल|हॉटेल|क्लिनिक|डॉक्टर|दुकान|सलून|जिम)/i,
     answers: {
-      en: "Munna AI is built for businesses that talk to customers — restaurants, hotels, clinics, doctors, salons, spas, shops, real estate, education, gyms, travel, e-commerce and more.",
+      en: "IBAX AI is built for businesses that talk to customers — restaurants, hotels, clinics, doctors, salons, spas, shops, real estate, education, gyms, travel, e-commerce and more.",
       hi: "शंभू उन सभी बिज़नेस के लिए है जो ग्राहकों से बात करते हैं — रेस्टोरेंट, होटल, क्लिनिक, डॉक्टर, सलून, स्पा, दुकानें, रियल एस्टेट, शिक्षा, जिम, ट्रैवल, ई-कॉमर्स और भी बहुत।",
       mr: "शंभू ग्राहकांशी बोलणाऱ्या सगळ्या व्यवसायांसाठी आहे — रेस्टॉरंट, हॉटेल, क्लिनिक, डॉक्टर, सलून, स्पा, दुकानं, रिअल इस्टेट, शिक्षण, जिम, ट्रॅव्हल, ई-कॉमर्स आणि बरंच काही.",
     },
@@ -157,7 +157,7 @@ const intents: Intent[] = [
   {
     keys: /(shambhu|शंभू|शम्भू|who are you|what is|kaun ho|kya hai|\bapp\b)/i,
     answers: {
-      en: "I'm Munna, your AI business assistant. I answer calls, WhatsApp, email and social media, follow up every lead and show you everything in one app. The full Munna AI app is in early access.",
+      en: "I'm IBAX, your AI business assistant. I answer calls, WhatsApp, email and social media, follow up every lead and show you everything in one app. The full IBAX AI app is in early access.",
       hi: "मैं शंभू हूँ, आपका AI बिज़नेस असिस्टेंट। मैं कॉल, WhatsApp, ईमेल और सोशल मीडिया संभालता हूँ, हर लीड का फॉलो-अप करता हूँ और सब कुछ एक ऐप में दिखाता हूँ। पूरा शंभू ऐप अभी अर्ली एक्सेस में है।",
       mr: "मी शंभू, तुमचा AI बिझनेस असिस्टंट. मी कॉल, WhatsApp, ईमेल आणि सोशल मीडिया सांभाळतो, प्रत्येक लीडचा पाठपुरावा करतो आणि सगळं एका ॲपमध्ये दाखवतो. पूर्ण शंभू ॲप सध्या अर्ली ॲक्सेसमध्ये आहे.",
     },
@@ -165,7 +165,7 @@ const intents: Intent[] = [
   {
     keys: /^\s*(hi|hello|hey|namaste|namaskar|नमस्ते|नमस्कार|हाय|हॅलो)\b/i,
     answers: {
-      en: "Hello! I'm Munna. Ask me about our services, prices or Digital Marketing.",
+      en: "Hello! I'm IBAX. Ask me about our services, prices or Digital Marketing.",
       hi: "नमस्ते! मैं शंभू हूँ। हमारी सर्विस, कीमत या डिजिटल मार्केटिंग के बारे में पूछिए।",
       mr: "नमस्कार! मी शंभू. आमच्या सेवा, किंमती किंवा डिजिटल मार्केटिंगबद्दल विचारा.",
     },

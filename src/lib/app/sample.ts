@@ -41,11 +41,11 @@ export function buildSampleWorkspace(ws: Workspace) {
     socialLinks: "instagram.com/sunrisebistro",
   };
   ws.assistant = {
-    name: "Munna",
+    name: "IBAX",
     language: "English",
     tone: "Warm & friendly",
     personality: "Helpful host",
-    welcome: "Hi! I'm Munna from Sunrise Bistro. Want to book a table, see the menu or ask about catering?",
+    welcome: "Hi! I'm IBAX from Sunrise Bistro. Want to book a table, see the menu or ask about catering?",
   };
   ws.team = [
     { id: uid(), name: "Alex Morgan", email: "sample@lumi.app", role: "owner" },
@@ -60,7 +60,7 @@ export function buildSampleWorkspace(ws: Workspace) {
     ["instagram", "active"],
     ["reviews", "active"],
     ["facebook", "paused", "Paused by you on " + new Date(daysAgo(3)).toLocaleDateString()],
-    ["followup", "attention", "3 leads have no phone or email — add one so Munna can follow up."],
+    ["followup", "attention", "3 leads have no phone or email — add one so IBAX can follow up."],
   ];
   for (const [serviceId, status, note] of plan) {
     const svc = serviceById(serviceId)!;
@@ -103,7 +103,7 @@ export function buildSampleWorkspace(ws: Workspace) {
   const sim = { simulated: true, status: "connected" as const, connectedAt: daysAgo(30) };
   ws.connections = {
     whatsapp: { provider: "whatsapp", account: "+1 555 0142", ...sim },
-    phone: { provider: "phone", account: "+1 555 0199 (Munna AI line)", ...sim },
+    phone: { provider: "phone", account: "+1 555 0199 (IBAX AI line)", ...sim },
     youtube: { provider: "youtube", account: "Sunrise Bistro", ...sim },
     instagram: { provider: "instagram", account: "@sunrisebistro", ...sim },
     facebook: { provider: "facebook", account: "Sunrise Bistro Page", ...sim },

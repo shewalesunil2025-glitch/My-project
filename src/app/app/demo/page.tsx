@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Pause, Play } from "lucide-react";
 import { product } from "@/config/product";
 import { openSampleWorkspace } from "@/lib/app/store";
 import { buildSampleWorkspace } from "@/lib/app/sample";
-import { Btn, BtnLink, LumiMark } from "@/components/app/ui";
+import { BrandLogo, Btn, BtnLink, LumiMark } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
 
 const N = product.name;
@@ -27,8 +27,7 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
     screen: (
       <div className="grid h-full place-items-center text-center">
         <div>
-          <LumiMark className="mx-auto size-16" />
-          <p className="mt-3 text-sm font-semibold">{N}</p>
+          <BrandLogo stacked tagline size="md" className="mx-auto" />
           <p className="text-[0.7rem] text-fg-muted">{product.positioning}</p>
         </div>
       </div>
@@ -173,8 +172,7 @@ export default function DemoPage() {
     <div className="min-h-dvh">
       <header className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/app" className="flex items-center gap-2">
-          <LumiMark className="size-8" />
-          <span className="text-lg font-bold tracking-tight">{N}</span>
+          <BrandLogo tagline />
         </Link>
         <BtnLink href="/app/signup" size="sm">
           Create Account
