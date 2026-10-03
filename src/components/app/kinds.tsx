@@ -14,7 +14,7 @@ const map: Record<ActivityKind, { icon: typeof Bell; label: string; tone: string
   automation: { icon: Bot, label: "Automation", tone: "text-violet-300 bg-violet-400/10" },
   payment: { icon: CreditCard, label: "Payment", tone: "text-emerald-300 bg-emerald-400/10" },
   website: { icon: Globe, label: "Website", tone: "text-cyan-300 bg-cyan-400/10" },
-  system: { icon: Bell, label: "Munna AI", tone: "text-fg-muted bg-white/[0.06]" },
+  system: { icon: Bell, label: "IBAX AI", tone: "text-fg-muted bg-white/[0.06]" },
 };
 
 export const kindLabel = (k: ActivityKind) => map[k].label;

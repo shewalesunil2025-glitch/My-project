@@ -7,7 +7,7 @@ import { product } from "@/config/product";
 import { services } from "@/content/app/services";
 import { openSampleWorkspace, useSession } from "@/lib/app/store";
 import { buildSampleWorkspace } from "@/lib/app/sample";
-import { BtnLink, Btn, Icon, LumiMark } from "@/components/app/ui";
+import { BrandLogo, BtnLink, Btn, Icon } from "@/components/app/ui";
 
 export default function WelcomePage() {
   const { ready, user, workspace } = useSession();
@@ -21,8 +21,7 @@ export default function WelcomePage() {
 
       <header className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/app" className="flex items-center gap-2">
-          <LumiMark className="size-8" />
-          <span className="text-lg font-bold tracking-tight">{product.name}</span>
+          <BrandLogo tagline />
         </Link>
         <nav className="flex items-center gap-1">
           <BtnLink href="/app/demo" variant="subtle" size="sm">
@@ -42,7 +41,7 @@ export default function WelcomePage() {
 
       <main className="relative mx-auto max-w-6xl px-4 pt-14 pb-20 sm:px-6 sm:pt-20">
         <section className="mx-auto max-w-3xl text-center">
-          <LumiMark className="mx-auto size-20 animate-float" />
+          <BrandLogo size="lg" stacked tagline className="mx-auto animate-float" />
           <p className="badge mx-auto mt-8">{product.positioning}</p>
           <h1 className="display text-metal mt-5 text-[2.6rem] sm:text-6xl">
             Meet {product.name}.

@@ -467,7 +467,7 @@ body {
 /* Animations run on every device, including phones with "reduce motion" /
    battery saver on — the site owner's choice (see src/hooks/useReducedMotion.ts). */
 
-/* Munna AI chatbot face (ShambhuBot): blinking, glancing eyes and glowing lights. */
+/* IBAX AI chatbot face (ShambhuBot): blinking, glancing eyes and glowing lights. */
 .bot-blink { animation: bot-blink 4.6s infinite; }
 @keyframes bot-blink {
   0%, 90%, 100% { transform: scaleY(1); }

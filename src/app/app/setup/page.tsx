@@ -8,7 +8,7 @@ import { businessCategories } from "@/content/app/services";
 import { countries } from "@/content/app/countries";
 import { audit, logActivity, nowIso, updateWorkspace, useSession } from "@/lib/app/store";
 import type { AssistantProfile, Business, User } from "@/lib/app/types";
-import { Btn, Field, FullScreenLoader, Input, LumiMark, Notice, Select, TextArea } from "@/components/app/ui";
+import { BrandLogo, Btn, Field, FullScreenLoader, Input, LumiMark, Notice, Select, TextArea } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
 
 const languages = ["English", "Spanish", "French", "German", "Portuguese", "Arabic", "Hindi", "Italian", "Japanese", "Mandarin", "Multilingual (match the customer)"];
@@ -88,8 +88,7 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
     <div className="min-h-dvh">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
         <div className="flex items-center gap-2">
-          <LumiMark className="size-8" />
-          <span className="font-bold tracking-tight">{product.name}</span>
+          <BrandLogo size="sm" />
           <span className="ml-auto text-xs text-fg-subtle">
             Step {step + 1} of {steps.length}
           </span>

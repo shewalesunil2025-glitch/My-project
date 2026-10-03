@@ -22,8 +22,44 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
+import { LogoMark, Wordmark } from "@/components/navigation/Logo";
+import { product } from "@/config/product";
 
-/* ── Brand mark: Munna AI's robot, the same one as the website chat assistant ── */
+/* ── Brand: the IBAX AI symbol and wordmark, the same as the website ── */
+export function BrandMark({ className }: { className?: string }) {
+  return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_14px_rgb(125_255_58/0.45)]", className)} />;
+}
+
+/** Symbol + "ibaxai" wordmark, with the "Intelligent Business Automation" line under it when `tagline` is set. */
+export function BrandLogo({
+  className,
+  size = "md",
+  tagline = false,
+  stacked = false,
+}: {
+  className?: string;
+  size?: "sm" | "md" | "lg";
+  tagline?: boolean;
+  stacked?: boolean;
+}) {
+  const mark = { sm: "size-7", md: "size-8", lg: "size-20" }[size];
+  const word = { sm: "text-[1.1rem]", md: "text-[1.25rem]", lg: "text-[2.6rem]" }[size];
+  return (
+    <span className={cn(stacked ? "flex w-fit flex-col items-center gap-4 text-center" : "inline-flex items-center gap-2.5", className)}>
+      <BrandMark className={mark} />
+      <span className={cn("flex flex-col", stacked ? "items-center" : "items-start")}>
+        <Wordmark className={word} />
+        {tagline && (
+          <span className={cn("mt-1.5 font-mono whitespace-nowrap uppercase text-fg-subtle", !stacked && "max-sm:hidden", size === "lg" ? "text-[0.62rem] tracking-[0.32em]" : "text-[0.5rem] tracking-[0.22em]")}>
+            {product.logoTagline}
+          </span>
+        )}
+      </span>
+    </span>
+  );
+}
+
+/* ── Assistant avatar: the IBAX chatbot robot, the same one as the website chat assistant ── */
 export function LumiMark({ className, glow = true }: { className?: string; glow?: boolean }) {
   return (
     <span
@@ -256,7 +292,7 @@ export function Spinner({ className }: { className?: string }) {
 export function FullScreenLoader() {
   return (
     <div className="grid min-h-dvh place-items-center" role="status" aria-label="Loading">
-      <LumiMark className="size-12 animate-pulse" />
+      <BrandMark className="size-12 animate-pulse" />
     </div>
   );
 }

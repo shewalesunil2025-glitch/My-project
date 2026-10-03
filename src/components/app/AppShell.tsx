@@ -27,7 +27,7 @@ import { product } from "@/config/product";
 import { cn } from "@/lib/cn";
 import { logOut, useSession } from "@/lib/app/store";
 import type { Workspace } from "@/lib/app/types";
-import { FullScreenLoader, LumiMark } from "./ui";
+import { BrandLogo, BrandMark, FullScreenLoader, LumiMark } from "./ui";
 
 export const workspaceNav = [
   { href: "/app/home", label: "Home", icon: House },
@@ -87,8 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Sidebar (desktop) */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/[0.06] bg-ink-900/80 backdrop-blur lg:flex">
         <Link href="/app/home" className="flex items-center gap-2.5 px-5 pt-5 pb-4">
-          <LumiMark className="size-8" />
-          <span className="text-lg font-bold tracking-tight">{product.name}</span>
+          <BrandLogo tagline />
         </Link>
         <nav aria-label="Workspace" className="no-scrollbar flex-1 overflow-y-auto px-3 pb-4">
           <ul className="space-y-0.5">
@@ -136,7 +135,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-ink-950/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
           <Link href="/app/home" className="flex min-w-0 items-center gap-2 lg:hidden">
-            <LumiMark className="size-7" />
+            <BrandMark className="size-7" />
             <span className="truncate text-[0.95rem] font-semibold">{workspace.business.name}</span>
           </Link>
           <p className="hidden truncate text-sm text-fg-muted lg:block">

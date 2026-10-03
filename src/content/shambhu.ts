@@ -26,16 +26,16 @@ import {
 } from "lucide-react";
 
 /**
- * Munna AI — the AI Business Operating System app, in development.
+ * IBAX AI — the AI Business Operating System app, in development.
  * Everything here describes what the app is being built to do. Nothing on the
  * site claims it is live: no user counts, no activity numbers, no prices yet.
  */
 export const shambhu = {
-  name: "Munna AI",
+  name: "IBAX AI",
   tagline: "Your AI Business Operating System",
   positioning: "One AI. One Platform. Your Entire Business.",
   status: "Preview · Try it on your phone",
-  interest: "Munna AI — early access",
+  interest: "IBAX AI — early access",
 };
 
 /** From choosing a service to going live. Each account is authorised by you. */
@@ -59,7 +59,7 @@ export type StoreItem = {
 
 /** The Automation Store: every service can be bought on its own. */
 export const store: StoreItem[] = [
-  { title: "Website", body: "A fast, modern website with Munna AI built in.", icon: Globe, price: "$299", billing: "one-time" },
+  { title: "Website", body: "A fast, modern website with IBAX AI built in.", icon: Globe, price: "$299", billing: "one-time" },
   { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "$79", billing: "monthly" },
   { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "$49", billing: "monthly" },
   { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "$49", billing: "monthly" },
@@ -83,7 +83,7 @@ export const store: StoreItem[] = [
 export const safeguards: { title: string; body: string; icon: LucideIcon }[] = [
   { title: "Your data stays yours", body: "Every business is kept separate from every other.", icon: Lock },
   { title: "Encrypted connections", body: "Account access is encrypted and can be removed any time.", icon: KeyRound },
-  { title: "Audit log", body: "Every action Munna AI takes is recorded and visible to you.", icon: ScrollText },
+  { title: "Audit log", body: "Every action IBAX AI takes is recorded and visible to you.", icon: ScrollText },
   { title: "You approve", body: "Nothing goes live without your approval.", icon: ShieldCheck },
 ];
 
@@ -100,7 +100,7 @@ export const sampleActivity: { icon: LucideIcon; channel: string; text: string }
 
 export const appNav: { label: string; icon: LucideIcon }[] = [
   { label: "Home", icon: Home },
-  { label: "Munna", icon: Bot },
+  { label: "IBAX", icon: Bot },
   { label: "Services", icon: LayoutGrid },
   { label: "Activity", icon: Activity },
   { label: "More", icon: MoreHorizontal },
@@ -115,10 +115,10 @@ export const appAreas = [
   "Notifications",
   "Billing",
   "Settings",
-  "Ask Munna",
+  "Ask IBAX",
 ];
 
-/** Businesses Munna AI is being built for. */
+/** Businesses IBAX AI is being built for. */
 export const businessCategories = [
   "Restaurant",
   "Hotel",
