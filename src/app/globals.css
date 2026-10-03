@@ -268,8 +268,8 @@ body {
 .intro-name {
   position: relative;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  font-size: 0.95rem;
+  letter-spacing: 0.32em;
+  font-size: 0.62rem;
   color: var(--color-fg-muted);
   animation: intro-fade 0.8s ease-out 0.2s both;
 }

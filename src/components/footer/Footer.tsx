@@ -34,7 +34,7 @@ export function Footer() {
       <div aria-hidden className="absolute bottom-[-10rem] left-1/2 h-[26rem] w-[50rem] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(125_255_58/0.28),rgb(40_140_30/0.12)_55%,transparent)] blur-2xl" />
       <div className="container-x relative grid gap-12 pt-20 pb-12 md:grid-cols-12 md:pt-28">
         <div className="md:col-span-4">
-          <Logo compact />
+          <Logo />
           <p className="display mt-6 text-[clamp(2rem,3.4vw,2.8rem)]">
             {siteConfig.name} —{" "}
             <span className="text-fg-subtle">

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Inter_Tight } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter_Tight, Poppins } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { MotionConfig } from "framer-motion";
 import { siteConfig } from "@/config/site";
@@ -10,6 +10,7 @@ import { Spotlight } from "@/components/effects/Spotlight";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
+const poppins = Poppins({ subsets: ["latin"], variable: "--font-poppins", weight: ["700"], display: "swap" });
 const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", weight: ["300", "400", "500"], display: "swap" });
 
 export const metadata: Metadata = {
@@ -50,7 +51,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${tight.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${jakarta.variable} ${tight.variable} ${poppins.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body>
         <IntroLoader />
         <MotionConfig reducedMotion="never">

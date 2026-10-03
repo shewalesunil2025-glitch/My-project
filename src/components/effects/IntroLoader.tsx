@@ -1,4 +1,4 @@
-import { LogoMark } from "@/components/navigation/Logo";
+import { LogoMark, Wordmark } from "@/components/navigation/Logo";
 
 /** When the hero entrances should start: part-way into the curtain lift (ms after the intro starts). */
 const HERO_CUE_MS = 1350;
@@ -22,9 +22,10 @@ export function IntroLoader() {
       <div aria-hidden className="intro">
         <div className="intro-glow" />
         <div className="intro-mark">
-          <LogoMark className="size-20 rounded-[22px]" />
+          <LogoMark className="size-20" />
         </div>
-        <p className="intro-name">IBAX AI</p>
+        <Wordmark className="text-[2.6rem]" />
+        <p className="intro-name">INTELLIGENT BUSINESS AUTOMATION</p>
         <div className="intro-line">
           <span />
         </div>
