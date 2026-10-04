@@ -15,6 +15,8 @@ const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", weight
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  /** Google Search Console ownership check. */
+  verification: { google: "ODcWuSObhQdoh_XvZuIuwYtXLAwehwNrrgnxRi1aBT0" },
   title: { default: siteConfig.title, template: `%s — ${siteConfig.name}` },
   description: siteConfig.description,
   applicationName: siteConfig.name,
