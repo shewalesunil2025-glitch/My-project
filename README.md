@@ -31,10 +31,11 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap and robots |
 | `NEXT_PUBLIC_BOOKING_URL` | Optional Calendly / Cal.com link. When set, every "Book a Free Demo" opens it |
-| `LEAD_WEBHOOK_URL` | Optional n8n / Make / Zapier / CRM webhook that receives demo requests |
+| `LEAD_WEBHOOK_URL` | Optional n8n / Make / Zapier / CRM webhook that receives contact requests |
+| `LEAD_EMAIL` | Optional address for contact-form emails (default: the site contact email) |
 | `ANTHROPIC_API_KEY` | Powers IBAX, the voice assistant in the bottom-right corner (`/api/shambhu`, Claude). Optional: without it IBAX runs in free mode, answering common questions from the site content in English, Hindi and Marathi |
 
-**Honest by default:** if `LEAD_WEBHOOK_URL` is not set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
+**Leads reach the owner:** `/api/lead` posts to `LEAD_WEBHOOK_URL` when set; otherwise it emails the lead to `LEAD_EMAIL` (default: the contact email in `src/config/site.ts`) through FormSubmit. FormSubmit sends one activation email first — click its link once. If delivery fails, the form offers to send the enquiry on WhatsApp.
 
 **IBAX voice assistant:** speech recognition and the child-like voice run in the visitor's browser (Web Speech API; Chrome and Android work best, Safari has partial support). IBAX detects the visitor's language (English, Hindi, Marathi and other Indian languages) and replies in it. Its knowledge is built from the site's own content in `src/lib/shambhuAgent.ts`, so prices and FAQs never drift.
 

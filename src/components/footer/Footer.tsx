@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { whatsappLink } from "@/lib/leads";
 import { store } from "@/content/shambhu";
 import { Logo } from "@/components/navigation/Logo";
 
@@ -73,10 +74,29 @@ export function Footer() {
 
         <div className="md:col-span-2">
           <p className="font-mono text-[0.65rem] tracking-[0.14em] text-fg-subtle uppercase">[ Contact ]</p>
-          <a href={`mailto:${siteConfig.email}`} className="link-underline mt-4 inline-block text-sm text-fg-muted hover:text-fg">
-            {siteConfig.email}
-          </a>
-          <p className="mt-3 text-sm text-fg-muted">Reply within 24 hours</p>
+          <ul className="mt-4 space-y-2.5 text-sm">
+            <li>
+              <a href={`mailto:${siteConfig.email}`} className="link-underline break-all text-fg-muted hover:text-fg">
+                {siteConfig.email}
+              </a>
+            </li>
+            <li>
+              <a href={`tel:${siteConfig.phone}`} className="link-underline text-fg-muted hover:text-fg">
+                {siteConfig.phoneDisplay}
+              </a>
+            </li>
+            <li>
+              <a
+                href={whatsappLink(`Hi ${siteConfig.name}, I'd like to know more.`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-flow hover:text-flow-soft"
+              >
+                WhatsApp us →
+              </a>
+            </li>
+          </ul>
+          <p className="mt-3 text-sm text-fg-subtle">Reply within 24 hours</p>
         </div>
       </div>
       <div className="container-x relative">

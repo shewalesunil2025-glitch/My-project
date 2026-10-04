@@ -22,6 +22,7 @@ const jsonLd = {
   name: siteConfig.name,
   url: siteConfig.url,
   email: siteConfig.email,
+  telephone: siteConfig.phone,
   founder: { "@type": "Person", name: founder.name, jobTitle: founder.role },
   description: siteConfig.description,
   serviceType: [

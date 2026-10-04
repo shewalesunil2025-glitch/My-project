@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { validateLead, type LeadResponse } from "@/lib/leads";
+import { siteConfig } from "@/config/site";
+import { validateLead, type LeadRequest, type LeadResponse } from "@/lib/leads";
 
 /**
- * Receives demo requests and forwards them to LEAD_WEBHOOK_URL
- * (n8n, Make, Zapier or a CRM endpoint). Nothing is stored here.
+ * Receives contact requests and delivers them to the owner. Nothing is stored here.
+ *
+ * - With LEAD_WEBHOOK_URL set (n8n, Make, Zapier or a CRM), the lead is posted there.
+ * - Otherwise it is emailed to LEAD_EMAIL (default: the site's contact email) through
+ *   FormSubmit, a free form-to-email relay. FormSubmit asks the owner to click an
+ *   activation link in the first email it sends; until then delivery fails, and the
+ *   form offers WhatsApp instead.
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -16,31 +22,50 @@ export async function POST(request: Request) {
   const { lead, error } = validateLead(body);
   if (!lead) return json({ ok: false, reason: "invalid", message: error ?? "Invalid request." }, 400);
 
-  const webhook = process.env.LEAD_WEBHOOK_URL;
-  if (!webhook) {
-    return json(
-      {
-        ok: false,
-        reason: "not_configured",
-        message: "Online booking isn't connected yet.",
-      },
-      503,
-    );
-  }
-
   try {
-    const res = await fetch(webhook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...lead, source: "website", receivedAt: new Date().toISOString() }),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) throw new Error(`Webhook responded ${res.status}`);
+    const webhook = process.env.LEAD_WEBHOOK_URL;
+    if (webhook) await sendToWebhook(webhook, lead);
+    else await sendByEmail(process.env.LEAD_EMAIL || siteConfig.email, lead);
     return json({ ok: true }, 200);
   } catch (err) {
-    console.error("[lead] forwarding failed", err);
-    return json({ ok: false, reason: "upstream", message: "We couldn't send your request. Please try again." }, 502);
+    console.error("[lead] delivery failed", err);
+    return json(
+      { ok: false, reason: "upstream", message: "We couldn't send your request online right now." },
+      502,
+    );
   }
+}
+
+async function sendToWebhook(url: string, lead: LeadRequest) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...lead, source: "website", receivedAt: new Date().toISOString() }),
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok) throw new Error(`Webhook responded ${res.status}`);
+}
+
+async function sendByEmail(to: string, lead: LeadRequest) {
+  const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json", Referer: siteConfig.url },
+    body: JSON.stringify({
+      _subject: `New enquiry from ${lead.name} — ${siteConfig.name} website`,
+      _template: "table",
+      _captcha: "false",
+      _replyto: lead.email,
+      Name: lead.name,
+      Email: lead.email,
+      "Phone / WhatsApp": lead.phone || "—",
+      Business: lead.business || "—",
+      "Interested in": lead.interest || "—",
+      Message: lead.message || "—",
+    }),
+    signal: AbortSignal.timeout(10000),
+  });
+  const data = (await res.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
+  if (!res.ok || String(data.success) !== "true") throw new Error(`FormSubmit: ${data.message ?? res.status}`);
 }
 
 function json(payload: LeadResponse, status: number) {

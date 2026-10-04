@@ -147,11 +147,11 @@ const intents: Intent[] = [
     },
   },
   {
-    keys: /(contact|human|talk|team|number|reach|संपर्क|बात करनी|बोलायचं|टीम)/i,
+    keys: /(contact|human|talk|team|number|phone|call me|email|whatsapp number|mobile|reach|नंबर|मोबाइल|संपर्क|बात करनी|बोलायचं|टीम)/i,
     answers: {
-      en: `Tap "Talk to a human" below or the Contact us button at the top, or email ${siteConfig.email}. Our team replies within 24 hours.`,
-      hi: `नीचे "Talk to a human" या ऊपर Contact us बटन दबाइए, या ${siteConfig.email} पर ईमेल कीजिए। हमारी टीम 24 घंटे में जवाब देती है।`,
-      mr: `खाली "Talk to a human" किंवा वर Contact us बटण दाबा, किंवा ${siteConfig.email} वर ईमेल करा. आमची टीम 24 तासांत उत्तर देते.`,
+      en: `Tap "Talk to a human" below or the Contact us button at the top, email ${siteConfig.email}, or call or WhatsApp ${siteConfig.phoneDisplay}. We reply within 24 hours.`,
+      hi: `नीचे "Talk to a human" या ऊपर Contact us बटन दबाइए, ${siteConfig.email} पर ईमेल कीजिए, या ${siteConfig.phoneDisplay} पर कॉल/WhatsApp कीजिए। हमारी टीम 24 घंटे में जवाब देती है।`,
+      mr: `खाली "Talk to a human" किंवा वर Contact us बटण दाबा, ${siteConfig.email} वर ईमेल करा, किंवा ${siteConfig.phoneDisplay} वर कॉल/WhatsApp करा. आमची टीम 24 तासांत उत्तर देते.`,
     },
   },
   {

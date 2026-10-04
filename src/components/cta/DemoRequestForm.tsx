@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, Mail, MessageCircle, Phone } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { submitLead, validateLead } from "@/lib/leads";
+import { leadMessage, submitLead, validateLead, whatsappLink, type LeadRequest } from "@/lib/leads";
 import { siteConfig } from "@/config/site";
 
 const interests = [
@@ -23,7 +23,7 @@ type Status =
   | { kind: "idle" }
   | { kind: "submitting" }
   | { kind: "success" }
-  | { kind: "error"; message: string; offline?: boolean };
+  | { kind: "error"; message: string; lead?: LeadRequest };
 
 const field =
   "w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-[0.95rem] text-fg placeholder:text-fg-subtle " +
@@ -44,7 +44,7 @@ export function DemoRequestForm({ defaultInterest = "", className }: { defaultIn
     setStatus({ kind: "submitting" });
     const res = await submitLead(lead);
     if (res.ok) setStatus({ kind: "success" });
-    else setStatus({ kind: "error", message: res.message, offline: res.reason === "not_configured" });
+    else setStatus({ kind: "error", message: res.message, lead });
   }
 
   if (status.kind === "success") {
@@ -55,6 +55,7 @@ export function DemoRequestForm({ defaultInterest = "", className }: { defaultIn
         </div>
         <p className="text-lg font-medium">Request received.</p>
         <p className="mt-1 text-fg-muted">We&apos;ll reach out within 24 hours to schedule your free call.</p>
+        <ContactLinks className="mt-5" />
       </div>
     );
   }
@@ -94,18 +95,19 @@ export function DemoRequestForm({ defaultInterest = "", className }: { defaultIn
 
       <div aria-live="polite" className="min-h-0">
         {status.kind === "error" && (
-          <p className="rounded-xl border border-amber-300/20 bg-amber-300/5 px-4 py-3 text-sm text-amber-100">
-            {status.message}{" "}
-            {status.offline && (
-              <>
-                Email us at{" "}
-                <a className="underline underline-offset-4" href={`mailto:${siteConfig.email}`}>
-                  {siteConfig.email}
-                </a>{" "}
-                and we&apos;ll set up your demo.
-              </>
+          <div className="rounded-xl border border-amber-300/20 bg-amber-300/5 px-4 py-3 text-sm text-amber-100">
+            <p>{status.message}</p>
+            {status.lead && (
+              <a
+                href={whatsappLink(leadMessage(status.lead))}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-2 font-medium text-ink-950"
+              >
+                <MessageCircle className="size-4" aria-hidden /> Send it on WhatsApp instead
+              </a>
             )}
-          </p>
+          </div>
         )}
       </div>
 
@@ -118,6 +120,25 @@ export function DemoRequestForm({ defaultInterest = "", className }: { defaultIn
         {status.kind === "submitting" ? "Sending…" : "Request my demo"}
       </button>
       <p className="text-center text-xs text-fg-subtle">Free 30-minute call · Proposal within 24 hours · No commitment.</p>
+      <ContactLinks className="mt-2 justify-center border-t border-white/[0.07] pt-4" />
     </form>
+  );
+}
+
+/** Direct ways to reach the owner: email, phone and WhatsApp. */
+export function ContactLinks({ className }: { className?: string }) {
+  const item = "inline-flex items-center gap-1.5 text-sm text-fg-muted transition-colors hover:text-flow";
+  return (
+    <div className={cn("flex flex-wrap gap-x-5 gap-y-2", className)}>
+      <a href={`mailto:${siteConfig.email}`} className={item}>
+        <Mail className="size-4" aria-hidden /> {siteConfig.email}
+      </a>
+      <a href={`tel:${siteConfig.phone}`} className={item}>
+        <Phone className="size-4" aria-hidden /> {siteConfig.phoneDisplay}
+      </a>
+      <a href={whatsappLink(`Hi ${siteConfig.name}, I'd like to know more.`)} target="_blank" rel="noopener noreferrer" className={item}>
+        <MessageCircle className="size-4" aria-hidden /> WhatsApp
+      </a>
+    </div>
   );
 }

@@ -1,3 +1,5 @@
+import { siteConfig } from "@/config/site";
+
 export type LeadRequest = {
   name: string;
   email: string;
@@ -44,4 +46,23 @@ export async function submitLead(lead: LeadRequest): Promise<LeadResponse> {
   } catch {
     return { ok: false, reason: "upstream", message: "Network error. Please try again." };
   }
+}
+
+/** A wa.me link to the owner's WhatsApp, optionally with a prefilled message. */
+export function whatsappLink(text?: string) {
+  return `https://wa.me/${siteConfig.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
+}
+
+/** The enquiry as a WhatsApp message, so a visitor can send it straight to the owner. */
+export function leadMessage(lead: LeadRequest) {
+  return [
+    `Hi ${siteConfig.name}, I'd like to talk.`,
+    `Name: ${lead.name}`,
+    lead.business && `Business: ${lead.business}`,
+    lead.interest && `Interested in: ${lead.interest}`,
+    `Email: ${lead.email}`,
+    lead.phone && `Phone: ${lead.phone}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
