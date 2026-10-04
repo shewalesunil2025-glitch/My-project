@@ -46,8 +46,8 @@ async function sendToWebhook(url: string, lead: LeadRequest) {
   if (!res.ok) throw new Error(`Webhook responded ${res.status}`);
 }
 
-/** FormSubmit activates each sending address separately; the activated one is the live www site. */
-const FORM_ORIGIN = "https://www.ibaxai.com";
+/** FormSubmit activates each sending address separately; use the same one browsers send (the live www site). */
+const FORM_ORIGIN = "https://www.ibaxai.com/";
 
 async function sendByEmail(to: string, lead: LeadRequest) {
   const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
