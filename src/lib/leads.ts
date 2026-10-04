@@ -35,17 +35,55 @@ export function validateLead(input: unknown): { lead?: LeadRequest; error?: stri
   return { lead };
 }
 
+/** The enquiry as FormSubmit fields, used by the API route and the browser fallback. */
+export function formSubmitPayload(lead: LeadRequest) {
+  return {
+    _subject: `New enquiry from ${lead.name} — ${siteConfig.name} website`,
+    _template: "table",
+    _captcha: "false",
+    _replyto: lead.email,
+    Name: lead.name,
+    Email: lead.email,
+    "Phone / WhatsApp": lead.phone || "—",
+    Business: lead.business || "—",
+    "Interested in": lead.interest || "—",
+    Message: lead.message || "—",
+  };
+}
+
+/** Emails the lead to the owner straight from the browser through FormSubmit. */
+async function sendFromBrowser(lead: LeadRequest): Promise<boolean> {
+  try {
+    const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(siteConfig.email)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(formSubmitPayload(lead)),
+    });
+    const data = (await res.json().catch(() => ({}))) as { success?: string | boolean };
+    return res.ok && String(data.success) === "true";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Sends the lead through /api/lead. If the server can't deliver it, the browser
+ * emails it directly, since FormSubmit accepts requests from the activated site.
+ */
 export async function submitLead(lead: LeadRequest): Promise<LeadResponse> {
+  let result: LeadResponse;
   try {
     const res = await fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(lead),
     });
-    return (await res.json()) as LeadResponse;
+    result = (await res.json()) as LeadResponse;
   } catch {
-    return { ok: false, reason: "upstream", message: "Network error. Please try again." };
+    result = { ok: false, reason: "upstream", message: "Network error. Please try again." };
   }
+  if (result.ok || result.reason === "invalid") return result;
+  return (await sendFromBrowser(lead)) ? { ok: true } : result;
 }
 
 /** A wa.me link to the owner's WhatsApp, optionally with a prefilled message. */

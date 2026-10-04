@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
-import { validateLead, type LeadRequest, type LeadResponse } from "@/lib/leads";
+import { formSubmitPayload, validateLead, type LeadRequest, type LeadResponse } from "@/lib/leads";
 
 /**
  * Receives contact requests and delivers them to the owner. Nothing is stored here.
@@ -53,18 +53,7 @@ async function sendByEmail(to: string, lead: LeadRequest) {
   const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json", Referer: FORM_ORIGIN },
-    body: JSON.stringify({
-      _subject: `New enquiry from ${lead.name} — ${siteConfig.name} website`,
-      _template: "table",
-      _captcha: "false",
-      _replyto: lead.email,
-      Name: lead.name,
-      Email: lead.email,
-      "Phone / WhatsApp": lead.phone || "—",
-      Business: lead.business || "—",
-      "Interested in": lead.interest || "—",
-      Message: lead.message || "—",
-    }),
+    body: JSON.stringify(formSubmitPayload(lead)),
     signal: AbortSignal.timeout(10000),
   });
   const data = (await res.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
