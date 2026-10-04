@@ -6,7 +6,7 @@ export const siteConfig = {
   description:
     "Nexa Flow AI and IBAX AI, your AI business assistant: websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ibaxai.com",
-  email: "hello@nexaflow.ai",
+  email: "shewalesunil2025@gmail.com",
   /** External booking page (Calendly, Cal.com…). When empty, the in-page demo form is used. */
   bookingUrl: process.env.NEXT_PUBLIC_BOOKING_URL || "",
   cta: {
