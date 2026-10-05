@@ -110,6 +110,12 @@ export default function HelpPage() {
               <LifeBuoy className="size-4" aria-hidden /> Create support ticket
             </Btn>
           </form>
+          <p className="mt-5 border-t border-white/10 pt-4 text-sm text-fg-muted">
+            Prefer to talk directly? Email{" "}
+            <a className="text-fg underline underline-offset-4" href={`mailto:${product.supportEmail}`}>{product.supportEmail}</a>, call{" "}
+            <a className="text-fg underline underline-offset-4" href={`tel:${product.supportPhone}`}>{product.supportPhoneDisplay}</a> or{" "}
+            <a className="text-fg underline underline-offset-4" href={`https://wa.me/${product.supportPhone.replace("+", "")}`} target="_blank" rel="noopener noreferrer">WhatsApp us</a>.
+          </p>
         </Card>
       </section>
 
