@@ -241,7 +241,7 @@ export default function DemoPage() {
         </section>
 
         {/* Phone frame */}
-        <div className="mx-auto w-[17rem] shrink-0 rounded-[2.4rem] border border-white/12 bg-ink-900 p-3 shadow-[0_40px_120px_-40px_rgb(125_255_58/0.5)]">
+        <div className="mx-auto w-[17rem] shrink-0 rounded-[2.4rem] border border-white/12 bg-ink-900 p-3 shadow-[0_40px_120px_-40px_rgb(102_211_76/0.5)]">
           <div className="mx-auto mb-2 h-1.5 w-16 rounded-full bg-white/10" />
           <div className="h-[26rem] overflow-hidden rounded-[1.8rem] bg-ink-950 p-4">
             <div className="mb-3 flex items-center gap-2">

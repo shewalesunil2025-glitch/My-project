@@ -33,7 +33,7 @@ export default function ServicesPage() {
       {/* Premium package */}
       <Link
         href={`/app/services/${premium.id}`}
-        className="group relative mb-8 block overflow-hidden rounded-3xl border border-flow/30 bg-[linear-gradient(135deg,rgb(125_255_58/0.18),rgb(125_255_58/0.03)_60%)] p-6 sm:p-8"
+        className="group relative mb-8 block overflow-hidden rounded-3xl border border-flow/30 bg-[linear-gradient(135deg,rgb(102_211_76/0.18),rgb(102_211_76/0.03)_60%)] p-6 sm:p-8"
       >
         <div aria-hidden className="absolute -top-20 -right-16 size-64 rounded-full bg-flow/20 blur-3xl" />
         <div className="relative grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-center">
