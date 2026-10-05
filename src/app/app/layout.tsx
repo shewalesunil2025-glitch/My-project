@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter_Tight } from "next/font/google";
 import { product } from "@/config/product";
+import { AppSplash } from "@/components/app/AppSplash";
 
 const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", display: "swap" });
 
@@ -26,5 +27,10 @@ export const viewport: Viewport = {
 };
 
 export default function ProductLayout({ children }: { children: React.ReactNode }) {
-  return <div className={`theme-lumi ${tight.variable}`}>{children}</div>;
+  return (
+    <div className={`theme-lumi ${tight.variable}`}>
+      <AppSplash />
+      {children}
+    </div>
+  );
 }
