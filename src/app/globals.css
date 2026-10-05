@@ -249,32 +249,53 @@ body {
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 1.1rem;
-  background: var(--color-ink-950);
+  background: radial-gradient(60% 55% at 50% 42%, #0f2a12, var(--color-ink-950) 70%);
   pointer-events: none;
-  animation: intro-lift 0.75s var(--ease-in-out-quart) 1.05s forwards;
+  animation: intro-lift 0.8s var(--ease-in-out-quart) 1.7s forwards;
 }
 .intro-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(30% 30% at 50% 50%, rgb(125 255 58 / 0.22), transparent 70%);
-  animation: intro-fade 1s ease-out both;
+  background: radial-gradient(22% 22% at 50% 38%, rgb(110 217 78 / 0.3), transparent 70%);
+  animation: intro-fade 1.2s ease-out both, intro-breathe 2.4s ease-in-out 0.6s infinite;
 }
 .intro-mark {
   position: relative;
-  filter: drop-shadow(0 0 24px rgb(125 255 58 / 0.55));
-  animation: intro-mark 0.9s var(--ease-out-expo) both;
+  border-radius: 23%;
+  overflow: hidden;
+  box-shadow: 0 0 60px -6px rgb(110 217 78 / 0.6);
+  animation: intro-mark 1s var(--ease-out-expo) both;
+}
+.intro-mark svg { display: block; }
+.intro-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.55) 48%, transparent 66%);
+  transform: translateX(-120%);
+  animation: intro-sheen 1s var(--ease-in-out-quart) 0.55s both;
+}
+.intro-word {
+  position: relative;
+  margin-top: 2.25rem;
+  animation: intro-rise 0.9s var(--ease-out-expo) 0.35s both;
 }
 .intro-name {
   position: relative;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  font-size: 0.62rem;
-  color: var(--color-fg-muted);
-  animation: intro-fade 0.8s ease-out 0.2s both;
+  margin-top: 1.4rem;
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  margin-right: -0.3em;
+  font-size: 0.68rem;
+  color: #9db3a0;
+  animation: intro-rise 0.9s var(--ease-out-expo) 0.6s both;
+}
+@media (min-width: 768px) {
+  .intro-name { font-size: 0.95rem; letter-spacing: 0.42em; margin-right: -0.42em; }
 }
 .intro-line {
   position: relative;
+  margin-top: 1.75rem;
   width: 9rem;
   height: 2px;
   overflow: hidden;
@@ -285,14 +306,23 @@ body {
   position: absolute;
   inset: 0;
   transform-origin: left;
-  background: linear-gradient(90deg, var(--color-flow-soft), var(--color-flow));
-  animation: intro-fill 0.9s var(--ease-in-out-quart) 0.1s both;
+  background: linear-gradient(90deg, #8fe865, #5fd24a);
+  animation: intro-fill 1.4s var(--ease-in-out-quart) 0.2s both;
 }
 .intro-seen .intro { display: none; }
-@keyframes intro-mark {
-  from { opacity: 0; transform: scale(0.6) rotate(-8deg); filter: blur(8px) drop-shadow(0 0 0 transparent); }
-  to { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .intro { display: none; }
 }
+@keyframes intro-mark {
+  from { opacity: 0; transform: scale(0.7); filter: blur(10px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes intro-sheen { to { transform: translateX(120%); } }
+@keyframes intro-rise {
+  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes intro-breathe { 50% { opacity: 0.65; } }
 @keyframes intro-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes intro-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes intro-lift {
