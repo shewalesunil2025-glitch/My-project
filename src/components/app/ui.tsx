@@ -27,7 +27,7 @@ import { product } from "@/config/product";
 
 /* ── Brand: the IBAX AI symbol and wordmark, the same as the website ── */
 export function BrandMark({ className }: { className?: string }) {
-  return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_14px_rgb(125_255_58/0.45)]", className)} />;
+  return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_16px_rgb(98_207_74/0.5)]", className)} />;
 }
 
 /** Symbol + "ibaxai" wordmark, with the "Intelligent Business Automation" line under it when `tagline` is set. */

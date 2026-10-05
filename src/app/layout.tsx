@@ -6,7 +6,7 @@ import { siteConfig } from "@/config/site";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
-const poppins = Poppins({ subsets: ["latin"], variable: "--font-poppins", weight: ["700"], display: "swap" });
+const poppins = Poppins({ subsets: ["latin"], variable: "--font-poppins", weight: ["500", "700"], display: "swap" });
 const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", weight: ["300", "400", "500"], display: "swap" });
 
 export const metadata: Metadata = {
