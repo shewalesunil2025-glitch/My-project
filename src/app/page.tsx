@@ -21,6 +21,8 @@ const jsonLd = {
   "@type": "ProfessionalService",
   name: siteConfig.name,
   url: siteConfig.url,
+  logo: `${siteConfig.url}/icon.png`,
+  image: `${siteConfig.url}/opengraph-image.png`,
   email: siteConfig.email,
   telephone: siteConfig.phone,
   founder: { "@type": "Person", name: founder.name, jobTitle: founder.role },
