@@ -34,8 +34,9 @@ export function ShambhuBot({ mood = "idle", className }: { mood?: BotMood; class
           <stop offset="100%" stopColor="#aebbab" />
         </linearGradient>
         <linearGradient id={id("logo")} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#b6ff8a" />
-          <stop offset="1" stopColor="#4fd11c" />
+          <stop offset="0" stopColor="#bdf59c" />
+          <stop offset="0.45" stopColor="#6ed94e" />
+          <stop offset="1" stopColor="#36a03b" />
         </linearGradient>
         <linearGradient id={id("visor")} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#12201a" />
@@ -64,12 +65,10 @@ export function ShambhuBot({ mood = "idle", className }: { mood?: BotMood; class
       <path d="M48 200 C50 168 66 152 100 152 C134 152 150 168 152 200 Z" fill={url("shell")} />
       <path d="M62 200 C64 176 76 166 100 166 C124 166 136 176 138 200 Z" fill="#000" opacity="0.06" />
       <rect x="84" y="164" width="32" height="32" rx="10" fill="#7dff3a" opacity="0.35" filter={url("glow")} className="bot-pulse" />
-      <svg x="86" y="166" width="28" height="28" viewBox="0 0 32 32">
-        <rect width="32" height="32" rx="9" fill={url("logo")} />
-        <path d="M8 21c4 0 4-10 8-10s4 10 8 10" fill="none" stroke="#030703" strokeWidth="2.6" strokeLinecap="round" />
-        <circle cx="8" cy="21" r="2.4" fill="#030703" />
-        <circle cx="16" cy="11" r="2.4" fill="#030703" />
-        <circle cx="24" cy="21" r="2.4" fill="#030703" />
+      <svg x="86" y="166" width="28" height="28" viewBox="0 0 1024 1024">
+        <rect width="1024" height="1024" rx="236" fill={url("logo")} />
+        <path d="M512 179C525 284 546 307 655 324 546 341 525 364 512 469 499 364 478 341 369 324 478 307 499 284 512 179Z" fill="#06140a" />
+        <rect x="434" y="564" width="156" height="342" rx="78" fill="#06140a" />
       </svg>
 
       {/* Neck */}

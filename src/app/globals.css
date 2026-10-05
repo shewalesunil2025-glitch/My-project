@@ -456,7 +456,11 @@ body {
   aspect-ratio: 1;
   translate: 0 -50%;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, #d4ffb8, #7dff3a 45%, #3fbf10);
+  /* The IBAX sparkle-over-"i" glyph on a glowing green ball. */
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='300 160 424 760'%3E%3Cg fill='%2306140a'%3E%3Cpath d='M512 179C525 284 546 307 655 324 546 341 525 364 512 469 499 364 478 341 369 324 478 307 499 284 512 179Z'/%3E%3Crect x='434' y='564' width='156' height='342' rx='78'/%3E%3C/g%3E%3C/svg%3E")
+      center / auto 66% no-repeat,
+    radial-gradient(circle at 35% 30%, #c8f7a8, #6ed94e 50%, #36a03b);
   box-shadow: 0 0 14px rgb(125 255 58 / 0.8), inset 0 -2px 4px rgb(0 0 0 / 0.25);
   transition: transform 0.5s var(--ease-out-expo);
 }
