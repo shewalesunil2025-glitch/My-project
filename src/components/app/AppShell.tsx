@@ -79,7 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh lg:pl-64">
-      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(ellipse_at_50%_-20%,rgb(125_255_58/0.14),transparent_70%)]" />
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(ellipse_at_50%_-20%,rgb(102_211_76/0.14),transparent_70%)]" />
       <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-ink-950">
         Skip to content
       </a>

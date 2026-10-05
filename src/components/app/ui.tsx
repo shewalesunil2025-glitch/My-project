@@ -66,7 +66,7 @@ export function LumiMark({ className, glow = true }: { className?: string; glow?
       aria-hidden
       className={cn(
         "inline-block size-9 shrink-0 overflow-hidden rounded-full border border-flow/40 bg-ink-950",
-        glow && "shadow-[0_0_18px_-4px_rgb(125_255_58/0.6)]",
+        glow && "shadow-[0_0_18px_-4px_rgb(102_211_76/0.6)]",
         className,
       )}
     >
@@ -101,7 +101,7 @@ type BtnVariant = "primary" | "ghost" | "light" | "danger" | "subtle";
 const btnBase =
   "inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-tight whitespace-nowrap transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none";
 const btnVariants: Record<BtnVariant, string> = {
-  primary: "bg-flow text-ink-950 hover:bg-flow-soft shadow-[0_0_28px_-6px_rgb(125_255_58/0.7)]",
+  primary: "bg-flow text-ink-950 hover:bg-flow-soft shadow-[0_0_28px_-6px_rgb(102_211_76/0.7)]",
   ghost: "border border-white/12 bg-white/[0.04] text-fg hover:border-white/25 hover:bg-white/[0.08]",
   light: "bg-white text-ink-950 hover:bg-white/90",
   danger: "border border-red-400/30 bg-red-500/10 text-red-200 hover:bg-red-500/20",
