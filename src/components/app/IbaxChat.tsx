@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { ArrowUp, Check, Lock, Mic, MicOff, PlugZap, ShieldCheck, Trash2, Volume2 } from "lucide-react";
+import { ArrowUp, Check, Mic, MicOff, PlugZap, ShieldCheck, Trash2, Volume2 } from "lucide-react";
 import { product } from "@/config/product";
 import { providerInfo, serviceById } from "@/content/app/services";
 import { priceLabel } from "@/lib/app/agentActions";
@@ -65,7 +65,7 @@ function PayCard({ card }: { card: Extract<AgentCard, { type: "pay" }> }) {
   if (!svc) return null;
   return (
     <div className="mt-3 rounded-2xl border border-flow/30 bg-ink-950/70 p-3.5">
-      <p className="text-xs text-fg-muted">Secure payment</p>
+      <p className="text-xs text-fg-muted">Payment</p>
       <p className="mt-0.5 font-semibold">{svc.name}</p>
       <p className="text-sm text-flow-soft">{priceLabel(svc, card.period)}</p>
       {card.done ? (
@@ -84,8 +84,7 @@ function PayCard({ card }: { card: Extract<AgentCard, { type: "pay" }> }) {
               setTimeout(() => void payFromCard(card).finally(() => setPaying(false)), 700);
             }}
           >
-            {paying ? <Spinner /> : <Lock className="size-3.5" aria-hidden />}
-            {product.previewMode ? "Confirm test payment" : "Pay securely"}
+            {paying ? <Spinner /> : "Pay"}
           </Btn>
           {product.previewMode && <p className="mt-2 text-[0.68rem] leading-snug text-amber-200/90">Preview mode — test payment, nothing is charged.</p>}
         </>
