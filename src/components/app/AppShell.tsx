@@ -28,6 +28,7 @@ import { cn } from "@/lib/cn";
 import { logOut, useSession } from "@/lib/app/store";
 import type { Workspace } from "@/lib/app/types";
 import { BrandLogo, BrandMark, FullScreenLoader, LumiMark } from "./ui";
+import { IbaxLauncher } from "./IbaxLauncher";
 
 export const workspaceNav = [
   { href: "/app/home", label: "Home", icon: House },
@@ -177,6 +178,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main id="app-main" className="mx-auto max-w-6xl px-4 pt-6 pb-28 sm:px-6 lg:pb-12">
         {children}
       </main>
+
+      <IbaxLauncher ws={workspace} />
 
       {/* Bottom navigation (mobile) */}
       <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-ink-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">

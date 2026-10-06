@@ -182,6 +182,12 @@ export function openSampleWorkspace(build: (ws: Workspace) => void) {
   save(db);
 }
 
+/** The signed-in user's workspace right now (for code that runs outside React). */
+export function currentWorkspace(): Workspace | null {
+  const db = load();
+  return db.sessionUserId ? (db.workspaces[db.sessionUserId] ?? null) : null;
+}
+
 /** Apply a change to the signed-in user's workspace. */
 export function updateWorkspace(mutate: (ws: Workspace) => void) {
   const db = structuredClone(load());
