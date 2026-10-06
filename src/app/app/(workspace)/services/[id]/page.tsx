@@ -6,7 +6,8 @@ import { useState } from "react";
 import type { PlanPeriod } from "@/lib/app/types";
 import { ArrowLeft, Check, Clock, Info, Link2 } from "lucide-react";
 import { formatPrice } from "@/config/product";
-import { annualPrice, providerInfo, serviceById, services } from "@/content/app/services";
+import { annualPrice, isLive, providerInfo, serviceById, services } from "@/content/app/services";
+import { joinWaitlist, onWaitlist } from "@/lib/app/agentActions";
 import { audit, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
 import { useWorkspace } from "@/components/app/AppShell";
 import { automationStatus } from "@/components/app/status";
@@ -143,6 +144,27 @@ export default function ServiceDetailPage() {
                 <BtnLink href={`/app/automations/${owned.id}`} className="w-full">
                   {owned.status === "setup" ? "Continue setup" : "Manage"}
                 </BtnLink>
+              </>
+            ) : !isLive(svc.id) ? (
+              <>
+                <Pill tone="amber">Coming soon</Pill>
+                <p className="text-sm text-fg-muted">
+                  We&apos;re finishing {svc.name}. Join the waitlist and we&apos;ll tell you here the day it launches — no payment now.
+                </p>
+                <p className="text-sm">
+                  <span className="text-2xl font-semibold">{formatPrice(svc.price!)}</span>
+                  <span className="text-fg-muted">{svc.billing === "one-time" ? " one-time" : " / month"} at launch</span>
+                </p>
+                {onWaitlist(ws, svc.id) ? (
+                  <Notice>
+                    <Check className="mr-1.5 inline size-4" aria-hidden />
+                    You&apos;re on the waitlist.
+                  </Notice>
+                ) : (
+                  <Btn className="w-full" size="lg" onClick={() => joinWaitlist(svc.id)}>
+                    Join the waitlist
+                  </Btn>
+                )}
               </>
             ) : svc.price === null ? (
               sent ? (

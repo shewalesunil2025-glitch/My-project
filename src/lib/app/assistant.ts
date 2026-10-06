@@ -1,5 +1,5 @@
 import { formatPrice, product } from "@/config/product";
-import { serviceById, services } from "@/content/app/services";
+import { isLive, serviceById, services } from "@/content/app/services";
 import type { ChatMessage, ContentItem, Workspace } from "./types";
 import { logActivity, nowIso, uid } from "./store";
 
@@ -43,6 +43,13 @@ function activeService(ws: Workspace, id: string) {
 
 function notActive(ws: Workspace, id: string, what: string): Reply {
   const svc = serviceById(id)!;
+  if (!isLive(id)) {
+    return {
+      matched: true,
+      text: `${what} will show up here once ${svc.name} is active. ${svc.name} is coming soon — say “I want ${svc.name}” and I'll add you to the waitlist.`,
+      links: [{ label: svc.name, href: `/app/services/${id}` }],
+    };
+  }
   return {
     matched: true,
     text: `${what} will show up here once ${svc.name} is active. It takes a few minutes to set up — you choose the plan, connect your account and I configure the rest.`,
@@ -241,7 +248,7 @@ export function localAnswer(ws: Workspace, raw: string): Reply {
     const priced = services.filter((s) => s.price !== null);
     return {
       matched: true,
-      text: `I can run these for ${biz} (starting prices):\n${priced.map((s) => `• ${s.name} — ${formatPrice(s.price!)}${s.billing === "one-time" ? " one-time" : "/mo"} · ${s.short}`).join("\n")}\n\nEach one can be bought on its own, or take Digital Marketing for everything together. Just tell me which one and I'll set it up here.`,
+      text: `I can run these for ${biz} (starting prices):\n${priced.map((s) => `• ${s.name} — ${formatPrice(s.price!)}${s.billing === "one-time" ? " one-time" : "/mo"}${isLive(s.id) ? "" : " (coming soon)"} · ${s.short}`).join("\n")}\n\nTell me which one you want — I'll set it up here, or add you to the waitlist if it's coming soon.`,
       links: [{ label: "Browse services", href: "/app/services" }],
     };
   }

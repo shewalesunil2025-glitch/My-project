@@ -1,5 +1,5 @@
 import { formatPrice, product } from "@/config/product";
-import { annualPrice, providerInfo, serviceById, services, type FieldDef, type ServiceDef } from "@/content/app/services";
+import { annualPrice, isLive, providerInfo, serviceById, services, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { activate, missingConnections, runTest, setAutomationStatus } from "./automation";
 import { audit, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
 import type { Automation, PlanPeriod, ProviderId, Workspace } from "./types";
@@ -48,7 +48,7 @@ function prefill(ws: Workspace, svc: ServiceDef): Automation["config"] {
 export function buyService(serviceId: string, requested?: string): string | null {
   const svc = serviceById(serviceId);
   const ws = currentWorkspace();
-  if (!svc || svc.price === null || !ws) return null;
+  if (!svc || svc.price === null || !ws || !isLive(svc.id)) return null;
   const existing = automationFor(ws, svc.id);
   if (existing) return existing.id;
 
@@ -185,6 +185,22 @@ export async function activateService(serviceId: string): Promise<ActivationResu
     });
   });
   return { ok: true, automationId: after.id, note: after.note, approvalNote: svc.approvalNote, backend };
+}
+
+export const onWaitlist = (ws: Workspace, serviceId: string) => !!ws.waitlist?.some((w) => w.serviceId === serviceId);
+
+/** Adds the owner to the waitlist of a service that hasn't launched yet. */
+export function joinWaitlist(serviceId: string) {
+  const svc = serviceById(serviceId);
+  const ws = currentWorkspace();
+  if (!svc || !ws) return false;
+  if (onWaitlist(ws, svc.id)) return true;
+  updateWorkspace((w) => {
+    w.waitlist = [...(w.waitlist ?? []), { serviceId: svc.id, at: nowIso() }];
+    notify(w, { kind: "upcoming", title: `You're on the ${svc.name} waitlist`, detail: "We'll tell you here the day it launches.", href: `/app/services/${svc.id}` });
+    audit(w, `Joined the ${svc.name} waitlist`);
+  });
+  return true;
 }
 
 export function setServiceState(serviceId: string, state: "pause" | "resume") {

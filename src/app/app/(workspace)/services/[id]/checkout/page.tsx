@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { formatPrice, product } from "@/config/product";
-import { annualPrice, serviceById } from "@/content/app/services";
+import { annualPrice, isLive, serviceById } from "@/content/app/services";
 import { buyService } from "@/lib/app/agentActions";
 import type { PlanPeriod } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -22,6 +22,7 @@ function Checkout() {
 
   if (!ws) return null;
   if (!svc || svc.price === null) return <EmptyState title="This service can't be bought online" action={<BtnLink href="/app/services">Back to services</BtnLink>} />;
+  if (!isLive(svc.id)) return <EmptyState title={`${svc.name} is coming soon`} action={<BtnLink href={`/app/services/${svc.id}`}>Join the waitlist</BtnLink>} />;
   const existing = ws.automations.find((a) => a.serviceId === svc.id);
   if (existing) return <EmptyState title={`You already have ${svc.name}`} action={<BtnLink href={`/app/automations/${existing.id}`}>Manage it</BtnLink>} />;
 

@@ -351,6 +351,14 @@ export const services: ServiceDef[] = [
 
 export const serviceById = (id: string) => services.find((s) => s.id === id);
 
+/**
+ * Services that can be bought today. The others show "Coming soon" and take a
+ * waitlist instead of payment. Add a service's id here once its automation is
+ * built and tested (see docs/ROADMAP.md).
+ */
+export const liveServices: readonly string[] = ["website", "custom"];
+export const isLive = (id: string) => liveServices.includes(id);
+
 export const annualPrice = (monthly: number) => monthly * 10;
 
 export const providerInfo: Record<ProviderId, { name: string; help: string }> = {
