@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   // iPhone: "Add to Home Screen" opens IBAX AI full screen, like a native app.
   appleWebApp: { capable: true, title: product.name, statusBarStyle: "black" },
   icons: {
-    icon: [{ url: "/lumi/icon-192.png?v=3", sizes: "192x192", type: "image/png" }],
-    apple: [{ url: "/lumi/apple-touch-icon.png?v=3", sizes: "180x180", type: "image/png" }],
+    icon: [{ url: "/lumi/icon-192.png?v=4", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/lumi/apple-touch-icon.png?v=4", sizes: "180x180", type: "image/png" }],
   },
   formatDetection: { telephone: false },
 };
