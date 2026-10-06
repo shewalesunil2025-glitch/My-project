@@ -263,6 +263,8 @@ export type Workspace = {
   tickets: Ticket[];
   chat: ChatMessage[];
   agentFlow?: AgentFlow | null;
+  /** Services the owner asked to be told about when they launch. */
+  waitlist?: { serviceId: string; at: string }[];
   metrics: DailyMetric[];
   website: WebsiteProject | null;
   team: { id: string; name: string; email: string; role: TeamRole }[];

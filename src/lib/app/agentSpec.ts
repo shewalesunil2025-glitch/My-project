@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { formatPrice, product } from "@/config/product";
-import { annualPrice, providerInfo, services } from "@/content/app/services";
+import { annualPrice, isLive, providerInfo, services } from "@/content/app/services";
 import type { ProviderId } from "./types";
 
 /**
@@ -41,7 +41,7 @@ function catalogue() {
       const info = s.info.map((f) => `${f.key}${f.required ? "*" : ""} = ${f.label}`).join("; ");
       const configure = s.configure.map((f) => `${f.key} = ${f.label}${f.options ? ` [${f.options.join(" | ")}]` : f.type === "toggle" ? " [yes/no]" : ""}`).join("; ");
       return [
-        `## ${s.id} — ${s.name} — ${price}`,
+        `## ${s.id} — ${s.name} — ${price} — ${isLive(s.id) ? "AVAILABLE NOW" : "COMING SOON (not for sale yet)"}`,
         `${s.short} ${s.description}`,
         `What you get: ${s.features.join("; ")}.`,
         s.package && `Everything in the package:\n${s.package.map((p) => `- ${p.title}: ${p.body}`).join("\n")}`,
@@ -67,7 +67,8 @@ export function agentSystemPrompt() {
 - Never mention tools, APIs, servers, n8n or prompts. Never ask for passwords, OTPs or card numbers — payment and account sign-in happen only on the secure cards you show.
 
 # Doing things for the owner
-The owner can buy and switch on any service just by talking to you. You have actions for this. Follow these steps for one service at a time:
+Services marked COMING SOON can't be bought yet. If the owner wants one, say it's launching soon, tell them the price it will have, and offer to add them to its waitlist with join_waitlist (no payment). Never show a payment card for it.
+The owner can buy and switch on any AVAILABLE NOW service just by talking to you. You have actions for this. Follow these steps for one service at a time:
 1. Understand which service they want. If unclear, suggest the best fit in one line. Tell them the price and what it does in one or two sentences.
 2. If the snapshot does not list the service as paid, call show_payment (monthly unless they asked for yearly; one-time services are one-time). This shows a secure payment card. Then stop and wait. Never say the payment is done until you receive "[App event] Payment confirmed".
 3. After payment, collect the missing details the snapshot lists for that service. Ask naturally, one or two at a time, and offer an example. Call save_service_details as soon as the owner answers, using the exact detail keys. Optional details (without *) can be skipped if the owner says so. Preferences have sensible defaults; ask only if the owner wants to change them.
@@ -133,6 +134,12 @@ export const agentTools: Anthropic.Beta.BetaTool[] = [
   {
     name: "activate_service",
     description: "Tests and switches on a paid service once its required details are saved and its accounts are connected. Returns the result, or what is still missing.",
+    strict: true,
+    input_schema: { type: "object", properties: { service_id: svcId }, required: ["service_id"], additionalProperties: false },
+  },
+  {
+    name: "join_waitlist",
+    description: "Adds the owner to the waitlist of a COMING SOON service so they are told the day it launches. No payment is taken.",
     strict: true,
     input_schema: { type: "object", properties: { service_id: svcId }, required: ["service_id"], additionalProperties: false },
   },

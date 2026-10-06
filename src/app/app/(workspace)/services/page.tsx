@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { formatPrice, product } from "@/config/product";
-import { services, type ServiceDef } from "@/content/app/services";
+import { isLive, services, type ServiceDef } from "@/content/app/services";
+import { onWaitlist } from "@/lib/app/agentActions";
 import { useWorkspace } from "@/components/app/AppShell";
 import { automationStatus } from "@/components/app/status";
 import { Icon, PageHeader, Pill, Segmented } from "@/components/app/ui";
@@ -38,7 +39,10 @@ export default function ServicesPage() {
         <div aria-hidden className="absolute -top-20 -right-16 size-64 rounded-full bg-flow/20 blur-3xl" />
         <div className="relative grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-center">
           <div>
-            <Pill tone="ember">Premium · Complete package</Pill>
+            <div className="flex flex-wrap gap-2">
+              <Pill tone="ember">Premium · Complete package</Pill>
+              {!owned(premium.id) && !isLive(premium.id) && <Pill tone="amber">Coming soon</Pill>}
+            </div>
             <h2 className="display mt-3 text-2xl sm:text-3xl">{premium.name}</h2>
             <p className="mt-2 max-w-lg text-sm text-fg-muted">{premium.description}</p>
             <p className="mt-4 text-sm">
@@ -51,7 +55,8 @@ export default function ServicesPage() {
               </Pill>
             ) : (
               <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-flow-soft group-hover:text-flow">
-                See what&apos;s included <ArrowRight className="size-4" aria-hidden />
+                {isLive(premium.id) ? "See what's included" : onWaitlist(ws, premium.id) ? "On the waitlist ✓" : "See what's included · Join the waitlist"}{" "}
+                <ArrowRight className="size-4" aria-hidden />
               </span>
             )}
           </div>
@@ -85,7 +90,11 @@ export default function ServicesPage() {
                   <span className="grid size-11 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow">
                     <Icon name={s.icon} className="size-5" />
                   </span>
-                  {a && <Pill tone={automationStatus[a.status].tone}>{automationStatus[a.status].label}</Pill>}
+                  {a ? (
+                    <Pill tone={automationStatus[a.status].tone}>{automationStatus[a.status].label}</Pill>
+                  ) : (
+                    !isLive(s.id) && <Pill tone="amber">Coming soon</Pill>
+                  )}
                 </div>
                 <p className="mt-5 text-lg font-semibold tracking-tight">{s.name}</p>
                 <p className="mt-1 flex-1 text-sm leading-relaxed text-fg-muted">{s.short}</p>
@@ -100,7 +109,9 @@ export default function ServicesPage() {
                     </p>
                   </>
                 )}
-                <span className="mt-3 text-sm font-semibold text-flow">{a ? "Manage" : s.price === null ? "Request a quote" : "Get started"} →</span>
+                <span className="mt-3 text-sm font-semibold text-flow">
+                  {a ? "Manage →" : !isLive(s.id) ? (onWaitlist(ws, s.id) ? "On the waitlist ✓" : "Join the waitlist →") : s.price === null ? "Request a quote →" : "Get started →"}
+                </span>
               </Link>
             </li>
           );

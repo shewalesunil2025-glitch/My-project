@@ -1,7 +1,7 @@
 import { product } from "@/config/product";
-import { providerInfo, serviceById, type FieldDef, type ServiceDef } from "@/content/app/services";
+import { isLive, providerInfo, serviceById, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { missingConnections } from "./automation";
-import { activateService, automationFor, missingDetails, periodFor, priceLabel, saveServiceDetails } from "./agentActions";
+import { activateService, automationFor, joinWaitlist, missingDetails, periodFor, priceLabel, saveServiceDetails } from "./agentActions";
 import { localAnswer } from "./assistant";
 import { currentWorkspace, updateWorkspace } from "./store";
 import type { AgentCard, AgentFlow, ChatMessage, Workspace } from "./types";
@@ -93,6 +93,20 @@ export async function flowNext(svc: ServiceDef, flow: AgentFlow): Promise<LocalR
   const ws = currentWorkspace()!;
   const a = automationFor(ws, svc.id);
 
+  if (!a && !isLive(svc.id)) {
+    setFlow(null);
+    joinWaitlist(svc.id);
+    const price = priceLabel(svc, periodFor(svc));
+    return {
+      text: t(lang, {
+        en: `${svc.name} is launching soon (${price}). I've added you to the waitlist — no payment now — and I'll tell you here the day it goes live.`,
+        hi: `${svc.name} जल्द आ रहा है (${price})। मैंने आपको वेटलिस्ट में जोड़ दिया है — अभी कोई पेमेंट नहीं — जिस दिन ये चालू होगा, मैं आपको यहीं बता दूँगा।`,
+        hl: `${svc.name} jaldi aa raha hai (${price}). Maine aapko waitlist me jod diya hai — abhi koi payment nahi — jis din ye chalu hoga, main aapko yahin bata dunga.`,
+      }),
+      links: [{ label: svc.name, href: `/app/services/${svc.id}` }],
+    };
+  }
+
   if (!a) {
     setFlow({ ...flow, field: undefined });
     const period = periodFor(svc);
@@ -133,7 +147,7 @@ export async function flowNext(svc: ServiceDef, flow: AgentFlow): Promise<LocalR
   if (!result.ok) return { text: t(lang, { en: "Something is still missing — let's check it together.", hi: "अभी कुछ बाकी है — चलिए साथ में देखते हैं।", hl: "Abhi kuch baaki hai — chaliye saath me dekhte hain." }) };
   const extra = [result.note, result.approvalNote].filter(Boolean).join(" ");
   const preview =
-    result.backend === "preview"
+    result.backend === "preview" && svc.connect.length > 0
       ? t(lang, {
           en: ` Preview mode: your setup is saved and the ${product.name} team will switch on live messages.`,
           hi: ` प्रीव्यू मोड: आपका सेटअप सेव है, लाइव मैसेज ${product.name} टीम चालू करेगी।`,
@@ -187,13 +201,13 @@ export async function localTurn(ws: Workspace, text: string): Promise<LocalReply
   if (local?.matched) return { text: local.text, links: local.links };
 
   if (svc) {
-    const price = svc.price === null ? null : priceLabel(svc, periodFor(svc));
+    const price = svc.price === null ? null : `${priceLabel(svc, periodFor(svc))}${isLive(svc.id) ? "" : " (coming soon)"}`;
     const pack = svc.package ? `\n\n${svc.package.map((p) => `• ${p.title} — ${p.body}`).join("\n")}\n\n` : " ";
     return {
       text: t(lang, {
-        en: `${svc.name}: ${svc.short}${pack}Price: ${price ?? "custom quote"}. To switch it on, just say “I want ${svc.name}”.`,
-        hi: `${svc.name}: ${svc.short}${pack}कीमत: ${price ?? "कोटेशन पर"}। चालू करना हो तो बस लिखिए “${svc.name} चाहिए”।`,
-        hl: `${svc.name}: ${svc.short}${pack}Price: ${price ?? "quote par"}. Chalu karna ho to bas likhiye “${svc.name} chahiye”.`,
+        en: `${svc.name}: ${svc.short}${pack}Price: ${price ?? "custom quote"}. ${isLive(svc.id) ? "To switch it on" : "To join the waitlist"}, just say “I want ${svc.name}”.`,
+        hi: `${svc.name}: ${svc.short}${pack}कीमत: ${price ?? "कोटेशन पर"}। ${isLive(svc.id) ? "चालू करना हो" : "वेटलिस्ट में जुड़ना हो"} तो बस लिखिए “${svc.name} चाहिए”।`,
+        hl: `${svc.name}: ${svc.short}${pack}Price: ${price ?? "quote par"}. ${isLive(svc.id) ? "Chalu karna ho" : "Waitlist me judna ho"} to bas likhiye “${svc.name} chahiye”.`,
       }),
       links: [{ label: svc.name, href: `/app/services/${svc.id}` }],
     };

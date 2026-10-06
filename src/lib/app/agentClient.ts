@@ -3,8 +3,8 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { useSyncExternalStore } from "react";
 import { formatPrice, product } from "@/config/product";
-import { providerInfo, serviceById } from "@/content/app/services";
-import { activateService, automationFor, buyService, connectProvider, periodFor, priceFor, saveServiceDetails, servicesSnapshot, setServiceState } from "./agentActions";
+import { isLive, providerInfo, serviceById } from "@/content/app/services";
+import { activateService, automationFor, buyService, joinWaitlist, connectProvider, periodFor, priceFor, saveServiceDetails, servicesSnapshot, setServiceState } from "./agentActions";
 import { detectLang, flowNext, localTurn, type LocalReply } from "./agentLocal";
 import { workspaceContext } from "./assistant";
 import { currentWorkspace, logActivity, nowIso, uid, updateWorkspace } from "./store";
@@ -123,6 +123,7 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
     case "show_payment": {
       if (!svc || svc.price === null) return { content: "Unknown service, or it needs a custom quote.", is_error: true };
       if (automationFor(ws, svc.id)) return { content: "Already paid — no payment needed. Continue with the setup." };
+      if (!isLive(svc.id)) return { content: `${svc.name} is COMING SOON and can't be bought yet. Offer join_waitlist instead.`, is_error: true };
       const period = periodFor(svc, String(input.period));
       out.cards.push({ type: "pay", serviceId: svc.id, period });
       return { content: `Payment card shown: ${svc.name}, ${formatPrice(priceFor(svc, period))} (${period}). Not paid yet — wait for "[App event] Payment confirmed".` };
@@ -146,6 +147,12 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
       const result = await activateService(svc.id);
       if (result.ok) out.cards.push({ type: "activated", serviceId: svc.id, automationId: result.automationId });
       return { content: JSON.stringify(result), is_error: !result.ok };
+    }
+    case "join_waitlist": {
+      if (!svc) return { content: "Unknown service.", is_error: true };
+      joinWaitlist(svc.id);
+      out.links.push({ href: `/app/services/${svc.id}`, label: svc.name });
+      return { content: `Added to the ${svc.name} waitlist. The owner will be told in the app the day it launches.` };
     }
     case "set_service_state": {
       if (!svc) return { content: "Unknown service.", is_error: true };
