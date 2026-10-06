@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { ArrowUp, Check, Mic, MicOff, PlugZap, ShieldCheck, Trash2, Volume2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Check, Mic, MicOff, PlugZap, Send, ShieldCheck, Trash2, Volume2, VolumeX, X } from "lucide-react";
 import { product } from "@/config/product";
 import { providerInfo, serviceById } from "@/content/app/services";
 import { priceLabel } from "@/lib/app/agentActions";
 import { clearAgentConversation, connectFromCard, payFromCard, sendToAgent, useAgentBusy } from "@/lib/app/agentClient";
-import { detectLang } from "@/lib/app/agentLocal";
-import type { AgentCard, ChatMessage, Workspace } from "@/lib/app/types";
+import type { AgentCard, Workspace } from "@/lib/app/types";
 import { cn } from "@/lib/cn";
-import { Btn, LumiMark, Spinner, fmtTime } from "./ui";
+import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
+import { Btn, Spinner } from "./ui";
 
 /* ── Voice: speak to IBAX and hear the answer (browser speech, where supported) ── */
 type RecognitionResult = { isFinal: boolean; 0: { transcript: string } };
@@ -33,27 +34,35 @@ function getRecognition(): RecognitionCtor | null {
 }
 const noopSubscribe = () => () => {};
 
-function speechLang(ws: Workspace) {
-  const last = ws.chat.filter((m) => m.role === "user").at(-1)?.text ?? "";
-  const lang = ws.agentFlow?.lang ?? (last ? detectLang(last) : undefined);
-  if (lang === "hi" || lang === "hl") return "hi-IN";
-  const pref = ws.assistant?.language.toLowerCase() ?? "";
-  if (pref.startsWith("hindi")) return "hi-IN";
-  if (pref.startsWith("marathi")) return "mr-IN";
-  return "en-IN";
+type Lang = "en" | "hi" | "mr";
+const languages: { code: Lang; label: string; speech: string }[] = [
+  { code: "en", label: "English", speech: "en-IN" },
+  { code: "hi", label: "हिंदी", speech: "hi-IN" },
+  { code: "mr", label: "मराठी", speech: "mr-IN" },
+];
+const speechTag = (lang: Lang) => languages.find((l) => l.code === lang)!.speech;
+
+/** Closest installed voice; Marathi falls back to Hindi (same script). */
+function pickVoice(tag: string) {
+  const voices = window.speechSynthesis.getVoices();
+  const norm = (v: SpeechSynthesisVoice) => v.lang.toLowerCase().replace("_", "-");
+  return voices.find((v) => norm(v) === tag.toLowerCase()) ?? voices.find((v) => norm(v).startsWith(tag.slice(0, 3).toLowerCase())) ?? (tag.startsWith("mr") ? voices.find((v) => norm(v).startsWith("hi-")) : undefined);
 }
 
-function speak(text: string, lang: string) {
+/** IBAX's voice, the same child's voice as on the website. */
+function speak(text: string, lang: Lang, onStart?: () => void, onEnd?: () => void) {
   if (!("speechSynthesis" in window)) return;
   const synth = window.speechSynthesis;
   synth.cancel();
   const utter = new SpeechSynthesisUtterance(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""));
-  const tag = /[ऀ-ॿ]/.test(text) ? "hi-IN" : lang;
-  const voice = synth.getVoices().find((v) => v.lang.replace("_", "-").toLowerCase() === tag.toLowerCase()) ?? synth.getVoices().find((v) => v.lang.toLowerCase().startsWith(tag.slice(0, 2)));
+  const tag = /[\u0900-\u097F]/.test(text) && lang === "en" ? "hi-IN" : speechTag(lang);
+  const voice = pickVoice(tag);
   if (voice) utter.voice = voice;
   utter.lang = voice?.lang ?? tag;
   utter.pitch = 1.65;
   utter.rate = 1.04;
+  utter.onstart = () => onStart?.();
+  utter.onend = utter.onerror = () => onEnd?.();
   synth.speak(utter);
 }
 
@@ -168,54 +177,99 @@ function Cards({ cards }: { cards: AgentCard[] }) {
   );
 }
 
-export const agentSuggestions = [
-  "Mujhe WhatsApp automation chahiye",
-  "What happened today?",
-  "Mere business ke liye kaunsi service best hai?",
-  "Instagram post ka idea do",
-  "How many leads came today?",
-  "Activate YouTube automation",
-];
+export const agentSuggestions = ["Mujhe WhatsApp automation chahiye", "Price kya hai?", "Aaj kya hua?", "Digital Marketing me kya milta hai?"];
+
+type Status = "idle" | "listening" | "thinking" | "speaking";
+
+/** Little equaliser bars while IBAX listens or speaks (as on the website). */
+function Bars() {
+  return (
+    <span className="flex h-3 items-end gap-[2px]" aria-hidden>
+      {[0, 1, 2, 3].map((i) => (
+        <motion.span
+          key={i}
+          className="w-[2px] rounded-full bg-flow"
+          animate={{ height: ["30%", "100%", "45%", "85%", "30%"] }}
+          transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12 }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function readMuted() {
+  try {
+    return localStorage.getItem("ibax-muted") === "1";
+  } catch {
+    return false;
+  }
+}
 
 /**
- * The IBAX conversation: messages, action cards (pay, connect, activated), typing and
- * the mic. Used on the Assistant page and in the floating IBAX sheet.
+ * The IBAX chat — the same panel as the chatbot on the website (living orb, voice,
+ * language picker, mic), plus the action cards that let the owner pay, connect an
+ * account and activate a service inside the conversation. Used in the floating sheet
+ * and on the Assistant page.
  */
-export function IbaxChat({ ws, compact, autoFocus }: { ws: Workspace; compact?: boolean; autoFocus?: boolean }) {
+export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: () => void; className?: string }) {
   const busy = useAgentBusy();
   const [q, setQ] = useState("");
   const [interim, setInterim] = useState("");
   const [listening, setListening] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [muted, setMuted] = useState(readMuted);
+  const [lang, setLang] = useState<Lang>(() => (ws.assistant?.language.toLowerCase().startsWith("hindi") ? "hi" : "en"));
   const canListen = useSyncExternalStore(noopSubscribe, () => Boolean(getRecognition()), () => false);
   const recRef = useRef<Recognition | null>(null);
-  const spokeRef = useRef(false);
-  const lastSpoken = useRef<string | null>(null);
+  const lastSpoken = useRef<string | null>(ws.chat.at(-1)?.id ?? null);
   const listRef = useRef<HTMLDivElement>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const name = product.assistantName;
   const last = ws.chat.at(-1);
+  const status: Status = listening ? "listening" : busy ? "thinking" : speaking ? "speaking" : "idle";
 
   useEffect(() => {
-    if (compact) listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    else endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [ws.chat.length, busy, interim, compact]);
-
-  // Read the answer aloud when the question was spoken.
-  useEffect(() => {
-    if (!last || last.role !== "assistant" || last.id === lastSpoken.current || !spokeRef.current) return;
-    lastSpoken.current = last.id;
-    spokeRef.current = false;
-    if (last.text) speak(last.text, speechLang(ws));
-  }, [last, ws]);
-
-  useEffect(() => () => recRef.current?.abort(), []);
-
-  const send = useCallback((text: string) => {
-    const t = text.trim();
-    if (!t) return;
-    setQ("");
-    void sendToAgent(t);
+    window.speechSynthesis?.getVoices();
+    return () => {
+      recRef.current?.abort();
+      window.speechSynthesis?.cancel();
+    };
   }, []);
+
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+  }, [ws.chat.length, busy, interim]);
+
+  // Every new answer is read aloud unless the voice is off — as on the website.
+  useEffect(() => {
+    if (!last || last.role !== "assistant" || last.id === lastSpoken.current) return;
+    lastSpoken.current = last.id;
+    if (!muted && last.text) speak(last.text, lang, () => setSpeaking(true), () => setSpeaking(false));
+  }, [last, muted, lang]);
+
+  const send = useCallback(
+    (text: string) => {
+      const t = text.trim();
+      if (!t || busy) return;
+      // A tap counts as a user gesture: prime speech so the reply can play on iPhone.
+      if (!muted && "speechSynthesis" in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+      setQ("");
+      void sendToAgent(t);
+    },
+    [busy, muted],
+  );
+
+  const toggleMute = () => {
+    const next = !muted;
+    setMuted(next);
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+    try {
+      localStorage.setItem("ibax-muted", next ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  };
 
   const toggleMic = () => {
     if (listening) {
@@ -225,10 +279,9 @@ export function IbaxChat({ ws, compact, autoFocus }: { ws: Workspace; compact?: 
     const Ctor = getRecognition();
     if (!Ctor) return;
     window.speechSynthesis?.cancel();
-    // A tap counts as a user gesture: prime speech so the reply can play on iPhone.
-    window.speechSynthesis?.speak(new SpeechSynthesisUtterance(""));
+    setSpeaking(false);
     const rec = new Ctor();
-    rec.lang = speechLang(ws);
+    rec.lang = speechTag(lang);
     rec.interimResults = true;
     rec.continuous = false;
     let finalText = "";
@@ -246,10 +299,7 @@ export function IbaxChat({ ws, compact, autoFocus }: { ws: Workspace; compact?: 
       recRef.current = null;
       setListening(false);
       setInterim("");
-      if (finalText.trim()) {
-        spokeRef.current = true;
-        send(finalText);
-      }
+      if (finalText.trim()) send(finalText);
     };
     recRef.current = rec;
     setListening(true);
@@ -261,107 +311,157 @@ export function IbaxChat({ ws, compact, autoFocus }: { ws: Workspace; compact?: 
     send(q);
   };
 
-  const bubble = (m: ChatMessage) => (
-    <div key={m.id} className={cn("flex items-start gap-2.5", m.role === "user" && "justify-end")}>
-      {m.role === "assistant" && <LumiMark className="size-8 shrink-0" glow={false} />}
-      <div className={cn("max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed", m.role === "user" ? "rounded-tr-sm bg-flow text-ink-950" : "rounded-tl-sm bg-white/[0.07]")}>
-        {m.text && <p className="whitespace-pre-line">{m.text}</p>}
-        {m.cards && <Cards cards={m.cards} />}
-        {m.links && m.links.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {m.links.map((l) => (
-              <Link key={l.href + l.label} href={l.href} className="inline-flex h-8 items-center rounded-full bg-white/10 px-3 text-xs font-semibold text-fg hover:bg-white/15">
-                {l.label} →
-              </Link>
+  const statusText = status === "listening" ? "Listening…" : status === "thinking" ? "Working on it…" : status === "speaking" ? "Speaking…" : "Online · voice assistant";
+  const greeting = `Namaste! Main ${name} hoon — aapka AI business assistant. English, हिंदी, मराठी — kisi bhi bhasha mein poochhiye. Koi bhi service chahiye to bas boliye, main yahin payment se activation tak sab kar dunga.`;
+  const human = `https://wa.me/${product.supportPhone.replace(/\D/g, "")}`;
+
+  return (
+    <div className={cn("flex h-full min-h-0 flex-col", className)}>
+      {/* Header */}
+      <header className="flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
+        <span className="relative size-11 shrink-0">
+          <ShambhuBot mood={status} bleed={1} className="size-full" />
+          <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" aria-hidden />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">{name}</span>
+          <span className="flex items-center gap-1.5 text-xs text-flow" aria-live="polite">
+            {(status === "speaking" || status === "listening") && <Bars />}
+            {statusText}
+          </span>
+        </span>
+        <button type="button" onClick={toggleMute} aria-label={muted ? "Turn voice on" : "Turn voice off"} className="grid size-9 place-items-center rounded-full text-fg-muted hover:bg-white/5 hover:text-fg">
+          {muted ? <VolumeX className="size-4" aria-hidden /> : <Volume2 className="size-4" aria-hidden />}
+        </button>
+        {ws.chat.length > 0 && (
+          <button type="button" onClick={() => clearAgentConversation(ws)} aria-label="Clear conversation" title="Clear conversation" className="grid size-9 place-items-center rounded-full text-fg-muted hover:bg-white/5 hover:text-fg">
+            <Trash2 className="size-4" aria-hidden />
+          </button>
+        )}
+        {onClose && (
+          <button type="button" onClick={onClose} aria-label="Close" className="grid size-9 place-items-center rounded-full text-fg-muted hover:bg-white/5 hover:text-fg">
+            <X className="size-4" aria-hidden />
+          </button>
+        )}
+      </header>
+
+      {/* Messages */}
+      <div ref={listRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4" aria-live="polite">
+        <div className="flex justify-start">
+          <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-white/[0.06] bg-white/[0.05] px-3.5 py-2.5 text-sm leading-relaxed text-fg">{greeting}</div>
+        </div>
+        {ws.chat.length === 0 && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {agentSuggestions.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => send(s)}
+                className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-fg-muted transition-colors hover:border-flow/50 hover:text-flow"
+              >
+                {s}
+              </button>
             ))}
           </div>
         )}
-        <div className={cn("mt-1.5 flex items-center gap-2 text-[0.65rem]", m.role === "user" ? "text-ink-950/60" : "text-fg-subtle")}>
-          {fmtTime(m.at)}
-          {m.role === "assistant" && m.text && (
-            <button type="button" onClick={() => speak(m.text, speechLang(ws))} className="inline-flex items-center gap-1 hover:text-fg" aria-label="Read this answer aloud">
-              <Volume2 className="size-3" aria-hidden />
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className={cn("flex flex-col", compact ? "h-full min-h-0" : "min-h-[calc(100dvh-15rem)] lg:min-h-[calc(100dvh-11rem)]")}>
-      <div ref={listRef} className={cn("flex-1 space-y-4", compact && "no-scrollbar min-h-0 overflow-y-auto px-4 pt-4 pb-2")} aria-live="polite">
-        <div className="flex items-start gap-2.5">
-          <LumiMark className="size-8 shrink-0" glow={false} />
-          <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white/[0.07] px-4 py-3 text-sm leading-relaxed">
-            {ws.assistant?.welcome ?? `Hi! I'm ${name}.`}
-            <p className="mt-2 text-fg-muted">
-              Ask me anything — or just tell me which service you want and I&apos;ll set it up right here: payment, details, account and activation.
-            </p>
-          </div>
-        </div>
-        {ws.chat.map(bubble)}
+        {ws.chat.map((m) => (
+          <motion.div key={m.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+            <div
+              className={cn(
+                "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
+                m.role === "user" ? "rounded-br-sm bg-flow text-ink-950" : "rounded-bl-sm border border-white/[0.06] bg-white/[0.05] text-fg",
+              )}
+            >
+              {m.text && <p className="whitespace-pre-line">{m.text}</p>}
+              {m.cards && <Cards cards={m.cards} />}
+              {m.links && m.links.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {m.links.map((l) => (
+                    <Link key={l.href + l.label} href={l.href} className="inline-flex h-8 items-center rounded-full bg-white/10 px-3 text-xs font-semibold text-fg hover:bg-white/15">
+                      {l.label} →
+                    </Link>
+                  ))}
+                </div>
+              )}
+              {m.role === "assistant" && m.text && !muted && (
+                <button
+                  type="button"
+                  onClick={() => speak(m.text, lang, () => setSpeaking(true), () => setSpeaking(false))}
+                  aria-label="Play this answer"
+                  className="mt-1.5 flex items-center gap-1 text-[0.7rem] text-flow/80 hover:text-flow"
+                >
+                  <Volume2 className="size-3" aria-hidden /> Listen
+                </button>
+              )}
+            </div>
+          </motion.div>
+        ))}
         {interim && (
           <div className="flex justify-end">
-            <p className="max-w-[85%] rounded-2xl rounded-tr-sm bg-flow/40 px-4 py-3 text-sm italic">{interim}</p>
+            <div className="max-w-[85%] rounded-2xl rounded-br-sm border border-flow/40 px-3.5 py-2.5 text-sm text-fg/80 italic">{interim}</div>
           </div>
         )}
         {busy && (
-          <div className="flex items-center gap-2.5" role="status">
-            <LumiMark className="size-8 shrink-0 animate-pulse" glow={false} />
-            <span className="text-sm text-fg-muted">{name} is working on it…</span>
+          <div className="flex w-fit gap-1 rounded-2xl rounded-bl-sm bg-white/[0.05] px-4 py-3" role="status" aria-label={`${name} is working on it`}>
+            {[0, 1, 2].map((d) => (
+              <span key={d} className="size-1.5 animate-bounce rounded-full bg-flow" style={{ animationDelay: `${d * 0.15}s` }} />
+            ))}
           </div>
         )}
-        <div ref={endRef} />
       </div>
 
-      <div className={cn(compact ? "border-t border-white/[0.06] px-3 pt-2 pb-3" : "sticky bottom-20 mt-6 bg-ink-950/90 pt-2 backdrop-blur lg:bottom-4")}>
-        {ws.chat.length === 0 && (
-          <ul className="no-scrollbar mb-2.5 flex gap-2 overflow-x-auto pb-1">
-            {agentSuggestions.map((s) => (
-              <li key={s} className="shrink-0">
-                <button type="button" onClick={() => send(s)} className="h-8 rounded-full border border-white/10 bg-white/[0.03] px-3 text-xs text-fg-muted hover:text-fg">
-                  {s}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-        <form onSubmit={onSubmit} className="glass flex items-center gap-1.5 rounded-full p-1.5 pl-4">
-          <label htmlFor={compact ? "ibax-sheet-input" : "chat-input"} className="sr-only">
-            Message {name}
-          </label>
-          <input
-            id={compact ? "ibax-sheet-input" : "chat-input"}
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={listening ? "Listening…" : `Message ${name}…`}
-            className="min-w-0 flex-1 bg-transparent text-[0.95rem] placeholder:text-fg-subtle focus:outline-none focus-visible:outline-none"
-            autoComplete="off"
-            autoFocus={autoFocus}
-          />
-          {ws.chat.length > 0 && !compact && (
-            <button type="button" onClick={() => clearAgentConversation(ws)} className="grid size-10 place-items-center rounded-full text-fg-muted hover:bg-white/[0.06] hover:text-fg" aria-label="Clear conversation" title="Clear conversation">
-              <Trash2 className="size-4" aria-hidden />
-            </button>
-          )}
-          {canListen && (
+      {/* Speaking language + contact */}
+      <div className="flex items-center justify-between gap-2 px-4 pb-2 text-[0.7rem] text-fg-subtle">
+        <span className="flex items-center gap-1" role="group" aria-label="Speaking language">
+          {languages.map((l) => (
             <button
+              key={l.code}
               type="button"
-              onClick={toggleMic}
-              disabled={busy}
-              aria-pressed={listening}
-              aria-label={listening ? "Stop listening" : "Speak to IBAX"}
-              className={cn("grid size-10 place-items-center rounded-full transition-colors disabled:opacity-40", listening ? "animate-pulse bg-red-500/90 text-white" : "bg-white/[0.08] text-fg hover:bg-white/[0.14]")}
+              onClick={() => setLang(l.code)}
+              aria-pressed={lang === l.code}
+              className={cn("rounded-full px-2 py-0.5 transition-colors", lang === l.code ? "bg-flow/15 text-flow" : "hover:text-fg")}
             >
-              {listening ? <MicOff className="size-4" aria-hidden /> : <Mic className="size-4" aria-hidden />}
+              {l.label}
             </button>
-          )}
-          <button type="submit" aria-label="Send" disabled={!q.trim() || busy} className="grid size-10 place-items-center rounded-full bg-flow text-ink-950 disabled:opacity-40">
-            <ArrowUp className="size-4" aria-hidden />
-          </button>
-        </form>
+          ))}
+        </span>
+        <a href={human} target="_blank" rel="noopener noreferrer" className="hover:text-flow">
+          Talk to a human →
+        </a>
       </div>
+
+      {/* Input */}
+      <form onSubmit={onSubmit} className="flex items-center gap-2 border-t border-white/[0.07] p-3">
+        {canListen && (
+          <button
+            type="button"
+            onClick={toggleMic}
+            disabled={busy}
+            aria-label={listening ? "Stop listening" : `Speak to ${name}`}
+            className={cn(
+              "relative grid size-11 shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
+              listening ? "bg-flow text-ink-950" : "border border-flow/40 text-flow hover:bg-flow/10",
+            )}
+          >
+            {listening && <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flow/40" />}
+            {listening ? <MicOff className="relative size-5" aria-hidden /> : <Mic className="size-5" aria-hidden />}
+          </button>
+        )}
+        <input
+          ref={inputRef}
+          id="ibax-input"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          maxLength={2000}
+          placeholder={canListen ? "Type or tap the mic…" : "Type your question…"}
+          aria-label={`Message ${name}`}
+          autoComplete="off"
+          className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-ink-950/60 px-4 text-[16px] text-fg placeholder:text-fg-subtle focus:border-flow/50 focus:outline-none md:text-sm"
+        />
+        <button type="submit" disabled={!q.trim() || busy} aria-label="Send" className="grid size-11 shrink-0 place-items-center rounded-full bg-flow text-ink-950 transition-opacity disabled:opacity-40">
+          <Send className="size-4" aria-hidden />
+        </button>
+      </form>
     </div>
   );
 }

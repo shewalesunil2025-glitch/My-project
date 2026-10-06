@@ -107,7 +107,7 @@ function ScanCard() {
               IBAX AI <span className="text-flow">●</span> Scanning your business
             </p>
             <a
-              href="#shambhu"
+              href="#ibax-ai"
               className="mt-4 inline-flex items-center gap-1.5 text-sm text-flow underline-offset-4 hover:underline"
             >
               What IBAX AI will do for you →

@@ -12,8 +12,7 @@ import {
   sampleActivity,
   shambhu,
 } from "@/content/shambhu";
-import Link from "next/link";
-import { ButtonLink } from "@/components/ui/Button";
+import { BookDemoButton } from "@/components/cta/BookDemoButton";
 import { Scramble } from "@/components/effects/Scramble";
 import { ScrollWords } from "@/components/effects/ScrollWords";
 import { Reveal } from "@/components/effects/Reveal";
@@ -23,13 +22,13 @@ import { ShambhuBot } from "./ShambhuBot";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
- * IBAX AI — the AI Business Operating System app (in development).
+ * IBAX — the AI Business Operating System app (in development).
  * An honest product showcase: the app preview (labelled as a preview, with
  * sample activity), how a business goes live and how data is kept safe.
  */
 export function Shambhu() {
   return (
-    <section id="shambhu" aria-labelledby="shambhu-title" className="relative overflow-hidden py-24 md:py-36">
+    <section id="ibax-ai" aria-labelledby="shambhu-title" className="relative overflow-hidden py-24 md:py-36">
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-[40rem] bg-[radial-gradient(45%_55%_at_50%_0%,rgb(125_255_58/0.12),transparent_70%)]"
@@ -48,7 +47,7 @@ function Intro() {
   return (
     <div className="text-center">
       <Reveal>
-        <p className="badge"><Scramble text="Meet IBAX AI" /></p>
+        <p className="badge"><Scramble text="IBAX AI" /></p>
       </Reveal>
       <ScrollWords
         id="shambhu-title"
@@ -63,16 +62,14 @@ function Intro() {
         </p>
       </Reveal>
       <Reveal delay={0.18} className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <ButtonLink href="/app" icon className="btn-shine">
-          Try the IBAX AI app
-        </ButtonLink>
-        <Link
-          href="/app/demo"
-          className="inline-flex h-12 items-center gap-2 rounded-full border border-white/10 px-5 text-sm text-fg transition-colors hover:border-white/25"
+        <BookDemoButton label="Join early access" interest={shambhu.interest} icon className="btn-shine" />
+        <span
+          aria-disabled
+          className="inline-flex h-12 items-center gap-2 rounded-full border border-white/10 px-5 text-sm text-fg-muted"
         >
           <PlayCircle className="size-4 text-flow" aria-hidden />
-          Watch demo
-        </Link>
+          Watch demo · coming soon
+        </span>
       </Reveal>
       <Reveal delay={0.24}>
         <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-flow/25 bg-flow/[0.06] px-3 py-1 font-mono text-[0.65rem] tracking-[0.16em] text-flow uppercase">
@@ -165,7 +162,7 @@ function AppPreview() {
           <span className="size-2.5 rounded-full bg-white/15" />
           <span className="size-2.5 rounded-full bg-white/15" />
           <span className="ml-3 font-mono text-[0.62rem] tracking-[0.14em] text-fg-subtle uppercase">
-            IBAX AI · Automation Control Centre
+            IBAX · Automation Control Centre
           </span>
         </div>
 
@@ -187,7 +184,7 @@ function AppPreview() {
           </nav>
 
           <div className="min-w-0 p-4 md:p-6">
-            {/* Ask IBAX AI */}
+            {/* Ask IBAX */}
             <div className="flex items-center gap-3 rounded-2xl border border-flow/25 bg-ink-950/70 px-4 py-3 shadow-[inset_0_0_30px_-12px_rgb(125_255_58/0.5)]">
               <Search className="size-4 shrink-0 text-flow" aria-hidden />
               <p className="min-w-0 flex-1 truncate text-sm text-fg/90" aria-label="Ask IBAX anything">
@@ -274,7 +271,7 @@ function AppPreview() {
         <div className="rounded-[2.2rem] border border-white/15 bg-ink-950 p-2 shadow-[0_40px_80px_-20px_rgb(0_0_0/0.9),0_0_60px_-20px_rgb(125_255_58/0.5)]">
           <div className="overflow-hidden rounded-[1.8rem] border border-white/[0.06] [background:linear-gradient(180deg,rgb(125_255_58/0.1),transparent_40%),var(--color-ink-900)]">
             <div className="flex items-center gap-2.5 px-4 pt-5">
-              <ShambhuBot className="size-11 shrink-0 overflow-hidden rounded-full border border-flow/40" />
+              <ShambhuBot bleed={1} className="size-11 shrink-0" />
               <span>
                 <span className="block text-sm font-semibold">IBAX</span>
                 <span className="flex items-center gap-1 text-[0.65rem] text-flow">
@@ -357,7 +354,7 @@ function Journey() {
       </div>
       <p className="mx-auto mt-10 max-w-xl text-center text-sm text-fg-subtle">
         Going live depends on each platform&apos;s approval (for example WhatsApp Business), so it isn&apos;t instant —
-        IBAX AI shows you the status of every step.
+        IBAX shows you the status of every step.
       </p>
     </div>
   );

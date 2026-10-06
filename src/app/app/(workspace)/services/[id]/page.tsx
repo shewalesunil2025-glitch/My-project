@@ -60,16 +60,40 @@ export default function ServiceDetailPage() {
           </div>
           <p className="leading-relaxed text-fg-muted">{svc.description}</p>
 
-          <Card>
-            <h2 className="mb-3 text-sm font-semibold">What you get</h2>
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {svc.features.map((f) => (
-                <li key={f} className="flex gap-2 text-sm text-fg-muted">
-                  <Check className="mt-0.5 size-4 shrink-0 text-flow" aria-hidden /> {f}
-                </li>
-              ))}
-            </ul>
-          </Card>
+          {svc.package && (
+            <section aria-labelledby="package">
+              <p className="font-mono text-[0.65rem] tracking-[0.2em] text-flow uppercase">[ What you get ]</p>
+              <h2 id="package" className="display mt-1 text-xl sm:text-2xl">
+                Everything in one package.
+              </h2>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {svc.package.map((f) => (
+                  <li key={f.title} className="flex gap-3.5 rounded-2xl border border-white/[0.07] bg-white/[0.03] p-4">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow">
+                      <Icon name={f.icon} className="size-5" />
+                    </span>
+                    <div>
+                      <p className="font-semibold">{f.title}</p>
+                      <p className="mt-0.5 text-sm leading-relaxed text-fg-muted">{f.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {!svc.package && (
+            <Card>
+              <h2 className="mb-3 text-sm font-semibold">What you get</h2>
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {svc.features.map((f) => (
+                  <li key={f} className="flex gap-2 text-sm text-fg-muted">
+                    <Check className="mt-0.5 size-4 shrink-0 text-flow" aria-hidden /> {f}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           {included.length > 0 && (
             <Card>
