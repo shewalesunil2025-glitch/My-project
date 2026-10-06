@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { formatPrice, product } from "@/config/product";
 import { services, type ServiceDef } from "@/content/app/services";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -55,10 +55,13 @@ export default function ServicesPage() {
               </span>
             )}
           </div>
-          <ul className="grid gap-1.5 text-sm text-fg-muted sm:grid-cols-2 md:grid-cols-1">
-            {premium.features.slice(0, 6).map((f) => (
-              <li key={f} className="flex gap-2">
-                <Check className="mt-0.5 size-4 shrink-0 text-flow" aria-hidden /> {f}
+          <ul className="grid gap-2 text-sm text-fg-muted sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
+            {(premium.package ?? []).map((f) => (
+              <li key={f.title} className="flex items-center gap-2.5">
+                <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-flow/12 text-flow-soft ring-1 ring-flow/20">
+                  <Icon name={f.icon} className="size-3.5" />
+                </span>
+                {f.title}
               </li>
             ))}
           </ul>
@@ -74,28 +77,30 @@ export default function ServicesPage() {
           const a = owned(s.id);
           return (
             <li key={s.id}>
-              <Link href={`/app/services/${s.id}`} className="glass flex h-full flex-col rounded-2xl p-5 transition-colors hover:border-white/20">
+              <Link
+                href={`/app/services/${s.id}`}
+                className="group flex h-full flex-col rounded-2xl border border-white/[0.07] bg-[linear-gradient(160deg,rgb(255_255_255/0.05),rgb(255_255_255/0.01))] p-5 transition-all hover:-translate-y-0.5 hover:border-flow/35 hover:shadow-[0_24px_50px_-30px_rgb(102_211_76/0.7)]"
+              >
                 <div className="flex items-start justify-between gap-3">
-                  <span className="grid size-10 place-items-center rounded-xl bg-flow/12 text-flow-soft">
+                  <span className="grid size-11 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow">
                     <Icon name={s.icon} className="size-5" />
                   </span>
                   {a && <Pill tone={automationStatus[a.status].tone}>{automationStatus[a.status].label}</Pill>}
                 </div>
-                <p className="mt-4 font-semibold">{s.name}</p>
-                <p className="mt-1 flex-1 text-sm text-fg-muted">{s.short}</p>
-                <div className="mt-4 flex items-center justify-between">
-                  <p className="text-sm">
-                    {s.price === null ? (
-                      <span className="font-semibold">Custom quote</span>
-                    ) : (
-                      <>
-                        <span className="font-semibold">{formatPrice(s.price)}</span>
-                        <span className="text-fg-muted">{s.billing === "one-time" ? " one-time" : " / mo"}</span>
-                      </>
-                    )}
-                  </p>
-                  <span className="text-xs font-semibold text-flow-soft">{a ? "Manage" : s.price === null ? "Request" : "Buy"} →</span>
-                </div>
+                <p className="mt-5 text-lg font-semibold tracking-tight">{s.name}</p>
+                <p className="mt-1 flex-1 text-sm leading-relaxed text-fg-muted">{s.short}</p>
+                {s.price === null ? (
+                  <p className="mt-5 text-xl font-semibold">Custom quote</p>
+                ) : (
+                  <>
+                    <p className="mt-5 font-mono text-[0.65rem] tracking-[0.2em] text-fg-subtle uppercase">Starting at</p>
+                    <p className="mt-1">
+                      <span className="text-3xl font-semibold tracking-tight tabular-nums group-hover:text-flow">{formatPrice(s.price)}</span>
+                      <span className="text-sm text-fg-muted">{s.billing === "one-time" ? " one-time" : " /mo"}</span>
+                    </p>
+                  </>
+                )}
+                <span className="mt-3 text-sm font-semibold text-flow">{a ? "Manage" : s.price === null ? "Request a quote" : "Get started"} →</span>
               </Link>
             </li>
           );

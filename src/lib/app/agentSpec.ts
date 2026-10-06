@@ -42,7 +42,9 @@ function catalogue() {
       const configure = s.configure.map((f) => `${f.key} = ${f.label}${f.options ? ` [${f.options.join(" | ")}]` : f.type === "toggle" ? " [yes/no]" : ""}`).join("; ");
       return [
         `## ${s.id} — ${s.name} — ${price}`,
-        `${s.description}`,
+        `${s.short} ${s.description}`,
+        `What you get: ${s.features.join("; ")}.`,
+        s.package && `Everything in the package:\n${s.package.map((p) => `- ${p.title}: ${p.body}`).join("\n")}`,
         `Setup time: ${s.setupTime}.${s.connect.length ? ` Accounts to connect: ${s.connect.join(", ")}.` : ""}${s.includes ? ` Includes: ${s.includes.join(", ")}.` : ""}`,
         info && `Details (* = required): ${info}`,
         configure && `Preferences: ${configure}`,

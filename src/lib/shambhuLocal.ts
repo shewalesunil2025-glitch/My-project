@@ -4,7 +4,7 @@ import { siteConfig } from "@/config/site";
 import type { AgentReply } from "@/lib/shambhuAgent";
 
 /**
- * IBAX AI's free mode: answers common questions from the site's own content,
+ * IBAX's free mode: answers common questions from the site's own content,
  * entirely in the browser — no API key and no cost. It detects English, Hindi
  * and Marathi (Devanagari or Roman letters) and answers in that language.
  * When ANTHROPIC_API_KEY is set, /api/shambhu (Claude) answers instead.
@@ -69,17 +69,17 @@ const intents: Intent[] = [
   {
     keys: /(website|web site|\bsite\b|वेबसाइट|वेबसाईट)/i,
     answers: {
-      en: `We build a fast, modern website with IBAX AI built in, so every enquiry is answered — starting at ${P.web} one-time.`,
-      hi: `हम तेज़ और मॉडर्न वेबसाइट बनाते हैं जिसमें शंभू पहले से होता है, ताकि हर पूछताछ का जवाब मिले — ${P.web} एक बार से शुरू।`,
-      mr: `आम्ही वेगवान, आधुनिक वेबसाईट बनवतो ज्यात शंभू आधीच असतो, म्हणजे प्रत्येक चौकशीला उत्तर मिळतं — ${P.web} एकदाच, पासून.`,
+      en: `We build a fast, modern website with IBAX built in, so every enquiry is answered — starting at ${P.web} one-time.`,
+      hi: `हम तेज़ और मॉडर्न वेबसाइट बनाते हैं जिसमें आइबैक्स पहले से होता है, ताकि हर पूछताछ का जवाब मिले — ${P.web} एक बार से शुरू।`,
+      mr: `आम्ही वेगवान, आधुनिक वेबसाईट बनवतो ज्यात आइबैक्स आधीच असतो, म्हणजे प्रत्येक चौकशीला उत्तर मिळतं — ${P.web} एकदाच, पासून.`,
     },
   },
   {
     keys: /(instagram|insta|facebook|youtube|social|इंस्टाग्राम|इन्स्टाग्राम|फेसबुक|यूट्यूब|युट्यूब|सोशल)/i,
     answers: {
-      en: `IBAX AI replies to DMs and comments and plans posts for Instagram, Facebook and YouTube — ${P.social} per channel. For everything together, choose Digital Marketing at ${P.dm}.`,
-      hi: `शंभू Instagram, Facebook और YouTube पर DM और कमेंट का जवाब देता है और पोस्ट प्लान करता है — हर चैनल ${P.social}। सब कुछ एक साथ चाहिए तो डिजिटल मार्केटिंग ${P.dm} लीजिए।`,
-      mr: `शंभू Instagram, Facebook आणि YouTube वर DM आणि कमेंटला उत्तर देतो आणि पोस्ट प्लॅन करतो — प्रत्येक चॅनेल ${P.social}. सगळं एकत्र हवं असेल तर डिजिटल मार्केटिंग ${P.dm} घ्या.`,
+      en: `IBAX replies to DMs and comments and plans posts for Instagram, Facebook and YouTube — ${P.social} per channel. For everything together, choose Digital Marketing at ${P.dm}.`,
+      hi: `आइबैक्स Instagram, Facebook और YouTube पर DM और कमेंट का जवाब देता है और पोस्ट प्लान करता है — हर चैनल ${P.social}। सब कुछ एक साथ चाहिए तो डिजिटल मार्केटिंग ${P.dm} लीजिए।`,
+      mr: `आइबैक्स Instagram, Facebook आणि YouTube वर DM आणि कमेंटला उत्तर देतो आणि पोस्ट प्लॅन करतो — प्रत्येक चॅनेल ${P.social}. सगळं एकत्र हवं असेल तर डिजिटल मार्केटिंग ${P.dm} घ्या.`,
     },
   },
   {
@@ -141,33 +141,33 @@ const intents: Intent[] = [
   {
     keys: /(restaurant|hotel|clinic|hospital|doctor|dentist|salon|spa|gym|shop|store|school|college|real estate|travel|business type|रेस्टोरेंट|होटल|हॉटेल|क्लिनिक|डॉक्टर|दुकान|सलून|जिम)/i,
     answers: {
-      en: "IBAX AI is built for businesses that talk to customers — restaurants, hotels, clinics, doctors, salons, spas, shops, real estate, education, gyms, travel, e-commerce and more.",
-      hi: "शंभू उन सभी बिज़नेस के लिए है जो ग्राहकों से बात करते हैं — रेस्टोरेंट, होटल, क्लिनिक, डॉक्टर, सलून, स्पा, दुकानें, रियल एस्टेट, शिक्षा, जिम, ट्रैवल, ई-कॉमर्स और भी बहुत।",
-      mr: "शंभू ग्राहकांशी बोलणाऱ्या सगळ्या व्यवसायांसाठी आहे — रेस्टॉरंट, हॉटेल, क्लिनिक, डॉक्टर, सलून, स्पा, दुकानं, रिअल इस्टेट, शिक्षण, जिम, ट्रॅव्हल, ई-कॉमर्स आणि बरंच काही.",
+      en: "IBAX is built for businesses that talk to customers — restaurants, hotels, clinics, doctors, salons, spas, shops, real estate, education, gyms, travel, e-commerce and more.",
+      hi: "आइबैक्स उन सभी बिज़नेस के लिए है जो ग्राहकों से बात करते हैं — रेस्टोरेंट, होटल, क्लिनिक, डॉक्टर, सलून, स्पा, दुकानें, रियल एस्टेट, शिक्षा, जिम, ट्रैवल, ई-कॉमर्स और भी बहुत।",
+      mr: "आइबैक्स ग्राहकांशी बोलणाऱ्या सगळ्या व्यवसायांसाठी आहे — रेस्टॉरंट, हॉटेल, क्लिनिक, डॉक्टर, सलून, स्पा, दुकानं, रिअल इस्टेट, शिक्षण, जिम, ट्रॅव्हल, ई-कॉमर्स आणि बरंच काही.",
     },
   },
   {
-    keys: /(contact|human|talk|team|number|reach|संपर्क|बात करनी|बोलायचं|टीम)/i,
+    keys: /(contact|human|talk|team|number|phone|call me|email|whatsapp number|mobile|reach|नंबर|मोबाइल|संपर्क|बात करनी|बोलायचं|टीम)/i,
     answers: {
-      en: `Tap "Talk to a human" below or the Contact us button at the top, or email ${siteConfig.email}. Our team replies within 24 hours.`,
-      hi: `नीचे "Talk to a human" या ऊपर Contact us बटन दबाइए, या ${siteConfig.email} पर ईमेल कीजिए। हमारी टीम 24 घंटे में जवाब देती है।`,
-      mr: `खाली "Talk to a human" किंवा वर Contact us बटण दाबा, किंवा ${siteConfig.email} वर ईमेल करा. आमची टीम 24 तासांत उत्तर देते.`,
+      en: `Tap "Talk to a human" below or the Contact us button at the top, email ${siteConfig.email}, or call or WhatsApp ${siteConfig.phoneDisplay}. We reply within 24 hours.`,
+      hi: `नीचे "Talk to a human" या ऊपर Contact us बटन दबाइए, ${siteConfig.email} पर ईमेल कीजिए, या ${siteConfig.phoneDisplay} पर कॉल/WhatsApp कीजिए। हमारी टीम 24 घंटे में जवाब देती है।`,
+      mr: `खाली "Talk to a human" किंवा वर Contact us बटण दाबा, ${siteConfig.email} वर ईमेल करा, किंवा ${siteConfig.phoneDisplay} वर कॉल/WhatsApp करा. आमची टीम 24 तासांत उत्तर देते.`,
     },
   },
   {
-    keys: /(shambhu|शंभू|शम्भू|who are you|what is|kaun ho|kya hai|\bapp\b)/i,
+    keys: /(ibax|ibex|shambhu|आइबैक्स|who are you|what is|kaun ho|kya hai|\bapp\b)/i,
     answers: {
-      en: "I'm IBAX, your AI business assistant. I answer calls, WhatsApp, email and social media, follow up every lead and show you everything in one app. The full IBAX AI app is in early access.",
-      hi: "मैं शंभू हूँ, आपका AI बिज़नेस असिस्टेंट। मैं कॉल, WhatsApp, ईमेल और सोशल मीडिया संभालता हूँ, हर लीड का फॉलो-अप करता हूँ और सब कुछ एक ऐप में दिखाता हूँ। पूरा शंभू ऐप अभी अर्ली एक्सेस में है।",
-      mr: "मी शंभू, तुमचा AI बिझनेस असिस्टंट. मी कॉल, WhatsApp, ईमेल आणि सोशल मीडिया सांभाळतो, प्रत्येक लीडचा पाठपुरावा करतो आणि सगळं एका ॲपमध्ये दाखवतो. पूर्ण शंभू ॲप सध्या अर्ली ॲक्सेसमध्ये आहे.",
+      en: "I'm IBAX, your AI business assistant. I answer calls, WhatsApp, email and social media, follow up every lead and show you everything in one app. The full IBAX app is in early access.",
+      hi: "मैं आइबैक्स हूँ, आपका AI बिज़नेस असिस्टेंट। मैं कॉल, WhatsApp, ईमेल और सोशल मीडिया संभालता हूँ, हर लीड का फॉलो-अप करता हूँ और सब कुछ एक ऐप में दिखाता हूँ। पूरा आइबैक्स ऐप अभी अर्ली एक्सेस में है।",
+      mr: "मी आइबैक्स, तुमचा AI बिझनेस असिस्टंट. मी कॉल, WhatsApp, ईमेल आणि सोशल मीडिया सांभाळतो, प्रत्येक लीडचा पाठपुरावा करतो आणि सगळं एका ॲपमध्ये दाखवतो. पूर्ण आइबैक्स ॲप सध्या अर्ली ॲक्सेसमध्ये आहे.",
     },
   },
   {
     keys: /^\s*(hi|hello|hey|namaste|namaskar|नमस्ते|नमस्कार|हाय|हॅलो)\b/i,
     answers: {
       en: "Hello! I'm IBAX. Ask me about our services, prices or Digital Marketing.",
-      hi: "नमस्ते! मैं शंभू हूँ। हमारी सर्विस, कीमत या डिजिटल मार्केटिंग के बारे में पूछिए।",
-      mr: "नमस्कार! मी शंभू. आमच्या सेवा, किंमती किंवा डिजिटल मार्केटिंगबद्दल विचारा.",
+      hi: "नमस्ते! मैं आइबैक्स हूँ। हमारी सर्विस, कीमत या डिजिटल मार्केटिंग के बारे में पूछिए।",
+      mr: "नमस्कार! मी आइबैक्स. आमच्या सेवा, किंमती किंवा डिजिटल मार्केटिंगबद्दल विचारा.",
     },
   },
 ];

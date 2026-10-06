@@ -41,6 +41,8 @@ export type ServiceDef = {
   /** Third-party steps IBAX AI can't skip (rule: never promise instant activation). */
   approvalNote?: string;
   includes?: string[];
+  /** Everything a package includes, shown as cards (Digital Marketing). */
+  package?: { title: string; body: string; icon: string }[];
 };
 
 const faq: FieldDef = {
@@ -97,7 +99,7 @@ export const services: ServiceDef[] = [
   {
     id: "website",
     name: "Website",
-    short: "A fast, mobile-ready website built from your business details.",
+    short: "A fast, modern website with IBAX built in.",
     group: "web",
     icon: "Globe",
     description:
@@ -119,8 +121,8 @@ export const services: ServiceDef[] = [
   },
   {
     id: "voice",
-    name: "AI Voice & Call Assistant",
-    short: "Answers your business calls 24/7, books appointments and captures leads.",
+    name: "AI Voice Assistant",
+    short: "Answers your calls around the clock.",
     group: "assistant",
     icon: "PhoneCall",
     description:
@@ -146,8 +148,8 @@ export const services: ServiceDef[] = [
   },
   {
     id: "whatsapp",
-    name: "WhatsApp AI Assistant",
-    short: "Replies to customers on WhatsApp instantly, day and night.",
+    name: "WhatsApp Automation",
+    short: "Replies, reminders and follow-ups.",
     group: "assistant",
     icon: "MessageCircle",
     description:
@@ -169,7 +171,7 @@ export const services: ServiceDef[] = [
   {
     id: "instagram",
     name: "Instagram Automation",
-    short: "Posts, reels and captions planned and published for you.",
+    short: "DMs, comments and post planning.",
     group: "social",
     icon: "Instagram",
     description:
@@ -185,7 +187,7 @@ export const services: ServiceDef[] = [
   {
     id: "facebook",
     name: "Facebook Automation",
-    short: "Page posts, reels and Messenger replies on autopilot.",
+    short: "Page messages, comments and posts.",
     group: "social",
     icon: "Facebook",
     description: "Posts and reels for your Facebook Page, scheduled content, comment help and Messenger replies where supported, with lead handling and analytics.",
@@ -199,7 +201,7 @@ export const services: ServiceDef[] = [
   {
     id: "youtube",
     name: "YouTube Automation",
-    short: "AI-made Shorts about your business, published on schedule.",
+    short: "Video planning and comment replies.",
     group: "social",
     icon: "Youtube",
     description:
@@ -216,8 +218,8 @@ export const services: ServiceDef[] = [
   },
   {
     id: "email",
-    name: "Email Assistant",
-    short: "Sorts enquiries, drafts replies and follows up by email.",
+    name: "Email Automation",
+    short: "Inbox sorting, drafts and follow-ups.",
     group: "assistant",
     icon: "Mail",
     description: "With your permission IBAX AI reads your business inbox, sorts enquiries, drafts replies for you to approve, follows up with leads and customers and sends campaigns you authorise.",
@@ -234,8 +236,8 @@ export const services: ServiceDef[] = [
   },
   {
     id: "reviews",
-    name: "Google Review Assistant",
-    short: "Watches your reviews, suggests replies and asks happy customers for one.",
+    name: "Google Review Management",
+    short: "Review requests and reply drafts. Never fake reviews.",
     group: "growth",
     icon: "Star",
     description: "Monitors your Google reviews, alerts you to new ones, suggests replies, runs review-request campaigns to real customers and tracks your rating. IBAX AI never writes fake reviews or manipulates ratings.",
@@ -251,8 +253,8 @@ export const services: ServiceDef[] = [
   },
   {
     id: "followup",
-    name: "Lead Follow-up Automation",
-    short: "No lead forgotten — timely follow-ups on WhatsApp, email or SMS.",
+    name: "Lead Follow-up",
+    short: "Every enquiry followed up on time.",
     group: "growth",
     icon: "UserCheck",
     description: "Every new lead from calls, WhatsApp, social media or your website gets a timely, personal follow-up. IBAX AI tells you who needs a call today.",
@@ -268,10 +270,10 @@ export const services: ServiceDef[] = [
   },
   {
     id: "support",
-    name: "Customer Support Assistant",
-    short: "Common questions answered on every channel, day and night.",
+    name: "Customer Support",
+    short: "Common questions answered on every channel.",
     group: "assistant",
-    icon: "MessageCircle",
+    icon: "Headset",
     description:
       "IBAX AI answers your customers' common questions — timings, prices, location, orders, bookings — on your website chat, WhatsApp, Instagram, Facebook and email, and hands anything tricky to you.",
     features: ["Answers on every connected channel", "Your FAQs, prices and policies", "Order and booking status questions", "Hands complaints to a person", "Every conversation visible in IBAX AI"],
@@ -289,7 +291,7 @@ export const services: ServiceDef[] = [
   {
     id: "digital-marketing",
     name: "Digital Marketing",
-    short: "The complete package — IBAX AI runs your entire online growth.",
+    short: "The premium package: content, social media, campaigns and reporting, run together.",
     group: "premium",
     icon: "Rocket",
     description:
@@ -306,6 +308,17 @@ export const services: ServiceDef[] = [
       "Monthly report",
     ],
     includes: ["instagram", "facebook", "youtube", "followup"],
+    package: [
+      { title: "Social media management", body: "Instagram, Facebook and YouTube planned, posted and answered.", icon: "Instagram" },
+      { title: "Content creation", body: "Posts, reels ideas, captions and hashtags in your brand voice.", icon: "PenTool" },
+      { title: "Monthly content calendar", body: "A clear plan for the month, ready for your approval.", icon: "CalendarDays" },
+      { title: "Ad campaigns", body: "Meta and Google Ads set up, targeted and managed.", icon: "Target" },
+      { title: "Local SEO & Google Business", body: "Your Google Business Profile optimised so nearby customers find you.", icon: "MapPin" },
+      { title: "Website SEO basics", body: "Titles, keywords and speed checks so search engines understand you.", icon: "Search" },
+      { title: "WhatsApp campaigns", body: "Offers and updates sent to customers who opted in.", icon: "MessageCircle" },
+      { title: "Lead follow-up", body: "Every enquiry from your campaigns followed up by IBAX.", icon: "UserCheck" },
+      { title: "Monthly report", body: "What went out, what people did and what we'll do next.", icon: "BarChart3" },
+    ],
     price: 299,
     setupTime: "Kick-off call within 2 working days",
     connect: ["google", "instagram", "facebook", "youtube"],

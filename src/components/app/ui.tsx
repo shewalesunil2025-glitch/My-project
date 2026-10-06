@@ -19,6 +19,13 @@ import {
   Wand2,
   MonitorPlay,
   type LucideIcon,
+  PenTool,
+  CalendarDays,
+  Target,
+  MapPin,
+  Search,
+  BarChart3,
+  Headset,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { LogoMark, Wordmark } from "@/components/navigation/Logo";
@@ -82,6 +89,13 @@ const icons: Record<string, LucideIcon> = {
   Wand2,
   Bell,
   Sparkles,
+  PenTool,
+  CalendarDays,
+  Target,
+  MapPin,
+  Search,
+  BarChart3,
+  Headset,
 };
 export function Icon({ name, className }: { name: string; className?: string }) {
   const I = icons[name] ?? CircleDot;

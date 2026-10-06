@@ -180,17 +180,20 @@ export async function localTurn(ws: Workspace, text: string): Promise<LocalReply
     }
     return flowNext(svc, { serviceId: svc.id, lang });
   }
-  const local = localAnswer(ws, text);
-  if (local.apply) updateWorkspace((w) => local.apply!(w));
-  if (local.matched) return { text: local.text, links: local.links };
+  // "WhatsApp ka price kya hai?" is about that one service, not the whole list.
+  const aboutService = svc && /price|cost|kitna|kitne|kimat|keemat|kya hai|kya karta|details|batao|bataiye|what is|what does|tell me|कीमत|प्राइस|क्या है|बताओ|बताइए/i.test(text);
+  const local = aboutService ? null : localAnswer(ws, text);
+  if (local?.apply) updateWorkspace((w) => local.apply!(w));
+  if (local?.matched) return { text: local.text, links: local.links };
 
   if (svc) {
     const price = svc.price === null ? null : priceLabel(svc, periodFor(svc));
+    const pack = svc.package ? `\n\n${svc.package.map((p) => `• ${p.title} — ${p.body}`).join("\n")}\n\n` : " ";
     return {
       text: t(lang, {
-        en: `${svc.name}: ${svc.short} Price: ${price ?? "custom quote"}. To switch it on, just say “I want ${svc.name}”.`,
-        hi: `${svc.name}: ${svc.short} कीमत: ${price ?? "कोटेशन पर"}। चालू करना हो तो बस लिखिए “${svc.name} चाहिए”।`,
-        hl: `${svc.name}: ${svc.short} Price: ${price ?? "quote par"}. Chalu karna ho to bas likhiye “${svc.name} chahiye”.`,
+        en: `${svc.name}: ${svc.short}${pack}Price: ${price ?? "custom quote"}. To switch it on, just say “I want ${svc.name}”.`,
+        hi: `${svc.name}: ${svc.short}${pack}कीमत: ${price ?? "कोटेशन पर"}। चालू करना हो तो बस लिखिए “${svc.name} चाहिए”।`,
+        hl: `${svc.name}: ${svc.short}${pack}Price: ${price ?? "quote par"}. Chalu karna ho to bas likhiye “${svc.name} chahiye”.`,
       }),
       links: [{ label: svc.name, href: `/app/services/${svc.id}` }],
     };

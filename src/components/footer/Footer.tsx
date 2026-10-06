@@ -8,7 +8,7 @@ const columns = [
     links: [
       { label: "Services", href: "#solutions" },
       { label: "Digital Marketing", href: "#digital-marketing" },
-      { label: "IBAX AI", href: "#shambhu" },
+      { label: "IBAX AI", href: "#ibax-ai" },
       { label: "Automation Store", href: "#store" },
       { label: "Industries", href: "#industries" },
       { label: "IBAX AI — the business app", href: "/app" },

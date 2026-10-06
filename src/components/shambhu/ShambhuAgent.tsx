@@ -44,7 +44,7 @@ const GREETING =
   "Namaste! Main IBAX hoon. English, हिंदी, मराठी — kisi bhi bhasha mein poochhiye, main usi bhasha mein jawab dunga.";
 
 
-const SUGGESTIONS = ["What does it cost?", "IBAX AI kya karta hai?", "हे कसं काम करतं?"];
+const SUGGESTIONS = ["What does it cost?", "IBAX kya karta hai?", "हे कसं काम करतं?"];
 
 const PICKER: AgentLang[] = ["en", "hi", "mr"];
 
@@ -70,8 +70,8 @@ function pickVoice(lang: AgentLang): SpeechSynthesisVoice | undefined {
 }
 
 /**
- * IBAX AI, the website's voice assistant: a round button in the bottom-right
- * corner that opens a chat. Visitors can type or tap the mic and speak; IBAX AI
+ * IBAX, the website's voice assistant: a round button in the bottom-right
+ * corner that opens a chat. Visitors can type or tap the mic and speak; IBAX
  * works out their language, answers in it and reads the answer aloud in a
  * child's voice. Speech runs in the browser (Web Speech API); answers come from
  * /api/shambhu. Where speech isn't supported, typing still works.
@@ -90,7 +90,7 @@ export function ShambhuAgent() {
   const desktop = useMediaQuery("(min-width: 768px)");
 
   const recRef = useRef<Recognition | null>(null);
-  /** Set once the AI endpoint is unavailable; IBAX AI then answers from the site's content (free mode). */
+  /** Set once the AI endpoint is unavailable; IBAX then answers from the site's content (free mode). */
   const localRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -276,21 +276,17 @@ export function ShambhuAgent() {
           aria-label={open ? "Close IBAX" : "Ask IBAX, the voice assistant"}
           className="group relative grid size-[3.25rem] place-items-center rounded-full md:size-16"
         >
-          {!open && <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flow/30 [animation-duration:2.4s]" />}
-          <span
-            aria-hidden
-            className={cn(
-              "absolute -inset-0.5 rounded-full bg-[conic-gradient(from_0deg,#7dff3a,#d4ffb8,#4fd11c,#7dff3a)] transition-opacity",
-              status === "speaking" || status === "listening" ? "animate-spin opacity-100 [animation-duration:2s]" : "opacity-80",
-            )}
-          />
-          <span className="relative grid size-full place-items-center overflow-hidden rounded-full border-2 border-ink-950 bg-ink-800 shadow-[0_12px_40px_-8px_rgb(125_255_58/0.7)] transition-transform duration-300 group-hover:scale-105">
-            {open ? (
+          {open ? (
+            <span className="grid size-full place-items-center rounded-full border border-flow/30 bg-ink-800 shadow-[0_12px_40px_-8px_rgb(125_255_58/0.6)]">
               <X className="size-6 text-fg" aria-hidden />
-            ) : (
-              <ShambhuBot mood={status} className="size-full" />
-            )}
-          </span>
+            </span>
+          ) : (
+            <ShambhuBot
+              mood={status}
+              bleed={0.84}
+              className="pointer-events-none absolute -top-[28%] -left-[28%] size-[156%] max-w-none transition-transform duration-300 group-hover:scale-105"
+            />
+          )}
         </button>
       </div>
 
@@ -325,7 +321,7 @@ export function ShambhuAgent() {
             {/* Header */}
             <header className="flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">
               <span className="relative size-11 shrink-0">
-                <ShambhuBot mood={status} className="size-full overflow-hidden rounded-full border border-flow/40" />
+                <ShambhuBot mood={status} bleed={1} className="size-full" />
                 <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">
@@ -436,7 +432,7 @@ export function ShambhuAgent() {
                   </button>
                 ))}
               </span>
-              <button type="button" onClick={() => openDemo("Question from IBAX AI chat")} className="hover:text-flow">
+              <button type="button" onClick={() => openDemo("Question from IBAX chat")} className="hover:text-flow">
                 Talk to a human →
               </button>
             </div>
@@ -485,7 +481,7 @@ export function ShambhuAgent() {
   );
 }
 
-/** Little equaliser bars while IBAX AI listens or speaks. */
+/** Little equaliser bars while IBAX listens or speaks. */
 function Bars() {
   return (
     <span className="flex h-3 items-end gap-[2px]" aria-hidden>
