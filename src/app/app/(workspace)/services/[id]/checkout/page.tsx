@@ -6,8 +6,8 @@ import { Suspense, useState } from "react";
 import { ArrowLeft, Lock, ShieldCheck } from "lucide-react";
 import { formatPrice, product } from "@/config/product";
 import { annualPrice, serviceById } from "@/content/app/services";
-import { audit, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
-import type { Automation, PlanPeriod } from "@/lib/app/types";
+import { buyService } from "@/lib/app/agentActions";
+import type { PlanPeriod } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
 import { Btn, BtnLink, Card, EmptyState, Icon, Notice, Spinner } from "@/components/app/ui";
 
@@ -32,39 +32,11 @@ function Checkout() {
 
   function pay() {
     setPaying(true);
-    const automationId = uid();
     // Preview mode: the payment provider call is simulated. In production this is a
     // hosted checkout (Stripe / Razorpay) and the subscription is created by its webhook.
     setTimeout(() => {
-      updateWorkspace((w) => {
-        const subId = uid();
-        w.subscriptions.push({ id: subId, serviceId: svc!.id, period, price: amount, status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
-        w.invoices.unshift({
-          id: uid(),
-          number: `LUMI-${1000 + w.invoices.length + 1}`,
-          serviceId: svc!.id,
-          period,
-          amount,
-          date: nowIso(),
-          status: product.previewMode ? "test" : "paid",
-        });
-        const automation: Automation = {
-          id: automationId,
-          serviceId: svc!.id,
-          subscriptionId: subId,
-          status: "setup",
-          config: {},
-          setupStep: 0,
-          tested: false,
-          createdAt: nowIso(),
-          logs: [{ at: nowIso(), level: "info", message: "Payment confirmed — waiting for setup" }],
-        };
-        w.automations.push(automation);
-        logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc!.name}`, detail: `${formatPrice(amount)} · ${period}`, href: "/app/billing" });
-        notify(w, { kind: "payment", title: "Payment confirmed", detail: `${svc!.name} — ${formatPrice(amount)}. Let's activate it.`, href: `/app/automations/${automationId}` });
-        audit(w, `Purchased ${svc!.name} (${period})`);
-      });
-      router.replace(`/app/automations/${automationId}?paid=1`);
+      const automationId = buyService(svc!.id, period);
+      router.replace(automationId ? `/app/automations/${automationId}?paid=1` : "/app/services");
     }, 900);
   }
 

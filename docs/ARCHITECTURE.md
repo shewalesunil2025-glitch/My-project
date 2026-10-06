@@ -15,7 +15,7 @@ The complete customer-facing app runs under `/app` (Next.js App Router). It is i
 | Payments | "Confirm test payment"; invoices marked *test* | Stripe Checkout / Razorpay. The subscription is created by the payment webhook, not the browser |
 | Account connections | Account name typed in, marked `simulated` | OAuth per platform. Tokens encrypted at rest |
 | Automations | Status machine + logs in the workspace | n8n workflows (one template per service, one instance per workspace) triggered by the backend |
-| Assistant | Built-in answers from workspace data (`src/lib/app/assistant.ts`) + Claude via `/api/assistant` when `ANTHROPIC_API_KEY` is set | Same, with the workspace context loaded server-side from the database |
+| Assistant | IBAX chat with action cards: Claude with tools via `/api/assistant` when `ANTHROPIC_API_KEY` is set, built-in activation conversation otherwise | Same, with the workspace context loaded server-side from the database |
 | Sample workspace | "Sunrise Bistro", labelled *Sample workspace* on every screen | Keep as the public demo |
 
 Nothing in preview mode pretends to be real. Test payments, simulated connections and sample data are labelled where they appear.
@@ -120,6 +120,32 @@ The TypeScript shapes in `src/lib/app/types.ts` map one-to-one onto these tables
 - Read replicas and `(workspace_id, at)` indexes on activity, messages and logs. Partition by month when those tables get large.
 - Per-provider quota tracking (YouTube upload quota, WhatsApp messaging tiers), surfaced as "Needs attention" in the Control Centre.
 
-## Assistant
+## Assistant (IBAX) — talks and takes action
 
-`useAsk` (client) answers workspace questions locally ("What happened today?", leads, calls, WhatsApp, YouTube, reviews, analytics, how-to and help questions) and performs actions ("Create tomorrow's Instagram post" adds a draft for approval). Anything else goes to `POST /api/assistant`, which calls Claude (`claude-opus-5-5`, low effort, server-side refusal fallback) with a compact workspace summary. Without `ANTHROPIC_API_KEY` the route returns `503 not_configured` and the built-in answer is shown.
+IBAX is on every workspace screen as a round robot button (`IbaxLauncher`), like on the website, and full screen at `/app/assistant`. Both show the same conversation (`IbaxChat`): typing or the mic (browser speech), answers read aloud when the question was spoken, and **action cards** inside the chat.
+
+The owner can buy and switch on any service just by chatting — "Mujhe WhatsApp automation chahiye":
+
+1. IBAX names the service and price and shows a **payment card** (preview mode: test payment; production: the payment provider's checkout).
+2. After payment, IBAX asks only for the details the service still needs (business-profile values are pre-filled) and saves them.
+3. It shows a **connect card** for the account the service needs (WhatsApp Business number; production: Meta Embedded Signup).
+4. It tests and activates the service and hands it to the automation backend (`POST /api/automation/activate`).
+
+How it runs:
+
+- `src/lib/app/agentActions.ts` — the actions (buy, save details, connect, activate, pause/resume). The Services checkout uses the same `buyService`, so chat and screens stay identical.
+- `POST /api/assistant` — one turn of Claude (`claude-opus-5-5`, low effort, server-side refusal fallback) with IBAX's instructions, the service catalogue and its tools (`src/lib/app/agentSpec.ts`). The app (`src/lib/app/agentClient.ts`) sends the conversation plus a workspace snapshot, carries out the tool calls on the owner's workspace and sends the results back until IBAX has answered. Requires `ANTHROPIC_API_KEY`.
+- Without the key (route returns `503`), `src/lib/app/agentLocal.ts` runs the same activation conversation built in (English, Hindi, Hinglish) and the built-in workspace answers (`src/lib/app/assistant.ts`).
+
+### Automation backend hook
+
+`POST /api/automation/activate` forwards every activation to the master n8n workflow when these environment variables are set (Vercel → Project → Settings → Environment Variables):
+
+| Variable | Purpose |
+|---|---|
+| `ANTHROPIC_API_KEY` | Turns on Claude for IBAX (all-rounder answers + actions) |
+| `N8N_ACTIVATE_WEBHOOK_URL` | n8n Webhook node URL that receives `service.activated` events |
+| `N8N_WEBHOOK_SECRET` | Shared secret, sent as the `x-ibax-secret` header; check it in n8n |
+
+Payload: `{ event: "service.activated", at, workspaceId, serviceId, business, config, accounts }` — `config` holds the details the owner gave (about, services, prices, hours, faqs, tone…), `accounts` the connected account per platform (for WhatsApp, the business number). Without the URL the app runs in preview mode and IBAX tells the owner the setup is saved.
+

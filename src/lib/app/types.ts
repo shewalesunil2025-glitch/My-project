@@ -201,7 +201,17 @@ export type ChatMessage = {
   text: string;
   at: string;
   links?: { label: string; href: string }[];
+  /** Action cards IBAX shows in the chat (pay, connect an account, activated). */
+  cards?: AgentCard[];
 };
+
+export type AgentCard =
+  | { type: "pay"; serviceId: string; period: PlanPeriod; done?: boolean }
+  | { type: "connect"; provider: ProviderId; serviceId: string; done?: boolean }
+  | { type: "activated"; serviceId: string; automationId: string };
+
+/** Where the built-in (offline) activation conversation is up to. */
+export type AgentFlow = { serviceId: string; field?: string; skipped?: string[]; lang?: "en" | "hi" | "hl" };
 
 export type DailyMetric = {
   date: string; // YYYY-MM-DD
@@ -252,6 +262,7 @@ export type Workspace = {
   notifications: AppNotification[];
   tickets: Ticket[];
   chat: ChatMessage[];
+  agentFlow?: AgentFlow | null;
   metrics: DailyMetric[];
   website: WebsiteProject | null;
   team: { id: string; name: string; email: string; role: TeamRole }[];
