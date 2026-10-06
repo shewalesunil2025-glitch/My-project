@@ -4,16 +4,45 @@ import { product } from "@/config/product";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { ArrowRight, Check, Globe, Sparkles, X } from "lucide-react";
+import { ArrowRight, CalendarClock, Check, Globe, MessageCircle, PhoneCall, Sparkles, Star, TrendingUp, Users, X, type LucideIcon } from "lucide-react";
 import { serviceById } from "@/content/app/services";
 import { suggestions } from "@/lib/app/assistant";
 import { useWorkspace } from "@/components/app/AppShell";
 import { AskBar } from "@/components/app/AskBar";
 import { KindIcon } from "@/components/app/kinds";
 import { automationStatus } from "@/components/app/status";
-import { BtnLink, Card, EmptyState, Icon, Notice, Pill, SectionTitle, Stat, fmtTime } from "@/components/app/ui";
+import { AreaChart, Sparkline } from "@/components/app/charts";
+import { BtnLink, Card, EmptyState, Icon, Notice, Pill, SectionTitle, fmtTime } from "@/components/app/ui";
+import type { DailyMetric } from "@/lib/app/types";
+import { cn } from "@/lib/cn";
 
 const isToday = (iso?: string) => !!iso && new Date(iso).toDateString() === new Date().toDateString();
+
+function Kpi({ label, value, hint, href, icon: I, trend, metric }: { label: string; value: number; hint: string; href: string; icon: LucideIcon; trend?: number[]; metric?: string }) {
+  return (
+    <Link
+      href={href}
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(160deg,rgb(255_255_255/0.06),rgb(255_255_255/0.015))] p-4 transition-all hover:-translate-y-0.5 hover:border-flow/30 hover:shadow-[0_18px_40px_-24px_rgb(102_211_76/0.6)]"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-medium text-fg-muted">{label}</p>
+        <span className="grid size-8 place-items-center rounded-xl bg-flow/12 text-flow-soft ring-1 ring-flow/20">
+          <I className="size-4" aria-hidden />
+        </span>
+      </div>
+      <p className="mt-2 text-3xl font-semibold tracking-tight text-fg tabular-nums">{value}</p>
+      <p className="mt-0.5 text-xs text-fg-subtle">{hint}</p>
+      {trend && trend.some((v) => v > 0) ? (
+        <Sparkline values={trend} className="mt-3" label={`${metric ?? label}, last 7 days: ${trend.join(", ")}`} />
+      ) : (
+        <div className="mt-3 h-8" />
+      )}
+    </Link>
+  );
+}
+
+const count = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const series = (metrics: DailyMetric[], key: keyof Omit<DailyMetric, "date">, days = 7) => metrics.slice(-days).map((m) => m[key]);
 
 function Dashboard() {
   const ws = useWorkspace();
@@ -46,13 +75,34 @@ function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <section>
-        <p className="text-sm text-fg-muted">
-          {greeting}, {first} 👋
-        </p>
-        <h1 className="display mt-1 text-2xl sm:text-3xl">{ws.business.name}</h1>
-        <div className="mt-5">
-          <AskBar name={name} examples={suggestions.slice(0, 6)} />
+      <section className="relative overflow-hidden rounded-[1.75rem] border border-flow/20 bg-[radial-gradient(120%_90%_at_100%_0%,rgb(102_211_76/0.22),transparent_55%),linear-gradient(160deg,#0e2414,#06100a_60%,#040905)] p-5 shadow-[0_30px_80px_-40px_rgb(102_211_76/0.55)] sm:p-7">
+        <div aria-hidden className="grid-backdrop pointer-events-none absolute inset-0 opacity-40" />
+        <div aria-hidden className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-flow/20 blur-3xl" />
+        <div className="relative">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-flow/30 bg-flow/10 px-2.5 py-1 font-medium text-flow-soft">
+              <span className="relative flex size-2">
+                <span className="absolute inset-0 animate-ping rounded-full bg-flow/70" />
+                <span className="relative size-2 rounded-full bg-flow" />
+              </span>
+              {name} online
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-fg-muted">
+              {live.length} service{live.length === 1 ? "" : "s"} live
+            </span>
+            <span className="text-fg-subtle">{new Date().toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" })}</span>
+          </div>
+          <p className="mt-5 text-sm text-fg-muted">
+            {greeting}, {first} 👋
+          </p>
+          <h1 className="display text-metal mt-1 text-3xl sm:text-4xl">{ws.business.name}</h1>
+          <p className="mt-2 max-w-xl text-sm text-fg-muted">
+            Today so far: <span className="text-fg">{count(callsToday, "call")}</span> · <span className="text-fg">{count(msgsToday, "message")}</span> ·{" "}
+            <span className="text-fg">{count(leadsToday, "new lead")}</span> · <span className="text-fg">{count(reviewsToday, "review")}</span>
+          </p>
+          <div className="mt-5">
+            <AskBar name={name} examples={suggestions.slice(0, 6)} />
+          </div>
         </div>
       </section>
 
@@ -112,13 +162,13 @@ function Dashboard() {
         <SectionTitle>
           <span id="today">Today</span>
         </SectionTitle>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          <Stat label="Leads" value={leadsToday} hint={`${ws.leads.length} total`} href="/app/leads" />
-          <Stat label="Messages" value={msgsToday} hint="WhatsApp · DMs · email" href="/app/inbox" />
-          <Stat label="Calls" value={callsToday} hint="Answered by AI" href="/app/calls" />
-          <Stat label="Reviews" value={reviewsToday} hint={`${unreplied.length} to reply`} href="/app/reviews" />
-          <Stat label="Social activity" value={socialToday} hint="Posts & uploads" href="/app/content" />
-          <Stat label="Scheduled content" value={scheduled} hint={`${approvals.length} to approve`} href="/app/content" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+          <Kpi label="Leads" value={leadsToday} hint={`${ws.leads.length} total`} href="/app/leads" icon={Users} trend={series(ws.metrics, "leads")} />
+          <Kpi label="Messages" value={msgsToday} hint="WhatsApp · DMs · email" href="/app/inbox" icon={MessageCircle} trend={series(ws.metrics, "messages")} />
+          <Kpi label="Calls" value={callsToday} hint="Answered by AI" href="/app/calls" icon={PhoneCall} trend={series(ws.metrics, "calls")} />
+          <Kpi label="Reviews" value={reviewsToday} hint={`${unreplied.length} to reply`} href="/app/reviews" icon={Star} trend={series(ws.metrics, "reviews")} />
+          <Kpi label="Social activity" value={socialToday} hint="Posts & uploads" href="/app/content" icon={TrendingUp} trend={series(ws.metrics, "reach")} metric="Reach" />
+          <Kpi label="Scheduled content" value={scheduled} hint={`${approvals.length} to approve`} href="/app/content" icon={CalendarClock} />
         </div>
       </section>
 
@@ -129,14 +179,14 @@ function Dashboard() {
           </SectionTitle>
           <div className="grid gap-3 sm:grid-cols-2">
             {setupPending.map((a) => (
-              <Link key={a.id} href={`/app/automations/${a.id}`} className="glass flex items-center gap-3 rounded-2xl p-4 hover:border-white/20">
+              <Link key={a.id} href={`/app/automations/${a.id}`} className="glass flex items-center gap-3 rounded-2xl border-l-2 border-l-flow/60 p-4 transition-colors hover:border-white/20 hover:bg-white/[0.04]">
                 <KindIcon kind="automation" />
                 <span className="text-sm">Finish setting up {serviceById(a.serviceId)?.name}</span>
                 <ArrowRight className="ml-auto size-4 text-fg-subtle" aria-hidden />
               </Link>
             ))}
             {followUps.length > 0 && (
-              <Link href="/app/leads" className="glass flex items-center gap-3 rounded-2xl p-4 hover:border-white/20">
+              <Link href="/app/leads" className="glass flex items-center gap-3 rounded-2xl border-l-2 border-l-flow/60 p-4 transition-colors hover:border-white/20 hover:bg-white/[0.04]">
                 <KindIcon kind="lead" />
                 <span className="text-sm">
                   {followUps.length} lead{followUps.length > 1 ? "s" : ""} need follow-up today
@@ -145,7 +195,7 @@ function Dashboard() {
               </Link>
             )}
             {approvals.length > 0 && (
-              <Link href="/app/content" className="glass flex items-center gap-3 rounded-2xl p-4 hover:border-white/20">
+              <Link href="/app/content" className="glass flex items-center gap-3 rounded-2xl border-l-2 border-l-flow/60 p-4 transition-colors hover:border-white/20 hover:bg-white/[0.04]">
                 <KindIcon kind="instagram" />
                 <span className="text-sm">
                   {approvals.length} post{approvals.length > 1 ? "s" : ""} waiting for your approval
@@ -154,7 +204,7 @@ function Dashboard() {
               </Link>
             )}
             {unreplied.length > 0 && (
-              <Link href="/app/reviews" className="glass flex items-center gap-3 rounded-2xl p-4 hover:border-white/20">
+              <Link href="/app/reviews" className="glass flex items-center gap-3 rounded-2xl border-l-2 border-l-flow/60 p-4 transition-colors hover:border-white/20 hover:bg-white/[0.04]">
                 <KindIcon kind="review" />
                 <span className="text-sm">
                   {unreplied.length} review{unreplied.length > 1 ? "s" : ""} — replies drafted
@@ -188,9 +238,9 @@ function Dashboard() {
           </SectionTitle>
           {todayActivity.length ? (
             <Card className="p-2">
-              <ul>
+              <ul className="relative before:absolute before:top-6 before:bottom-6 before:left-[1.69rem] before:w-px before:bg-gradient-to-b before:from-flow/40 before:to-transparent">
                 {todayActivity.slice(0, 6).map((e) => (
-                  <li key={e.id}>
+                  <li key={e.id} className="relative">
                     <Link href={e.href ?? "/app/activity"} className="flex items-center gap-3 rounded-xl p-2.5 hover:bg-white/[0.04]">
                       <KindIcon kind={e.kind} />
                       <div className="min-w-0 flex-1">
@@ -244,8 +294,9 @@ function Dashboard() {
                     const st = automationStatus[a.status];
                     return (
                       <li key={a.id} className="flex items-center gap-3 rounded-xl p-2.5">
-                        <span className="grid size-9 place-items-center rounded-xl bg-flow/12 text-flow-soft">
+                        <span className="relative grid size-9 place-items-center rounded-xl bg-flow/12 text-flow-soft ring-1 ring-flow/20">
                           <Icon name={svc.icon} className="size-4" />
+                          {a.status === "active" && <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full border-2 border-ink-900 bg-flow shadow-[0_0_8px_rgb(102_211_76/0.9)]" />}
                         </span>
                         <span className="min-w-0 flex-1 truncate text-sm">{svc.name}</span>
                         <Pill tone={st.tone}>{st.label}</Pill>
@@ -270,18 +321,29 @@ function Dashboard() {
                   </Link>
                 }
               >
-                <span id="week">Leads, last 14 days</span>
+                <span id="week">Leads trend</span>
               </SectionTitle>
               <Card>
-                <div className="flex h-24 items-end gap-1" role="img" aria-label={`Leads per day: ${ws.metrics.slice(-14).map((m) => m.leads).join(", ")}`}>
-                  {(() => {
-                    const last = ws.metrics.slice(-14);
-                    const max = Math.max(...last.map((m) => m.leads), 1);
-                    return last.map((m, i) => (
-                      <div key={m.date} className={`flex-1 rounded-t-[3px] ${i === last.length - 1 ? "bg-flow" : "bg-flow/40"}`} style={{ height: `${(m.leads / max) * 100}%` }} title={`${m.date}: ${m.leads}`} />
-                    ));
-                  })()}
-                </div>
+                {(() => {
+                  const last = ws.metrics.slice(-14);
+                  const total = last.reduce((t, m) => t + m.leads, 0);
+                  const prev = ws.metrics.slice(-28, -14).reduce((t, m) => t + m.leads, 0);
+                  const change = prev ? Math.round(((total - prev) / prev) * 100) : null;
+                  return (
+                    <>
+                      <div className="mb-2 flex items-baseline gap-2">
+                        <p className="text-2xl font-semibold tabular-nums">{total}</p>
+                        <p className="text-xs text-fg-muted">leads in 14 days</p>
+                        {change !== null && (
+                          <span className={cn("ml-auto rounded-full px-2 py-0.5 text-xs font-medium", change >= 0 ? "bg-emerald-400/12 text-emerald-300" : "bg-red-400/12 text-red-300")}>
+                            {change >= 0 ? "▲" : "▼"} {Math.abs(change)}% vs previous 14 days
+                          </span>
+                        )}
+                      </div>
+                      <AreaChart data={last.map((m) => ({ date: m.date, value: m.leads }))} unit="leads" />
+                    </>
+                  );
+                })()}
               </Card>
             </section>
           )}

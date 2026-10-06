@@ -21,7 +21,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
 import { LogoMark, Wordmark } from "@/components/navigation/Logo";
 import { product } from "@/config/product";
 
@@ -59,18 +58,11 @@ export function BrandLogo({
   );
 }
 
-/* ── Assistant avatar: the IBAX chatbot robot, the same one as the website chat assistant ── */
+/* ── Assistant avatar: the IBAX logo ── */
 export function LumiMark({ className, glow = true }: { className?: string; glow?: boolean }) {
   return (
-    <span
-      aria-hidden
-      className={cn(
-        "inline-block size-9 shrink-0 overflow-hidden rounded-full border border-flow/40 bg-ink-950",
-        glow && "shadow-[0_0_18px_-4px_rgb(102_211_76/0.6)]",
-        className,
-      )}
-    >
-      <ShambhuBot className="size-full" />
+    <span aria-hidden className={cn("inline-block size-9 shrink-0", className)}>
+      <LogoMark className={cn("size-full", glow && "drop-shadow-[0_0_14px_rgb(102_211_76/0.55)]")} />
     </span>
   );
 }

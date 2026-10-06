@@ -11,6 +11,7 @@ import type { Workspace } from "@/lib/app/types";
 import { cn } from "@/lib/cn";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
 import { IbaxChat } from "./IbaxChat";
+import { LumiMark } from "./ui";
 
 /**
  * IBAX on every workspace screen, like on the website: a round robot button in the
@@ -83,9 +84,7 @@ export function IbaxLauncher({ ws }: { ws: Workspace }) {
               className="fixed inset-x-0 bottom-0 z-[47] flex h-[88dvh] flex-col overflow-hidden rounded-t-[1.6rem] border border-b-0 border-flow/25 pb-[env(safe-area-inset-bottom)] shadow-[0_40px_100px_-30px_rgb(0_0_0/0.95),0_0_60px_-30px_rgb(102_211_76/0.6)] [background:linear-gradient(180deg,rgb(102_211_76/0.1),transparent_30%),var(--color-ink-900)] lg:inset-x-auto lg:right-6 lg:bottom-[6.5rem] lg:h-[min(40rem,calc(100dvh-9rem))] lg:w-[26rem] lg:rounded-[1.6rem] lg:border-b lg:pb-0"
             >
               <header className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
-                <span className="grid size-10 place-items-center overflow-hidden rounded-full border border-flow/40 bg-ink-950">
-                  <ShambhuBot mood={busy ? "thinking" : "idle"} className="size-full" />
-                </span>
+                <LumiMark className={cn("size-10", busy && "animate-pulse")} />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{product.assistantName}</p>
                   <p className="text-xs text-fg-muted">{busy ? "Working on it…" : "Online · ask anything or activate a service"}</p>

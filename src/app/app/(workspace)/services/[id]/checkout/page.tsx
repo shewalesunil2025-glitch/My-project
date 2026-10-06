@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { ArrowLeft, Lock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { formatPrice, product } from "@/config/product";
 import { annualPrice, serviceById } from "@/content/app/services";
 import { buyService } from "@/lib/app/agentActions";
@@ -91,7 +91,7 @@ function Checkout() {
           </>
         ) : (
           <>
-            <Lock className="size-4" aria-hidden /> {product.previewMode ? "Confirm test payment" : `Pay ${formatPrice(amount)} securely`}
+            Pay
           </>
         )}
       </Btn>

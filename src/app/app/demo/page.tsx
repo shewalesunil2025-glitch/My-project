@@ -80,13 +80,13 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
     ),
   },
   {
-    title: "5. Pay securely",
+    title: "5. Pay",
     text: "Choose monthly or annual (2 months free) and pay through the secure payment page. Your invoice appears in Billing.",
     screen: (
       <div className="space-y-2">
         <Row>YouTube Automation — Monthly</Row>
         <Row className="flex justify-between"><span>Total</span><b>$39.00</b></Row>
-        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-ink-950">Pay securely</div>
+        <div className="rounded-full bg-flow py-2 text-center text-[0.72rem] font-semibold text-ink-950">Pay</div>
         <p className="text-center text-[0.65rem] text-emerald-300">✓ Payment confirmed</p>
       </div>
     ),
