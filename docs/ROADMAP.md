@@ -36,3 +36,20 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 4. Test on our own business.
 5. Pilot with 1–3 clients.
 6. Add the service id to `liveServices`. The store, the service page and IBAX start selling it, and the waitlist can be told it has launched.
+
+## WhatsApp Automation — n8n setup (built)
+
+n8n Cloud: `ibaxai.app.n8n.cloud`. Secrets (the webhook secret, the Evolution token, API keys) live only in Vercel and n8n, never in this repository.
+
+| Piece | What it does |
+|---|---|
+| Workflow **IBAX · WhatsApp · Activation** (published) | `POST /webhook/ibax-activate` ← the app's `/api/automation/activate`. Checks `x-ibax-secret`, then saves the client's business details in the **IBAX WhatsApp Clients** table under the instance name `ibax-<whatsapp number digits>` |
+| Workflow **IBAX · WhatsApp · AI Replies (Evolution API)** | `POST /webhook/ibax-evolution?token=…` ← Evolution API `MESSAGES_UPSERT`. Finds the client by instance and skips customers the owner has taken over. Claude Haiku writes the reply from the client's facts and the reply is sent through Evolution. The chat is saved to **IBAX WhatsApp Messages**. When a person is needed, the bot pauses for that customer (**IBAX WhatsApp Contacts**) and alerts the owner on WhatsApp |
+
+To go live:
+1. Vercel: set `N8N_ACTIVATE_WEBHOOK_URL` = `https://ibaxai.app.n8n.cloud/webhook/ibax-activate` and `N8N_WEBHOOK_SECRET` (the value checked in the Activation workflow), then redeploy.
+2. n8n: create an Anthropic credential with our own API key and select it on the **Claude Haiku** node. n8n's free gateway credits don't support this agent.
+3. Evolution API server: for each client, create an instance named `ibax-<number>` and scan its QR code with the client's WhatsApp. Set its webhook to the AI Replies production URL plus `?token=…`, events `MESSAGES_UPSERT`, webhookByEvents off.
+4. Publish **AI Replies**, test with one pilot number, then add `whatsapp` to `liveServices`.
+
+Evolution API uses WhatsApp Web, not Meta's official API. Use it for replies only (no bulk or promotional sends), and plan the move to the WhatsApp Cloud API. Only the receive and send nodes change.
