@@ -27,7 +27,7 @@ export function IntroLoader() {
         <div className="intro-word">
           <Wordmark className="text-[3.25rem] md:text-[5rem]" />
         </div>
-        <p className="intro-name">INTELLIGENT BUSINESS AUTOMATION</p>
+        <p className="intro-name">INTELLIGENT BUSINESS AUTOMATION EXPERT</p>
         <div className="intro-line">
           <span />
         </div>
