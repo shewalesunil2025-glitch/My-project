@@ -7,9 +7,10 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | # | Task | Owner |
 |---|---|---|
 | 1 | "Coming soon" + waitlist for services that aren't built ✅ | Claude |
-| 2 | Real database + login (Supabase) instead of browser storage, so n8n can read each client's details and the app can show their messages and leads | Claude builds; owner creates the Supabase project and adds its keys to Vercel |
+| 2 | Real database + login (Supabase) instead of browser storage ✅ accounts and workspaces (`supabase/migrations/0001_init.sql`). Next: n8n reads client details from it and the app shows their messages and leads | Claude builds; owner creates the Supabase project and adds its keys to Vercel |
 | 3 | n8n running (n8n Cloud to start) and the n8n connector working in Claude | Owner |
 | 4 | `ANTHROPIC_API_KEY` in Vercel (smart IBAX answers) | Owner |
+| 4b | Supabase sends confirmation emails from its own low-limit mailer. Add our own SMTP (Authentication → Emails) before turning "Confirm email" on | Owner |
 | 5 | Real payments (Razorpay / Stripe) with a webhook that activates the subscription | Claude builds; owner creates the account |
 | 6 | Privacy Policy + Terms pages (needed for Meta and Google reviews) | Claude |
 | 7 | Apply early for slow approvals: Meta Business Verification, Google Business Profile API, YouTube quota increase | Owner |
@@ -44,11 +45,11 @@ n8n Cloud: `ibaxai.app.n8n.cloud`. Secrets (the webhook secret, the Evolution to
 | Piece | What it does |
 |---|---|
 | Workflow **IBAX · WhatsApp · Activation** (published) | `POST /webhook/ibax-activate` ← the app's `/api/automation/activate`. Checks `x-ibax-secret`, then saves the client's business details in the **IBAX WhatsApp Clients** table under the instance name `ibax-<whatsapp number digits>` |
-| Workflow **IBAX · WhatsApp · AI Replies (Evolution API)** | `POST /webhook/ibax-evolution?token=…` ← Evolution API `MESSAGES_UPSERT`. Finds the client by instance and skips customers the owner has taken over. Claude Haiku writes the reply from the client's facts and the reply is sent through Evolution. The chat is saved to **IBAX WhatsApp Messages**. When a person is needed, the bot pauses for that customer (**IBAX WhatsApp Contacts**) and alerts the owner on WhatsApp |
+| Workflow **IBAX · WhatsApp · AI Replies (Evolution API)** | `POST /webhook/ibax-evolution?token=…` ← Evolution API `MESSAGES_UPSERT`. Finds the client by instance and skips customers the owner has taken over. Gemini Flash (free tier) writes the reply from the client's facts and the reply is sent through Evolution. The chat is saved to **IBAX WhatsApp Messages**. When a person is needed, the bot pauses for that customer (**IBAX WhatsApp Contacts**) and alerts the owner on WhatsApp |
 
 To go live:
 1. Vercel: set `N8N_ACTIVATE_WEBHOOK_URL` = `https://ibaxai.app.n8n.cloud/webhook/ibax-activate` and `N8N_WEBHOOK_SECRET` (the value checked in the Activation workflow), then redeploy.
-2. n8n: create an Anthropic credential with our own API key and select it on the **Claude Haiku** node. n8n's free gateway credits don't support this agent.
+2. n8n: a Google Gemini credential with our own free API key, selected on the **Gemini Flash** node ✅ (the reply step retries 3 times when Google is busy).
 3. Evolution API server: for each client, create an instance named `ibax-<number>` and scan its QR code with the client's WhatsApp. Set its webhook to the AI Replies production URL plus `?token=…`, events `MESSAGES_UPSERT`, webhookByEvents off.
 4. Publish **AI Replies**, test with one pilot number, then add `whatsapp` to `liveServices`.
 

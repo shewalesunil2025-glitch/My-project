@@ -48,6 +48,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState("");
   const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   if (!ws || !user || !biz || !asst) return null;
 
@@ -334,14 +335,20 @@ export default function SettingsPage() {
             <Btn
               variant="danger"
               disabled={confirmDelete !== "DELETE"}
-              onClick={() => {
-                deleteAccount();
-                router.replace("/app");
+              onClick={async () => {
+                setDeleteError("");
+                if (await deleteAccount()) router.replace("/app");
+                else setDeleteError("Couldn't delete your account. Check your connection and try again.");
               }}
             >
               Delete everything
             </Btn>
           </div>
+          {deleteError && (
+            <Notice tone="amber" className="mt-3">
+              {deleteError}
+            </Notice>
+          )}
         </div>
       </Section>
 
