@@ -56,7 +56,7 @@ export function BrandLogo({
       <span className={cn("flex flex-col", stacked ? "items-center" : "items-start")}>
         <Wordmark className={word} />
         {tagline && (
-          <span className={cn("mt-1.5 font-mono whitespace-nowrap uppercase text-fg-subtle", !stacked && "max-sm:hidden", size === "lg" ? "text-[0.62rem] tracking-[0.32em]" : "text-[0.5rem] tracking-[0.22em]")}>
+          <span className={cn("mt-1.5 font-mono whitespace-nowrap uppercase text-fg-subtle", !stacked && "max-sm:hidden", size === "lg" ? "text-[0.62rem] tracking-[0.22em]" : "text-[0.5rem] tracking-[0.22em]")}>
             {product.logoTagline}
           </span>
         )}
