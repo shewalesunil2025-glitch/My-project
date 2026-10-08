@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "IBAX AI",
   wordmark: "IBAX AI",
-  tagline: "Intelligent Business Automation Experience",
+  tagline: "Intelligent Business Automation Expert",
   title: "IBAX AI — AI Automation & Intelligent Business Systems",
   description:
-    "IBAX AI — Intelligent Business Automation Experience. Your AI business assistant for websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
+    "IBAX AI — Intelligent Business Automation Expert. Your AI business assistant for websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ibaxai.com",
   email: "ibaxai369@gmail.com",
   /** Phone and WhatsApp (same number). `phone` is for tel: links, `whatsapp` is digits only for wa.me. */

@@ -2,11 +2,23 @@
 
 import { useSyncExternalStore } from "react";
 import type { ActivityEvent, AppNotification, Database, NotificationKind, User, Workspace } from "./types";
+import {
+  cloudChangePassword,
+  cloudCurrent,
+  cloudDeleteAccount,
+  cloudEnabled,
+  cloudSaveWorkspace,
+  cloudSignIn,
+  cloudSignOut,
+  cloudSignUp,
+  type CloudAccount,
+} from "./cloud";
 
 /**
- * Preview-mode persistence: the whole app state lives in this browser's localStorage.
- * Every read and write goes through the signed-in user's own workspace, mirroring the
- * tenant isolation the production backend enforces (see docs/ARCHITECTURE.md).
+ * The app state lives in this browser's localStorage. Every read and write goes through
+ * the signed-in user's own workspace. When Supabase is configured (see ./cloud.ts),
+ * accounts are real and each change to the workspace is also saved to the database,
+ * so the owner gets the same workspace on any device.
  */
 
 const KEY = "lumi-db-v1";
@@ -23,6 +35,7 @@ function load(): Database {
   } catch {
     cache = empty;
   }
+  startCloudSync();
   return cache;
 }
 
@@ -116,11 +129,18 @@ export function newWorkspace(ownerId: string, sample = false): Workspace {
   };
 }
 
-export type AuthResult = { ok: true } | { ok: false; error: string };
+export type AuthResult = { ok: true; confirmEmail?: boolean } | { ok: false; error: string };
 
 export async function signUp(input: Omit<User, "id" | "createdAt" | "passwordHash"> & { password: string }): Promise<AuthResult> {
-  const db = structuredClone(load());
   const email = input.email.trim().toLowerCase();
+  if (cloudEnabled) {
+    const res = await cloudSignUp({ ...input, email });
+    if (!res.ok) return res;
+    if (res.value === "confirm-email") return { ok: true, confirmEmail: true };
+    openCloudAccount(res.value);
+    return { ok: true };
+  }
+  const db = structuredClone(load());
   if (db.users.some((u) => u.email === email)) return { ok: false, error: "An account with this email already exists. Log in instead." };
   const { password, ...rest } = input;
   const user: User = { ...rest, email, id: uid(), createdAt: nowIso(), passwordHash: await hashPassword(email, password) };
@@ -133,8 +153,9 @@ export async function signUp(input: Omit<User, "id" | "createdAt" | "passwordHas
 }
 
 export async function logIn(emailRaw: string, password: string): Promise<AuthResult> {
-  const db = structuredClone(load());
   const email = emailRaw.trim().toLowerCase();
+  if (cloudEnabled) return cloudLogIn(email, password);
+  const db = structuredClone(load());
   const user = db.users.find((u) => u.email === email);
   if (!user || user.passwordHash !== (await hashPassword(email, password))) {
     return { ok: false, error: "That email and password don't match an account on this device." };
@@ -149,6 +170,15 @@ export async function changePassword(current: string, next: string): Promise<Aut
   const db = structuredClone(load());
   const user = db.users.find((u) => u.id === db.sessionUserId);
   if (!user) return { ok: false, error: "You're signed out." };
+  if (user.cloud) {
+    const res = await cloudChangePassword(user.email, current, next);
+    if (!res.ok) return res;
+    updateWorkspace((ws) => {
+      ws.security.lastPasswordChange = nowIso();
+      audit(ws, "Password changed");
+    });
+    return { ok: true };
+  }
   if (user.passwordHash !== (await hashPassword(user.email, current))) return { ok: false, error: "Current password is wrong." };
   user.passwordHash = await hashPassword(user.email, next);
   const ws = db.workspaces[user.id];
@@ -162,6 +192,11 @@ export async function changePassword(current: string, next: string): Promise<Aut
 
 export function logOut() {
   const db = structuredClone(load());
+  const user = db.users.find((u) => u.id === db.sessionUserId);
+  if (user?.cloud) {
+    flushCloud();
+    void cloudSignOut();
+  }
   db.sessionUserId = null;
   save(db);
 }
@@ -196,16 +231,138 @@ export function updateWorkspace(mutate: (ws: Workspace) => void) {
   if (!ws) return;
   mutate(ws);
   save(db);
+  if (db.users.find((u) => u.id === db.sessionUserId)?.cloud) scheduleCloudSave(db.sessionUserId, ws);
 }
 
-export function deleteAccount() {
+export async function deleteAccount(): Promise<boolean> {
+  const id = load().sessionUserId;
+  if (!id) return false;
+  if (load().users.find((u) => u.id === id)?.cloud) {
+    clearTimeout(pending?.timer);
+    pending = null;
+    if (!(await cloudDeleteAccount())) return false;
+  }
   const db = structuredClone(load());
-  const id = db.sessionUserId;
-  if (!id) return;
   db.users = db.users.filter((u) => u.id !== id);
   delete db.workspaces[id];
   db.sessionUserId = null;
   save(db);
+  return true;
+}
+
+/* ── Supabase sync ── */
+
+const DIRTY_KEY = "ibax-cloud-dirty";
+let pending: { timer: ReturnType<typeof setTimeout>; ownerId: string; ws: Workspace } | null = null;
+let syncStarted = false;
+
+function markDirty(ownerId: string | null) {
+  try {
+    if (ownerId) localStorage.setItem(DIRTY_KEY, ownerId);
+    else localStorage.removeItem(DIRTY_KEY);
+  } catch {
+    /* storage blocked */
+  }
+}
+
+function isDirty(ownerId: string) {
+  try {
+    return localStorage.getItem(DIRTY_KEY) === ownerId;
+  } catch {
+    return false;
+  }
+}
+
+async function pushWorkspace(ownerId: string, ws: Workspace) {
+  if (await cloudSaveWorkspace(ownerId, ws)) markDirty(null);
+}
+
+function scheduleCloudSave(ownerId: string, ws: Workspace) {
+  markDirty(ownerId);
+  if (pending) clearTimeout(pending.timer);
+  pending = { ownerId, ws, timer: setTimeout(flushCloud, 800) };
+}
+
+function flushCloud() {
+  if (!pending) return;
+  clearTimeout(pending.timer);
+  const { ownerId, ws } = pending;
+  pending = null;
+  void pushWorkspace(ownerId, ws);
+}
+
+/** Puts a Supabase account on this device and signs it in here. */
+function openCloudAccount(acc: CloudAccount, fallback?: Workspace) {
+  const db = structuredClone(load());
+  const user: User = { id: acc.id, name: acc.name, email: acc.email, phone: acc.phone, country: acc.country, passwordHash: "", createdAt: acc.createdAt, cloud: true };
+  db.users = [...db.users.filter((u) => u.id !== acc.id && u.email !== acc.email), user];
+  let ws = acc.workspace;
+  const fresh = !ws;
+  if (!ws) {
+    ws = fallback ?? db.workspaces[acc.id] ?? newWorkspace(acc.id);
+    ws.ownerId = acc.id;
+    if (!ws.team.some((m) => m.role === "owner")) ws.team.push({ id: uid(), name: acc.name, email: acc.email, role: "owner" });
+  }
+  db.workspaces[acc.id] = ws;
+  db.sessionUserId = acc.id;
+  save(db);
+  if (fresh) void pushWorkspace(acc.id, ws);
+}
+
+async function cloudLogIn(email: string, password: string): Promise<AuthResult> {
+  const res = await cloudSignIn(email, password);
+  if (res.ok) {
+    openCloudAccount(res.value);
+    updateWorkspace((ws) => audit(ws, "Signed in"));
+    return { ok: true };
+  }
+  // An account made on this device before accounts moved to Supabase: move it across.
+  const db = load();
+  const legacy = db.users.find((u) => u.email === email && !u.cloud && u.passwordHash);
+  if (legacy && legacy.passwordHash === (await hashPassword(email, password))) {
+    const created = await cloudSignUp({ email, password, name: legacy.name, phone: legacy.phone, country: legacy.country });
+    if (!created.ok) return res;
+    if (created.value === "confirm-email") return { ok: true, confirmEmail: true };
+    const ws = db.workspaces[legacy.id];
+    const moved = structuredClone(load());
+    delete moved.workspaces[legacy.id];
+    moved.users = moved.users.filter((u) => u.id !== legacy.id);
+    save(moved);
+    openCloudAccount(created.value, ws ? structuredClone(ws) : undefined);
+    return { ok: true };
+  }
+  return res;
+}
+
+/** Once per page load: pick up the Supabase session and the latest saved workspace. */
+function startCloudSync() {
+  if (syncStarted || !cloudEnabled || typeof window === "undefined") return;
+  syncStarted = true;
+  window.addEventListener("pagehide", flushCloud);
+  void cloudCurrent()
+    .then((acc) => {
+      const db = load();
+      const signedIn = db.users.find((u) => u.id === db.sessionUserId);
+      if (!acc) {
+        // Signed out or expired elsewhere: don't keep showing a cloud workspace.
+        if (signedIn?.cloud) {
+          const next = structuredClone(db);
+          next.sessionUserId = null;
+          save(next);
+        }
+        return;
+      }
+      // Leave someone exploring the sample workspace where they are.
+      if (db.sessionUserId && db.sessionUserId !== acc.id) return;
+      const local = db.workspaces[acc.id];
+      if (local && isDirty(acc.id)) {
+        openCloudAccount({ ...acc, workspace: local });
+        void pushWorkspace(acc.id, local);
+      } else openCloudAccount(acc);
+    })
+    .catch(() => {
+      /* offline: keep working from this device's copy */
+    });
 }
 
 /* ── Helpers used inside updateWorkspace mutators ── */

@@ -10,6 +10,8 @@ export type User = {
   country: string;
   passwordHash: string;
   createdAt: string;
+  /** Account lives in Supabase; this device keeps a copy of its workspace. */
+  cloud?: boolean;
 };
 
 export type Business = {

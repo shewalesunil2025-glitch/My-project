@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { product } from "@/config/product";
-import { logIn, openSampleWorkspace } from "@/lib/app/store";
+import { logIn, openSampleWorkspace, useSession } from "@/lib/app/store";
 import { buildSampleWorkspace } from "@/lib/app/sample";
 import { AuthFrame } from "@/components/app/AuthFrame";
 import { SocialSignIn } from "@/components/app/SocialSignIn";
@@ -13,15 +13,25 @@ import { Btn, Field, Input, Notice, Spinner } from "@/components/app/ui";
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
+  const { user, workspace } = useSession();
+
+  // Already signed in, e.g. back from the email-confirmation link.
+  useEffect(() => {
+    if (user && workspace && !workspace.sample) router.replace(workspace.business ? "/app/home" : "/app/setup");
+  }, [user, workspace, router]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     setBusy(true);
+    setError("");
+    setInfo("");
     const res = await logIn(String(f.get("email") ?? ""), String(f.get("password") ?? ""));
     setBusy(false);
     if (!res.ok) return setError(res.error);
+    if (res.confirmEmail) return setInfo("We sent you a confirmation link. Open it to finish moving your account, then log in.");
     router.push("/app/home");
   }
 
@@ -47,6 +57,7 @@ export default function LoginPage() {
           <Input id="password" name="password" type="password" autoComplete="current-password" required />
         </Field>
         {error && <Notice tone="amber">{error}</Notice>}
+        {info && <Notice tone="blue">{info}</Notice>}
         <Btn type="submit" size="lg" className="w-full" disabled={busy}>
           {busy ? <Spinner /> : "Log in"}
         </Btn>

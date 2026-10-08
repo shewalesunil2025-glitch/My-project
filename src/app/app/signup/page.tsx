@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { product } from "@/config/product";
 import { countries } from "@/content/app/countries";
+import { cloudEnabled } from "@/lib/app/cloud";
 import { signUp } from "@/lib/app/store";
 import { AuthFrame } from "@/components/app/AuthFrame";
 import { SocialSignIn } from "@/components/app/SocialSignIn";
@@ -13,6 +14,7 @@ import { Btn, Field, Input, Notice, Select, Spinner } from "@/components/app/ui"
 export default function SignUpPage() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [sentTo, setSentTo] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -26,8 +28,19 @@ export default function SignUpPage() {
     const res = await signUp({ name: get("name"), email: get("email"), phone: get("phone"), country: get("country"), password: get("password") });
     setBusy(false);
     if (!res.ok) return setError(res.error);
+    if (res.confirmEmail) return setSentTo(get("email"));
     router.push("/app/setup");
   }
+
+  if (sentTo)
+    return (
+      <AuthFrame title="Check your email" subtitle={`We sent a confirmation link to ${sentTo}.`}>
+        <Notice tone="blue">Open the link in that email to confirm your account. It brings you back here, signed in.</Notice>
+        <Link href="/app/login" className="mt-6 block text-center text-sm font-semibold text-fg underline underline-offset-2">
+          Already confirmed? Log in
+        </Link>
+      </AuthFrame>
+    );
 
   return (
     <AuthFrame
@@ -76,7 +89,7 @@ export default function SignUpPage() {
         <Btn type="submit" size="lg" className="w-full" disabled={busy}>
           {busy ? <Spinner /> : "Create Account"}
         </Btn>
-        {product.previewMode && <p className="text-center text-xs text-fg-subtle">Preview mode: your account is stored on this device only.</p>}
+        {!cloudEnabled && <p className="text-center text-xs text-fg-subtle">Preview mode: your account is stored on this device only.</p>}
       </form>
     </AuthFrame>
   );
