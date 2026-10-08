@@ -11,7 +11,7 @@ export const product = {
   tagline: "Your AI Business Operating System",
   positioning: "One AI. One Platform. Your Entire Business.",
   /** Shown under the logo, as on the website. */
-  logoTagline: "Intelligent Business Automation",
+  logoTagline: "Intelligent Business Automation Expert",
   description:
     "IBAX AI runs your website, AI assistants, WhatsApp, calls, social media, reviews, content and leads from one app — you give the instructions, IBAX AI handles the technology.",
   /** Currency for the placeholder prices in src/content/app/services.ts. */

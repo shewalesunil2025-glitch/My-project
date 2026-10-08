@@ -36,7 +36,7 @@ export function BrandMark({ className }: { className?: string }) {
   return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_16px_rgb(98_207_74/0.5)]", className)} />;
 }
 
-/** Symbol + "ibaxai" wordmark, with the "Intelligent Business Automation" line under it when `tagline` is set. */
+/** Symbol + "ibaxai" wordmark, with the "Intelligent Business Automation Expert" line under it when `tagline` is set. */
 export function BrandLogo({
   className,
   size = "md",
