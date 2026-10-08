@@ -40,6 +40,7 @@ function friendly(message: string): string {
   if (m.includes("already registered") || m.includes("already been registered")) return "An account with this email already exists. Log in instead.";
   if (m.includes("invalid login credentials")) return "That email and password don't match an account.";
   if (m.includes("email not confirmed")) return "Please confirm your email first: open the link we sent you, then log in.";
+  if (m.includes("email rate limit")) return "We couldn't send the confirmation email right now. Please try again in an hour.";
   if (m.includes("rate limit") || m.includes("too many")) return "Too many attempts. Please wait a few minutes and try again.";
   if (m.includes("password")) return message;
   return "Something went wrong. Please try again.";
@@ -71,6 +72,19 @@ export async function cloudSignUp(input: {
   phone: string;
   country: string;
 }): Promise<CloudResult<CloudAccount | "confirm-email">> {
+  // The server creates the account straight away (no confirmation email to wait for).
+  const res = await fetch("/api/account/signup", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  }).catch(() => null);
+  if (res && res.status !== 503) {
+    const out = (await res.json().catch(() => ({}))) as { ok?: boolean; reason?: string; message?: string };
+    if (out.reason === "exists") return { ok: false, error: friendly("already registered") };
+    if (!out.ok) return { ok: false, error: out.message ?? friendly("") };
+    return cloudSignIn(input.email, input.password);
+  }
+  // Server not configured: let Supabase handle sign-up (sends a confirmation email when enabled).
   const { data, error } = await sb().auth.signUp({
     email: input.email,
     password: input.password,
@@ -101,6 +115,22 @@ export async function cloudCurrent(): Promise<CloudAccount | null> {
 export async function cloudSaveWorkspace(ownerId: string, workspace: Workspace): Promise<boolean> {
   const { error } = await sb().from("workspaces").upsert({ owner_id: ownerId, data: workspace }, { onConflict: "owner_id" });
   return !error;
+}
+
+export type OAuthProvider = "google" | "apple";
+
+/** Sends the visitor to Google / Apple; they come back to /app/login signed in. */
+export async function cloudOAuth(provider: OAuthProvider): Promise<CloudResult<null>> {
+  const settings = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key! } })
+    .then((r) => r.json() as Promise<{ external?: Record<string, boolean> }>)
+    .catch(() => null);
+  if (settings && !settings.external?.[provider]) {
+    const name = provider === "google" ? "Google" : "Apple";
+    return { ok: false, error: `${name} sign-in isn't switched on yet. Please use your email for now.` };
+  }
+  const { error } = await sb().auth.signInWithOAuth({ provider, options: { redirectTo: `${window.location.origin}/app/login` } });
+  if (error) return { ok: false, error: friendly(error.message) };
+  return { ok: true, value: null };
 }
 
 export async function cloudSignOut() {
