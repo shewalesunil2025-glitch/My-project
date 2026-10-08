@@ -36,7 +36,7 @@ export function BrandMark({ className }: { className?: string }) {
   return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_16px_rgb(98_207_74/0.5)]", className)} />;
 }
 
-/** Symbol + "ibaxai" wordmark, with the "Intelligent Business Automation" line under it when `tagline` is set. */
+/** Symbol + "ibaxai" wordmark, with the "Intelligent Business Automation Expert" line under it when `tagline` is set. */
 export function BrandLogo({
   className,
   size = "md",
@@ -56,7 +56,7 @@ export function BrandLogo({
       <span className={cn("flex flex-col", stacked ? "items-center" : "items-start")}>
         <Wordmark className={word} />
         {tagline && (
-          <span className={cn("mt-1.5 font-mono whitespace-nowrap uppercase text-fg-subtle", !stacked && "max-sm:hidden", size === "lg" ? "text-[0.62rem] tracking-[0.32em]" : "text-[0.5rem] tracking-[0.22em]")}>
+          <span className={cn("mt-1.5 font-mono whitespace-nowrap uppercase text-fg-subtle", !stacked && "max-sm:hidden", size === "lg" ? "text-[0.62rem] tracking-[0.22em]" : "text-[0.5rem] tracking-[0.22em]")}>
             {product.logoTagline}
           </span>
         )}
