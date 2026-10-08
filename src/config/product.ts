@@ -1,7 +1,7 @@
 /**
  * The business app's brand. Change `name` here and it updates everywhere in the app.
  *
- * "IBAX AI" (Intelligent Business Automation Experience) — the brand and its
+ * "IBAX AI" (Intelligent Business Automation Expert) — the brand and its
  * domain, www.ibaxai.com. The assistant inside the app and on the website is IBAX.
  */
 export const product = {
