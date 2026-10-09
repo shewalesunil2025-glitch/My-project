@@ -1,6 +1,6 @@
 import { siteConfig } from "@/config/site";
 
-/** Who runs IBAX AI — used on the Privacy Policy and Terms pages. */
+/** Who runs IBAXAI — used on the Privacy Policy and Terms pages. */
 export const legal = {
   brand: siteConfig.name,
   operator: "Shewale Sunil",

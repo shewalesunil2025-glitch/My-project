@@ -38,7 +38,7 @@ export type ServiceDef = {
   info: FieldDef[];
   /** Behaviour / schedule choices (step "Configure"). */
   configure: FieldDef[];
-  /** Third-party steps IBAX AI can't skip (rule: never promise instant activation). */
+  /** Third-party steps IBAXAI can't skip (rule: never promise instant activation). */
   approvalNote?: string;
   includes?: string[];
   /** Everything a package includes, shown as cards (Digital Marketing). */
@@ -103,8 +103,8 @@ export const services: ServiceDef[] = [
     group: "web",
     icon: "Globe",
     description:
-      "IBAX AI builds your website from the details you already gave — pages, menu or services, gallery, reviews, map, WhatsApp button and enquiry form — with SEO basics in place. Already have a site? Connect it instead.",
-    features: ["Home, About, Services/Menu, Gallery, Reviews, Contact", "WhatsApp button & enquiry form", "Google Maps & SEO basics", "IBAX AI built in — every enquiry answered", "Edit text and photos from IBAX AI"],
+      "IBAXAI builds your website from the details you already gave — pages, menu or services, gallery, reviews, map, WhatsApp button and enquiry form — with SEO basics in place. Already have a site? Connect it instead.",
+    features: ["Home, About, Services/Menu, Gallery, Reviews, Contact", "WhatsApp button & enquiry form", "Google Maps & SEO basics", "IBAXAI built in — every enquiry answered", "Edit text and photos from IBAXAI"],
     price: 299,
     billing: "one-time",
     setupTime: "3–5 working days after you submit your details",
@@ -126,8 +126,8 @@ export const services: ServiceDef[] = [
     group: "assistant",
     icon: "PhoneCall",
     description:
-      "Your assistant picks up every call, answers questions about your business, takes enquiries and appointment requests, and transfers to a person when needed. You get a summary of every call in IBAX AI.",
-    features: ["Answers incoming calls 24/7", "Business information, prices & hours", "Appointment requests", "Lead capture & follow-up", "Call summaries in IBAX AI", "Transfer to a person"],
+      "Your assistant picks up every call, answers questions about your business, takes enquiries and appointment requests, and transfers to a person when needed. You get a summary of every call in IBAXAI.",
+    features: ["Answers incoming calls 24/7", "Business information, prices & hours", "Appointment requests", "Lead capture & follow-up", "Call summaries in IBAXAI", "Transfer to a person"],
     price: 79,
     setupTime: "1–2 working days (number setup)",
     connect: ["phone"],
@@ -144,7 +144,7 @@ export const services: ServiceDef[] = [
       handoff,
       { key: "voice", label: "Voice", type: "select", options: ["Female — warm", "Male — calm", "Female — energetic", "Male — friendly"], default: "Female — warm" },
     ],
-    approvalNote: "Call forwarding to your IBAX AI number has to be switched on with your phone provider — IBAX AI shows you exactly how.",
+    approvalNote: "Call forwarding to your IBAXAI number has to be switched on with your phone provider — IBAXAI shows you exactly how.",
   },
   {
     id: "whatsapp",
@@ -153,8 +153,8 @@ export const services: ServiceDef[] = [
     group: "assistant",
     icon: "MessageCircle",
     description:
-      "Answers customer questions, shares product and service details, captures leads, handles appointment and order enquiries and follows up — all on your WhatsApp Business number. Conversations appear inside IBAX AI.",
-    features: ["Instant answers & FAQs", "Product / service information", "Lead capture", "Appointment & order enquiries", "Follow-ups", "Conversations inside IBAX AI"],
+      "Answers customer questions, shares product and service details, captures leads, handles appointment and order enquiries and follows up — all on your WhatsApp Business number. Conversations appear inside IBAXAI.",
+    features: ["Instant answers & FAQs", "Product / service information", "Lead capture", "Appointment & order enquiries", "Follow-ups", "Conversations inside IBAXAI"],
     price: 49,
     setupTime: "Same day after WhatsApp approval",
     connect: ["whatsapp"],
@@ -166,7 +166,7 @@ export const services: ServiceDef[] = [
       faq,
     ],
     configure: [tone, handoff, { key: "followUp", label: "Follow up with new leads after 24 hours", type: "toggle", default: true }],
-    approvalNote: "Meta reviews every WhatsApp Business API number. This usually takes 1–3 days; IBAX AI guides you through it.",
+    approvalNote: "Meta reviews every WhatsApp Business API number. This usually takes 1–3 days; IBAXAI guides you through it.",
   },
   {
     id: "instagram",
@@ -175,7 +175,7 @@ export const services: ServiceDef[] = [
     group: "social",
     icon: "Instagram",
     description:
-      "IBAX AI plans your content, writes captions and hashtags, schedules posts and reels, helps with comments and replies to DMs where Instagram allows it — with your approval or automatically.",
+      "IBAXAI plans your content, writes captions and hashtags, schedules posts and reels, helps with comments and replies to DMs where Instagram allows it — with your approval or automatically.",
     features: ["Content ideas & captions", "Hashtag suggestions", "Post & reel scheduling", "Comment assistance", "DM replies where supported", "Lead capture & analytics"],
     price: 39,
     setupTime: "Same day",
@@ -205,8 +205,8 @@ export const services: ServiceDef[] = [
     group: "social",
     icon: "Youtube",
     description:
-      "Tell IBAX AI “every day at 7 PM upload one Short about my restaurant.” IBAX AI turns your business into ideas, scripts, AI video, voice, thumbnail, title and description, checks quality, schedules and publishes — and shows views, likes and comments in IBAX AI.",
-    features: ["AI content ideas & scripts", "AI video & voice-over", "Thumbnail, title & description", "Quality check before publishing", "Scheduled publishing", "Views, likes & comments in IBAX AI"],
+      "Tell IBAXAI “every day at 7 PM upload one Short about my restaurant.” IBAXAI turns your business into ideas, scripts, AI video, voice, thumbnail, title and description, checks quality, schedules and publishes — and shows views, likes and comments in IBAXAI.",
+    features: ["AI content ideas & scripts", "AI video & voice-over", "Thumbnail, title & description", "Quality check before publishing", "Scheduled publishing", "Views, likes & comments in IBAXAI"],
     price: 39,
     setupTime: "Same day — first video within 24 hours",
     connect: ["youtube"],
@@ -222,7 +222,7 @@ export const services: ServiceDef[] = [
     short: "Inbox sorting, drafts and follow-ups.",
     group: "assistant",
     icon: "Mail",
-    description: "With your permission IBAX AI reads your business inbox, sorts enquiries, drafts replies for you to approve, follows up with leads and customers and sends campaigns you authorise.",
+    description: "With your permission IBAXAI reads your business inbox, sorts enquiries, drafts replies for you to approve, follows up with leads and customers and sends campaigns you authorise.",
     features: ["Reads only the inbox you authorise", "Sorts enquiries", "Drafts replies", "Customer & lead follow-up", "Notifications", "Email campaigns you approve"],
     price: 29,
     setupTime: "Same day",
@@ -232,7 +232,7 @@ export const services: ServiceDef[] = [
       { key: "mode", label: "Replies", type: "select", options: ["Draft replies for me to approve", "Send routine replies automatically"], default: "Draft replies for me to approve" },
       tone,
     ],
-    approvalNote: "Google asks you to grant IBAX AI permission to your mailbox. You can revoke it anytime in Settings → Connected accounts.",
+    approvalNote: "Google asks you to grant IBAXAI permission to your mailbox. You can revoke it anytime in Settings → Connected accounts.",
   },
   {
     id: "reviews",
@@ -240,7 +240,7 @@ export const services: ServiceDef[] = [
     short: "Review requests and reply drafts. Never fake reviews.",
     group: "growth",
     icon: "Star",
-    description: "Monitors your Google reviews, alerts you to new ones, suggests replies, runs review-request campaigns to real customers and tracks your rating. IBAX AI never writes fake reviews or manipulates ratings.",
+    description: "Monitors your Google reviews, alerts you to new ones, suggests replies, runs review-request campaigns to real customers and tracks your rating. IBAXAI never writes fake reviews or manipulates ratings.",
     features: ["New-review alerts", "Suggested replies", "Review requests to real customers", "Rating analytics", "Google Business Profile help"],
     price: 29,
     setupTime: "Same day",
@@ -257,7 +257,7 @@ export const services: ServiceDef[] = [
     short: "Every enquiry followed up on time.",
     group: "growth",
     icon: "UserCheck",
-    description: "Every new lead from calls, WhatsApp, social media or your website gets a timely, personal follow-up. IBAX AI tells you who needs a call today.",
+    description: "Every new lead from calls, WhatsApp, social media or your website gets a timely, personal follow-up. IBAXAI tells you who needs a call today.",
     features: ["Leads from every channel in one list", "Automatic follow-up sequence", "Daily follow-up list", "Status tracking to conversion"],
     price: 39,
     setupTime: "Same day",
@@ -275,8 +275,8 @@ export const services: ServiceDef[] = [
     group: "assistant",
     icon: "Headset",
     description:
-      "IBAX AI answers your customers' common questions — timings, prices, location, orders, bookings — on your website chat, WhatsApp, Instagram, Facebook and email, and hands anything tricky to you.",
-    features: ["Answers on every connected channel", "Your FAQs, prices and policies", "Order and booking status questions", "Hands complaints to a person", "Every conversation visible in IBAX AI"],
+      "IBAXAI answers your customers' common questions — timings, prices, location, orders, bookings — on your website chat, WhatsApp, Instagram, Facebook and email, and hands anything tricky to you.",
+    features: ["Answers on every connected channel", "Your FAQs, prices and policies", "Order and booking status questions", "Hands complaints to a person", "Every conversation visible in IBAXAI"],
     price: 49,
     setupTime: "Same day",
     connect: [],
@@ -295,7 +295,7 @@ export const services: ServiceDef[] = [
     group: "premium",
     icon: "Rocket",
     description:
-      "Your complete digital marketing team — run by IBAX AI, guided by people. Social media, content, a monthly calendar, Meta and Google ads, local SEO and your Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report, managed together. Ad spend is paid separately, straight to Meta or Google, and nothing is posted without your approval.",
+      "Your complete digital marketing team — run by IBAXAI, guided by people. Social media, content, a monthly calendar, Meta and Google ads, local SEO and your Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report, managed together. Ad spend is paid separately, straight to Meta or Google, and nothing is posted without your approval.",
     features: [
       "Social media management — Instagram, Facebook & YouTube",
       "Content creation in your brand voice",
@@ -304,7 +304,7 @@ export const services: ServiceDef[] = [
       "Local SEO & Google Business Profile",
       "Website SEO basics",
       "WhatsApp campaigns to opted-in customers",
-      "Lead follow-up by IBAX AI",
+      "Lead follow-up by IBAXAI",
       "Monthly report",
     ],
     includes: ["instagram", "facebook", "youtube", "followup"],
@@ -339,7 +339,7 @@ export const services: ServiceDef[] = [
     short: "Something specific to your business? We build it.",
     group: "custom",
     icon: "Wand2",
-    description: "Describe the job you want automated — billing reminders, stock alerts, staff rosters, CRM sync — and our team designs, builds and connects it to IBAX AI.",
+    description: "Describe the job you want automated — billing reminders, stock alerts, staff rosters, CRM sync — and our team designs, builds and connects it to IBAXAI.",
     features: ["Free consultation", "Built and maintained for you", "Appears in your Automation Control Centre", "Any app with an API"],
     price: null,
     setupTime: "Quote within 2 working days",
@@ -364,12 +364,12 @@ export const annualPrice = (monthly: number) => monthly * 10;
 export const providerInfo: Record<ProviderId, { name: string; help: string }> = {
   youtube: { name: "YouTube", help: "Sign in with the Google account that owns your channel and allow uploads." },
   instagram: { name: "Instagram", help: "Use a Business or Creator account linked to your Facebook Page." },
-  facebook: { name: "Facebook Page", help: "Sign in as a Page admin and choose the Page IBAX AI should manage." },
+  facebook: { name: "Facebook Page", help: "Sign in as a Page admin and choose the Page IBAXAI should manage." },
   whatsapp: { name: "WhatsApp Business", help: "Sign in with Meta and pick (or register) the number customers message." },
   google: { name: "Google Business Profile", help: "Sign in with the Google account that manages your Business Profile." },
-  gmail: { name: "Gmail / Email", help: "Sign in and allow IBAX AI to read and draft emails in this mailbox only." },
-  phone: { name: "Business phone", help: "IBAX AI gives you a number; forward your business calls to it." },
-  website: { name: "Website", help: "Add a small IBAX AI snippet to your existing site to capture enquiries." },
+  gmail: { name: "Gmail / Email", help: "Sign in and allow IBAXAI to read and draft emails in this mailbox only." },
+  phone: { name: "Business phone", help: "IBAXAI gives you a number; forward your business calls to it." },
+  website: { name: "Website", help: "Add a small IBAXAI snippet to your existing site to capture enquiries." },
 };
 
 export const businessCategories = [

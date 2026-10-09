@@ -103,7 +103,7 @@ export function buildSampleWorkspace(ws: Workspace) {
   const sim = { simulated: true, status: "connected" as const, connectedAt: daysAgo(30) };
   ws.connections = {
     whatsapp: { provider: "whatsapp", account: "+1 555 0142", ...sim },
-    phone: { provider: "phone", account: "+1 555 0199 (IBAX AI line)", ...sim },
+    phone: { provider: "phone", account: "+1 555 0199 (IBAXAI line)", ...sim },
     youtube: { provider: "youtube", account: "Sunrise Bistro", ...sim },
     instagram: { provider: "instagram", account: "@sunrisebistro", ...sim },
     facebook: { provider: "facebook", account: "Sunrise Bistro Page", ...sim },

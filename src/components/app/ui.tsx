@@ -31,7 +31,7 @@ import { cn } from "@/lib/cn";
 import { LogoMark, Wordmark } from "@/components/navigation/Logo";
 import { product } from "@/config/product";
 
-/* ── Brand: the IBAX AI symbol and wordmark, the same as the website ── */
+/* ── Brand: the IBAXAI symbol and wordmark, the same as the website ── */
 export function BrandMark({ className }: { className?: string }) {
   return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_16px_rgb(98_207_74/0.5)]", className)} />;
 }
