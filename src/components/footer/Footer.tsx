@@ -82,7 +82,16 @@ export function Footer() {
       </div>
       <div className="container-x relative">
         <div className="flex flex-col justify-between gap-3 border-t border-white/[0.07] pt-6 pb-24 text-xs text-fg-subtle sm:flex-row">
-          <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved. ·{" "}
+            <a href="/privacy" className="link-underline hover:text-fg">
+              Privacy Policy
+            </a>{" "}
+            ·{" "}
+            <a href="/terms" className="link-underline hover:text-fg">
+              Terms of Service
+            </a>
+          </p>
           <p>AI Automation • Websites • Intelligent Business Systems</p>
         </div>
       </div>
