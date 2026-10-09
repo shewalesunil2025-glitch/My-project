@@ -1,6 +1,6 @@
 {
-  "name": "IBAX AI — AI Business Operating System",
-  "short_name": "IBAX AI",
+  "name": "IBAXAI — AI Business Operating System",
+  "short_name": "IBAXAI",
   "description": "Run your website, AI assistants, WhatsApp, calls, social media, reviews and leads from one app.",
   "start_url": "/app",
   "scope": "/app",

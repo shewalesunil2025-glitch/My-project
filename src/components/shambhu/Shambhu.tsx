@@ -47,7 +47,7 @@ function Intro() {
   return (
     <div className="text-center">
       <Reveal>
-        <p className="badge"><Scramble text="IBAX AI" /></p>
+        <p className="badge"><Scramble text="IBAXAI" /></p>
       </Reveal>
       <ScrollWords
         id="shambhu-title"

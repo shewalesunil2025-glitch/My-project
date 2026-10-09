@@ -1,4 +1,4 @@
-/** Data model of one IBAX AI workspace. One customer → one workspace → one business. */
+/** Data model of one IBAXAI workspace. One customer → one workspace → one business. */
 
 export type ProviderId = "youtube" | "instagram" | "facebook" | "whatsapp" | "google" | "gmail" | "phone" | "website";
 

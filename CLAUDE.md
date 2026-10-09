@@ -1,4 +1,4 @@
-# IBAX AI — notes for Claude
+# IBAXAI — notes for Claude
 
 **The owner's plan lives in `docs/ROADMAP.md`.** When the owner says "road map" / "roadmap" (or asks what's next), read it, start from the **Where we are** table, and take the next pending item — then update that table in the same PR when an item moves.
 
