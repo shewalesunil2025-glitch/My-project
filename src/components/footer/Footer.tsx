@@ -90,6 +90,18 @@ export function Footer() {
             ·{" "}
             <a href="/terms" className="link-underline hover:text-fg">
               Terms of Service
+            </a>{" "}
+            ·{" "}
+            <a href="/refund-policy" className="link-underline hover:text-fg">
+              Refund Policy
+            </a>{" "}
+            ·{" "}
+            <a href="/shipping-policy" className="link-underline hover:text-fg">
+              Delivery Policy
+            </a>{" "}
+            ·{" "}
+            <a href="/contact" className="link-underline hover:text-fg">
+              Contact Us
             </a>
           </p>
           <p>AI Automation • Websites • Intelligent Business Systems</p>
