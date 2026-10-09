@@ -1,6 +1,7 @@
 import { formatPrice, product } from "@/config/product";
 import { annualPrice, isLive, providerInfo, serviceById, services, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { activate, missingConnections, runTest, setAutomationStatus } from "./automation";
+import { cloudAuthHeader } from "./cloud";
 import { audit, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
 import type { Automation, PlanPeriod, ProviderId, Workspace } from "./types";
 
@@ -126,10 +127,10 @@ export function saveServiceDetails(serviceId: string, fields: { key: string; val
  * Preview mode: the account name/number is recorded on this device. In production this is
  * the platform's own sign-in (for WhatsApp, Meta's Embedded Signup) and the backend keeps the token.
  */
-export function connectProvider(provider: ProviderId, account: string) {
+export function connectProvider(provider: ProviderId, account: string, simulated: boolean = product.previewMode) {
   const name = providerInfo[provider].name;
   updateWorkspace((w) => {
-    w.connections[provider] = { provider, account: account.trim(), status: "connected", connectedAt: nowIso(), simulated: product.previewMode };
+    w.connections[provider] = { provider, account: account.trim(), status: "connected", connectedAt: nowIso(), simulated };
     logActivity(w, { kind: "system", title: `${name} connected`, detail: account.trim(), href: "/app/settings#accounts" });
     audit(w, `Connected ${name}`);
   });
@@ -161,7 +162,7 @@ export async function activateService(serviceId: string): Promise<ActivationResu
   try {
     const res = await fetch("/api/automation/activate", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(await cloudAuthHeader()) },
       body: JSON.stringify({
         workspaceId: ws.id,
         serviceId: svc.id,

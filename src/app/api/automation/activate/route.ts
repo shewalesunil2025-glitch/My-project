@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serviceById } from "@/content/app/services";
+import { evolutionReady, instanceFor, ownership, userFromRequest, waDigits } from "@/lib/server/whatsapp";
 
 /**
  * Hands a newly activated service to the automation backend (n8n).
@@ -23,6 +24,17 @@ export async function POST(request: Request) {
   }
   const svc = typeof body.serviceId === "string" ? serviceById(body.serviceId) : undefined;
   if (!svc || typeof body.workspaceId !== "string") return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
+
+  // WhatsApp: only the account that linked the number may switch its replies on.
+  if (svc.id === "whatsapp" && evolutionReady()) {
+    const user = await userFromRequest(request);
+    if (!user) return NextResponse.json({ ok: false, reason: "unauthorized" }, { status: 401 });
+    const accounts = (body.accounts ?? {}) as Record<string, unknown>;
+    const digits = waDigits(String(accounts.whatsapp ?? ""));
+    if (!digits || (await ownership(user.id, instanceFor(digits))) !== "mine") {
+      return NextResponse.json({ ok: false, reason: "not_linked" }, { status: 403 });
+    }
+  }
 
   const url = process.env.N8N_ACTIVATE_WEBHOOK_URL;
   if (!url) return NextResponse.json({ ok: true, mode: "preview" });

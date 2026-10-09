@@ -293,10 +293,10 @@ export async function payFromCard(card: Extract<AgentCard, { type: "pay" }>) {
 }
 
 /** The owner connected an account on a connect card. */
-export async function connectFromCard(card: Extract<AgentCard, { type: "connect" }>, account: string) {
+export async function connectFromCard(card: Extract<AgentCard, { type: "connect" }>, account: string, simulated?: boolean) {
   const svc = serviceById(card.serviceId);
   if (!svc || !account.trim() || busy) return;
-  connectProvider(card.provider, account);
+  connectProvider(card.provider, account, simulated);
   markCard((c) => c.type === "connect" && c.provider === card.provider);
   const ws = currentWorkspace()!;
   const lang = ws.agentFlow?.lang ?? detectLang(ws.chat.filter((m) => m.role === "user").at(-1)?.text ?? "");

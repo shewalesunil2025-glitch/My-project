@@ -10,7 +10,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Accounts + database (Supabase) | ✅ Live: sign-up without email wait, workspace syncs across devices | n8n reads client details from Supabase instead of its own tables |
 | Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
-| WhatsApp ($49) | 🟡 n8n Activation (live) + AI Replies (Gemini, tested, not published) | Evolution API server (Oracle free tier blocked by card verification; fallback: ₹400–500/month VPS), QR scan, publish AI Replies, add `whatsapp` to `liveServices` |
+| WhatsApp ($49) | 🟡 Self-service built: the client links their number in the app with a WhatsApp pairing code (`/api/whatsapp` creates the Evolution instance `ibax-<digits>` with the AI Replies webhook); activation is checked against the instance owner. n8n Activation (live) + AI Replies (Gemini, tested) | Owner: VPS with Evolution API; Vercel: `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, `N8N_EVOLUTION_WEBHOOK_URL`; publish AI Replies; add `whatsapp` to `liveServices` |
 | Privacy Policy + Terms | ✅ Live at `/privacy` and `/terms` (operator Shewale Sunil, sole proprietor, Chhatrapati Sambhajinagar); data-deletion steps at `/privacy#data-deletion` | — |
 | Udyam (MSME) registration | ✅ Registered as a proprietorship (Services, NIC 62011/62012/62013/62020) | Download the certificate PDF; use it for Meta Business Verification, Razorpay and a bank current account |
 | Payments (Razorpay) | ⏳ Policy pages Razorpay checks are live: /terms, /privacy, /refund-policy, /shipping-policy, /contact | Owner opens a Razorpay account; Claude builds checkout + webhook |
@@ -65,7 +65,7 @@ n8n Cloud: `ibaxai.app.n8n.cloud`. Secrets (the webhook secret, the Evolution to
 To go live:
 1. Vercel: set `N8N_ACTIVATE_WEBHOOK_URL` = `https://ibaxai.app.n8n.cloud/webhook/ibax-activate` and `N8N_WEBHOOK_SECRET` (the value checked in the Activation workflow), then redeploy.
 2. n8n: a Google Gemini credential with our own free API key, selected on the **Gemini Flash** node ✅ (the reply step retries 3 times when Google is busy).
-3. Evolution API server: for each client, create an instance named `ibax-<number>` and scan its QR code with the client's WhatsApp. Set its webhook to the AI Replies production URL plus `?token=…`, events `MESSAGES_UPSERT`, webhookByEvents off.
+3. Evolution API server (one VPS for all clients). Vercel: `EVOLUTION_API_URL`, `EVOLUTION_API_KEY` (the server's global key) and `N8N_EVOLUTION_WEBHOOK_URL` (AI Replies production URL plus `?token=…`). The app then creates each client's instance `ibax-<number>` with that webhook (`MESSAGES_UPSERT`), and the client links WhatsApp themselves with a pairing code.
 4. Publish **AI Replies**, test with one pilot number, then add `whatsapp` to `liveServices`.
 
 Evolution API uses WhatsApp Web, not Meta's official API. Use it for replies only (no bulk or promotional sends), and plan the move to the WhatsApp Cloud API. Only the receive and send nodes change.

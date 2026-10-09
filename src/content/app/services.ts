@@ -153,10 +153,10 @@ export const services: ServiceDef[] = [
     group: "assistant",
     icon: "MessageCircle",
     description:
-      "Answers customer questions, shares product and service details, captures leads, handles appointment and order enquiries and follows up — all on your WhatsApp Business number. Conversations appear inside ibaxai.",
+      "Answers customer questions, shares product and service details, captures leads, handles appointment and order enquiries and follows up — all on your own WhatsApp number. When a customer needs you, it pauses and alerts you. Conversations appear inside ibaxai.",
     features: ["Instant answers & FAQs", "Product / service information", "Lead capture", "Appointment & order enquiries", "Follow-ups", "Conversations inside ibaxai"],
     price: 49,
-    setupTime: "Same day after WhatsApp approval",
+    setupTime: "Minutes — link your WhatsApp with a code",
     connect: ["whatsapp"],
     info: [
       { key: "about", label: "About your business", type: "textarea", fromBusiness: "description", required: true },
@@ -166,7 +166,7 @@ export const services: ServiceDef[] = [
       faq,
     ],
     configure: [tone, handoff, { key: "followUp", label: "Follow up with new leads after 24 hours", type: "toggle", default: true }],
-    approvalNote: "Meta reviews every WhatsApp Business API number. This usually takes 1–3 days; ibaxai guides you through it.",
+    approvalNote: "Your WhatsApp is linked like WhatsApp Web (Linked devices). Keep the phone with this number connected to the internet at least once every 14 days, and use it for replies, not bulk promotions.",
   },
   {
     id: "instagram",
@@ -365,7 +365,7 @@ export const providerInfo: Record<ProviderId, { name: string; help: string }> = 
   youtube: { name: "YouTube", help: "Sign in with the Google account that owns your channel and allow uploads." },
   instagram: { name: "Instagram", help: "Use a Business or Creator account linked to your Facebook Page." },
   facebook: { name: "Facebook Page", help: "Sign in as a Page admin and choose the Page ibaxai should manage." },
-  whatsapp: { name: "WhatsApp Business", help: "Sign in with Meta and pick (or register) the number customers message." },
+  whatsapp: { name: "WhatsApp", help: "Link the number your customers message, with a code from WhatsApp → Linked devices." },
   google: { name: "Google Business Profile", help: "Sign in with the Google account that manages your Business Profile." },
   gmail: { name: "Gmail / Email", help: "Sign in and allow ibaxai to read and draft emails in this mailbox only." },
   phone: { name: "Business phone", help: "ibaxai gives you a number; forward your business calls to it." },

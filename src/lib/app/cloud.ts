@@ -117,6 +117,14 @@ export async function cloudSaveWorkspace(ownerId: string, workspace: Workspace):
   return !error;
 }
 
+/** `Authorization: Bearer …` for our own API routes, when signed in with Supabase. */
+export async function cloudAuthHeader(): Promise<Record<string, string>> {
+  if (!cloudEnabled) return {};
+  const { data } = await sb().auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { authorization: `Bearer ${token}` } : {};
+}
+
 export type OAuthProvider = "google" | "apple";
 
 /** Sends the visitor to Google / Apple; they come back to /app/login signed in. */

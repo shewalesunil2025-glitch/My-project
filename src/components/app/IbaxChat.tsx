@@ -8,6 +8,8 @@ import { product } from "@/config/product";
 import { providerInfo, serviceById } from "@/content/app/services";
 import { priceLabel } from "@/lib/app/agentActions";
 import { clearAgentConversation, connectFromCard, payFromCard, sendToAgent, useAgentBusy } from "@/lib/app/agentClient";
+import { waAccount, whatsappLinkAvailable } from "@/lib/app/whatsappLink";
+import { WhatsAppLink } from "./WhatsAppLink";
 import type { AgentCard, Workspace } from "@/lib/app/types";
 import { cn } from "@/lib/cn";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
@@ -121,6 +123,14 @@ function ConnectCard({ card }: { card: Extract<AgentCard, { type: "connect" }> }
         <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300">
           <Check className="size-4" aria-hidden /> Connected
         </p>
+      ) : whatsapp && whatsappLinkAvailable() ? (
+        <div className="mt-2">
+          <WhatsAppLink
+            disabled={busy}
+            onLinked={(n) => void connectFromCard(card, waAccount(n), false)}
+            onPreview={(n) => void connectFromCard(card, waAccount(n))}
+          />
+        </div>
       ) : (
         <form onSubmit={submit} className="mt-2 space-y-2">
           <p className="text-xs leading-snug text-fg-muted">{info.help}</p>
