@@ -24,22 +24,26 @@ const sections: LegalSection[] = [
     title: "When you get the service",
     body: (
       <ul>
-        <li>Your account and the app are available as soon as you sign up.</li>
+        <li>Everything is self-service and available straight away. Your account and the app work as soon as you sign up.</li>
         <li>
-          Automation services start once payment is confirmed and you have connected the accounts the service needs. Most are set up within 1–3
-          working days.
+          <strong>Automations:</strong> you switch them on yourself by chatting with IBAX, the assistant in the app. As soon as payment is
+          confirmed and you have given the details and connected the accounts the service needs (for example, your WhatsApp number), the
+          automation starts.
         </li>
-        <li>Website builds are delivered within the time agreed for your project, usually 7–14 working days after we receive your content.</li>
-        <li>We confirm each step by email or in the app, and you can follow progress in the app.</li>
+        <li>
+          <strong>Websites:</strong> you build your website yourself in the app from our templates. It is ready as soon as you publish it.
+        </li>
+        <li>The app shows the status of every service, and confirms each step.</li>
       </ul>
     ),
   },
   {
     id: "delays",
-    title: "Delays",
+    title: "Help and delays",
     body: (
       <p>
-        If a delay is caused by us, we tell you the new date. If a service cannot be delivered, you can cancel and get a refund under our{" "}
+        If you get stuck, ask IBAX in the app at any time, or contact us. If a service cannot start because of a problem on our side, we
+        tell you and fix it. If it still cannot be delivered, you can cancel and get a refund under our{" "}
         <a href="/refund-policy" className="link-underline text-fg">
           Cancellation &amp; Refund Policy
         </a>

@@ -59,7 +59,7 @@ const sections: LegalSection[] = [
       <ul>
         <li>Prices are shown in the app before you pay. Taxes are added where the law requires.</li>
         <li>
-          Monthly and annual plans renew automatically at the end of each period until you cancel. One-time services (such as a website build) are
+          Monthly and annual plans renew automatically at the end of each period until you cancel. One-time services (such as a website) are
           charged once.
         </li>
         <li>Payments are processed by our payment provider. If a payment fails, the service may pause until it is paid.</li>
@@ -81,8 +81,7 @@ const sections: LegalSection[] = [
           side. Then we refund the unused part.
         </li>
         <li>
-          Website builds: full refund if you cancel before we start the design. After we start, the work already done is charged and the rest is
-          refunded.
+          Websites: full refund if you ask before your website is published. After it is published, the payment is not refunded.
         </li>
         <li>Approved refunds go back to the original payment method within 7–10 working days.</li>
       </ul>
