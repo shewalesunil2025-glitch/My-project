@@ -1,4 +1,4 @@
-# IBAXAI — Service roadmap
+# ibaxai — Service roadmap
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 

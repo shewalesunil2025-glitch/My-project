@@ -26,16 +26,16 @@ import {
 } from "lucide-react";
 
 /**
- * IBAXAI — the AI Business Operating System app, in development.
+ * ibaxai — the AI Business Operating System app, in development.
  * Everything here describes what the app is being built to do. Nothing on the
  * site claims it is live: no user counts, no activity numbers, no prices yet.
  */
 export const shambhu = {
-  name: "IBAXAI",
+  name: "ibaxai",
   tagline: "Your AI Business Operating System",
   positioning: "One AI. One Platform. Your Entire Business.",
   status: "Preview · Try it on your phone",
-  interest: "IBAXAI — early access",
+  interest: "ibaxai — early access",
 };
 
 /** From choosing a service to going live. Each account is authorised by you. */
@@ -59,7 +59,7 @@ export type StoreItem = {
 
 /** The Automation Store: every service can be bought on its own. */
 export const store: StoreItem[] = [
-  { title: "Website", body: "A fast, modern website with IBAXAI built in.", icon: Globe, price: "$299", billing: "one-time" },
+  { title: "Website", body: "A fast, modern website with ibaxai built in.", icon: Globe, price: "$299", billing: "one-time" },
   { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "$79", billing: "monthly" },
   { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "$49", billing: "monthly" },
   { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "$49", billing: "monthly" },
@@ -83,7 +83,7 @@ export const store: StoreItem[] = [
 export const safeguards: { title: string; body: string; icon: LucideIcon }[] = [
   { title: "Your data stays yours", body: "Every business is kept separate from every other.", icon: Lock },
   { title: "Encrypted connections", body: "Account access is encrypted and can be removed any time.", icon: KeyRound },
-  { title: "Audit log", body: "Every action IBAXAI takes is recorded and visible to you.", icon: ScrollText },
+  { title: "Audit log", body: "Every action ibaxai takes is recorded and visible to you.", icon: ScrollText },
   { title: "You approve", body: "Nothing goes live without your approval.", icon: ShieldCheck },
 ];
 
@@ -118,7 +118,7 @@ export const appAreas = [
   "Ask IBAX",
 ];
 
-/** Businesses IBAXAI is being built for. */
+/** Businesses ibaxai is being built for. */
 export const businessCategories = [
   "Restaurant",
   "Hotel",

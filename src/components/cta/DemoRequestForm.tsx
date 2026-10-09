@@ -7,7 +7,7 @@ import { submitLead, validateLead } from "@/lib/leads";
 import { siteConfig } from "@/config/site";
 
 const interests = [
-  "IBAXAI — early access",
+  "ibaxai — early access",
   "Website",
   "AI Voice Assistant",
   "WhatsApp Automation",

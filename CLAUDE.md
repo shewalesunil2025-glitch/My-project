@@ -1,4 +1,4 @@
-# IBAXAI — notes for Claude
+# ibaxai — notes for Claude
 
 **The owner's plan lives in `docs/ROADMAP.md`.** When the owner says "road map" / "roadmap" (or asks what's next), read it, start from the **Where we are** table, and take the next pending item — then update that table in the same PR when an item moves.
 
@@ -10,6 +10,7 @@ How the owner likes to work:
 - Prefer free options; say plainly when something costs money.
 
 Project facts:
+- The brand is written **ibaxai** (lowercase, no space) everywhere, like the logo. The Udyam (MSME) registration spells it IBAXAI, the same name in capitals.
 - Next.js app on Vercel project `my-project-98t4` (https://my-project-98t4.vercel.app/app), auto-deploys `main`. Ship changes as a PR and merge it.
 - Services are sold only when their automation is live: `liveServices` in `src/content/app/services.ts`.
 - Accounts and workspaces: Supabase (`src/lib/app/cloud.ts`, schema in `supabase/migrations/`). Without the Supabase env vars the app falls back to this-device-only preview mode.

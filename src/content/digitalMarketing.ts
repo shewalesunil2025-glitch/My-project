@@ -21,7 +21,7 @@ export const digitalMarketing = {
   id: "digital-marketing",
   href: "#digital-marketing",
   title: "Digital Marketing",
-  tagline: "Your complete digital marketing team — run by IBAXAI, guided by people.",
+  tagline: "Your complete digital marketing team — run by ibaxai, guided by people.",
   price: "$299",
   billing: "/mo",
   interest: "Digital Marketing — premium package",
@@ -40,7 +40,7 @@ export const inclusions: Inclusion[] = [
   { title: "Local SEO & Google Business", body: "Your Google Business Profile optimised so nearby customers find you.", icon: MapPin },
   { title: "Website SEO basics", body: "Titles, keywords and speed checks so search engines understand you.", icon: Search },
   { title: "WhatsApp campaigns", body: "Offers and updates sent to customers who opted in.", icon: MessageCircle },
-  { title: "Lead follow-up", body: "Every enquiry from your campaigns followed up by IBAXAI.", icon: UserRoundCheck },
+  { title: "Lead follow-up", body: "Every enquiry from your campaigns followed up by ibaxai.", icon: UserRoundCheck },
   { title: "Monthly report", body: "What went out, what people did and what we'll do next.", icon: BarChart3 },
 ];
 

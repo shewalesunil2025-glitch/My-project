@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   applicationName: product.name,
   robots: { index: true, follow: true },
   manifest: "/lumi.webmanifest",
-  // iPhone: "Add to Home Screen" opens IBAXAI full screen, like a native app.
+  // iPhone: "Add to Home Screen" opens ibaxai full screen, like a native app.
   appleWebApp: { capable: true, title: product.name, statusBarStyle: "black" },
   icons: {
     icon: [{ url: "/lumi/icon-192.png?v=4", sizes: "192x192", type: "image/png" }],

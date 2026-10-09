@@ -9,7 +9,7 @@ export type Solution = {
   price: string;
 };
 
-/** The services IBAXAI runs. Prices match the Automation Store (src/content/shambhu.ts). */
+/** The services ibaxai runs. Prices match the Automation Store (src/content/shambhu.ts). */
 export const solutions: Solution[] = [
   {
     id: "marketing",
@@ -22,7 +22,7 @@ export const solutions: Solution[] = [
     id: "website",
     title: "Website",
     headline: "A website that works while you sleep.",
-    summary: "A fast, modern website that captures enquiries and hands them straight to IBAXAI.",
+    summary: "A fast, modern website that captures enquiries and hands them straight to ibaxai.",
     price: "$299",
   },
   {

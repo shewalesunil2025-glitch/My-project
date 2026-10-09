@@ -8,10 +8,10 @@ const columns = [
     links: [
       { label: "Services", href: "#solutions" },
       { label: "Digital Marketing", href: "#digital-marketing" },
-      { label: "IBAXAI", href: "#ibax-ai" },
+      { label: "ibaxai", href: "#ibax-ai" },
       { label: "Automation Store", href: "#store" },
       { label: "Industries", href: "#industries" },
-      { label: "IBAXAI — the business app", href: "/app" },
+      { label: "ibaxai — the business app", href: "/app" },
     ],
   },
   {
