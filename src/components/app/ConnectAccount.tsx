@@ -6,7 +6,9 @@ import { product } from "@/config/product";
 import { providerInfo, serviceById } from "@/content/app/services";
 import { audit, logActivity, notify, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { ProviderId, Workspace } from "@/lib/app/types";
+import { unlinkWhatsApp, waAccount, whatsappLinkAvailable } from "@/lib/app/whatsappLink";
 import { Btn, Field, Input, Pill, fmtDate } from "./ui";
+import { WhatsAppLink } from "./WhatsAppLink";
 
 /**
  * Connect / disconnect one platform account.
@@ -19,11 +21,11 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
   const [open, setOpen] = useState(false);
   const [account, setAccount] = useState("");
 
-  function connect() {
-    if (!account.trim()) return;
+  function connect(name = account, simulated: boolean = product.previewMode) {
+    if (!name.trim()) return;
     updateWorkspace((w) => {
-      w.connections[provider] = { provider, account: account.trim(), status: "connected", connectedAt: nowIso(), simulated: product.previewMode };
-      logActivity(w, { kind: "system", title: `${info.name} connected`, detail: account.trim(), href: "/app/settings#accounts" });
+      w.connections[provider] = { provider, account: name.trim(), status: "connected", connectedAt: nowIso(), simulated };
+      logActivity(w, { kind: "system", title: `${info.name} connected`, detail: name.trim(), href: "/app/settings#accounts" });
       audit(w, `Connected ${info.name}`);
     });
     setOpen(false);
@@ -31,6 +33,7 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
   }
 
   function disconnect() {
+    if (provider === "whatsapp" && conn && !conn.simulated) void unlinkWhatsApp(conn.account);
     updateWorkspace((w) => {
       delete w.connections[provider];
       for (const a of w.automations) {
@@ -70,7 +73,12 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
           )
         )}
       </div>
-      {open && !conn && (
+      {open && !conn && provider === "whatsapp" && whatsappLinkAvailable() && (
+        <div className="mt-4 border-t border-white/[0.06] pt-4">
+          <WhatsAppLink onLinked={(n) => connect(waAccount(n), false)} onPreview={(n) => connect(waAccount(n))} />
+        </div>
+      )}
+      {open && !conn && !(provider === "whatsapp" && whatsappLinkAvailable()) && (
         <div className="mt-4 space-y-3 border-t border-white/[0.06] pt-4">
           <p className="flex items-start gap-2 text-xs text-fg-muted">
             <ExternalLink className="mt-0.5 size-3.5 shrink-0" aria-hidden />
@@ -82,7 +90,7 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
             <Input id={`acc-${provider}`} value={account} onChange={(e) => setAccount(e.target.value)} placeholder={provider === "phone" || provider === "whatsapp" ? "+1 555 0100" : "@yourbusiness"} />
           </Field>
           <div className="flex gap-2">
-            <Btn size="sm" onClick={connect} disabled={!account.trim()}>
+            <Btn size="sm" onClick={() => connect()} disabled={!account.trim()}>
               Allow access
             </Btn>
             <Btn size="sm" variant="ghost" onClick={() => setOpen(false)}>
