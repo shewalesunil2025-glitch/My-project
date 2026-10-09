@@ -6,14 +6,14 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 
 | Area | Status | Next step |
 |---|---|---|
-| Website ($299) | ✅ Live | — |
+| Website ($299) | ✅ Live at www.ibaxai.com (domain moved to this project; site, app and policy pages in one place) | — |
 | Accounts + database (Supabase) | ✅ Live: sign-up without email wait, workspace syncs across devices | n8n reads client details from Supabase instead of its own tables |
 | Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
 | WhatsApp ($49) | 🟡 n8n Activation (live) + AI Replies (Gemini, tested, not published) | Evolution API server (Oracle free tier blocked by card verification; fallback: ₹400–500/month VPS), QR scan, publish AI Replies, add `whatsapp` to `liveServices` |
 | Privacy Policy + Terms | ✅ Live at `/privacy` and `/terms` (operator Shewale Sunil, sole proprietor, Chhatrapati Sambhajinagar); data-deletion steps at `/privacy#data-deletion` | — |
 | Udyam (MSME) registration | ✅ Registered as a proprietorship (Services, NIC 62011/62012/62013/62020) | Download the certificate PDF; use it for Meta Business Verification, Razorpay and a bank current account |
-| Payments (Razorpay) | ⏳ | Owner opens a Razorpay account; Claude builds checkout + webhook |
+| Payments (Razorpay) | ⏳ Policy pages Razorpay checks are live: /terms, /privacy, /refund-policy, /shipping-policy, /contact | Owner opens a Razorpay account; Claude builds checkout + webhook |
 | IBAX bot AI in the app | ⏳ Built-in fallback answers only | Free option: Gemini key in Vercel instead of `ANTHROPIC_API_KEY` |
 | Meta / Google / YouTube approvals | ⏳ | Owner applies early (2–4 weeks) |
 

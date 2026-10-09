@@ -11,7 +11,7 @@ How the owner likes to work:
 
 Project facts:
 - The brand is written **ibaxai** (lowercase, no space) everywhere, like the logo. The Udyam (MSME) registration spells it IBAXAI, the same name in capitals.
-- Next.js app on Vercel project `my-project-98t4` (https://my-project-98t4.vercel.app/app), auto-deploys `main`. Ship changes as a PR and merge it.
+- Next.js app on Vercel project `my-project-98t4`, served at https://www.ibaxai.com (app at `/app`), auto-deploys `main`. Ship changes as a PR and merge it.
 - Services are sold only when their automation is live: `liveServices` in `src/content/app/services.ts`.
 - Accounts and workspaces: Supabase (`src/lib/app/cloud.ts`, schema in `supabase/migrations/`). Without the Supabase env vars the app falls back to this-device-only preview mode.
 - Automations: n8n Cloud `ibaxai.app.n8n.cloud`; the app sends `service.activated` via `/api/automation/activate`. WhatsApp workflows are described in `docs/ROADMAP.md`.

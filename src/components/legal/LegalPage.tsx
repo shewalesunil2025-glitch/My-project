@@ -45,6 +45,18 @@ export function LegalPage({ title, intro, sections }: { title: string; intro: Re
         <Link href="/terms" className="link-underline hover:text-fg">
           Terms of Service
         </Link>{" "}
+        ·{" "}
+        <Link href="/refund-policy" className="link-underline hover:text-fg">
+          Refunds
+        </Link>{" "}
+        ·{" "}
+        <Link href="/shipping-policy" className="link-underline hover:text-fg">
+          Delivery
+        </Link>{" "}
+        ·{" "}
+        <Link href="/contact" className="link-underline hover:text-fg">
+          Contact
+        </Link>{" "}
         · © {new Date().getFullYear()} {legal.brand}
       </p>
     </main>
