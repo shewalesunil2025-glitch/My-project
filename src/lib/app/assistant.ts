@@ -86,7 +86,7 @@ export function localAnswer(ws: Workspace, raw: string): Reply {
     const p = (["whatsapp", "instagram", "youtube", "facebook", "google", "gmail", "email"] as const).find((w) => q.includes(w))!;
     return {
       matched: true,
-      text: `To connect ${cap(p)}:\n\n1. Go to Settings → Connected accounts (or start the service that needs it).\n2. Press Connect next to ${cap(p)}.\n3. Sign in on ${cap(p)}'s own page and allow access.\n4. You're sent back to ${"IBAXAI"} and the account shows as Connected.\n\nYou can disconnect at any time, and I only use the permissions you grant.`,
+      text: `To connect ${cap(p)}:\n\n1. Go to Settings → Connected accounts (or start the service that needs it).\n2. Press Connect next to ${cap(p)}.\n3. Sign in on ${cap(p)}'s own page and allow access.\n4. You're sent back to ${"ibaxai"} and the account shows as Connected.\n\nYou can disconnect at any time, and I only use the permissions you grant.`,
       links: [{ label: "Connected accounts", href: "/app/settings#accounts" }],
     };
   }

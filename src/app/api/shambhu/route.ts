@@ -10,7 +10,7 @@ import {
 } from "@/lib/shambhuAgent";
 
 /**
- * IBAXAI, the website voice assistant. The browser sends the conversation as
+ * ibaxai, the website voice assistant. The browser sends the conversation as
  * text (speech is recognised and spoken in the browser); Claude answers in the
  * visitor's language and says which language that is, so the right voice reads it.
  * Needs ANTHROPIC_API_KEY. Nothing is stored.
@@ -107,9 +107,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "busy" }, { status: 429 });
     }
     if (err instanceof Anthropic.APIError) {
-      console.error("IBAXAI API error", err.status, err.message);
+      console.error("ibaxai API error", err.status, err.message);
     } else {
-      console.error("IBAXAI error", err);
+      console.error("ibaxai error", err);
     }
     return NextResponse.json({ error: "upstream" }, { status: 502 });
   }

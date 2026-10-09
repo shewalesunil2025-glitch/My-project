@@ -1,10 +1,10 @@
 export const siteConfig = {
-  name: "IBAXAI",
-  wordmark: "IBAXAI",
+  name: "ibaxai",
+  wordmark: "ibaxai",
   tagline: "Intelligent Business Automation Expert",
-  title: "IBAXAI — AI Automation & Intelligent Business Systems",
+  title: "ibaxai — AI Automation & Intelligent Business Systems",
   description:
-    "IBAXAI — Intelligent Business Automation Expert. Your AI business assistant for websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
+    "ibaxai — Intelligent Business Automation Expert. Your AI business assistant for websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ibaxai.com",
   email: "ibaxai369@gmail.com",
   /** Phone and WhatsApp (same number). `phone` is for tel: links, `whatsapp` is digits only for wa.me. */
@@ -20,7 +20,7 @@ export const siteConfig = {
   nav: [
     { label: "Services", href: "#solutions" },
     { label: "Digital Marketing", href: "#digital-marketing" },
-    { label: "IBAXAI", href: "#ibax-ai" },
+    { label: "ibaxai", href: "#ibax-ai" },
     { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },
     { label: "About", href: "#about" },
@@ -29,7 +29,7 @@ export const siteConfig = {
   footerNav: [
     { label: "Services", href: "#solutions" },
     { label: "Digital Marketing", href: "#digital-marketing" },
-    { label: "IBAXAI", href: "#ibax-ai" },
+    { label: "ibaxai", href: "#ibax-ai" },
     { label: "Automation Store", href: "#store" },
     { label: "Industries", href: "#industries" },
     { label: "About", href: "#about" },
@@ -54,12 +54,12 @@ export const founder = {
   name: "Sunil S.",
   role: "Founder & AI Automation Strategist",
   photo: "/images/founder/shewale-sunil.webp",
-  photoAlt: "Sunil S., founder of IBAXAI",
+  photoAlt: "Sunil S., founder of ibaxai",
   headline:
     "Building next-generation digital systems that combine AI, automation, websites, WhatsApp, voice technology, and intelligent business workflows.",
   bio: [
     "Sunil focuses on creating premium digital experiences and automation systems that help businesses simplify operations, improve customer communication, capture leads, manage bookings, and automate repetitive tasks.",
-    "IBAXAI is built with a vision to go beyond traditional website development — creating an intelligent technology ecosystem where websites, AI agents, conversations, and business workflows work together as one connected system.",
+    "ibaxai is built with a vision to go beyond traditional website development — creating an intelligent technology ecosystem where websites, AI agents, conversations, and business workflows work together as one connected system.",
   ],
   vision: "Building smarter businesses for the next generation.",
   focus: ["AI agents", "Automation", "Websites", "WhatsApp", "Voice AI", "Business workflows"],

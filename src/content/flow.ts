@@ -20,7 +20,7 @@ export type FlowNode = {
   icon: LucideIcon;
 };
 
-/** The customer journey IBAXAI automates end-to-end. */
+/** The customer journey ibaxai automates end-to-end. */
 export const customerFlow: FlowNode[] = [
   { id: "website", label: "Website", detail: "A visitor lands on a site built to convert.", icon: Globe },
   { id: "conversation", label: "AI Conversation", detail: "AI answers questions instantly, 24/7.", icon: Bot },
@@ -35,7 +35,7 @@ export const customerFlow: FlowNode[] = [
 /** The fragmented tools most businesses juggle today. */
 export const fragmentedTools = ["Website", "WhatsApp", "Phone", "Bookings", "Follow-ups", "Reviews"] as const;
 
-/** The six connected systems around IBAXAI, the central AI, each with the job it does. */
+/** The six connected systems around ibaxai, the central AI, each with the job it does. */
 export const ecosystem: { label: string; benefit: string; icon: LucideIcon }[] = [
   { label: "Website", benefit: "Brings customers in", icon: Globe },
   { label: "WhatsApp", benefit: "Replies instantly", icon: MessageCircle },

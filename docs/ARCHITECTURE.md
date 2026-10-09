@@ -1,8 +1,8 @@
-# IBAXAI — Architecture
+# ibaxai — Architecture
 
-**IBAXAI** is the AI Business Operating System built by Nexa Flow AI. Business owners run their website, AI assistants, WhatsApp, calls, social media, reviews, content, leads and automations from one app. They never touch n8n, APIs, webhooks or video tools: IBAXAI handles those in the background.
+**ibaxai** is the AI Business Operating System built by Nexa Flow AI. Business owners run their website, AI assistants, WhatsApp, calls, social media, reviews, content, leads and automations from one app. They never touch n8n, APIs, webhooks or video tools: ibaxai handles those in the background.
 
-> The brand name lives in one place: `src/config/product.ts`. The app and the assistant inside it are both called **IBAXAI**; customers choose its language, tone and personality. The `/app` routes use the live Nexa Flow AI look (deep green-black, neon lime `#7dff3a`, Inter Tight), set under `.theme-lumi` in `src/app/globals.css`. On iPhone, Safari → Share → "Add to Home Screen" installs it full-screen (`public/lumi.webmanifest`, icons in `public/lumi/`).
+> The brand name lives in one place: `src/config/product.ts`. The app and the assistant inside it are both called **ibaxai**; customers choose its language, tone and personality. The `/app` routes use the live Nexa Flow AI look (deep green-black, neon lime `#7dff3a`, Inter Tight), set under `.theme-lumi` in `src/app/globals.css`. On iPhone, Safari → Share → "Add to Home Screen" installs it full-screen (`public/lumi.webmanifest`, icons in `public/lumi/`).
 
 ## What is in this repository today
 
