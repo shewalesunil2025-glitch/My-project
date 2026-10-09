@@ -11,7 +11,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
 | WhatsApp ($49) | 🟡 n8n Activation (live) + AI Replies (Gemini, tested, not published) | Evolution API server (Oracle free tier blocked by card verification; fallback: ₹400–500/month VPS), QR scan, publish AI Replies, add `whatsapp` to `liveServices` |
-| Privacy Policy + Terms | ⏳ | Claude builds; owner gives registered business name, city/state, GST (yes/no) |
+| Privacy Policy + Terms | ✅ Live at `/privacy` and `/terms` (operator Shewale Sunil, sole proprietor, Chhatrapati Sambhajinagar); data-deletion steps at `/privacy#data-deletion` | Owner: free Udyam (MSME) registration, needed later for Meta Business Verification and Razorpay |
 | Payments (Razorpay) | ⏳ | Owner opens a Razorpay account; Claude builds checkout + webhook |
 | IBAX bot AI in the app | ⏳ Built-in fallback answers only | Free option: Gemini key in Vercel instead of `ANTHROPIC_API_KEY` |
 | Meta / Google / YouTube approvals | ⏳ | Owner applies early (2–4 weeks) |
@@ -26,7 +26,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | 4 | AI for the in-app IBAX bot: `ANTHROPIC_API_KEY` in Vercel, or switch the bot to Gemini's free tier | Owner adds the key |
 | 4b | Own SMTP in Supabase (Authentication → Emails), then sign-up can go back to email confirmation | Owner |
 | 5 | Real payments (Razorpay / Stripe) with a webhook that activates the subscription | Claude builds; owner creates the account |
-| 6 | Privacy Policy + Terms pages (needed for Meta and Google reviews) | Claude |
+| 6 | Privacy Policy + Terms pages (needed for Meta and Google reviews) ✅ | Claude |
 | 7 | Apply early for slow approvals: Meta Business Verification, Google Business Profile API, YouTube quota increase | Owner |
 
 ## Phases

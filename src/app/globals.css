@@ -641,3 +641,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ibax-splash { animation-duration: 0.3s !important; animation-delay: 0.6s !important; }
 }
+
+/* Privacy Policy / Terms of Service body text */
+.legal-body ul { list-style: disc; padding-left: 1.25rem; }
+.legal-body ul > li + li { margin-top: 0.35rem; }
+.legal-body strong { color: var(--color-fg); font-weight: 600; }

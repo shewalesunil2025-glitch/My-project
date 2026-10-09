@@ -83,7 +83,17 @@ export default function SignUpPage() {
         </Field>
         <label className="flex items-start gap-3 text-sm text-fg-muted">
           <input type="checkbox" name="terms" className="mt-0.5 size-4 accent-[var(--color-flow)]" required />
-          <span>I accept the Terms of Service and Privacy Policy.</span>
+          <span>
+            I accept the{" "}
+            <Link href="/terms" target="_blank" className="font-semibold text-fg underline underline-offset-2">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" target="_blank" className="font-semibold text-fg underline underline-offset-2">
+              Privacy Policy
+            </Link>
+            .
+          </span>
         </label>
         {error && <Notice tone="amber">{error}</Notice>}
         <Btn type="submit" size="lg" className="w-full" disabled={busy}>
