@@ -2,15 +2,29 @@
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 
+## Where we are (updated 2026-10-09)
+
+| Area | Status | Next step |
+|---|---|---|
+| Website ($299) | ✅ Live | — |
+| Accounts + database (Supabase) | ✅ Live: sign-up without email wait, workspace syncs across devices | n8n reads client details from Supabase instead of its own tables |
+| Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
+| Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
+| WhatsApp ($49) | 🟡 n8n Activation (live) + AI Replies (Gemini, tested, not published) | Evolution API server (Oracle free tier blocked by card verification; fallback: ₹400–500/month VPS), QR scan, publish AI Replies, add `whatsapp` to `liveServices` |
+| Privacy Policy + Terms | ⏳ | Claude builds; owner gives registered business name, city/state, GST (yes/no) |
+| Payments (Razorpay) | ⏳ | Owner opens a Razorpay account; Claude builds checkout + webhook |
+| IBAX bot AI in the app | ⏳ Built-in fallback answers only | Free option: Gemini key in Vercel instead of `ANTHROPIC_API_KEY` |
+| Meta / Google / YouTube approvals | ⏳ | Owner applies early (2–4 weeks) |
+
 ## Phase 0 — Foundation (1–2 weeks)
 
 | # | Task | Owner |
 |---|---|---|
 | 1 | "Coming soon" + waitlist for services that aren't built ✅ | Claude |
-| 2 | Real database + login (Supabase) instead of browser storage ✅ accounts and workspaces (`supabase/migrations/0001_init.sql`). Next: n8n reads client details from it and the app shows their messages and leads | Claude builds; owner creates the Supabase project and adds its keys to Vercel |
-| 3 | n8n running (n8n Cloud to start) and the n8n connector working in Claude | Owner |
-| 4 | `ANTHROPIC_API_KEY` in Vercel (smart IBAX answers) | Owner |
-| 4b | Supabase sends confirmation emails from its own low-limit mailer. Add our own SMTP (Authentication → Emails) before turning "Confirm email" on | Owner |
+| 2 | Real database + login (Supabase) ✅ accounts and workspaces (`supabase/migrations/0001_init.sql`). Next: n8n reads client details from it and the app shows their messages and leads | Claude builds; owner created the project and added its keys to Vercel |
+| 3 | n8n running (n8n Cloud) ✅ | Owner |
+| 4 | AI for the in-app IBAX bot: `ANTHROPIC_API_KEY` in Vercel, or switch the bot to Gemini's free tier | Owner adds the key |
+| 4b | Own SMTP in Supabase (Authentication → Emails), then sign-up can go back to email confirmation | Owner |
 | 5 | Real payments (Razorpay / Stripe) with a webhook that activates the subscription | Claude builds; owner creates the account |
 | 6 | Privacy Policy + Terms pages (needed for Meta and Google reviews) | Claude |
 | 7 | Apply early for slow approvals: Meta Business Verification, Google Business Profile API, YouTube quota increase | Owner |
