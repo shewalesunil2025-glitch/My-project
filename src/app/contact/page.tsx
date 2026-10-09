@@ -27,8 +27,13 @@ const sections: LegalSection[] = [
   },
   {
     id: "hours",
-    title: "Hours",
-    body: <p>Monday to Saturday, 10 AM – 7 PM (India time). We reply to emails within 24 hours on working days.</p>,
+    title: "Help",
+    body: (
+      <p>
+        For quick help, ask IBAX, the assistant in the app, at any time. For anything else, email or WhatsApp us. We reply within 24 hours on
+        working days.
+      </p>
+    ),
   },
   {
     id: "business",

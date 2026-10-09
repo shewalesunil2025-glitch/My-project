@@ -5,7 +5,7 @@ import { legal } from "@/content/legal";
 
 export const metadata: Metadata = {
   title: "Cancellation & Refund Policy",
-  description: `How cancellations and refunds work for ${legal.brand} subscriptions and website builds.`,
+  description: `How cancellations and refunds work for ${legal.brand} subscriptions and websites.`,
   alternates: { canonical: "/refund-policy" },
 };
 
@@ -37,12 +37,12 @@ const sections: LegalSection[] = [
   },
   {
     id: "websites",
-    title: "Refunds on website builds",
+    title: "Refunds on websites",
     body: (
       <ul>
-        <li>Full refund if you cancel before we start the design.</li>
-        <li>After the design has started, the work already done is charged and the rest is refunded.</li>
-        <li>No refund after the website has been delivered and approved by you.</li>
+        <li>You build your website yourself in the app from our templates.</li>
+        <li>Full refund if you ask before your website is published.</li>
+        <li>After the website is published, the payment is not refunded.</li>
       </ul>
     ),
   },
