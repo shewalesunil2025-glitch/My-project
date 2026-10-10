@@ -15,6 +15,16 @@ if ! swapon --show | grep -q . && [ "$(awk '/MemTotal/ {print $2}' /proc/meminfo
   grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
 fi
 
+# Security: automatic security updates, and a firewall that only allows SSH and the website ports.
+if command -v apt-get >/dev/null 2>&1; then
+  echo "==> Turning on automatic security updates and the firewall…"
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update -qq && apt-get install -y -qq unattended-upgrades ufw >/dev/null
+  dpkg-reconfigure -f noninteractive unattended-upgrades >/dev/null 2>&1 || true
+  ufw allow OpenSSH >/dev/null && ufw allow 80/tcp >/dev/null && ufw allow 443/tcp >/dev/null
+  ufw --force enable >/dev/null
+fi
+
 echo "==> Installing Docker (if needed)…"
 command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
 
