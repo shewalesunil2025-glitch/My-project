@@ -11,7 +11,7 @@ export const product = {
   tagline: "Your AI Business Operating System",
   positioning: "One AI. One Platform. Your Entire Business.",
   /** The brand slogan, shown on the website hero, the app welcome screen and the footer. */
-  slogan: "Just say it. ibaxai does it.",
+  slogan: "Just say it. IBAX does it.",
   /** Shown under the logo, as on the website. */
   logoTagline: "Intelligent Business Automation Expert",
   description:

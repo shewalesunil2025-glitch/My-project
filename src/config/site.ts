@@ -3,7 +3,7 @@ export const siteConfig = {
   wordmark: "ibaxai",
   tagline: "Intelligent Business Automation Expert",
   /** The brand slogan (same as product.slogan). */
-  slogan: "Just say it. ibaxai does it.",
+  slogan: "Just say it. IBAX does it.",
   title: "ibaxai — AI Automation & Intelligent Business Systems",
   description:
     "ibaxai — Intelligent Business Automation Expert. Your AI business assistant for websites, AI voice, WhatsApp, customer support, lead follow-up, social media, email and Google review automation, with clear USD pricing.",
