@@ -42,7 +42,9 @@ export default function WelcomePage() {
       <main className="relative mx-auto max-w-6xl px-4 pt-14 pb-20 sm:px-6 sm:pt-20">
         <section className="mx-auto max-w-3xl text-center">
           <BrandLogo size="lg" stacked tagline className="mx-auto animate-float" />
-          <p className="badge mx-auto mt-8">{product.positioning}</p>
+          <p className="mx-auto mt-8 text-base font-semibold tracking-tight text-fg sm:text-lg">
+            Just say it. <span className="text-flow">ibaxai</span> does it.
+          </p>
           <h1 className="display text-metal mt-5 text-[2.6rem] sm:text-6xl">
             Meet {product.name}.
             <br />

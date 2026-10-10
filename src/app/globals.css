@@ -633,6 +633,14 @@ body {
   from { opacity: 0; letter-spacing: 0.7em; }
   to { opacity: 1; letter-spacing: 0.36em; }
 }
+/* Phones: keep "Intelligent Business Automation Expert" on screen */
+@media (max-width: 480px) {
+  .ibax-splash-tag { font-size: 0.56rem; animation-name: ibax-splash-tag-sm; }
+}
+@keyframes ibax-splash-tag-sm {
+  from { opacity: 0; letter-spacing: 0.4em; }
+  to { opacity: 1; letter-spacing: 0.18em; }
+}
 @keyframes ibax-splash-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ibax-splash-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes ibax-splash-out {
