@@ -2,11 +2,14 @@
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 
-## Where we are (updated 2026-10-09)
+## Where we are (updated 2026-10-10)
+
+**Launch plan (owner's decision):** build 3–4 services fully first — Website (self-service builder), WhatsApp, Lead Follow-up, Customer Support — then add Razorpay and launch.
 
 | Area | Status | Next step |
 |---|---|---|
-| Website ($299) | ✅ Live at www.ibaxai.com (domain moved to this project; site, app and policy pages in one place) | — |
+| ibaxai site + app | ✅ Live at www.ibaxai.com (site, app, policy pages; slogan "Just say it. IBAX does it."; IBAX Hub at `/app/ibax`) | — |
+| Website service ($299) | 🟡 Sold, but the builder is only a design preview ("our team builds it") | Claude: self-service builder — templates, edit, one-click publish at `ibaxai.com/s/<name>` |
 | Accounts + database (Supabase) | ✅ Live: sign-up without email wait, workspace syncs across devices | n8n reads client details from Supabase instead of its own tables |
 | Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
