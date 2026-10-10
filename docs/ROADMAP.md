@@ -9,7 +9,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Area | Status | Next step |
 |---|---|---|
 | ibaxai site + app | ✅ Live at www.ibaxai.com (site, app, policy pages; slogan "Just say it. IBAX does it."; IBAX Hub at `/app/ibax`) | — |
-| Website service ($299) | 🟡 Sold, but the builder is only a design preview ("our team builds it") | Claude: self-service builder — templates, edit, one-click publish at `ibaxai.com/s/<name>` |
+| Website service ($299) | 🟡 Self-service builder built: 5 premium templates (Aurora, Prism, Glass, Luxe, Neon) with 3D and scroll animations, filled from the business profile; publish to `/s/<slug>`; enquiry form → Leads | Owner: run `supabase/migrations/0002_sites.sql` in Supabase; then add the custom-domain option later |
 | Accounts + database (Supabase) | ✅ Live: sign-up without email wait, workspace syncs across devices | n8n reads client details from Supabase instead of its own tables |
 | Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |

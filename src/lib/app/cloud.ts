@@ -125,6 +125,35 @@ export async function cloudAuthHeader(): Promise<Record<string, string>> {
   return token ? { authorization: `Bearer ${token}` } : {};
 }
 
+/* ── Websites built in the app (sites table) ── */
+
+export async function cloudPublishSite(data: { slug: string } & Record<string, unknown>): Promise<CloudResult<null>> {
+  const { data: session } = await sb().auth.getSession();
+  const ownerId = session.session?.user.id;
+  if (!ownerId) return { ok: false, error: "Please log in again." };
+  const { error } = await sb().from("sites").upsert({ slug: data.slug, owner_id: ownerId, data }, { onConflict: "owner_id" });
+  if (!error) return { ok: true, value: null };
+  if (error.code === "23505") return { ok: false, error: "That address is taken. Try another one." };
+  if (error.code === "42P01" || /relation .* does not exist|schema cache/i.test(error.message)) return { ok: false, error: "Publishing isn't switched on yet. Please contact ibaxai support." };
+  return { ok: false, error: "Couldn't publish. Please try again." };
+}
+
+export async function cloudUnpublishSite(): Promise<boolean> {
+  const { data: session } = await sb().auth.getSession();
+  const ownerId = session.session?.user.id;
+  if (!ownerId) return false;
+  const { error } = await sb().from("sites").delete().eq("owner_id", ownerId);
+  return !error;
+}
+
+export type SiteLeadRow = { id: string; slug: string; name: string; phone: string; message: string; created_at: string };
+
+/** Enquiries from the owner's published website (newest first). */
+export async function cloudSiteLeads(): Promise<SiteLeadRow[]> {
+  const { data, error } = await sb().from("site_leads").select("id, slug, name, phone, message, created_at").order("created_at", { ascending: false }).limit(200);
+  return error || !data ? [] : (data as SiteLeadRow[]);
+}
+
 export type OAuthProvider = "google" | "apple";
 
 /** Sends the visitor to Google / Apple; they come back to /app/login signed in. */
