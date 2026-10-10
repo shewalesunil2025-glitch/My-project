@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { product } from "@/config/product";
-import { useAgentBusy } from "@/lib/app/agentClient";
+import { sendToAgent, useAgentBusy } from "@/lib/app/agentClient";
 import type { Workspace } from "@/lib/app/types";
 import { cn } from "@/lib/cn";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
@@ -30,6 +30,17 @@ export function IbaxLauncher({ ws }: { ws: Workspace }) {
       clearTimeout(show);
       clearTimeout(hide);
     };
+  }, []);
+
+  // openIbaxChat() from the IBAX Hub and other pages
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      setOpen(true);
+      const message = (e as CustomEvent<{ message?: string }>).detail?.message;
+      if (message) void sendToAgent(message);
+    };
+    window.addEventListener("ibax:open", onOpen);
+    return () => window.removeEventListener("ibax:open", onOpen);
   }, []);
 
   useEffect(() => {

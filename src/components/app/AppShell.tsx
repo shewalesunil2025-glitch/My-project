@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import {
@@ -32,7 +33,7 @@ import { IbaxLauncher } from "./IbaxLauncher";
 
 export const workspaceNav = [
   { href: "/app/home", label: "Home", icon: House },
-  { href: "/app/assistant", label: "Assistant", icon: Bot },
+  { href: "/app/ibax", label: "IBAX", icon: Bot },
   { href: "/app/services", label: "Services", icon: LayoutGrid },
   { href: "/app/automations", label: "Automations", icon: Workflow },
   { href: "/app/inbox", label: "Inbox", icon: Inbox },
@@ -72,7 +73,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const bottom = [
     { href: "/app/home", label: "Home", icon: House },
-    { href: "/app/assistant", label: product.assistantName, icon: Bot, lumi: true },
+    { href: "/app/ibax", label: product.assistantName, icon: Bot, lumi: true },
     { href: "/app/services", label: "Services", icon: LayoutGrid },
     { href: "/app/activity", label: "Activity", icon: Activity },
     { href: "/app/more", label: "More", icon: Ellipsis },
@@ -103,7 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   <item.icon className={cn("size-[1.05rem]", isActive(item.href) && "text-flow")} aria-hidden />
-                  {item.href === "/app/assistant" ? `Ask ${product.assistantName}` : item.label}
+                  {item.label}
                 </Link>
               </li>
             ))}
@@ -181,26 +182,51 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <IbaxLauncher ws={workspace} />
 
-      {/* Bottom navigation (mobile) */}
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-ink-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
-        <ul className="mx-auto grid max-w-lg grid-cols-5">
+      {/* Bottom navigation (mobile): one floating glass bar; the open page's tab glows and lights up the page above it */}
+      <nav aria-label="Main" className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(0.6rem+env(safe-area-inset-bottom))] lg:hidden">
+        <div aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-ink-950 via-ink-950/80 to-transparent" />
+        <ul className="pointer-events-auto relative mx-auto grid max-w-md grid-cols-5 rounded-[1.6rem] border border-white/10 bg-ink-900/85 p-1.5 shadow-[0_24px_60px_-18px_rgb(0_0_0/0.95),inset_0_1px_0_rgb(255_255_255/0.07)] backdrop-blur-xl">
           {bottom.map((item) => {
-            const active = isActive(item.href) || (item.href === "/app/more" && ["/app/more", "/app/settings", "/app/billing", "/app/help", "/app/analytics", "/app/leads", "/app/reviews", "/app/website", "/app/notifications", "/app/content", "/app/automations", "/app/inbox", "/app/calls"].some((p) => isActive(p)));
+            const active = isActive(item.href) || (item.href === "/app/more" && ["/app/more", "/app/settings", "/app/billing", "/app/help", "/app/analytics", "/app/leads", "/app/reviews", "/app/website", "/app/notifications", "/app/content", "/app/automations", "/app/inbox", "/app/calls"].some((p) => isActive(p))) || (item.lumi && isActive("/app/assistant"));
             return (
-              <li key={item.href}>
+              <li key={item.href} className="relative">
+                {active && (
+                  <>
+                    {/* Light from the tab into the page */}
+                    <motion.span
+                      layoutId="nav-beam"
+                      aria-hidden
+                      className="pointer-events-none absolute bottom-[calc(100%+0.375rem)] left-1/2 h-20 w-24 -translate-x-1/2 bg-[radial-gradient(ellipse_at_50%_100%,rgb(102_211_76/0.28),transparent_70%)]"
+                      transition={{ type: "spring", stiffness: 420, damping: 36 }}
+                    />
+                    <motion.span
+                      layoutId="nav-edge"
+                      aria-hidden
+                      className="absolute -top-[0.4rem] left-1/2 h-[3px] w-9 -translate-x-1/2 rounded-full bg-flow shadow-[0_0_14px_2px_rgb(102_211_76/0.75)]"
+                      transition={{ type: "spring", stiffness: 420, damping: 36 }}
+                    />
+                    <motion.span
+                      layoutId="nav-pill"
+                      aria-hidden
+                      className="absolute inset-0 rounded-[1.15rem] bg-[linear-gradient(180deg,rgb(102_211_76/0.22),rgb(102_211_76/0.06))] ring-1 ring-flow/35 shadow-[0_8px_24px_-10px_rgb(102_211_76/0.7)]"
+                      transition={{ type: "spring", stiffness: 420, damping: 36 }}
+                    />
+                  </>
+                )}
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex h-16 flex-col items-center justify-center gap-1 text-[0.68rem] font-medium", active ? "text-fg" : "text-fg-subtle")}
+                  className={cn(
+                    "relative flex h-14 flex-col items-center justify-center gap-1 rounded-[1.15rem] text-[0.66rem] font-medium transition-colors",
+                    active ? "text-fg" : "text-fg-subtle hover:text-fg-muted",
+                  )}
                 >
                   {item.lumi ? (
-                    <span className={cn("-mt-5 grid size-12 place-items-center rounded-full border-4 border-ink-900 bg-ink-850 shadow-lg", active && "ring-2 ring-flow/60")}>
-                      <LumiMark className="size-9" glow={false} />
-                    </span>
+                    <LumiMark className={cn("size-[1.35rem] transition-transform", active && "scale-110")} glow={active} />
                   ) : (
-                    <item.icon className={cn("size-5", active && "text-flow")} aria-hidden />
+                    <item.icon className={cn("size-5 transition-transform", active && "scale-110 text-flow")} aria-hidden />
                   )}
-                  <span className="max-w-full truncate px-1">{item.label}</span>
+                  <span className={cn("max-w-full truncate px-1", active && "font-semibold")}>{item.label}</span>
                 </Link>
               </li>
             );
