@@ -228,15 +228,29 @@ export type DailyMetric = {
   conversions: number;
 };
 
+/** Premium website templates (older projects may still say classic/bold/minimal/elegant). */
+export type SiteTemplate = "aurora" | "prism" | "glass" | "luxe" | "neon" | "classic" | "bold" | "minimal" | "elegant";
+export type SiteSection = "services" | "hours" | "faq" | "enquiry" | "whatsapp";
+
 export type WebsiteProject = {
   status: "draft" | "requested" | "live";
-  template: "classic" | "bold" | "minimal";
+  template: SiteTemplate;
+  /** Legacy page list from the first preview builder. */
   pages: string[];
   headline: string;
   about: string;
   accent: string;
   connectedUrl?: string;
   updatedAt: string;
+  /** Self-service builder */
+  slug?: string;
+  tagline?: string;
+  /** One service per line: "Haircut — ₹300". */
+  servicesText?: string;
+  /** "Q: … / A: …" pairs. */
+  faqText?: string;
+  sections?: SiteSection[];
+  publishedAt?: string;
 };
 
 export type AuditEntry = { at: string; action: string };

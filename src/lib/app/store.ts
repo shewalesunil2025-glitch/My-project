@@ -11,6 +11,7 @@ import {
   cloudSignIn,
   cloudSignOut,
   cloudSignUp,
+  cloudSiteLeads,
   type CloudAccount,
 } from "./cloud";
 
@@ -359,10 +360,46 @@ function startCloudSync() {
         openCloudAccount({ ...acc, workspace: local });
         void pushWorkspace(acc.id, local);
       } else openCloudAccount(acc);
+      void syncSiteLeads();
     })
     .catch(() => {
       /* offline: keep working from this device's copy */
     });
+}
+
+/** Copies new enquiries from the owner's published website into Leads (and notifies once). */
+export async function syncSiteLeads() {
+  const db = load();
+  if (!cloudEnabled || !db.users.find((u) => u.id === db.sessionUserId)?.cloud) return;
+  const rows = await cloudSiteLeads().catch(() => []);
+  const ws = currentWorkspace();
+  if (!ws || !rows.length) return;
+  const known = new Set(ws.leads.map((l) => l.id));
+  const fresh = rows.filter((r) => !known.has(`site-${r.id}`));
+  if (!fresh.length) return;
+  updateWorkspace((w) => {
+    for (const r of [...fresh].reverse()) {
+      w.leads.unshift({
+        id: `site-${r.id}`,
+        name: r.name,
+        phone: r.phone,
+        email: "",
+        source: "Website",
+        interest: r.message,
+        status: "new",
+        returning: false,
+        createdAt: r.created_at,
+        notes: "",
+      });
+      logActivity(w, { kind: "lead", title: `New website enquiry from ${r.name}`, detail: r.message || r.phone, href: "/app/leads", at: r.created_at });
+    }
+    notify(w, {
+      kind: "lead",
+      title: fresh.length === 1 ? `New website enquiry from ${fresh[0].name}` : `${fresh.length} new website enquiries`,
+      detail: fresh.length === 1 ? fresh[0].message || fresh[0].phone : "See them in Leads.",
+      href: "/app/leads",
+    });
+  });
 }
 
 /* ── Helpers used inside updateWorkspace mutators ── */

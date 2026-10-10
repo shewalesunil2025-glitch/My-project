@@ -103,21 +103,18 @@ export const services: ServiceDef[] = [
     group: "web",
     icon: "Globe",
     description:
-      "ibaxai builds your website from the details you already gave — pages, menu or services, gallery, reviews, map, WhatsApp button and enquiry form — with SEO basics in place. Already have a site? Connect it instead.",
-    features: ["Home, About, Services/Menu, Gallery, Reviews, Contact", "WhatsApp button & enquiry form", "Google Maps & SEO basics", "ibaxai built in — every enquiry answered", "Edit text and photos from ibaxai"],
+      "Build your own website in minutes: pick a template and your business details fill it in — services and prices, hours, location, FAQ, WhatsApp and call buttons and an enquiry form. Change anything, then publish in one click. Every enquiry lands in your Leads.",
+    features: ["4 mobile-ready templates", "Filled in from your business details", "Services & prices, hours, map, FAQ", "WhatsApp, call & enquiry form", "Enquiries go straight to your Leads", "Publish and update in one click"],
     price: 299,
     billing: "one-time",
-    setupTime: "3–5 working days after you submit your details",
+    setupTime: "Minutes — build it yourself and publish in one click",
     connect: [],
-    info: [
-      { key: "domain", label: "Domain you want (or already own)", type: "text", placeholder: "mybusiness.com" },
-      { key: "brand", label: "Brand colours & style", type: "text", placeholder: "Warm orange, modern, simple" },
-    ],
+    info: [],
     configure: [
       { key: "booking", label: "Add booking / enquiry form", type: "toggle", default: true },
       { key: "whatsapp", label: "Add WhatsApp chat button", type: "toggle", default: true },
     ],
-    approvalNote: "Domains take up to 48 hours to point to your new site after purchase.",
+    approvalNote: "Your site goes live at ibaxai.com/s/your-name. Using your own domain (like mybusiness.com) is coming soon.",
   },
   {
     id: "voice",
