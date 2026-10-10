@@ -182,7 +182,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <IbaxLauncher ws={workspace} />
 
-      {/* Bottom navigation (mobile): one floating glass bar; the open page's tab glows and lights up the page above it */}
+      {/* Bottom navigation (mobile): one floating glass bar; the open page's tab gets a green pill and a lit edge */}
       <nav aria-label="Main" className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(0.6rem+env(safe-area-inset-bottom))] lg:hidden">
         <div aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-ink-950 via-ink-950/80 to-transparent" />
         <ul className="pointer-events-auto relative mx-auto grid max-w-md grid-cols-5 rounded-[1.6rem] border border-white/10 bg-ink-900/85 p-1.5 shadow-[0_24px_60px_-18px_rgb(0_0_0/0.95),inset_0_1px_0_rgb(255_255_255/0.07)] backdrop-blur-xl">
@@ -192,13 +192,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               <li key={item.href} className="relative">
                 {active && (
                   <>
-                    {/* Light from the tab into the page */}
-                    <motion.span
-                      layoutId="nav-beam"
-                      aria-hidden
-                      className="pointer-events-none absolute bottom-[calc(100%+0.375rem)] left-1/2 h-20 w-24 -translate-x-1/2 bg-[radial-gradient(ellipse_at_50%_100%,rgb(102_211_76/0.28),transparent_70%)]"
-                      transition={{ type: "spring", stiffness: 420, damping: 36 }}
-                    />
                     <motion.span
                       layoutId="nav-edge"
                       aria-hidden
