@@ -8,6 +8,13 @@ set -euo pipefail
 DIR=/opt/ibaxai-evolution
 mkdir -p "$DIR" && cd "$DIR"
 
+# Small servers (2 GB RAM): add 2 GB of swap so Postgres + Evolution don't run out of memory.
+if ! swapon --show | grep -q . && [ "$(awk '/MemTotal/ {print $2}' /proc/meminfo)" -lt 3500000 ]; then
+  echo "==> Adding 2 GB swap…"
+  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile
+  grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+
 echo "==> Installing Docker (if needed)…"
 command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
 
