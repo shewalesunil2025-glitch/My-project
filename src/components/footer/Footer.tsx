@@ -43,6 +43,7 @@ export function Footer() {
             </span>
           </p>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-fg-muted">{siteConfig.tagline}</p>
+          <p className="mt-2 max-w-xs text-sm font-semibold text-fg">{siteConfig.slogan}</p>
           <ul className="mt-6 flex flex-wrap gap-2" aria-label="Social links">
             {siteConfig.social.map((s) => (
               <li key={s.label}>

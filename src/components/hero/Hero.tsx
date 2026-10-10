@@ -104,6 +104,9 @@ export function Hero() {
           className="absolute top-[52%] left-[6%] md:top-[60%] md:left-[7%]"
         >
           <motion.div {...rise(0.5)} className="flex flex-col items-start gap-3">
+            <p className="text-lg font-semibold tracking-tight text-fg md:text-xl">
+              Just say it. <span className="text-flow">ibaxai</span> does it.
+            </p>
             <BookDemoButton size="md" />
             <p className="max-w-[16rem] text-xs text-fg-subtle">Free 30-minute AI automation call — proposal within 24 hours.</p>
             <a
