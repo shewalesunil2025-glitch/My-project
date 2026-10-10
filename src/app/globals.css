@@ -427,8 +427,9 @@ body {
   aspect-ratio: 1;
   translate: 0 -50%;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, #d4ffb8, #7dff3a 45%, #3fbf10);
-  box-shadow: 0 0 14px rgb(125 255 58 / 0.8), inset 0 -2px 4px rgb(0 0 0 / 0.25);
+  /* The ibaxai logo mark in the green knob */
+  background: url("/brand/knob.svg") center / cover no-repeat, #62cf4a;
+  box-shadow: 0 0 14px rgb(125 255 58 / 0.8), inset 0 -2px 4px rgb(0 0 0 / 0.2);
   transition: transform 0.5s var(--ease-out-expo);
 }
 .knob:hover::after { transform: translateX(-0.25em) scale(1.06); }
