@@ -10,7 +10,8 @@ import { evolutionReady, instanceFor, ownership, userFromRequest, waDigits } fro
  * Without it the app runs in preview mode and reports that nothing was forwarded.
  */
 
-const MAX_BODY = 20_000;
+// Room for a logo from older app versions (dropped below); the automation server gets ~20 KB at most.
+const MAX_BODY = 600_000;
 
 export async function POST(request: Request) {
   const raw = await request.text();
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
         at: new Date().toISOString(),
         workspaceId: body.workspaceId,
         serviceId: svc.id,
-        business: body.business ?? null,
+        business: body.business && typeof body.business === "object" ? { ...(body.business as Record<string, unknown>), logo: undefined } : null,
         config: body.config ?? {},
         accounts: body.accounts ?? {},
       }),
