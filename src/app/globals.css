@@ -704,50 +704,45 @@ body {
 @keyframes site-tilt { from { opacity: 0; transform: perspective(900px) rotateX(32deg) translateY(60px); } to { opacity: 1; transform: none; } }
 @keyframes site-out { to { opacity: 0.15; transform: translateY(-50px) scale(0.95); } }
 
-/* Premium deep-emerald button: lit from the top, deep green base, inner light, soft depth */
+/* Premium glow-outline button: dark glass pill, multicolour light border (green → cyan → white → violet), soft glow */
 .btn-3d {
+  --btn-ring: linear-gradient(100deg, #3ee07a 0%, #22d3ee 28%, #f5fbff 50%, #a78bfa 72%, #6366f1 100%);
   position: relative;
-  overflow: hidden;
-  isolation: isolate;
   color: #fff;
-  text-shadow: 0 1px 1px rgb(0 40 10 / 0.35);
-  background: radial-gradient(120% 140% at 50% 0%, #6ee35a 0%, #2fb34a 45%, #0f7a3a 100%);
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(180deg, #121a17 0%, #060a09 100%) padding-box,
+    var(--btn-ring) border-box;
+  background-size: 100% 100%, 200% 100%;
+  background-position: 0 0, 0% 0;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.45),
-    inset 0 -6px 14px rgb(0 40 10 / 0.45),
-    0 1px 0 rgb(255 255 255 / 0.08),
-    0 14px 30px -10px rgb(16 122 58 / 0.9),
-    0 30px 60px -30px rgb(102 211 76 / 0.8);
-  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 -8px 18px rgb(99 102 241 / 0.1),
+    -10px 6px 26px -10px rgb(62 224 122 / 0.75),
+    10px 6px 26px -10px rgb(139 92 246 / 0.8),
+    0 12px 34px -14px rgb(34 211 238 / 0.6);
+  transition: box-shadow 0.25s ease, filter 0.2s ease, background-position 0.6s ease;
 }
-.btn-3d::after {
-  /* slow soft shine */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%);
-  transform: translateX(-120%);
-  pointer-events: none;
-}
-.btn-3d:hover { filter: brightness(1.08); transform: translateY(-1px); }
-.btn-3d:active {
-  transform: translateY(1px);
-  filter: brightness(0.97);
+.btn-3d:hover {
+  filter: brightness(1.12);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
-    inset 0 -3px 10px rgb(0 40 10 / 0.5),
-    0 6px 16px -8px rgb(16 122 58 / 0.9);
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -8px 18px rgb(99 102 241 / 0.14),
+    -12px 6px 32px -8px rgb(62 224 122 / 0.85),
+    12px 6px 32px -8px rgb(139 92 246 / 0.9),
+    0 14px 40px -12px rgb(34 211 238 / 0.7);
 }
+.btn-3d:active { filter: brightness(0.95); }
 .btn-3d-sm {
+  border-width: 1px;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.45),
-    inset 0 -4px 10px rgb(0 40 10 / 0.45),
-    0 8px 18px -8px rgb(16 122 58 / 0.9);
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    -6px 3px 16px -7px rgb(62 224 122 / 0.75),
+    6px 3px 16px -7px rgb(139 92 246 / 0.8);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .btn-3d::after { animation: btn-3d-sweep 5s ease-in-out 1.5s infinite; }
+  .btn-3d { animation: btn-3d-flow 6s ease-in-out infinite alternate; }
 }
-@keyframes btn-3d-sweep {
-  0%, 70% { transform: translateX(-120%); }
-  90%, 100% { transform: translateX(120%); }
+@keyframes btn-3d-flow {
+  to { background-position: 0 0, 100% 0; }
 }
