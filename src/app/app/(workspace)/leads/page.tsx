@@ -1,9 +1,10 @@
 "use client";
 
 import { product } from "@/config/product";
-import { useState, type FormEvent } from "react";
-import { Plus, Sparkles, X } from "lucide-react";
-import { audit, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
+import { useEffect, useState, type FormEvent } from "react";
+import { MessageCircle, Plus, Sparkles, X } from "lucide-react";
+import { cloudEnabled, cloudFollowupAction } from "@/lib/app/cloud";
+import { audit, logActivity, notify, nowIso, syncFollowups, syncSiteLeads, uid, updateWorkspace } from "@/lib/app/store";
 import type { Lead, LeadStatus } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
 import { leadStatus } from "@/components/app/status";
@@ -11,11 +12,24 @@ import { Btn, Card, EmptyState, Field, Input, Notice, PageHeader, Pill, Segmente
 
 type Tab = "all" | LeadStatus | "returning";
 
+const autoLabel: Record<NonNullable<Lead["auto"]>["state"], string> = {
+  waiting: "following up",
+  replied: "replied ✓",
+  done: "no reply yet, give them a call",
+  stopped: "stopped",
+  failed: "couldn't reach this number on WhatsApp",
+};
+
 export default function LeadsPage() {
   const ws = useWorkspace();
   const [tab, setTab] = useState<Tab>("all");
   const [adding, setAdding] = useState(false);
+  useEffect(() => {
+    void syncSiteLeads().then(syncFollowups);
+  }, []);
   if (!ws) return null;
+
+  const followingUp = cloudEnabled && !ws.sample && ws.automations.some((a) => a.serviceId === "followup" && a.status === "active");
 
   const count = (s: LeadStatus) => ws.leads.filter((l) => l.status === s).length;
   const tabs: { value: Tab; label: string }[] = [
@@ -38,6 +52,9 @@ export default function LeadsPage() {
       if (status !== "follow_up") l.followUpAt = undefined;
       logActivity(w, { kind: "lead", title: `${l.name} marked ${leadStatus[status].label.toLowerCase()}`, href: "/app/leads" });
     });
+    const lead = ws?.leads.find((x) => x.id === id);
+    // Converted or lost: Lead Follow-up sends no more reminders.
+    if (followingUp && lead?.phone && (status === "converted" || status === "lost")) void cloudFollowupAction("stop", { phone: lead.phone });
   }
 
   function update(id: string, fn: (l: Lead) => void) {
@@ -52,14 +69,16 @@ export default function LeadsPage() {
     const f = new FormData(e.currentTarget);
     const g = (k: string) => String(f.get(k) ?? "").trim();
     if (!g("name")) return;
+    const lead: Lead = { id: uid(), name: g("name"), phone: g("phone"), email: g("email"), source: g("source") || "Added manually", interest: g("interest"), status: "new", returning: false, createdAt: nowIso(), notes: g("notes") };
     updateWorkspace((w) => {
-      const lead: Lead = { id: uid(), name: g("name"), phone: g("phone"), email: g("email"), source: g("source") || "Added manually", interest: g("interest"), status: "new", returning: false, createdAt: nowIso(), notes: g("notes") };
       w.leads.unshift(lead);
       logActivity(w, { kind: "lead", title: `New lead — ${lead.name}`, detail: lead.interest, href: "/app/leads" });
       notify(w, { kind: "lead", title: `New lead: ${lead.name}`, detail: lead.interest || lead.source, href: "/app/leads" });
       audit(w, `Added lead ${lead.name}`);
     });
     setAdding(false);
+    if (followingUp && lead.phone)
+      void cloudFollowupAction("enroll", { phone: lead.phone, name: lead.name, interest: lead.interest, source: lead.source, leadRef: lead.id }).then(() => syncFollowups());
   }
 
   return (
@@ -78,7 +97,8 @@ export default function LeadsPage() {
         <Notice className="mb-5 flex items-center gap-2">
           <Sparkles className="size-4 shrink-0" aria-hidden />
           <span>
-            <b className="text-fg">{due} lead{due > 1 ? "s" : ""} need follow-up today.</b> {product.assistantName} can message them for you once Lead Follow-up is active.
+            <b className="text-fg">{due} lead{due > 1 ? "s" : ""} need follow-up today.</b>{" "}
+            {followingUp ? "They replied or didn't answer the WhatsApp reminders, so give them a call." : `${product.assistantName} can message them for you once Lead Follow-up is active.`}
           </span>
         </Notice>
       )}
@@ -142,6 +162,11 @@ export default function LeadsPage() {
                     {l.source} · {relTime(l.createdAt)} {l.phone && `· ${l.phone}`} {l.email && `· ${l.email}`}
                     {!l.phone && !l.email && <span className="text-amber-200"> · no contact details</span>}
                   </p>
+                  {l.auto && (
+                    <p className="mt-1 inline-flex items-center gap-1 text-xs text-flow-soft">
+                      <MessageCircle className="size-3" aria-hidden /> {product.assistantName} WhatsApp: {l.auto.sent} of 3 sent · {autoLabel[l.auto.state]}
+                    </p>
+                  )}
                 </div>
                 <label className="sr-only" htmlFor={`st-${l.id}`}>
                   Status for {l.name}

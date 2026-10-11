@@ -25,8 +25,8 @@ export async function POST(request: Request) {
   const svc = typeof body.serviceId === "string" ? serviceById(body.serviceId) : undefined;
   if (!svc || typeof body.workspaceId !== "string") return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
 
-  // WhatsApp: only the account that linked the number may switch its replies on.
-  if (svc.id === "whatsapp" && evolutionReady()) {
+  // WhatsApp replies and Lead Follow-up send from the owner's number: only the account that linked it may switch them on.
+  if ((svc.id === "whatsapp" || svc.id === "followup") && evolutionReady()) {
     const user = await userFromRequest(request);
     if (!user) return NextResponse.json({ ok: false, reason: "unauthorized" }, { status: 401 });
     const accounts = (body.accounts ?? {}) as Record<string, unknown>;

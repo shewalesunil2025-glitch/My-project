@@ -154,6 +154,24 @@ export async function cloudSiteLeads(): Promise<SiteLeadRow[]> {
   return error || !data ? [] : (data as SiteLeadRow[]);
 }
 
+/* ── Lead Follow-up (followups table, written by the server) ── */
+
+export type FollowupRow = { lead_ref: string; phone: string; state: "waiting" | "replied" | "done" | "stopped" | "failed"; steps_sent: number; replied_at: string | null };
+
+export async function cloudFollowups(): Promise<FollowupRow[]> {
+  const { data, error } = await sb().from("followups").select("lead_ref, phone, state, steps_sent, replied_at").order("created_at", { ascending: false }).limit(500);
+  return error || !data ? [] : (data as FollowupRow[]);
+}
+
+/** Starts (enroll) or stops follow-up messages for one lead. */
+export async function cloudFollowupAction(action: "enroll" | "stop", lead: { phone: string; name?: string; interest?: string; source?: string; leadRef?: string }) {
+  await fetch("/api/followup", {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(await cloudAuthHeader()) },
+    body: JSON.stringify({ action, ...lead }),
+  }).catch(() => null);
+}
+
 export type OAuthProvider = "google" | "apple";
 
 /** Sends the visitor to Google / Apple; they come back to /app/login signed in. */

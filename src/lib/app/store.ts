@@ -11,6 +11,7 @@ import {
   cloudSignIn,
   cloudSignOut,
   cloudSignUp,
+  cloudFollowups,
   cloudSiteLeads,
   type CloudAccount,
 } from "./cloud";
@@ -360,7 +361,7 @@ function startCloudSync() {
         openCloudAccount({ ...acc, workspace: local });
         void pushWorkspace(acc.id, local);
       } else openCloudAccount(acc);
-      void syncSiteLeads();
+      void syncSiteLeads().then(syncFollowups);
     })
     .catch(() => {
       /* offline: keep working from this device's copy */
@@ -399,6 +400,44 @@ export async function syncSiteLeads() {
       detail: fresh.length === 1 ? fresh[0].message || fresh[0].phone : "See them in Leads.",
       href: "/app/leads",
     });
+  });
+}
+
+const leadDigits = (phone: string) => {
+  const d = phone.replace(/\D/g, "").replace(/^0+/, "");
+  return d.length === 10 ? `91${d}` : d;
+};
+
+/** Shows what Lead Follow-up has done for each lead, and moves leads who replied to "Follow-up required". */
+export async function syncFollowups() {
+  const db = load();
+  if (!cloudEnabled || !db.users.find((u) => u.id === db.sessionUserId)?.cloud) return;
+  const rows = await cloudFollowups().catch(() => []);
+  const ws = currentWorkspace();
+  if (!ws || !rows.length) return;
+  const byRef = new Map(rows.filter((r) => r.lead_ref).map((r) => [r.lead_ref, r]));
+  const byPhone = new Map(rows.map((r) => [r.phone, r]));
+  const rowFor = (l: Workspace["leads"][number]) => byRef.get(l.id) ?? (l.phone ? byPhone.get(leadDigits(l.phone)) : undefined);
+  const changed = ws.leads.some((l) => {
+    const r = rowFor(l);
+    return r && (l.auto?.sent !== r.steps_sent || l.auto?.state !== r.state);
+  });
+  if (!changed) return;
+  updateWorkspace((w) => {
+    for (const l of w.leads) {
+      const r = rowFor(l);
+      if (!r || (l.auto?.sent === r.steps_sent && l.auto?.state === r.state)) continue;
+      const open = l.status === "new" || l.status === "contacted";
+      if (r.state === "replied" && l.auto?.state !== "replied") {
+        notify(w, { kind: "lead", title: `${l.name} replied on WhatsApp`, detail: "Lead Follow-up stopped the reminders. Talk to them today.", href: "/app/leads" });
+        logActivity(w, { kind: "lead", title: `${l.name} replied to the follow-up`, href: "/app/leads" });
+      }
+      if (open && (r.state === "replied" || r.state === "done")) {
+        l.status = "follow_up";
+        l.followUpAt = nowIso();
+      } else if (l.status === "new" && r.steps_sent > 0) l.status = "contacted";
+      l.auto = { sent: r.steps_sent, state: r.state };
+    }
   });
 }
 

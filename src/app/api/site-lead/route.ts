@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { validSlug } from "@/lib/sites/site";
+import { enroll } from "@/lib/server/followup";
 
 /**
  * Enquiry form on a client's published website → their Leads.
@@ -28,10 +29,12 @@ export async function POST(request: Request) {
   const { data: site } = await admin.from("sites").select("owner_id").eq("slug", slug).maybeSingle();
   if (!site) return NextResponse.json({ ok: false, reason: "not_found" }, { status: 404 });
 
-  const { error } = await admin.from("site_leads").insert({ owner_id: site.owner_id, slug, name, phone, message });
-  if (error) {
-    console.error("[site-lead] insert failed", error.message);
+  const { data: lead, error } = await admin.from("site_leads").insert({ owner_id: site.owner_id, slug, name, phone, message }).select("id").single();
+  if (error || !lead) {
+    console.error("[site-lead] insert failed", error?.message);
     return NextResponse.json({ ok: false, reason: "failed" }, { status: 500 });
   }
+  // Lead Follow-up: thank the visitor on WhatsApp right away, if the owner has it on.
+  await enroll(admin, site.owner_id, { name, phone, interest: message, source: "Website", leadRef: `site-${lead.id}` }).catch((e) => console.error("[site-lead] follow-up failed", e));
   return NextResponse.json({ ok: true });
 }
