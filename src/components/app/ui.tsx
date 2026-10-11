@@ -107,8 +107,8 @@ type BtnVariant = "primary" | "ghost" | "light" | "danger" | "subtle";
 const btnBase =
   "inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-tight whitespace-nowrap transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none";
 const btnVariants: Record<BtnVariant, string> = {
-  /** Glossy 3D green (see .btn-3d in globals.css). */
-  primary: "btn-3d text-ink-950",
+  /** Premium deep-emerald green (see .btn-3d in globals.css). */
+  primary: "btn-3d text-white",
   ghost: "border border-white/12 bg-white/[0.04] text-fg hover:border-white/25 hover:bg-white/[0.08]",
   light: "bg-white text-ink-950 hover:bg-white/90",
   danger: "border border-red-400/30 bg-red-500/10 text-red-200 hover:bg-red-500/20",
