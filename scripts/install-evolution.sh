@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # ibaxai — installs the Evolution API (WhatsApp) server on a fresh Ubuntu VPS.
-# Run as root:  curl -fsSL https://raw.githubusercontent.com/shewalesunil2025-glitch/My-project/main/scripts/install-evolution.sh | bash
+# Run:  curl -fsSL https://raw.githubusercontent.com/shewalesunil2025-glitch/My-project/main/scripts/install-evolution.sh | sudo bash
 # Creates Evolution API + Postgres + Redis behind Caddy with free HTTPS on <ip>.sslip.io,
 # then prints the two values to put in Vercel. Safe to run again: keeps the existing key.
 set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then echo "Please run with sudo:  ... | sudo bash"; exit 1; fi
 
 DIR=/opt/ibaxai-evolution
 mkdir -p "$DIR" && cd "$DIR"
@@ -21,12 +23,17 @@ if command -v apt-get >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive
   apt-get update -qq && apt-get install -y -qq unattended-upgrades ufw >/dev/null
   dpkg-reconfigure -f noninteractive unattended-upgrades >/dev/null 2>&1 || true
-  ufw allow OpenSSH >/dev/null && ufw allow 80/tcp >/dev/null && ufw allow 443/tcp >/dev/null
+  ufw allow 22/tcp >/dev/null && ufw allow 80/tcp >/dev/null && ufw allow 443/tcp >/dev/null
   ufw --force enable >/dev/null
 fi
 
 echo "==> Installing Docker (if needed)…"
-command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
+if ! command -v docker >/dev/null 2>&1; then
+  # Docker's script may not know the newest Ubuntu yet; fall back to Ubuntu's own packages.
+  curl -fsSL https://get.docker.com | sh || apt-get install -y -qq docker.io docker-compose-v2
+fi
+systemctl enable --now docker >/dev/null 2>&1 || true
+docker compose version >/dev/null 2>&1 || apt-get install -y -qq docker-compose-v2 || apt-get install -y -qq docker-compose-plugin
 
 IP=$(curl -fsS https://api.ipify.org)
 HOST="${IP//./-}.sslip.io"
