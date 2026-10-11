@@ -254,16 +254,14 @@ export const services: ServiceDef[] = [
     short: "Every enquiry followed up on time.",
     group: "growth",
     icon: "UserCheck",
-    description: "Every new lead from calls, WhatsApp, social media or your website gets a timely, personal follow-up. ibaxai tells you who needs a call today.",
-    features: ["Leads from every channel in one list", "Automatic follow-up sequence", "Daily follow-up list", "Status tracking to conversion"],
+    description:
+      "Every new lead from your website or added by you gets a thank-you on your own WhatsApp straight away, then a friendly reminder if they don't reply. It stops as soon as they answer, and every morning ibaxai tells you who to call today.",
+    features: ["Instant thank-you on WhatsApp", "Up to 2 polite reminders", "Stops when the lead replies", "Morning “call these today” list", "Status tracking to conversion"],
     price: 39,
     setupTime: "Same day",
-    connect: [],
-    info: [{ key: "offer", label: "What do you offer new customers?", type: "textarea", placeholder: "10% off the first visit" }],
-    configure: [
-      { key: "channel", label: "Follow up on", type: "select", options: ["WhatsApp", "Email", "SMS", "WhatsApp, then email"], default: "WhatsApp, then email" },
-      { key: "delay", label: "First follow-up after", type: "select", options: ["1 hour", "1 day", "2 days"], default: "1 day" },
-    ],
+    connect: ["whatsapp"],
+    info: [{ key: "offer", label: "Any offer for new customers? (optional)", type: "textarea", placeholder: "10% off the first visit" }],
+    configure: [{ key: "delay", label: "Send a reminder after", type: "select", options: ["1 hour", "1 day", "2 days"], default: "1 day" }],
   },
   {
     id: "support",
@@ -353,7 +351,7 @@ export const serviceById = (id: string) => services.find((s) => s.id === id);
  * waitlist instead of payment. Add a service's id here once its automation is
  * built and tested (see docs/ROADMAP.md).
  */
-export const liveServices: readonly string[] = ["website", "whatsapp", "custom"];
+export const liveServices: readonly string[] = ["website", "whatsapp", "followup", "custom"];
 export const isLive = (id: string) => liveServices.includes(id);
 
 export const annualPrice = (monthly: number) => monthly * 10;

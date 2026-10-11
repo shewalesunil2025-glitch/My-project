@@ -117,6 +117,8 @@ export type Lead = {
   createdAt: string;
   followUpAt?: string;
   notes: string;
+  /** Lead Follow-up: WhatsApp messages IBAX has sent this lead, and whether they replied. */
+  auto?: { sent: number; state: "waiting" | "replied" | "done" | "stopped" | "failed" };
 };
 
 export type Channel = "whatsapp" | "instagram" | "facebook" | "email";
