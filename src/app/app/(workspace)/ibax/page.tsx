@@ -55,7 +55,7 @@ export default function IbaxHubPage() {
         <button
           type="button"
           onClick={() => openIbaxChat()}
-          className="btn-3d group mt-6 inline-flex h-13 w-full items-center justify-center gap-2 rounded-full px-6 text-[0.95rem] font-semibold text-ink-950 sm:w-auto"
+          className="btn-3d group mt-6 inline-flex h-13 w-full items-center justify-center gap-2 rounded-full px-6 text-[0.95rem] font-semibold text-white sm:w-auto"
         >
           <MessageCircle className="size-4" aria-hidden /> Talk to {product.assistantName}
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
@@ -138,7 +138,7 @@ export default function IbaxHubPage() {
                     <button
                       type="button"
                       onClick={() => openIbaxChat(`I want ${s.name}`)}
-                      className="btn-3d btn-3d-sm inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-ink-950"
+                      className="btn-3d btn-3d-sm inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-white"
                     >
                       <Sparkles className="size-3.5" aria-hidden /> Start with {product.assistantName}
                     </button>
