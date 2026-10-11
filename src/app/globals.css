@@ -137,6 +137,13 @@
 
 /* Unlayered on purpose: layered rules lose to any unlayered host stylesheet
    (e.g. an embedding page's reset), which would repaint the page light. */
+/* Native dropdown lists (Windows Chrome draws them white): keep them dark and readable. */
+select option,
+select optgroup {
+  background-color: var(--color-ink-900);
+  color: var(--color-fg);
+}
+
 html,
 body {
   color-scheme: dark;
