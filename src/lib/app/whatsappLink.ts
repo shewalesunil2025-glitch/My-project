@@ -32,8 +32,14 @@ export async function startWhatsAppLink(number: string): Promise<LinkStart> {
 }
 
 export async function whatsAppState(number: string): Promise<string> {
+  return (await whatsAppStatus(number)).state;
+}
+
+/** Link state plus, while linking, the current pairing code and QR (WhatsApp renews them every ~20 s). */
+export async function whatsAppStatus(number: string): Promise<{ state: string; pairingCode: string | null; qr: string | null }> {
   const r = await call("status", number);
-  return r.ok ? String(r.state ?? "unknown") : "unknown";
+  if (!r.ok) return { state: "unknown", pairingCode: null, qr: null };
+  return { state: String(r.state ?? "unknown"), pairingCode: (r.pairingCode as string | null) ?? null, qr: (r.qr as string | null) ?? null };
 }
 
 export async function unlinkWhatsApp(number: string) {

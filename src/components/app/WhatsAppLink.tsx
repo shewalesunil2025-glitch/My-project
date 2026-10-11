@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Check, ShieldCheck, Smartphone } from "lucide-react";
-import { linkErrors, startWhatsAppLink, whatsAppState } from "@/lib/app/whatsappLink";
+import { linkErrors, startWhatsAppLink, whatsAppStatus } from "@/lib/app/whatsappLink";
 import { Btn, Notice, Spinner } from "./ui";
 
 type Phase = { step: "number" } | { step: "starting" } | { step: "pairing"; code: string | null; qr: string | null } | { step: "linked" };
@@ -30,11 +30,16 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
         setError("The code expired. Press “Get a new code” and try again.");
         return;
       }
-      if ((await whatsAppState(number)) === "open" && !done.current) {
+      const now = await whatsAppStatus(number);
+      if (done.current) return;
+      if (now.state === "open") {
         done.current = true;
         clearInterval(timer);
         setPhase({ step: "linked" });
         onLinked(number);
+      } else if (now.pairingCode || now.qr) {
+        // Keep the code and QR on screen fresh, so the owner never types an expired one.
+        setPhase((p) => (p.step === "pairing" ? { step: "pairing", code: now.pairingCode ?? p.code, qr: now.qr ?? p.qr } : p));
       }
     }, POLL_MS);
     return () => clearInterval(timer);
@@ -84,14 +89,14 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
           <li>{code ? "Tap “Link with phone number instead” and type the code above." : "Scan the QR code below."}</li>
         </ol>
         {phase.qr && (
-          <details className="text-xs text-fg-muted">
+          <details open className="text-xs text-fg-muted">
             <summary className="cursor-pointer">{code ? "Or scan a QR code (from a computer)" : "QR code"}</summary>
             {/* eslint-disable-next-line @next/next/no-img-element -- data URL from the WhatsApp server */}
             <img src={phase.qr} alt="WhatsApp link QR code" className="mx-auto mt-2 size-48 rounded-lg bg-white p-2" />
           </details>
         )}
         <p className="flex items-center gap-2 text-xs text-fg-subtle">
-          <Spinner className="size-3" /> Waiting for WhatsApp…
+          <Spinner className="size-3" /> Waiting for WhatsApp… The code and QR refresh on their own, so take your time.
         </p>
         {error && <Notice tone="amber">{error}</Notice>}
         <Btn size="sm" variant="ghost" className="w-full" onClick={() => start()}>

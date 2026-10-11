@@ -30,7 +30,12 @@ export async function POST(request: Request) {
 
     if (body.action === "status") {
       if (owner === "none") return json({ ok: true, state: "close" });
-      return json({ ok: true, state: await connectionState(instance), instance });
+      const state = await connectionState(instance);
+      if (state !== "connecting") return json({ ok: true, state, instance });
+      // WhatsApp replaces the QR and link code every ~20 s; hand back the current ones.
+      const r = await evo(`/instance/connect/${encodeURIComponent(instance)}`);
+      const qr = r.data as QrCode;
+      return json({ ok: true, state, instance, pairingCode: qr?.pairingCode ?? null, qr: qr?.base64 ?? null });
     }
 
     if (body.action === "disconnect") {
