@@ -1,0 +1,420 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>IBAX reel</title>
+<style>
+  :root { --g1:#7dff3a; --g2:#66d34c; --g3:#b6ff8a; --bg:#030703; --ink:#f4ffe9; --mute:#9aa89a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { width:1080px; height:1920px; overflow:hidden; background:var(--bg); font-family:'Inter',sans-serif; color:var(--ink); }
+  .abs { position:absolute; }
+  #stage { position:relative; width:1080px; height:1920px; overflow:hidden; }
+
+  /* ---------- top: motion graphics (0..1000) ---------- */
+  #top { position:absolute; left:0; top:0; width:1080px; height:1000px; overflow:hidden;
+         background:radial-gradient(120% 90% at 50% 0%, #0f2a10 0%, #061006 55%, #030703 100%); }
+  #grid { position:absolute; inset:-200px; opacity:.16;
+          background-image:linear-gradient(rgba(125,255,58,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(125,255,58,.35) 1px, transparent 1px);
+          background-size:60px 60px; }
+  .glow { position:absolute; width:620px; height:620px; border-radius:50%; filter:blur(90px); opacity:.35;
+          background:radial-gradient(circle, #5fe02c 0%, transparent 70%); }
+  .dot { position:absolute; width:6px; height:6px; border-radius:50%; background:var(--g3); box-shadow:0 0 10px var(--g1); }
+  .scene { position:absolute; inset:0; opacity:0; }
+  .kicker { position:absolute; left:0; right:0; top:112px; text-align:center; font-weight:800; font-size:30px; letter-spacing:.32em; color:var(--g1); text-transform:uppercase; }
+  .h1 { position:absolute; left:0; right:0; text-align:center; font-weight:900; font-size:76px; line-height:1.05; letter-spacing:-.02em; }
+  .grad { background:linear-gradient(90deg,#b6ff8a,#7dff3a 50%,#4fd12a); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .pill { position:absolute; display:flex; align-items:center; gap:18px; padding:20px 28px; border-radius:26px; font-size:32px; font-weight:700;
+          background:rgba(20,32,20,.85); border:1.5px solid rgba(255,255,255,.12); box-shadow:0 20px 50px rgba(0,0,0,.5); white-space:nowrap; }
+  .badge { min-width:56px; height:44px; padding:0 12px; border-radius:22px; background:#ff3b3b; color:#fff; font-size:26px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .ico { width:62px; height:62px; flex:none; }
+  .card { position:absolute; border-radius:34px; background:rgba(14,24,14,.9); border:1.5px solid rgba(125,255,58,.25); box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
+  .chip { position:absolute; padding:18px 26px; border-radius:22px; font-size:30px; font-weight:800; white-space:nowrap;
+          background:rgba(125,255,58,.12); border:1.5px solid rgba(125,255,58,.45); color:var(--g3); }
+  .chip b { color:#fff; }
+
+  /* WhatsApp phone */
+  #phone { left:84px; top:175px; width:500px; height:800px; border-radius:56px; background:#0b141a; border:10px solid #1d2a22; overflow:hidden; }
+  #phone .hdr { height:118px; background:#1f2c34; display:flex; align-items:center; gap:18px; padding:30px 26px 0; }
+  #phone .av { width:62px; height:62px; border-radius:50%; background:#2a3942; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:28px; color:#cfd8dc; }
+  #phone .nm { font-size:28px; font-weight:700; } #phone .st { font-size:21px; color:#8696a0; }
+  .bub { position:absolute; max-width:380px; padding:16px 20px; border-radius:22px; font-size:25px; line-height:1.3; font-weight:500; }
+  .in { left:20px; background:#202c33; border-top-left-radius:6px; }
+  .out { right:20px; background:#005c4b; border-top-right-radius:6px; }
+  .tick { color:#53bdeb; font-size:20px; margin-left:8px; }
+  .typing { position:absolute; left:20px; padding:20px 24px; border-radius:22px; background:#202c33; display:flex; gap:8px; }
+  .typing i { width:12px; height:12px; border-radius:50%; background:#8696a0; display:block; }
+
+  /* Instagram */
+  #igpost { left:70px; top:180px; width:470px; height:620px; overflow:hidden; }
+  #igpost .ph { height:360px; margin:20px; border-radius:22px; background:linear-gradient(135deg,#feda75,#fa7e1e 30%,#d62976 60%,#962fbf 85%,#4f5bd5); display:flex; align-items:center; justify-content:center; }
+  .cm { position:absolute; left:26px; right:26px; font-size:24px; line-height:1.3; padding:12px 16px; border-radius:16px; background:rgba(255,255,255,.06); }
+  .cm b { color:#fff; } .cm .rp { color:var(--g3); font-weight:700; }
+  #igdm { left:600px; top:180px; width:410px; height:330px; }
+  #leads { left:600px; top:560px; width:410px; height:250px; }
+  .leadrow { position:absolute; left:28px; right:28px; height:44px; display:flex; align-items:center; gap:14px; font-size:24px; font-weight:600; }
+  .leadrow .d { width:14px; height:14px; border-radius:50%; background:var(--g1); box-shadow:0 0 12px var(--g1); }
+
+  /* YouTube */
+  #ytcard { left:70px; top:185px; width:520px; height:560px; }
+  #ytcard .th { margin:22px; height:270px; border-radius:22px; background:linear-gradient(135deg,#1b3a1b,#0d1f0d); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  #ytcal { left:630px; top:185px; width:380px; height:560px; }
+  .day { position:absolute; left:28px; right:28px; height:70px; border-radius:18px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:28px; font-weight:700; background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.08); }
+
+  /* Workflow */
+  .node { position:absolute; width:340px; height:104px; margin-left:-170px; margin-top:-52px; border-radius:26px; display:flex; align-items:center; gap:16px; padding:0 22px;
+          background:rgba(14,26,14,.95); border:2px solid rgba(125,255,58,.3); font-size:27px; font-weight:800; box-shadow:0 18px 40px rgba(0,0,0,.5); }
+  .node small { display:block; font-size:19px; font-weight:600; color:var(--mute); }
+  .node .ni { width:56px; height:56px; flex:none; border-radius:16px; display:flex; align-items:center; justify-content:center; }
+  #wfsvg { position:absolute; left:0; top:0; width:1080px; height:1000px; }
+  #toggle { position:absolute; left:50%; top:920px; transform:translateX(-50%); display:flex; align-items:center; gap:20px; font-size:30px; font-weight:800; }
+  #sw { width:110px; height:58px; border-radius:30px; background:#2b352b; position:relative; }
+  #knob { position:absolute; top:6px; left:6px; width:46px; height:46px; border-radius:50%; background:#fff; }
+
+  /* Voice */
+  #orb { position:absolute; left:540px; top:430px; width:300px; height:300px; margin:-150px 0 0 -150px; border-radius:50%;
+         background:radial-gradient(circle at 35% 30%, #d4ffb8, #7dff3a 35%, #2f9a14 75%, #0f3a08); box-shadow:0 0 120px rgba(125,255,58,.6); }
+  .ring { position:absolute; left:540px; top:430px; border-radius:50%; border:3px solid rgba(125,255,58,.6); }
+  #wave { position:absolute; left:240px; top:640px; width:600px; height:120px; display:flex; align-items:center; justify-content:space-between; }
+  #wave i { display:block; width:12px; border-radius:6px; background:linear-gradient(#b6ff8a,#4fd12a); }
+  .vb { position:absolute; padding:22px 28px; border-radius:28px; font-size:30px; font-weight:700; line-height:1.3; max-width:820px; }
+
+  /* CTA */
+  #url { position:absolute; left:50%; top:700px; transform:translateX(-50%); padding:26px 54px; border-radius:60px; font-size:52px; font-weight:900; color:#041004;
+         background:linear-gradient(90deg,#b6ff8a,#7dff3a,#4fd12a); box-shadow:0 0 70px rgba(125,255,58,.55); overflow:hidden; white-space:nowrap; }
+  #shine { position:absolute; top:-20px; bottom:-20px; width:90px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent); transform:skewX(-20deg); }
+
+  /* progress + corner logo */
+  #prog { position:absolute; left:0; top:0; height:8px; background:linear-gradient(90deg,#4fd12a,#b6ff8a); box-shadow:0 0 16px #7dff3a; z-index:5; }
+  #corner { position:absolute; left:36px; top:34px; display:flex; align-items:center; gap:14px; z-index:5; }
+  #corner img.i { width:58px; height:58px; } #corner img.w { height:34px; }
+
+  /* ---------- bottom: presenter (1000..1920) ---------- */
+  #bot { position:absolute; left:0; top:1000px; width:1080px; height:920px; overflow:hidden; background:#000; }
+  #pres { position:absolute; left:0; top:0; height:920px; width:auto; transform-origin:50% 35%; }
+  #botfade { position:absolute; left:0; right:0; top:0; height:140px; background:linear-gradient(#030703, rgba(3,7,3,0)); }
+  #divider { position:absolute; left:0; right:0; top:996px; height:6px; background:linear-gradient(90deg,transparent,#7dff3a,transparent); box-shadow:0 0 30px #7dff3a; z-index:4; }
+  #mic { position:absolute; left:40px; top:1040px; display:flex; align-items:center; gap:14px; padding:12px 22px; border-radius:30px; background:rgba(0,0,0,.55); border:1.5px solid rgba(125,255,58,.5); font-size:24px; font-weight:800; z-index:4; }
+  #mic .bars { display:flex; align-items:center; gap:5px; height:30px; }
+  #mic .bars i { width:6px; border-radius:3px; background:var(--g1); display:block; }
+  #cap { position:absolute; left:60px; right:60px; top:1430px; text-align:center; font-size:46px; line-height:1.25; font-weight:900; z-index:4;
+         text-shadow:0 3px 0 #000, 0 0 24px rgba(0,0,0,.9); }
+  #cap span { display:inline-block; margin:0 7px; }
+  #cap span.on { color:#7dff3a; transform:scale(1.08); }
+  #cap span.off { color:#fff; opacity:.92; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="top">
+    <div id="grid"></div>
+    <div class="glow" id="glowA"></div><div class="glow" id="glowB"></div>
+    <div id="dots"></div>
+
+    <!-- S1 hook -->
+    <div class="scene" id="s1">
+      <div class="h1" id="s1t" style="top:110px">Business ke saare kaam<br><span class="grad">khud karte-karte thak gaye?</span></div>
+      <div class="pill" id="n1" style="left:90px;top:420px"><svg class="ico" viewBox="0 0 64 64"><use href="#i-wa"/></svg>WhatsApp<div class="badge">99+</div></div>
+      <div class="pill" id="n2" style="left:520px;top:540px"><svg class="ico" viewBox="0 0 64 64"><use href="#i-ig"/></svg>Instagram DMs<div class="badge">47</div></div>
+      <div class="pill" id="n3" style="left:120px;top:680px"><svg class="ico" viewBox="0 0 64 64"><use href="#i-yt"/></svg>YouTube comments<div class="badge">120</div></div>
+      <div class="pill" id="n4" style="left:600px;top:800px"><svg class="ico" viewBox="0 0 64 64"><use href="#i-call"/></svg>Missed calls<div class="badge">12</div></div>
+    </div>
+
+    <!-- S2 logo -->
+    <div class="scene" id="s2">
+      <img id="s2icon" class="abs" src="logo-icon.png" style="left:390px;top:150px;width:300px;height:300px">
+      <img id="s2word" class="abs" src="logo-word.png" style="left:290px;top:500px;width:500px">
+      <div class="h1" id="s2meet" style="top:680px;font-size:58px">Milo <span class="grad">IBAX</span> se — aapka AI assistant</div>
+      <div class="h1" id="s2slo" style="top:790px;font-size:50px;font-weight:800;color:#d4ffb8"></div>
+    </div>
+
+    <!-- S3 WhatsApp -->
+    <div class="scene" id="s3">
+      <div class="kicker" style="color:#25d366">WhatsApp Automation</div>
+      <div class="card" id="phone">
+        <div class="hdr"><div class="av">R</div><div><div class="nm">Rahul (Customer)</div><div class="st" id="wast">online</div></div></div>
+        <div class="bub in" id="w1" style="top:150px">Hi! Price aur details bhejo?</div>
+        <div class="typing" id="wty" style="top:250px"><i></i><i></i><i></i></div>
+        <div class="bub out" id="w2" style="top:250px">Namaste Rahul! Yeh rahe humare plans aur demo link <span class="tick">✓✓</span></div>
+        <div class="bub in" id="w3" style="top:400px">Kal 11 baje demo book kar do</div>
+        <div class="bub out" id="w4" style="top:500px">Booked! Kal 10:30 ko reminder aayega <span class="tick">✓✓</span></div>
+        <div class="bub out" id="w5" style="top:640px;background:rgba(125,255,58,.18);border:1.5px solid rgba(125,255,58,.5);color:#d4ffb8;font-weight:700">⚡ Reply by IBAX</div>
+      </div>
+      <div class="chip" id="wc1" style="left:630px;top:260px">Reply time<br><b style="font-size:54px">3 sec</b></div>
+      <div class="chip" id="wc2" style="left:630px;top:470px"><b style="font-size:54px">24×7</b><br>hamesha ON</div>
+      <div class="chip" id="wc3" style="left:630px;top:680px">Booking<br><b style="font-size:44px">Automatic ✓</b></div>
+    </div>
+
+    <!-- S4 Instagram -->
+    <div class="scene" id="s4">
+      <div class="kicker" style="color:#f77737">Instagram Automation</div>
+      <div class="card" id="igpost">
+        <div class="ph" id="igph"><svg viewBox="0 0 64 64" width="150" height="150"><use href="#i-igw"/></svg></div>
+        <div class="cm" id="c1" style="top:400px"><b>@riya_shop</b> price kya hai? <div class="rp" id="c1r">↳ IBAX: DM check karo! ✓</div></div>
+        <div class="cm" id="c2" style="top:510px"><b>@amit.k</b> details please <div class="rp" id="c2r">↳ IBAX: DM bhej diya! ✓</div></div>
+      </div>
+      <div class="card" id="igdm">
+        <div style="padding:24px 28px;font-size:26px;font-weight:800;color:#f77737">Auto DM ✉</div>
+        <div class="bub out" id="d1" style="top:80px;right:24px;background:#3b2a5c">Hi Riya! Yeh rahi price list aur offer 🎁</div>
+        <div class="bub in" id="d2" style="top:200px;left:24px">Wow, order karna hai!</div>
+      </div>
+      <div class="card" id="leads">
+        <div style="padding:22px 28px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:26px;font-weight:800;color:var(--g1)">Leads list</span><span id="leadn" style="font-size:44px;font-weight:900">0</span></div>
+        <div class="leadrow" id="l1" style="top:96px"><span class="d"></span>Riya · Instagram</div>
+        <div class="leadrow" id="l2" style="top:146px"><span class="d"></span>Amit · Instagram</div>
+        <div class="leadrow" id="l3" style="top:196px"><span class="d"></span>Rahul · WhatsApp</div>
+      </div>
+    </div>
+
+    <!-- S5 YouTube -->
+    <div class="scene" id="s5">
+      <div class="kicker" style="color:#ff3b3b">YouTube Automation</div>
+      <div class="card" id="ytcard">
+        <div class="th"><svg viewBox="0 0 64 64" width="140" height="140" id="ytplay"><use href="#i-yt"/></svg><div id="ytbar" class="abs" style="left:0;bottom:0;height:8px;background:#ff3b3b"></div></div>
+        <div class="cm" id="y1" style="top:330px">💬 Kaunsa plan best hai? <div class="rp" id="y1r">↳ IBAX: Starter plan se shuru karo ✓</div></div>
+        <div class="cm" id="y2" style="top:440px">💬 Demo kaise milega? <div class="rp" id="y2r">↳ IBAX: Link description mein hai ✓</div></div>
+      </div>
+      <div class="card" id="ytcal">
+        <div style="padding:24px 28px;font-size:26px;font-weight:800;color:#ff6b6b">Upload planner 📅</div>
+        <div class="day" id="yd1" style="top:100px">Mon<span>Video 1</span></div>
+        <div class="day" id="yd2" style="top:190px">Wed<span>Short</span></div>
+        <div class="day" id="yd3" style="top:280px">Fri<span>Video 2</span></div>
+        <div class="day" id="yd4" style="top:370px">Sun<span>Short</span></div>
+        <div id="ytauto" class="abs" style="left:28px;right:28px;top:470px;text-align:center;font-size:30px;font-weight:900;color:var(--g1)">Sab automatic ✓</div>
+      </div>
+    </div>
+
+    <!-- S6 Workflows -->
+    <div class="scene" id="s6">
+      <div class="kicker">Ready-made Workflows</div>
+      <svg id="wfsvg" viewBox="0 0 1080 1000">
+        <defs><linearGradient id="lg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b6ff8a"/><stop offset="1" stop-color="#4fd12a"/></linearGradient></defs>
+        <path class="wl" d="M540 274 L540 410"/>
+        <path class="wl" d="M540 500 C540 580 200 560 200 650"/>
+        <path class="wl" d="M540 500 L540 650"/>
+        <path class="wl" d="M540 500 C540 580 880 560 880 650"/>
+        <path class="wl" d="M200 710 C200 800 540 760 540 820"/>
+        <path class="wl" d="M540 710 L540 820"/>
+        <path class="wl" d="M880 710 C880 800 540 760 540 820"/>
+        <g id="pulses"></g>
+      </svg>
+      <div class="node" id="nd0" style="left:540px;top:222px"><div class="ni" style="background:#1e3b1e">⚡</div><div>New message<small>Trigger</small></div></div>
+      <div class="node" id="nd1" style="left:540px;top:455px;border-color:#7dff3a"><img class="ni" src="logo-icon.png"><div>IBAX AI<small>Samjhe + jawab de</small></div></div>
+      <div class="node" id="nd2" style="left:200px;top:680px;width:260px;margin-left:-130px"><svg class="ni" viewBox="0 0 64 64"><use href="#i-wa"/></svg><div>WhatsApp</div></div>
+      <div class="node" id="nd3" style="left:540px;top:680px;width:260px;margin-left:-130px"><svg class="ni" viewBox="0 0 64 64"><use href="#i-ig"/></svg><div>Instagram</div></div>
+      <div class="node" id="nd4" style="left:880px;top:680px;width:260px;margin-left:-130px"><svg class="ni" viewBox="0 0 64 64"><use href="#i-yt"/></svg><div>YouTube</div></div>
+      <div class="node" id="nd5" style="left:540px;top:850px"><div class="ni" style="background:#1e3b1e">📈</div><div>Leads + Report<small>Aapke paas</small></div></div>
+      <div id="toggle" style="top:-200px"></div>
+    </div>
+
+    <!-- S7 Voice -->
+    <div class="scene" id="s7">
+      <div class="kicker">AI Voice Agent</div>
+      <div class="ring" id="r1"></div><div class="ring" id="r2"></div><div class="ring" id="r3"></div>
+      <div id="orb"></div>
+      <svg class="abs" viewBox="0 0 64 64" style="left:500px;top:390px;width:80px;height:80px" id="micico"><use href="#i-mic"/></svg>
+      <div id="wave"></div>
+      <div class="vb" id="v1" style="left:80px;top:160px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15)">🗣 “IBAX, aaj ke naye leads ko follow-up bhej do”</div>
+      <div class="vb" id="v2" style="right:80px;top:800px;background:rgba(125,255,58,.16);border:1.5px solid rgba(125,255,58,.6);color:#d4ffb8">🤖 Ho gaya! 12 leads ko message chala gaya ✓</div>
+    </div>
+
+    <!-- S8 CTA -->
+    <div class="scene" id="s8">
+      <img id="s8icon" class="abs" src="logo-icon.png" style="left:420px;top:110px;width:240px;height:240px">
+      <img id="s8word" class="abs" src="logo-word.png" style="left:330px;top:390px;width:420px">
+      <div class="h1" id="s8slo" style="top:560px;font-size:56px">Just say it. <span class="grad">IBAX does it.</span></div>
+      <div id="url">www.ibaxai.com<div id="shine"></div></div>
+      <div class="h1" id="s8bio" style="top:870px;font-size:40px;font-weight:800;color:var(--g3)">Link bio mein hai ↗</div>
+    </div>
+
+    <div id="corner"><img class="i" src="logo-icon.png"><img class="w" src="logo-word.png"></div>
+  </div>
+
+  <div id="bot">
+    <img id="pres" src="presenter.png">
+    <div id="botfade"></div>
+  </div>
+  <div id="divider"></div>
+  <div id="mic"><svg viewBox="0 0 64 64" width="30" height="30"><use href="#i-mic"/></svg><span>IBAX ke baare mein</span><div class="bars" id="mbars"></div></div>
+  <div id="cap"></div>
+  <div id="prog"></div>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".6" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient>
+    <symbol id="i-wa" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#25d366"/><path d="M32 12a20 20 0 0 0-17.3 30L12 52l10.3-2.7A20 20 0 1 0 32 12z" fill="none" stroke="#fff" stroke-width="4"/><path d="M24 24c1-2 3-2 4 0l2 4-2 3c1 3 3 5 6 6l3-2 4 2c2 1 2 3 0 4-3 3-8 2-13-3s-6-10-4-14z" fill="#fff"/></symbol>
+    <symbol id="i-ig" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="url(#igg)"/><rect x="14" y="14" width="36" height="36" rx="11" fill="none" stroke="#fff" stroke-width="4.5"/><circle cx="32" cy="32" r="8.5" fill="none" stroke="#fff" stroke-width="4.5"/><circle cx="43" cy="21" r="2.8" fill="#fff"/></symbol>
+    <symbol id="i-igw" viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="44" rx="13" fill="none" stroke="#fff" stroke-width="5"/><circle cx="32" cy="32" r="10" fill="none" stroke="#fff" stroke-width="5"/><circle cx="44" cy="20" r="3.2" fill="#fff"/></symbol>
+    <symbol id="i-yt" viewBox="0 0 64 64"><rect y="10" width="64" height="44" rx="13" fill="#ff1f1f"/><path d="M26 22 L44 32 L26 42Z" fill="#fff"/></symbol>
+    <symbol id="i-call" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#3a3f45"/><path d="M22 16c2-1 4 0 5 2l3 7c1 2 0 4-1 5l-3 2c2 5 6 9 11 11l2-3c1-1 3-2 5-1l7 3c2 1 3 3 2 5l-2 4c-1 2-3 3-5 3-17-1-30-14-31-31 0-2 1-4 3-5z" fill="#ff5b5b"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 64 64"><rect x="22" y="6" width="20" height="34" rx="10" fill="#041004"/><path d="M14 30a18 18 0 0 0 36 0" fill="none" stroke="#041004" stroke-width="5" stroke-linecap="round"/><path d="M32 48v10" stroke="#041004" stroke-width="5" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<script>
+// ---------------- timeline (seconds) ----------------
+// Each scene and caption has a start/end. Change these numbers to re-sync with a recorded voice.
+const SCENES = { s1:[0,4], s2:[4,9], s3:[9,17], s4:[17,24], s5:[24,30], s6:[30,38], s7:[38,46], s8:[46,52.5] };
+const CAPTIONS = [
+  [0.0, 3.8, "Business ke saare kaam khud karte-karte thak gaye ho?"],
+  [4.0, 6.4, "Toh milo IBAX se — ibaxai ka AI assistant."],
+  [6.4, 8.8, "Just say it. IBAX does it."],
+  [9.0, 12.8, "WhatsApp automation: customer ka message aaya,"],
+  [12.8, 16.8, "IBAX turant reply karta hai — 24 ghante, 7 din."],
+  [17.0, 20.4, "Instagram automation: comment aur DM ka auto-reply,"],
+  [20.4, 23.8, "aur har lead seedha aapki list mein."],
+  [24.0, 27.0, "YouTube automation: comments ke reply,"],
+  [27.0, 29.8, "aur upload ki planning — sab automatic."],
+  [30.0, 33.8, "Sab kuch ready-made workflows se juda hai."],
+  [33.8, 37.8, "Bas ek click — aur service ON."],
+  [38.0, 41.8, "Aur sabse khaas — IBAX ka AI voice agent."],
+  [41.8, 45.8, "Aap bolo, IBAX sunta hai, aur kaam kar deta hai."],
+  [46.0, 49.0, "Abhi try karo — www.ibaxai.com"],
+  [49.0, 52.5, "Link bio mein hai. Just say it. IBAX does it."],
+];
+const DURATION = 52.5;
+
+// ---------------- helpers ----------------
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => cl((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c = 1.70158; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+function css(el, o, tf) { if (typeof el === 'string') el = $(el); el.style.opacity = o; if (tf !== undefined) el.style.transform = tf; }
+// pop-in: element appears at local time a (scaled up from below)
+function pop(el, t, a, d = .45) { const k = P(t, a, a + d); css(el, eo(k), `translateY(${(1 - eo(k)) * 40}px) scale(${.85 + .15 * back(k)})`); }
+const noise = (x, s) => (Math.sin(x * 12.9898 + s * 78.233) * 43758.5453) % 1;
+const n1 = (t, s) => .5 + .25 * Math.sin(t * 9 + s * 1.7) + .25 * Math.sin(t * 15.3 + s * 3.1);
+
+// static builders
+(() => {
+  const d = $('dots'); for (let i = 0; i < 26; i++) { const e = document.createElement('div'); e.className = 'dot'; d.appendChild(e); }
+  const w = $('wave'); for (let i = 0; i < 40; i++) w.appendChild(document.createElement('i'));
+  const m = $('mbars'); for (let i = 0; i < 5; i++) m.appendChild(document.createElement('i'));
+  const g = $('pulses'); for (let i = 0; i < 7; i++) { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('r', 9); c.setAttribute('fill', '#d4ffb8'); c.style.filter = 'drop-shadow(0 0 8px #7dff3a)'; g.appendChild(c); }
+  document.querySelectorAll('.wl').forEach(p => { p.setAttribute('fill', 'none'); p.setAttribute('stroke', 'url(#lg)'); p.setAttribute('stroke-width', 5); p.setAttribute('stroke-linecap', 'round'); });
+  const tg = $('toggle'); tg.innerHTML = '<span>Service</span><div id="sw"><div id="knob"></div></div><span id="swl">OFF</span>'; tg.style.top = '930px';
+  for (let i = 1; i <= 3; i++) { const r = $('r' + i); }
+})();
+
+function sceneAlpha(t, [a, b]) { return Math.min(eo(P(t, a, a + .45)), 1 - eio(P(t, b - .4, b))); }
+
+function render(t) {
+  // background
+  $('grid').style.transform = `translateY(${(t * 18) % 60}px)`;
+  css('glowA', .3 + .1 * Math.sin(t * .8), `translate(${-120 + 80 * Math.sin(t * .35)}px, ${-140 + 60 * Math.cos(t * .4)}px)`);
+  css('glowB', .25 + .1 * Math.cos(t * .7), `translate(${560 + 70 * Math.cos(t * .3)}px, ${520 + 80 * Math.sin(t * .45)}px)`);
+  [...$('dots').children].forEach((e, i) => {
+    const sx = (Math.abs(noise(i, 1)) * 1080), sp = 20 + Math.abs(noise(i, 2)) * 40, y = 1000 - ((t * sp + Math.abs(noise(i, 3)) * 1000) % 1040);
+    css(e, .25 + .5 * Math.abs(Math.sin(t + i)), `translate(${sx + 20 * Math.sin(t * .6 + i)}px, ${y}px)`);
+  });
+  $('prog').style.width = (cl(t / DURATION) * 1080) + 'px';
+  css('corner', cl(P(t, 9, 9.6) - P(t, 45.6, 46.1)), '');
+
+  for (const [id, r] of Object.entries(SCENES)) { const a = sceneAlpha(t, r); const el = $(id); el.style.opacity = a; el.style.display = a > 0.001 ? 'block' : 'none'; }
+
+  // S1 hook
+  { const L = t - SCENES.s1[0];
+    pop('s1t', L, .1, .6);
+    ['n1', 'n2', 'n3', 'n4'].forEach((id, i) => { const k = eo(P(L, .5 + i * .35, .9 + i * .35)); const sh = L > 2.4 ? Math.sin(L * 40 + i) * 6 * P(L, 2.4, 2.8) : 0;
+      const out = eio(P(L, 3.4, 4)); css(id, k * (1 - out), `translate(${(i % 2 ? 1 : -1) * ((1 - k) * 300 + out * 700) + sh}px, ${sh * .5}px) rotate(${(i % 2 ? 2 : -2) * k}deg)`); }); }
+
+  // S2 logo
+  { const L = t - SCENES.s2[0];
+    const k = P(L, .1, .9); css('s2icon', eo(k), `scale(${.3 + .7 * back(k)}) rotate(${(1 - eo(k)) * -25}deg)`);
+    $('s2icon').style.filter = `drop-shadow(0 0 ${40 + 20 * Math.sin(L * 3)}px rgba(125,255,58,.55))`;
+    const w = P(L, .6, 1.2); css('s2word', eo(w), `translateY(${(1 - eo(w)) * 40}px)`); $('s2word').style.clipPath = `inset(0 ${100 - 100 * eo(w)}% 0 0)`;
+    pop('s2meet', L, 1.1, .5);
+    const slo = 'Just say it. IBAX does it.'; const n = Math.floor(P(L, 2.4, 4.2) * slo.length);
+    $('s2slo').innerHTML = slo.slice(0, n) + (L > 2.3 && L < 4.6 && Math.floor(L * 3) % 2 ? '<span style="color:#7dff3a">|</span>' : '');
+    $('s2slo').style.opacity = L > 2.3 ? 1 : 0; }
+
+  // S3 WhatsApp
+  { const L = t - SCENES.s3[0];
+    const k = P(L, 0, .7); css('phone', eo(k), `translateX(${(1 - eo(k)) * -200}px) rotate(${(1 - eo(k)) * -6}deg)`);
+    pop('w1', L, .9);
+    const ty = L > 2 && L < 3.2 ? 1 : 0; css('wty', ty, ''); [...$('wty').children].forEach((d, i) => d.style.transform = `translateY(${-6 * Math.max(0, Math.sin(L * 10 - i))}px)`);
+    $('wast').textContent = ty ? 'IBAX typing…' : 'online'; $('wast').style.color = ty ? '#25d366' : '#8696a0';
+    pop('w2', L, 3.2); pop('w3', L, 4.7); pop('w4', L, 5.8); pop('w5', L, 6.6);
+    pop('wc1', L, 3.5); pop('wc2', L, 4.5); pop('wc3', L, 6.0); }
+
+  // S4 Instagram
+  { const L = t - SCENES.s4[0];
+    const k = P(L, 0, .6); css('igpost', eo(k), `translateY(${(1 - eo(k)) * 80}px)`);
+    $('igph').style.transform = `scale(${1 + .03 * Math.sin(L * 2)})`;
+    pop('c1', L, .7); css('c1r', P(L, 1.4, 1.7), ''); pop('c2', L, 1.8); css('c2r', P(L, 2.6, 2.9), '');
+    pop('igdm', L, 1.6, .5); pop('d1', L, 2.1); pop('d2', L, 3.0);
+    pop('leads', L, 3.4, .5); pop('l1', L, 3.8); pop('l2', L, 4.3); pop('l3', L, 4.8);
+    $('leadn').textContent = Math.round(eio(P(L, 3.6, 6.6)) * 128); }
+
+  // S5 YouTube
+  { const L = t - SCENES.s5[0];
+    const k = P(L, 0, .6); css('ytcard', eo(k), `translateX(${(1 - eo(k)) * -120}px)`);
+    $('ytplay').style.transform = `scale(${1 + .08 * Math.sin(L * 5)})`; $('ytbar').style.width = (P(L, 0, 6) * 100) + '%';
+    pop('y1', L, .6); css('y1r', P(L, 1.3, 1.6), ''); pop('y2', L, 1.6); css('y2r', P(L, 2.3, 2.6), '');
+    pop('ytcal', L, 2.6, .5);
+    ['yd1', 'yd2', 'yd3', 'yd4'].forEach((id, i) => { pop(id, L, 3.0 + i * .3); const on = L > 3.6 + i * .3; const e = $(id);
+      e.style.background = on ? 'rgba(125,255,58,.16)' : 'rgba(255,255,255,.05)'; e.style.borderColor = on ? 'rgba(125,255,58,.6)' : 'rgba(255,255,255,.08)'; });
+    pop('ytauto', L, 4.9); }
+
+  // S6 Workflows
+  { const L = t - SCENES.s6[0];
+    const paths = document.querySelectorAll('.wl');
+    const order = [[0, .2], [1, .9], [2, .9], [3, .9], [4, 1.6], [5, 1.6], [6, 1.6]];
+    order.forEach(([i, a]) => { const p = paths[i], len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len * (1 - eio(P(L, a + .3, a + 1))); });
+    pop('nd0', L, .1); pop('nd1', L, .6); pop('nd2', L, 1.2); pop('nd3', L, 1.35); pop('nd4', L, 1.5); pop('nd5', L, 2.2);
+    $('nd1').style.boxShadow = `0 0 ${30 + 25 * Math.sin(L * 4)}px rgba(125,255,58,.5)`;
+    const on = L > 4.6; const sk = eo(P(L, 4.4, 4.8));
+    css('toggle', P(L, 3.6, 4), `translateX(-50%) scale(${1 + .1 * Math.sin(P(L, 4.4, 5) * Math.PI)})`);
+    $('knob').style.transform = `translateX(${sk * 52}px)`; $('sw').style.background = on ? '#4fd12a' : '#2b352b'; $('sw').style.boxShadow = on ? '0 0 30px #7dff3a' : 'none';
+    $('swl').textContent = on ? 'ON ✓' : 'OFF'; $('swl').style.color = on ? '#7dff3a' : '#9aa89a';
+    // data pulses travel once the graph is drawn (faster after the switch is ON)
+    const speed = on ? 1.1 : .55;
+    [...$('pulses').children].forEach((c, i) => { const p = paths[i], len = p.getTotalLength(); const f = ((L - 2.6) * speed + i * .17) % 1;
+      if (L < 2.6) { c.style.opacity = 0; return; } const pt = p.getPointAtLength(len * f); c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.style.opacity = Math.sin(f * Math.PI); });
+    ['nd2', 'nd3', 'nd4', 'nd5'].forEach(id => $(id).style.borderColor = on ? '#7dff3a' : 'rgba(125,255,58,.3)'); }
+
+  // S7 Voice
+  { const L = t - SCENES.s7[0];
+    const k = P(L, 0, .8); const lvl = n1(t, 1);
+    css('orb', 1, `scale(${(.4 + .6 * back(k)) * (1 + .06 * lvl)})`); css('micico', eo(k), '');
+    [1, 2, 3].forEach(i => { const f = ((L * .6) + i / 3) % 1; const s = 300 + f * 520; const r = $('r' + i);
+      r.style.width = r.style.height = s + 'px'; r.style.marginLeft = r.style.marginTop = (-s / 2) + 'px'; r.style.opacity = (1 - f) * .8 * eo(k); });
+    const listening = L > .8 && L < 4.6, speaking = L > 5.0;
+    [...$('wave').children].forEach((b, i) => { const amp = listening || speaking ? n1(t * (speaking ? 1.3 : 1), i) : .08;
+      b.style.height = (10 + amp * 100 * Math.sin((i + 1) / 41 * Math.PI)) + 'px'; b.style.opacity = eo(k); });
+    pop('v1', L, 1.0, .5); $('v1').style.clipPath = `inset(0 ${100 - 100 * P(L, 1.0, 3.6)}% 0 0)`;
+    pop('v2', L, 4.8, .5); }
+
+  // S8 CTA
+  { const L = t - SCENES.s8[0];
+    const k = P(L, 0, .7); css('s8icon', eo(k), `scale(${.4 + .6 * back(k)}) translateY(${4 * Math.sin(L * 2.4)}px)`);
+    $('s8icon').style.filter = `drop-shadow(0 0 ${36 + 18 * Math.sin(L * 3)}px rgba(125,255,58,.6))`;
+    pop('s8word', L, .4); pop('s8slo', L, .9);
+    const u = P(L, 1.4, 1.9); css('url', eo(u), `translateX(-50%) scale(${(.7 + .3 * back(u)) * (1 + .025 * Math.sin(L * 4))})`);
+    $('shine').style.left = (-120 + ((L * 420) % 900)) + 'px';
+    pop('s8bio', L, 2.6); $('s8bio').style.transform += ` translateY(${-8 * Math.abs(Math.sin(L * 3))}px)`; }
+
+  // presenter: slow push-in + tiny breathing so the photo feels alive
+  const zoom = 1.0 + .07 * eio(P(t, 0, DURATION)) + .006 * Math.sin(t * 1.3);
+  $('pres').style.transform = `translateX(${-298 + 10 * Math.sin(t * .25)}px) scale(${zoom})`;
+  // mic level bars
+  const talking = CAPTIONS.some(([a, b]) => t >= a && t <= b);
+  [...$('mbars').children].forEach((b, i) => b.style.height = (6 + (talking ? n1(t * 1.4, i * 2.3) * 24 : 2)) + 'px');
+  css('mic', eo(P(t, .2, .8)), '');
+
+  // captions with word highlight
+  const c = CAPTIONS.find(([a, b]) => t >= a && t < b);
+  if (c) {
+    const [a, b, text] = c; const words = text.split(' '); const idx = Math.floor(P(t, a, b - .2) * words.length);
+    const k = eo(P(t, a, a + .25));
+    $('cap').innerHTML = words.map((w, i) => `<span class="${i === Math.min(idx, words.length - 1) ? 'on' : 'off'}">${w}</span>`).join('');
+    css('cap', k, `translateY(${(1 - k) * 20}px)`);
+  } else $('cap').style.opacity = 0;
+}
+window.render = render; window.DURATION = DURATION;
+render(Number(new URLSearchParams(location.search).get('t') || 0));
+</script>
+</body>
+</html>
