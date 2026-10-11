@@ -190,7 +190,17 @@ export async function localTurn(ws: Workspace, text: string): Promise<LocalReply
   if (svc && svc.price !== null && wantsIt(text)) {
     const a = automationFor(ws, svc.id);
     if (a?.status === "active") {
-      return { text: t(lang, { en: `${svc.name} is already active.`, hi: `${svc.name} पहले से चालू है।`, hl: `${svc.name} pehle se chalu hai.` }), links: [{ label: svc.name, href: `/app/automations/${a.id}` }] };
+      // Re-send its details, in case the automation server missed the first activation.
+      const sync = await activateService(svc.id);
+      const synced = sync.ok && sync.backend === "sent";
+      return {
+        text: t(lang, {
+          en: `${svc.name} is already active.${synced ? " I've refreshed its details on the automation server too." : ""}`,
+          hi: `${svc.name} पहले से चालू है।${synced ? " मैंने इसकी जानकारी ऑटोमेशन सर्वर पर भी अपडेट कर दी है।" : ""}`,
+          hl: `${svc.name} pehle se chalu hai.${synced ? " Maine iski jaankari automation server par bhi update kar di hai." : ""}`,
+        }),
+        links: [{ label: svc.name, href: `/app/automations/${a.id}` }],
+      };
     }
     return flowNext(svc, { serviceId: svc.id, lang });
   }
