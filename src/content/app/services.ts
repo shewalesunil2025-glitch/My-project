@@ -353,7 +353,7 @@ export const serviceById = (id: string) => services.find((s) => s.id === id);
  * waitlist instead of payment. Add a service's id here once its automation is
  * built and tested (see docs/ROADMAP.md).
  */
-export const liveServices: readonly string[] = ["website", "custom"];
+export const liveServices: readonly string[] = ["website", "whatsapp", "custom"];
 export const isLive = (id: string) => liveServices.includes(id);
 
 export const annualPrice = (monthly: number) => monthly * 10;

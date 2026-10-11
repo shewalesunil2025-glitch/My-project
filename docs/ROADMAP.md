@@ -2,18 +2,18 @@
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 
-## Where we are (updated 2026-10-10)
+## Where we are (updated 2026-10-11)
 
 **Launch plan (owner's decision):** build 3–4 services fully first — Website (self-service builder), WhatsApp, Lead Follow-up, Customer Support — then add Razorpay and launch.
 
 | Area | Status | Next step |
 |---|---|---|
 | ibaxai site + app | ✅ Live at www.ibaxai.com (site, app, policy pages; slogan "Just say it. IBAX does it."; IBAX Hub at `/app/ibax`) | — |
-| Website service ($299) | 🟡 Self-service builder built: 5 premium templates (Aurora, Prism, Glass, Luxe, Neon) with 3D and scroll animations, filled from the business profile; publish to `/s/<slug>`; enquiry form → Leads | Owner: run `supabase/migrations/0002_sites.sql` in Supabase; then add the custom-domain option later |
+| Website service ($299) | 🟡 Self-service builder built: 5 premium templates (Aurora, Prism, Glass, Luxe, Neon) with 3D and scroll animations, filled from the business profile; publish to `/s/<slug>`; enquiry form → Leads | SQL done. Later: custom-domain option |
 | Accounts + database (Supabase) | ✅ Live: sign-up without email wait, workspace syncs across devices | n8n reads client details from Supabase instead of its own tables |
 | Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
-| WhatsApp ($49) | 🟡 Self-service built: the client links their number in the app with a WhatsApp pairing code (`/api/whatsapp` creates the Evolution instance `ibax-<digits>` with the AI Replies webhook); activation is checked against the instance owner. n8n Activation (live) + AI Replies (Gemini, tested) | Owner: VPS with Evolution API; Vercel: `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, `N8N_EVOLUTION_WEBHOOK_URL`; publish AI Replies; add `whatsapp` to `liveServices` |
+| WhatsApp ($49) | ✅ Live: Bluehost VPS (Mumbai, `129-121-169-80.sslip.io`) runs Evolution API; Vercel env vars set; AI Replies published; owner linked their own number. Link code and QR refresh on screen while linking | Owner: activate the service from IBAX chat and test a reply from another phone; later move to the WhatsApp Cloud API |
 | Privacy Policy + Terms | ✅ Live at `/privacy` and `/terms` (operator Shewale Sunil, sole proprietor, Chhatrapati Sambhajinagar); data-deletion steps at `/privacy#data-deletion` | — |
 | Udyam (MSME) registration | ✅ Registered as a proprietorship (Services, NIC 62011/62012/62013/62020) | Download the certificate PDF; use it for Meta Business Verification, Razorpay and a bank current account |
 | Payments (Razorpay) | ⏳ Policy pages Razorpay checks are live: /terms, /privacy, /refund-policy, /shipping-policy, /contact | Owner opens a Razorpay account; Claude builds checkout + webhook |
