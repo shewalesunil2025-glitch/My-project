@@ -704,47 +704,47 @@ body {
 @keyframes site-tilt { from { opacity: 0; transform: perspective(900px) rotateX(32deg) translateY(60px); } to { opacity: 1; transform: none; } }
 @keyframes site-out { to { opacity: 0.15; transform: translateY(-50px) scale(0.95); } }
 
-/* Premium glow-outline button: dark glass pill, multicolour light border (green → cyan → white → violet), soft glow */
+/* Premium glow-outline button in the brand greens: dark glass pill, light border (emerald → lime → white → lime → emerald), soft glow */
 .btn-3d {
-  --btn-ring: linear-gradient(100deg, #3ee07a 0%, #22d3ee 28%, #f5fbff 50%, #a78bfa 72%, #6366f1 100%);
+  --btn-ring: linear-gradient(100deg, #1f9d55 0%, #66d34c 26%, #f4ffe9 50%, #9cf06f 74%, #2fbf5a 100%);
   position: relative;
   color: #fff;
   border: 1.5px solid transparent;
   background:
-    linear-gradient(180deg, #141b26 0%, #070a12 55%, #0b1020 100%) padding-box,
+    linear-gradient(180deg, #13201a 0%, #060c09 55%, #0b1a10 100%) padding-box,
     var(--btn-ring) border-box;
   background-size: 100% 100%, 200% 100%;
   background-position: 0 0, 0% 0;
   box-shadow:
-    inset 14px 0 22px -12px rgb(62 224 122 / 0.55),
-    inset -14px 0 22px -12px rgb(139 92 246 / 0.6),
-    inset 0 -10px 18px -12px rgb(186 230 253 / 0.55),
+    inset 14px 0 22px -12px rgb(47 191 90 / 0.55),
+    inset -14px 0 22px -12px rgb(156 240 111 / 0.6),
+    inset 0 -10px 18px -12px rgb(214 255 196 / 0.55),
     inset 0 8px 14px -12px rgb(255 255 255 / 0.45),
-    -10px 6px 26px -10px rgb(62 224 122 / 0.75),
-    10px 6px 26px -10px rgb(139 92 246 / 0.8),
-    0 12px 34px -14px rgb(34 211 238 / 0.6);
+    -10px 6px 26px -10px rgb(47 191 90 / 0.75),
+    10px 6px 26px -10px rgb(156 240 111 / 0.8),
+    0 12px 34px -14px rgb(102 211 76 / 0.6);
   transition: box-shadow 0.25s ease, filter 0.2s ease, background-position 0.6s ease;
 }
 .btn-3d:hover {
   filter: brightness(1.12);
   box-shadow:
-    inset 14px 0 22px -12px rgb(62 224 122 / 0.7),
-    inset -14px 0 22px -12px rgb(139 92 246 / 0.75),
-    inset 0 -10px 18px -12px rgb(186 230 253 / 0.7),
+    inset 14px 0 22px -12px rgb(47 191 90 / 0.7),
+    inset -14px 0 22px -12px rgb(156 240 111 / 0.75),
+    inset 0 -10px 18px -12px rgb(214 255 196 / 0.7),
     inset 0 8px 14px -12px rgb(255 255 255 / 0.45),
-    -12px 6px 32px -8px rgb(62 224 122 / 0.85),
-    12px 6px 32px -8px rgb(139 92 246 / 0.9),
-    0 14px 40px -12px rgb(34 211 238 / 0.7);
+    -12px 6px 32px -8px rgb(47 191 90 / 0.85),
+    12px 6px 32px -8px rgb(156 240 111 / 0.9),
+    0 14px 40px -12px rgb(102 211 76 / 0.7);
 }
 .btn-3d:active { filter: brightness(0.95); }
 .btn-3d-sm {
   border-width: 1px;
   box-shadow:
-    inset 8px 0 12px -7px rgb(62 224 122 / 0.6),
-    inset -8px 0 12px -7px rgb(139 92 246 / 0.65),
-    inset 0 -5px 10px -7px rgb(186 230 253 / 0.5),
-    -6px 3px 16px -7px rgb(62 224 122 / 0.75),
-    6px 3px 16px -7px rgb(139 92 246 / 0.8);
+    inset 8px 0 12px -7px rgb(47 191 90 / 0.6),
+    inset -8px 0 12px -7px rgb(156 240 111 / 0.65),
+    inset 0 -5px 10px -7px rgb(214 255 196 / 0.5),
+    -6px 3px 16px -7px rgb(47 191 90 / 0.75),
+    6px 3px 16px -7px rgb(156 240 111 / 0.8);
 }
 @media (prefers-reduced-motion: no-preference) {
   .btn-3d { animation: btn-3d-flow 6s ease-in-out infinite alternate; }
