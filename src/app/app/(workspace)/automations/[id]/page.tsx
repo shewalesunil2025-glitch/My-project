@@ -6,6 +6,7 @@ import { Suspense, useState, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, Check, CircleCheck, FlaskConical, Pause, Pencil, Play, Send } from "lucide-react";
 import { product } from "@/config/product";
 import { providerInfo, serviceById, type FieldDef, type ServiceDef } from "@/content/app/services";
+import { activateService } from "@/lib/app/agentActions";
 import { contentIdea } from "@/lib/app/assistant";
 import { activate, missingConnections, runTest, setAutomationStatus } from "@/lib/app/automation";
 import { audit, nowIso, updateWorkspace } from "@/lib/app/store";
@@ -111,6 +112,8 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
         x?.logs.unshift({ at: nowIso(), level: "info", message: "Settings updated" });
         audit(w, `Updated ${svc.name} settings`);
       });
+      // A live service gets the new details on the automation server too (e.g. WhatsApp replies).
+      if (a.status === "active") void activateService(svc.id);
       router.replace(`/app/automations/${a.id}`);
       return;
     }
