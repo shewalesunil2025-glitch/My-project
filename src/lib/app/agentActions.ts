@@ -166,7 +166,8 @@ export async function activateService(serviceId: string): Promise<ActivationResu
       body: JSON.stringify({
         workspaceId: ws.id,
         serviceId: svc.id,
-        business: ws.business,
+        // The logo is a large image the automation server doesn't need; it would push the request over the size limit.
+        business: ws.business ? { ...ws.business, logo: undefined } : null,
         config: after.config,
         accounts: Object.fromEntries(svc.connect.map((p) => [p, ws.connections[p]?.account ?? ""])),
       }),
