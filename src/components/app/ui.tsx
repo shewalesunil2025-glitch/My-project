@@ -107,7 +107,8 @@ type BtnVariant = "primary" | "ghost" | "light" | "danger" | "subtle";
 const btnBase =
   "inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-tight whitespace-nowrap transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none";
 const btnVariants: Record<BtnVariant, string> = {
-  primary: "bg-flow text-ink-950 hover:bg-flow-soft shadow-[0_0_28px_-6px_rgb(102_211_76/0.7)]",
+  /** Glossy 3D green (see .btn-3d in globals.css). */
+  primary: "btn-3d text-ink-950",
   ghost: "border border-white/12 bg-white/[0.04] text-fg hover:border-white/25 hover:bg-white/[0.08]",
   light: "bg-white text-ink-950 hover:bg-white/90",
   danger: "border border-red-400/30 bg-red-500/10 text-red-200 hover:bg-red-500/20",
@@ -121,7 +122,7 @@ export function Btn({
   className,
   ...props
 }: { variant?: BtnVariant; size?: keyof typeof btnSizes } & ComponentProps<"button">) {
-  return <button type="button" className={cn(btnBase, btnVariants[variant], btnSizes[size], className)} {...props} />;
+  return <button type="button" className={cn(btnBase, btnVariants[variant], variant === "primary" && size === "sm" && "btn-3d-sm", btnSizes[size], className)} {...props} />;
 }
 
 export function BtnLink({
@@ -130,7 +131,7 @@ export function BtnLink({
   className,
   ...props
 }: { variant?: BtnVariant; size?: keyof typeof btnSizes } & ComponentProps<typeof Link>) {
-  return <Link className={cn(btnBase, btnVariants[variant], btnSizes[size], className)} {...props} />;
+  return <Link className={cn(btnBase, btnVariants[variant], variant === "primary" && size === "sm" && "btn-3d-sm", btnSizes[size], className)} {...props} />;
 }
 
 /* ── Surfaces ── */

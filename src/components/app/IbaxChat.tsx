@@ -468,7 +468,7 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
           autoComplete="off"
           className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-ink-950/60 px-4 text-[16px] text-fg placeholder:text-fg-subtle focus:border-flow/50 focus:outline-none md:text-sm"
         />
-        <button type="submit" disabled={!q.trim() || busy} aria-label="Send" className="grid size-11 shrink-0 place-items-center rounded-full bg-flow text-ink-950 transition-opacity disabled:opacity-40">
+        <button type="submit" disabled={!q.trim() || busy} aria-label="Send" className="btn-3d btn-3d-sm grid size-11 shrink-0 place-items-center rounded-full text-ink-950 disabled:opacity-40">
           <Send className="size-4" aria-hidden />
         </button>
       </form>
