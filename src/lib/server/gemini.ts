@@ -58,23 +58,56 @@ function toContents(messages: Anthropic.Beta.BetaMessageParam[]): GeminiContent[
   return out;
 }
 
+function withoutSignatures(contents: GeminiContent[]): GeminiContent[] {
+  return contents.map((c) => ({
+    ...c,
+    parts: c.parts.map(({ thoughtSignature, ...p }) => (p.functionCall && thoughtSignature ? { ...p, thoughtSignature: "skip_thought_signature_validator" } : p)),
+  }));
+}
+
 export type GeminiTurn = { content: Block[]; stop_reason: "tool_use" | "end_turn" | "refusal" };
 
+// Free-tier models are often "experiencing high demand" (503): retry, then try lighter models.
+const FALLBACK_MODELS = ["gemini-flash-latest", "gemini-flash-lite-latest"];
+const BUDGET_MS = 52_000;
+
 export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[], messages: Anthropic.Beta.BetaMessageParam[]): Promise<GeminiTurn> {
-  const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: system }] },
-      contents: toContents(messages),
-      tools: [{ functionDeclarations: tools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }],
-      // Chat replies need little "thinking"; the default level made a turn take over a minute.
-      generationConfig: { temperature: 0.6, maxOutputTokens: 2048, thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || "low" } },
-    }),
-    signal: AbortSignal.timeout(55_000),
-  });
-  if (!res.ok) throw Object.assign(new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 300)}`), { status: res.status });
+  const primary = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+  const attempts = [primary, primary, ...FALLBACK_MODELS.filter((m) => m !== primary)];
+  const contents = toContents(messages);
+  const started = Date.now();
+  let res: Response | null = null;
+  let lastError: Error & { status?: number } = new Error("Gemini unavailable");
+
+  for (const [i, model] of attempts.entries()) {
+    const left = BUDGET_MS - (Date.now() - started);
+    if (left < 4_000) break;
+    // Another model can't check this one's thought signatures; tell it to skip the check.
+    const body = model === primary ? contents : withoutSignatures(contents);
+    try {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: body,
+          tools: [{ functionDeclarations: tools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }],
+          // Chat replies need little "thinking"; the default level made a turn take over a minute.
+          generationConfig: { temperature: 0.6, maxOutputTokens: 2048, thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || "low" } },
+        }),
+        signal: AbortSignal.timeout(Math.min(left, i === attempts.length - 1 ? left : 25_000)),
+      });
+    } catch (error) {
+      lastError = error instanceof Error ? error : lastError; // timeout or network: try the next one
+      res = null;
+      continue;
+    }
+    if (res.ok) break;
+    lastError = Object.assign(new Error(`Gemini ${res.status} (${model}): ${(await res.text()).slice(0, 300)}`), { status: res.status });
+    res = null;
+    if (i === 0) await new Promise((r) => setTimeout(r, 1_200));
+  }
+  if (!res) throw lastError;
 
   const data = (await res.json()) as { candidates?: { content?: { parts?: Part[] }; finishReason?: string }[]; promptFeedback?: { blockReason?: string } };
   const candidate = data.candidates?.[0];
