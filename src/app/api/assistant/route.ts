@@ -13,6 +13,8 @@ import { geminiReady, geminiTurn } from "@/lib/server/gemini";
  * conversation instead.
  */
 
+export const maxDuration = 60;
+
 const MAX_BODY = 400_000;
 const MAX_MESSAGES = 120;
 const system = agentSystemPrompt();
