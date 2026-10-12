@@ -23,7 +23,7 @@ export type Capture = {
   done: Promise<Blob | null>;
 };
 
-const QUIET_AFTER_SPEECH_MS = 1500;
+const QUIET_AFTER_SPEECH_MS = 1100;
 const NO_SPEECH_MS = 7000;
 const MAX_MS = 30000;
 

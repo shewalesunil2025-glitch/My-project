@@ -138,7 +138,9 @@ export async function geminiTranscribe(wavBase64: string, lang: string): Promise
   const primary = process.env.GEMINI_MODEL || "gemini-3.8-flash";
   const prompt = `Transcribe this voice message from a business owner talking to their assistant. Most likely language: ${LANG_HINT[lang] ?? LANG_HINT.en}; if they clearly speak another language, use that. Write Hindi and Marathi in Devanagari and English or Hinglish in Roman letters. Return only the exact words spoken, nothing else. If there are no clear spoken words (only silence, noise, beeps or music), return an empty string — never guess.`;
   let lastError: Error & { status?: number } = new Error("Gemini unavailable");
-  for (const model of [primary, ...FALLBACK_MODELS.filter((m) => m !== primary)]) {
+  // Transcribing is a simple job: the lite model is quickest; the bigger ones are the fallback.
+  const models = [...new Set(["gemini-flash-lite-latest", primary, "gemini-flash-latest"])];
+  for (const model of models) {
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",

@@ -60,14 +60,22 @@ const languages: { code: Lang; label: string; speech: string }[] = [
 ];
 const speechTag = (lang: Lang) => languages.find((l) => l.code === lang)!.speech;
 
-/** Closest installed voice; Marathi falls back to Hindi (same script). */
+/** Known female voices on iPhone, Android, Chrome and Windows (best first). */
+const FEMALE = /lekha|veena|kiyara|isha|heera|kalpana|swara|neerja|aarohi|google हिन्दी|google hindi|samantha|karen|moira|tessa|serena|female|woman|zira|aria|jenny|sonia|libby|natasha/i;
+const MALE = /rishi|hemant|ravi|prabhat|madhur|daniel|alex|fred|aaron|arthur|gordon|male|david|mark|guy/i;
+
+/** Closest installed voice, preferring a woman's voice; Marathi falls back to Hindi (same script). */
 function pickVoice(tag: string) {
   const voices = window.speechSynthesis.getVoices();
   const norm = (v: SpeechSynthesisVoice) => v.lang.toLowerCase().replace("_", "-");
-  return voices.find((v) => norm(v) === tag.toLowerCase()) ?? voices.find((v) => norm(v).startsWith(tag.slice(0, 3).toLowerCase())) ?? (tag.startsWith("mr") ? voices.find((v) => norm(v).startsWith("hi-")) : undefined);
+  const prefix = tag.slice(0, 3).toLowerCase();
+  const inLang = voices.filter((v) => norm(v) === tag.toLowerCase() || norm(v).startsWith(prefix));
+  const pool = inLang.length ? inLang : tag.startsWith("mr") ? voices.filter((v) => norm(v).startsWith("hi-")) : [];
+  const female = pool.find((v) => FEMALE.test(v.name) && !/male/i.test(v.name.replace(/female/i, "")));
+  return female ?? pool.find((v) => !MALE.test(v.name)) ?? pool[0];
 }
 
-/** IBAX's voice, the same child's voice as on the website. */
+/** IBAX's voice: a warm, natural woman's voice at a normal pace. */
 function speak(text: string, lang: Lang, onStart?: () => void, onEnd?: () => void) {
   if (!("speechSynthesis" in window)) return;
   const synth = window.speechSynthesis;
@@ -77,8 +85,8 @@ function speak(text: string, lang: Lang, onStart?: () => void, onEnd?: () => voi
   const voice = pickVoice(tag);
   if (voice) utter.voice = voice;
   utter.lang = voice?.lang ?? tag;
-  utter.pitch = 1.65;
-  utter.rate = 1.04;
+  utter.pitch = 1.08;
+  utter.rate = 1.08;
   utter.onstart = () => onStart?.();
   utter.onend = utter.onerror = () => onEnd?.();
   synth.speak(utter);
