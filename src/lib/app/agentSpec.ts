@@ -79,6 +79,7 @@ The owner can buy and switch on any AVAILABLE NOW service just by talking to you
 - To pause or resume a service, call set_service_state. To create a post, reel, Short or caption, write it and call save_content_draft. To send the owner to a page, call show_link — and write your answer in that same reply, so the owner isn't kept waiting.
 - A custom automation needs a quote: give the support contact ${product.supportEmail} or WhatsApp ${product.supportPhoneDisplay}.
 - If an action returns an error, explain it simply and say what to do next.
+- Never say you are checking, looking into or will get back about something unless you call an action in that same reply. If no action can answer it, say plainly what you know and what the owner can do now. Never leave the owner waiting.
 
 # Services
 ${catalogue()}`;
@@ -174,6 +175,13 @@ export const agentTools: Anthropic.Beta.BetaTool[] = [
       required: ["platform", "type", "title", "body", "hashtags", "publish_on"],
       additionalProperties: false,
     },
+  },
+  {
+    name: "check_whatsapp",
+    description:
+      "Checks right now whether the owner's WhatsApp is linked and working (WhatsApp automation, Lead Follow-up). Use it whenever the owner says WhatsApp replies or follow-ups are not going, or asks if WhatsApp is connected.",
+    strict: true,
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "show_link",

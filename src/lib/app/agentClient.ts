@@ -7,6 +7,7 @@ import { isLive, providerInfo, serviceById } from "@/content/app/services";
 import { activateService, automationFor, buyService, joinWaitlist, connectProvider, periodFor, priceFor, saveServiceDetails, servicesSnapshot, setServiceState } from "./agentActions";
 import { detectLang, flowNext, localTurn, type LocalReply } from "./agentLocal";
 import { workspaceContext } from "./assistant";
+import { whatsAppStatus } from "./whatsappLink";
 import { currentWorkspace, logActivity, nowIso, uid, updateWorkspace } from "./store";
 import type { AgentCard, ChatMessage, ProviderId, Workspace } from "./types";
 
@@ -181,6 +182,20 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
       });
       out.links.push({ href: "/app/content", label: "Content Centre" });
       return { content: "Draft saved in the Content Centre, waiting for the owner's approval." };
+    }
+    case "check_whatsapp": {
+      const conn = ws.connections.whatsapp;
+      if (!conn?.account) return { content: "No WhatsApp number is linked yet. The owner can link it from Services → WhatsApp Automation (request_connection)." };
+      const state = (await whatsAppStatus(conn.account)).state;
+      if (state === "open")
+        return {
+          content: `WhatsApp ${conn.account} is linked and working right now. If a customer got no reply: replies can pause for a customer after IBAX handed them to the owner, numbers in the ignore list get no replies, and Lead Follow-up only messages new leads from the website or the Leads page (not every WhatsApp chat).`,
+        };
+      if (state === "unknown") return { content: "Couldn't reach the WhatsApp server just now. Ask the owner to try again in a minute.", is_error: true };
+      out.links.push({ href: "/app/services/whatsapp", label: "Link WhatsApp again" });
+      return {
+        content: `WhatsApp ${conn.account} is NOT linked right now (state: ${state}). WhatsApp logs out linked devices when the phone is offline for about 14 days, when the owner removes it under Linked devices, or after a WhatsApp update. Fix: open the WhatsApp service page and link again with the code (Linked devices → Link a device → Link with phone number instead). A "Link WhatsApp again" button was added.`,
+      };
     }
     case "show_link": {
       if (typeof input.page !== "string" || !input.page.startsWith("/app")) return { content: "Unknown page.", is_error: true };
