@@ -13,6 +13,7 @@ import { WhatsAppLink } from "./WhatsAppLink";
 import type { AgentCard, Workspace } from "@/lib/app/types";
 import { cn } from "@/lib/cn";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
+import { canRecord, startCapture, transcribe, type Capture } from "@/lib/app/voiceCapture";
 import { Btn, Spinner } from "./ui";
 
 /* ── Voice: speak to IBAX and hear the answer (browser speech, where supported) ── */
@@ -245,7 +246,8 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
   const [speaking, setSpeaking] = useState(false);
   const [muted, setMuted] = useState(readMuted);
   const [lang, setLang] = useState<Lang>(() => (ws.assistant?.language.toLowerCase().startsWith("hindi") ? "hi" : "en"));
-  const canListen = useSyncExternalStore(noopSubscribe, () => Boolean(getRecognition()), () => false);
+  const canListen = useSyncExternalStore(noopSubscribe, () => Boolean(getRecognition()) || canRecord(), () => false);
+  const captureRef = useRef<Capture | null>(null);
   const recRef = useRef<Recognition | null>(null);
   const lastSpoken = useRef<string | null>(ws.chat.at(-1)?.id ?? null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -258,6 +260,7 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
     window.speechSynthesis?.getVoices();
     return () => {
       recRef.current?.abort();
+      captureRef.current?.cancel();
       window.speechSynthesis?.cancel();
     };
   }, []);
@@ -303,9 +306,47 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
     }
   };
 
+  /** Record → our server turns it into text → send. Works on iPhone, where browser recognition doesn't. */
+  const recordAndSend = async () => {
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+    setTip("");
+    let cap: Capture;
+    try {
+      cap = await startCapture();
+    } catch {
+      setTip(micErrorTip("not-allowed"));
+      return;
+    }
+    captureRef.current = cap;
+    setListening(true);
+    setInterim("🎙️ Boliye… rukte hi main sun kar jawab dunga");
+    const blob = await cap.done;
+    captureRef.current = null;
+    setListening(false);
+    if (!blob) {
+      setInterim("");
+      setTip(micErrorTip("no-speech"));
+      return;
+    }
+    setInterim("✍️ Samajh raha hoon…");
+    const r = await transcribe(blob, lang);
+    setInterim("");
+    if (!r.ok) return setTip(r.reason === "not_configured" ? "Voice abhi chalu nahi hai. Likh kar poochhiye." : "Awaaz samajh nahi aayi. Dobara boliye ya likh kar poochhiye.");
+    if (!r.text) return setTip(micErrorTip("no-speech"));
+    send(r.text);
+  };
+
   const toggleMic = () => {
     if (listening) {
-      recRef.current?.stop();
+      if (captureRef.current) captureRef.current.stop();
+      else recRef.current?.stop();
+      return;
+    }
+    if ((isAppleMobile() || !getRecognition()) && canRecord()) {
+      // Prime speech inside the tap so IBAX's spoken answer can play on iPhone.
+      if (!muted && "speechSynthesis" in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+      void recordAndSend();
       return;
     }
     if (isAppleMobile()) {
