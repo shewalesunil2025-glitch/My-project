@@ -264,7 +264,7 @@ export async function geminiSpeak(text: string): Promise<Buffer | null> {
 
 let liveModels: string[] | null = null;
 
-/** Models this key can use for live voice, best first: native-audio Flash models, newest first. */
+/** Models this key can use for live voice calls, quickest first (Flash Live answered in ~0.6 s in tests). */
 export async function geminiLiveModels(): Promise<string[]> {
   if (liveModels) return liveModels;
   const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000", {
@@ -273,9 +273,13 @@ export async function geminiLiveModels(): Promise<string[]> {
   });
   if (!res.ok) return [];
   const data = (await res.json()) as { models?: { name: string; supportedGenerationMethods?: string[] }[] };
-  const names = (data.models ?? []).filter((m) => (m.supportedGenerationMethods ?? []).includes("bidiGenerateContent")).map((m) => m.name.replace(/^models\//, ""));
+  const names = (data.models ?? [])
+    .filter((m) => (m.supportedGenerationMethods ?? []).includes("bidiGenerateContent"))
+    .map((m) => m.name.replace(/^models\//, ""))
+    // Not for conversation: transcription, translation, robots, slow "extended thinking".
+    .filter((n) => !/transcribe|translate|robotics|thinking/.test(n));
   const score = (n: string) =>
-    (/native-audio/.test(n) ? 0 : 20) + (/flash/.test(n) ? 0 : 10) + (/lite/.test(n) ? 1 : 0) - (parseFloat(n.match(/(\d+(?:\.\d+)?)/)?.[1] ?? "0") || 0) / 100;
+    (/flash-live/.test(n) ? 0 : /live/.test(n) ? 10 : 20) + (/preview/.test(n) ? 1 : 0) - (parseFloat(n.match(/(\d+(?:\.\d+)?)/)?.[1] ?? "0") || 0) / 100;
   liveModels = names.sort((a, b) => score(a) - score(b));
   return liveModels;
 }
