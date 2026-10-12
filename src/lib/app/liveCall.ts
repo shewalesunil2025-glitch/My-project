@@ -15,6 +15,8 @@ export type LiveCall = {
 };
 
 export type LiveOptions = {
+  /** "site": a visitor on the website instead of an owner in the app. */
+  audience?: "app" | "site";
   /** Workspace facts for this call (business, services, numbers). */
   context: string;
   onState: (s: LiveState) => void;
@@ -81,7 +83,7 @@ type ServerMessage = {
 export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Promise<LiveCall | null> {
   let start: { ok?: boolean; token?: string; setup?: { systemInstruction: { parts: { text: string }[] } } & Record<string, unknown> } | null;
   try {
-    const res = await fetch("/api/live", { method: "POST" });
+    const res = await fetch("/api/live", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ audience: opts.audience ?? "app" }) });
     start = res.ok ? await res.json() : null;
   } catch {
     start = null;
@@ -98,7 +100,8 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     return { interrupt: () => {}, end: () => {} };
   }
 
-  const setup = { ...start.setup, systemInstruction: { parts: [{ text: `${start.setup.systemInstruction.parts[0].text}\n\n# Workspace now\n${opts.context}` }] } };
+  const base = start.setup.systemInstruction.parts[0].text;
+  const setup = { ...start.setup, systemInstruction: { parts: [{ text: opts.context ? `${base}\n\n# Workspace now\n${opts.context}` : base }] } };
   const ws = new WebSocket(`${WS_URL}?access_token=${encodeURIComponent(start.token)}`);
   let ready = false;
   let ended = false;

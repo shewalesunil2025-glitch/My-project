@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { agentSystemPrompt, agentTools } from "@/lib/app/agentSpec";
+import { buildAgentSystemPrompt } from "@/lib/shambhuAgent";
 import { geminiLiveModels, geminiLiveToken, geminiReady, toSchema } from "@/lib/server/gemini";
 
 /**
@@ -13,11 +14,19 @@ const VOICE_RULES = `
 # Live voice call
 You are on a live voice call with the owner, like a phone call. Speak naturally and warmly, as a friendly young woman would. Answer straight away in one or two short sentences, in the language the owner speaks. Never read out links, lists or symbols. If the owner interrupts, stop and listen. Payment, connect and activation cards appear on the owner's screen when you use those actions — tell them to tap it there.`;
 
+const SITE_VOICE_RULES = `
+
+# Live voice call
+You are on a live voice call with a visitor of the website, like a phone call. Speak naturally and warmly, as a friendly young woman would. Answer straight away in one or two short sentences, in the language the visitor speaks. Never read out links, lists or symbols. If the visitor interrupts, stop and listen. To buy or start a service, tell them to tap "Get started" on the website or talk to the team on WhatsApp.`;
+
 export async function POST(request: Request) {
   // Only our own pages may start calls.
-  const site = request.headers.get("sec-fetch-site");
-  if (site && site !== "same-origin") return NextResponse.json({ ok: false, reason: "forbidden" }, { status: 403 });
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if (fetchSite && fetchSite !== "same-origin") return NextResponse.json({ ok: false, reason: "forbidden" }, { status: 403 });
   if (!geminiReady()) return NextResponse.json({ ok: false, reason: "not_configured" }, { status: 503 });
+  // "site": a visitor on the website, not an owner in the app (no workspace, so no actions).
+  const body = (await request.json().catch(() => ({}))) as { audience?: unknown };
+  const site = body.audience === "site";
   try {
     const model = process.env.GEMINI_LIVE_MODEL || (await geminiLiveModels())[0];
     const token = model ? await geminiLiveToken() : null;
@@ -34,8 +43,8 @@ export async function POST(request: Request) {
             // 2.5 native-audio models think before speaking by default (5 s); a call can't wait.
             ...(/2\.5.*native-audio/.test(model) ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
           },
-          systemInstruction: { parts: [{ text: agentSystemPrompt() + VOICE_RULES }] },
-          tools: [{ functionDeclarations: agentTools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }],
+          systemInstruction: { parts: [{ text: site ? buildAgentSystemPrompt() + SITE_VOICE_RULES : agentSystemPrompt() + VOICE_RULES }] },
+          ...(site ? {} : { tools: [{ functionDeclarations: agentTools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }] }),
           inputAudioTranscription: {},
           outputAudioTranscription: {},
         },

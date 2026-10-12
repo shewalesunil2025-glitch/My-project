@@ -8,12 +8,14 @@ import {
   type AgentMessage,
   type AgentReply,
 } from "@/lib/shambhuAgent";
+import { geminiJson, geminiReady } from "@/lib/server/gemini";
 
 /**
  * ibaxai, the website voice assistant. The browser sends the conversation as
  * text (speech is recognised and spoken in the browser); Claude answers in the
  * visitor's language and says which language that is, so the right voice reads it.
- * Needs ANTHROPIC_API_KEY. Nothing is stored.
+ * Runs on Claude when ANTHROPIC_API_KEY is set, otherwise on Gemini (GEMINI_API_KEY),
+ * like IBAX in the app. Nothing is stored.
  */
 
 const SYSTEM_PROMPT = buildAgentSystemPrompt();
@@ -62,7 +64,8 @@ function validate(body: unknown): AgentMessage[] | null {
 let client: Anthropic | null = null;
 
 export async function POST(request: Request) {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  const useClaude = Boolean(process.env.ANTHROPIC_API_KEY);
+  if (!useClaude && !geminiReady()) {
     return NextResponse.json({ error: "not_configured" }, { status: 503 });
   }
 
@@ -77,6 +80,19 @@ export async function POST(request: Request) {
   }
   const messages = validate(body);
   if (!messages) return NextResponse.json({ error: "invalid" }, { status: 400 });
+
+  if (!useClaude) {
+    try {
+      const parsed = (await geminiJson(SYSTEM_PROMPT, messages, REPLY_SCHEMA)) as { reply?: unknown; lang?: unknown };
+      if (typeof parsed.reply !== "string" || !parsed.reply.trim()) throw new Error("Empty reply");
+      const lang = (agentLangCodes as string[]).includes(String(parsed.lang)) ? (parsed.lang as AgentLang) : "en";
+      return NextResponse.json({ reply: parsed.reply.trim(), lang } satisfies AgentReply);
+    } catch (err) {
+      const status = (err as { status?: number }).status;
+      console.error("ibaxai gemini error", err instanceof Error ? err.message : err);
+      return NextResponse.json({ error: status === 429 ? "busy" : "upstream" }, { status: status === 429 ? 429 : 502 });
+    }
+  }
 
   client ??= new Anthropic();
 

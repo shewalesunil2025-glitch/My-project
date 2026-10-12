@@ -303,3 +303,44 @@ export async function geminiLiveToken(): Promise<string | null> {
   const data = (await res.json()) as { name?: string };
   return data.name ?? null;
 }
+
+/**
+ * One JSON answer from Gemini for a plain text conversation (the website assistant).
+ * Same quick setup as IBAX in the app: minimal thinking, lighter models when busy.
+ */
+export async function geminiJson(system: string, messages: { role: "user" | "assistant"; content: string }[], schema: unknown): Promise<unknown> {
+  const primary = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+  const models = [...new Set([primary, ...FALLBACK_MODELS])];
+  const contents = messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }));
+  let thinking = process.env.GEMINI_THINKING || "minimal";
+  let lastError: Error & { status?: number } = new Error("Gemini unavailable");
+  for (const model of models) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents,
+          generationConfig: { temperature: 0.6, maxOutputTokens: 1024, responseMimeType: "application/json", responseSchema: toSchema(schema), thinkingConfig: { thinkingLevel: thinking } },
+        }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok) {
+        const detail = (await res.text()).slice(0, 300);
+        lastError = Object.assign(new Error(`Gemini ${res.status} (${model}): ${detail}`), { status: res.status });
+        if (res.status === 400 && /thinking/i.test(detail)) thinking = "low";
+        continue;
+      }
+      const data = (await res.json()) as { candidates?: { content?: { parts?: Part[] } }[] };
+      const text = (data.candidates?.[0]?.content?.parts ?? [])
+        .filter((p) => p.thought !== true && typeof p.text === "string")
+        .map((p) => p.text as string)
+        .join("");
+      return JSON.parse(text);
+    } catch (error) {
+      lastError = error instanceof Error ? error : lastError;
+    }
+  }
+  throw lastError;
+}
