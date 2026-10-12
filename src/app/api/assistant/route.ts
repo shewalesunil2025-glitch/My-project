@@ -51,7 +51,9 @@ export async function POST(request: Request) {
       const status = (error as { status?: number }).status;
       console.error("[assistant] gemini failed", error instanceof Error ? error.message : error);
       if (status === 429) return NextResponse.json({ ok: false, reason: "busy" }, { status: 429 });
-      return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });
+      // Gemini's own error text (never includes the key) makes setup problems easy to spot.
+      const detail = error instanceof Error ? error.message.slice(0, 300) : "";
+      return NextResponse.json({ ok: false, reason: "upstream", detail }, { status: 502 });
     }
   }
 
