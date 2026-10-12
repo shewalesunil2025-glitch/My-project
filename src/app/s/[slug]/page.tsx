@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { SiteView } from "@/components/sites/SiteView";
+import { SiteChat } from "@/components/sites/SiteChat";
 import { premiumTemplate, validSlug, type PublishedSite } from "@/lib/sites/site";
 
 /** A client's published website: www.ibaxai.com/s/<slug>. */
@@ -40,5 +41,11 @@ export default async function ClientSitePage({ params }: { params: Promise<{ slu
   const { slug } = await params;
   const site = await loadSite(slug);
   if (!site) notFound();
-  return <SiteView site={site} />;
+  return (
+    <>
+      <SiteView site={site} />
+      {/* Every published website gets the IBAX customer chat. */}
+      <SiteChat slug={slug} name={site.name} accent={site.accent} />
+    </>
+  );
 }
