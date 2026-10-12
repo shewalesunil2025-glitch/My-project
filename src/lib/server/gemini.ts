@@ -126,3 +126,43 @@ export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[
   }
   return { content, stop_reason: calls ? "tool_use" : "end_turn" };
 }
+
+const LANG_HINT: Record<string, string> = {
+  en: "English (or Hinglish in Roman letters)",
+  hi: "Hindi, written in Devanagari",
+  mr: "Marathi, written in Devanagari",
+};
+
+/** Speech → text for the in-app mic (iPhone's browser speech recognition is unreliable). */
+export async function geminiTranscribe(wavBase64: string, lang: string): Promise<string> {
+  const primary = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+  const prompt = `Transcribe this voice message from a business owner talking to their assistant. Most likely language: ${LANG_HINT[lang] ?? LANG_HINT.en}; if they clearly speak another language, use that. Write Hindi and Marathi in Devanagari and English or Hinglish in Roman letters. Return only the exact words spoken, nothing else. If there is no speech, return an empty string.`;
+  let lastError: Error & { status?: number } = new Error("Gemini unavailable");
+  for (const model of [primary, ...FALLBACK_MODELS.filter((m) => m !== primary)]) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ inlineData: { mimeType: "audio/wav", data: wavBase64 } }, { text: prompt }] }],
+          generationConfig: { temperature: 0, maxOutputTokens: 600, thinkingConfig: { thinkingLevel: "low" } },
+        }),
+        signal: AbortSignal.timeout(18_000),
+      });
+      if (!res.ok) {
+        lastError = Object.assign(new Error(`Gemini ${res.status} (${model}): ${(await res.text()).slice(0, 200)}`), { status: res.status });
+        continue;
+      }
+      const data = (await res.json()) as { candidates?: { content?: { parts?: Part[] } }[] };
+      const text = (data.candidates?.[0]?.content?.parts ?? [])
+        .filter((p) => p.thought !== true && typeof p.text === "string")
+        .map((p) => p.text as string)
+        .join("")
+        .trim();
+      return text.replace(/^["“]|["”]$/g, "").trim();
+    } catch (error) {
+      lastError = error instanceof Error ? error : lastError;
+    }
+  }
+  throw lastError;
+}
