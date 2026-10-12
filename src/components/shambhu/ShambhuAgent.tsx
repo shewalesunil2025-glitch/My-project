@@ -413,7 +413,7 @@ export function ShambhuAgent() {
       onState: (st) => {
         if (!stillOn()) return;
         setLiveState(st);
-        setStatus(st === "connecting" ? "thinking" : st);
+        setStatus(st === "connecting" ? "idle" : st);
       },
       onOwnerSaid: (text) =>
         setLines((l) => [...l, { role: "user", content: text }]),
@@ -714,10 +714,10 @@ export function ShambhuAgent() {
                   <Bars />
                   <span className="truncate">
                     {liveState === "connecting"
-                      ? "Call jud rahi hai…"
+                      ? "Connecting…"
                       : liveState === "listening"
-                        ? "Boliye, main sun rahi hoon…"
-                        : "Beech mein bolne ke liye tap kariye"}
+                        ? "Connected · Speak now"
+                        : "IBAX is speaking · Tap to interrupt"}
                   </span>
                 </button>
                 <button

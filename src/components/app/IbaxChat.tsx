@@ -917,14 +917,14 @@ export function IbaxChat({
             <Bars />
             <span className="truncate">
               {liveState === "connecting"
-                ? "Call jud rahi hai…"
+                ? "Connecting…"
                 : listening
-                  ? "Boliye, main sun rahi hoon…"
+                  ? "Connected · Speak now"
                   : busy || interim
-                    ? "Jawab aa raha hai…"
+                    ? "Connected · Thinking…"
                     : speaking
-                      ? "Beech mein bolne ke liye tap kariye"
-                      : "Call chalu hai…"}
+                      ? "IBAX is speaking · Tap to interrupt"
+                      : "Connected"}
             </span>
           </button>
           <button
