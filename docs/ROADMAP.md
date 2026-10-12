@@ -2,7 +2,7 @@
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 
-## Where we are (updated 2026-10-11)
+## Where we are (updated 2026-10-12)
 
 **Launch plan (owner's decision):** build 3–4 services fully first — Website (self-service builder), WhatsApp, Lead Follow-up, Customer Support — then add Razorpay and launch.
 
@@ -14,11 +14,13 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Google sign-in | 🟡 Button works; Google provider not yet switched on in Supabase | Owner: Google Cloud OAuth client → Supabase → Authentication → Providers → Google |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
 | WhatsApp ($49) | ✅ Live: Bluehost VPS (Mumbai, `129-121-169-80.sslip.io`) runs Evolution API; Vercel env vars set; AI Replies published; owner linked their own number. Link code and QR refresh on screen while linking | Owner: activate the service from IBAX chat and test a reply from another phone; later move to the WhatsApp Cloud API |
-| Lead Follow-up ($39) | 🟡 Built: website enquiries and leads added in the app get a WhatsApp thank-you from the owner's number, then up to 2 reminders (after 1 hour / 1 day / 2 days, 9 am–9 pm India time); stops when the lead replies or is marked converted/lost; 9 am "call these today" list on WhatsApp; Leads page shows what was sent. Queue: `followups` table; n8n **IBAX · Lead Follow-up · Hourly** calls `/api/followup/run`, AI Replies tells `/api/followup/inbound` about replies | Owner: run `supabase/migrations/0003_followups.sql`; Claude publishes the hourly workflow; test by adding a lead with a second number |
+| Lead Follow-up ($39) | ✅ Live: website enquiries and leads added in the app get a WhatsApp thank-you from the owner's number, then up to 2 reminders (after 1 hour / 1 day / 2 days, 9 am–9 pm India time); stops when the lead replies or is marked converted/lost; 9 am "call these today" list on WhatsApp. SQL `0003_followups.sql` run; n8n **IBAX · Lead Follow-up · Hourly** published | Owner: test by adding a lead with a second number |
+| Customer Support ($49) | ⏳ **Next.** Answers customers' common questions (FAQs, prices, timings, policies) on the client's website chat and WhatsApp, and hands complaints to the owner | Claude builds it (website chat on `/s/<slug>` + WhatsApp answers + complaint alert), then add `support` to `liveServices` |
 | Privacy Policy + Terms | ✅ Live at `/privacy` and `/terms` (operator Shewale Sunil, sole proprietor, Chhatrapati Sambhajinagar); data-deletion steps at `/privacy#data-deletion` | — |
 | Udyam (MSME) registration | ✅ Registered as a proprietorship (Services, NIC 62011/62012/62013/62020) | Download the certificate PDF; use it for Meta Business Verification, Razorpay and a bank current account |
 | Payments (Razorpay) | ⏳ Policy pages Razorpay checks are live: /terms, /privacy, /refund-policy, /shipping-policy, /contact | Owner opens a Razorpay account; Claude builds checkout + webhook |
-| IBAX bot AI in the app | 🟡 Real AI ready: runs on Claude (`ANTHROPIC_API_KEY`) or, free, on Gemini (`GEMINI_API_KEY`, optional `GEMINI_MODEL`); talks in any language and activates services itself | Owner: create a Gemini API key in Google AI Studio and add `GEMINI_API_KEY` in Vercel, then redeploy |
+| IBAX bot AI (app + website) | ✅ Live on Gemini (free): answers in any language and activates services in the app; natural woman's voice (Gemini TTS); live voice calls like a phone call (Gemini Live, ~1 s replies, stops when the caller talks); the website bot works the same way for visitors | — |
+| App icon | ✅ New icons (`/icons/`, `/ibaxai.webmanifest`) match the iPhone App Store icon on Android too | Owner: remove the old home-screen icon, clear Chrome's site data for ibaxai.com, add it again |
 | Meta / Google / YouTube approvals | ⏳ | Owner applies early (2–4 weeks) |
 
 ## Phase 0 — Foundation (1–2 weeks)
