@@ -626,14 +626,6 @@ export function IbaxChat({
     });
   };
 
-  /** While IBAX talks, a tap lets the owner speak straight away. */
-  const interruptCall = () => {
-    if (liveRef.current) return liveRef.current.interrupt();
-    if (!callRef.current || listening || busy) return;
-    stopSpeaking();
-    setSpeaking(false);
-    void listenInCall();
-  };
 
   const toggleMic = () => {
     if (listening) {
@@ -908,25 +900,16 @@ export function IbaxChat({
       )}
       {inCall ? (
         <div className="flex items-center gap-2 border-t border-white/[0.07] p-3">
-          <button
-            type="button"
-            onClick={interruptCall}
+          <div
+            role="status"
             aria-live="polite"
-            className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-flow/40 bg-flow/[0.07] px-4 text-left text-sm text-flow"
+            className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-flow/40 bg-flow/[0.07] px-4 text-sm text-flow"
           >
             <Bars />
             <span className="truncate">
-              {liveState === "connecting"
-                ? "Connecting…"
-                : listening
-                  ? "Connected · Speak now"
-                  : busy || interim
-                    ? "Connected · Thinking…"
-                    : speaking
-                      ? "IBAX is speaking · Tap to interrupt"
-                      : "Connected"}
+              {liveState === "connecting" ? "Connecting…" : "Connected · Speak now"}
             </span>
-          </button>
+          </div>
           <button
             type="button"
             onClick={() => endCall()}

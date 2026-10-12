@@ -705,21 +705,14 @@ export function ShambhuAgent() {
             )}
             {liveState ? (
               <div className="flex items-center gap-2 border-t border-white/[0.07] p-3">
-                <button
-                  type="button"
-                  onClick={() => liveRef.current?.interrupt()}
+                <div
+                  role="status"
                   aria-live="polite"
-                  className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-flow/40 bg-flow/[0.07] px-4 text-left text-sm text-flow"
+                  className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-flow/40 bg-flow/[0.07] px-4 text-sm text-flow"
                 >
                   <Bars />
-                  <span className="truncate">
-                    {liveState === "connecting"
-                      ? "Connecting…"
-                      : liveState === "listening"
-                        ? "Connected · Speak now"
-                        : "IBAX is speaking · Tap to interrupt"}
-                  </span>
-                </button>
+                  <span className="truncate">{liveState === "connecting" ? "Connecting…" : "Connected · Speak now"}</span>
+                </div>
                 <button
                   type="button"
                   onClick={() => endCall()}

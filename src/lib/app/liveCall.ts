@@ -93,7 +93,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   let stream: MediaStream;
   try {
     // The phone's echo canceller and auto-volume also turn IBAX's voice up and down (it
-    // sounded near, then far). Not needed here: the mic is held back while IBAX speaks.
+    // sounded near, then far), so they stay off; IBAX's own voice is told apart below.
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false } });
   } catch {
     opts.onDrop("mic");
@@ -127,6 +127,11 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   limiter.attack.value = 0.001;
   limiter.release.value = 0.1;
   leveller.connect(volume).connect(limiter).connect(audio.destination);
+  // What IBAX is saying right now, to tell its voice (from the speaker) apart from the owner's.
+  const outTap = audio.createAnalyser();
+  outTap.fftSize = 512;
+  limiter.connect(outTap);
+  const outBuf = new Float32Array(outTap.fftSize);
   const playing = new Set<AudioBufferSourceNode>();
   let state: LiveState = "connecting";
   const setState = (s: LiveState) => {
@@ -134,12 +139,45 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   };
   opts.onState(state);
 
-  // Mic → Google, in 100 ms pieces. While IBAX talks the mic is held back, so IBAX doesn't
-  // hear its own voice from the speaker and stop itself.
+  // Mic → Google, in 100 ms pieces. While IBAX talks, the mic is held back so IBAX doesn't
+  // hear its own voice from the speaker; but when the owner starts talking over it, IBAX
+  // stops at once and listens (barge-in), like a person on a phone call.
   let source: MediaStreamAudioSourceNode | null = null;
   let tap: AudioWorkletNode | null = null;
   let pending: Float32Array[] = [];
   let pendingLength = 0;
+  let micLevel = 0;
+  let outLevel = 0;
+  let echo = 0; // how much of IBAX's own voice reaches the mic, learned during the call
+  let learned = 0; // seconds of IBAX's voice heard so far; it learns its echo first
+  let talkingFor = 0; // seconds the owner has been talking over IBAX
+  let preRoll: Float32Array[] = []; // the last half second, so the owner's first words aren't lost
+  let preRollLength = 0;
+  const rms = (a: Float32Array) => {
+    let sum = 0;
+    for (const v of a) sum += v * v;
+    return Math.sqrt(sum / a.length);
+  };
+  /** True when the owner (not IBAX's echo) is talking while IBAX speaks. */
+  const ownerTalking = (chunk: Float32Array) => {
+    outTap.getFloatTimeDomainData(outBuf);
+    micLevel = micLevel * 0.85 + rms(chunk) * 0.15;
+    outLevel = Math.max(rms(outBuf), outLevel * 0.97); // held a little: the speaker reaches the mic late
+    const seconds = chunk.length / audio.sampleRate;
+    if (outLevel > 0.01) {
+      const ratio = micLevel / outLevel;
+      if (learned < 0.8) {
+        // The first moments of IBAX's voice: learn how loud its echo is.
+        learned += seconds;
+        echo = echo * 0.95 + ratio * 0.05;
+        return false;
+      }
+      echo = ratio < echo ? echo * 0.7 + ratio * 0.3 : echo * 0.998 + ratio * 0.002;
+    }
+    const louder = micLevel > 0.035 && micLevel > echo * outLevel * 2.5 + 0.02;
+    talkingFor = louder ? talkingFor + seconds : Math.max(0, talkingFor - seconds / 2);
+    return talkingFor >= 0.25;
+  };
   try {
     const url = URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" }));
     await audio.audioWorklet.addModule(url);
@@ -150,13 +188,26 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     mute.gain.value = 0;
     source.connect(tap).connect(mute).connect(audio.destination);
     tap.port.onmessage = (e: MessageEvent<Float32Array>) => {
-      if (!ready || ended || state === "speaking") {
+      if (!ready || ended) {
         pending = [];
         pendingLength = 0;
         return;
       }
-      pending.push(e.data);
-      pendingLength += e.data.length;
+      if (state === "speaking") {
+        preRoll.push(e.data);
+        preRollLength += e.data.length;
+        while (preRollLength > audio.sampleRate * 0.6) preRollLength -= preRoll.shift()!.length;
+        if (!ownerTalking(e.data)) return;
+        // The owner started talking: IBAX stops and listens, starting from their first words.
+        bargeIn();
+        pending = preRoll;
+        pendingLength = preRollLength;
+      } else {
+        pending.push(e.data);
+        pendingLength += e.data.length;
+      }
+      preRoll = [];
+      preRollLength = 0;
       if (pendingLength < audio.sampleRate / 10) return;
       const data = toBase64(toPcm16(pending, audio.sampleRate));
       pending = [];
@@ -180,6 +231,13 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     }
     playing.clear();
     nextAt = 0;
+  };
+
+  const bargeIn = () => {
+    skipping = true; // drop the rest of the answer IBAX was giving
+    talkingFor = 0;
+    stopPlayback();
+    setState("listening");
   };
 
   const flushOwner = () => {
@@ -277,10 +335,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
 
   return {
     interrupt: () => {
-      if (state !== "speaking") return;
-      skipping = true;
-      stopPlayback();
-      setState("listening");
+      if (state === "speaking") bargeIn();
     },
     end: () => end(),
   };
