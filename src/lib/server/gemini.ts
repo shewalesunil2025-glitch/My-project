@@ -69,7 +69,8 @@ export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[
       systemInstruction: { parts: [{ text: system }] },
       contents: toContents(messages),
       tools: [{ functionDeclarations: tools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }],
-      generationConfig: { temperature: 0.6, maxOutputTokens: 4000 },
+      // Chat replies need little "thinking"; the default level made a turn take over a minute.
+      generationConfig: { temperature: 0.6, maxOutputTokens: 2048, thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || "low" } },
     }),
     signal: AbortSignal.timeout(55_000),
   });
