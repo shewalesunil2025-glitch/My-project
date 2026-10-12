@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   description: product.description,
   applicationName: product.name,
   robots: { index: true, follow: true },
-  manifest: "/lumi.webmanifest",
+  manifest: "/ibaxai.webmanifest",
   // iPhone: "Add to Home Screen" opens ibaxai full screen, like a native app.
   appleWebApp: { capable: true, title: product.name, statusBarStyle: "black" },
   icons: {
-    icon: [{ url: "/lumi/icon-192.png?v=6", sizes: "192x192", type: "image/png" }],
-    apple: [{ url: "/lumi/apple-touch-icon.png?v=6", sizes: "180x180", type: "image/png" }],
+    icon: [{ url: "/icons/ibaxai-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/icons/ibaxai-apple-180.png", sizes: "180x180", type: "image/png" }],
   },
   formatDetection: { telephone: false },
 };

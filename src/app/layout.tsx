@@ -11,6 +11,8 @@ const tight = Inter_Tight({ subsets: ["latin"], variable: "--font-tight", weight
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  // "Add to Home screen" from the website installs the ibaxai app with its real icon.
+  manifest: "/ibaxai.webmanifest",
   title: { default: siteConfig.title, template: `%s — ${siteConfig.name}` },
   description: siteConfig.description,
   applicationName: siteConfig.name,
