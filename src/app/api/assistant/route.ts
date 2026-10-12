@@ -1,14 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { agentSystemPrompt, agentTools } from "@/lib/app/agentSpec";
+import { geminiReady, geminiTurn } from "@/lib/server/gemini";
 
 /**
  * One turn of IBAX, the in-app assistant. The app keeps the conversation and carries
  * out the actions IBAX asks for (show a payment card, save details, connect an account,
  * activate a service) on the owner's workspace, then sends the results back here.
  *
- * Honest by default: without ANTHROPIC_API_KEY it returns 503 and the app uses its
- * built-in conversation instead.
+ * Runs on Claude when ANTHROPIC_API_KEY is set, otherwise on Gemini's free tier when
+ * GEMINI_API_KEY is set. Without either it returns 503 and the app uses its built-in
+ * conversation instead.
  */
 
 const MAX_BODY = 400_000;
@@ -26,7 +28,8 @@ function validMessages(value: unknown): value is Anthropic.Beta.BetaMessageParam
 }
 
 export async function POST(request: Request) {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  const useClaude = Boolean(process.env.ANTHROPIC_API_KEY);
+  if (!useClaude && !geminiReady()) {
     return NextResponse.json({ ok: false, reason: "not_configured" }, { status: 503 });
   }
 
@@ -39,6 +42,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
   }
   if (!validMessages(messages)) return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
+
+  if (!useClaude) {
+    try {
+      const turn = await geminiTurn(system, agentTools, messages);
+      return NextResponse.json({ ok: true, refused: turn.stop_reason === "refusal", content: turn.content, stop_reason: turn.stop_reason });
+    } catch (error) {
+      const status = (error as { status?: number }).status;
+      console.error("[assistant] gemini failed", error instanceof Error ? error.message : error);
+      if (status === 429) return NextResponse.json({ ok: false, reason: "busy" }, { status: 429 });
+      return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });
+    }
+  }
 
   try {
     const client = new Anthropic();

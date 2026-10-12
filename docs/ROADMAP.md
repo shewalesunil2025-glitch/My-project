@@ -18,7 +18,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Privacy Policy + Terms | ✅ Live at `/privacy` and `/terms` (operator Shewale Sunil, sole proprietor, Chhatrapati Sambhajinagar); data-deletion steps at `/privacy#data-deletion` | — |
 | Udyam (MSME) registration | ✅ Registered as a proprietorship (Services, NIC 62011/62012/62013/62020) | Download the certificate PDF; use it for Meta Business Verification, Razorpay and a bank current account |
 | Payments (Razorpay) | ⏳ Policy pages Razorpay checks are live: /terms, /privacy, /refund-policy, /shipping-policy, /contact | Owner opens a Razorpay account; Claude builds checkout + webhook |
-| IBAX bot AI in the app | ⏳ Built-in fallback answers only | Free option: Gemini key in Vercel instead of `ANTHROPIC_API_KEY` |
+| IBAX bot AI in the app | 🟡 Real AI ready: runs on Claude (`ANTHROPIC_API_KEY`) or, free, on Gemini (`GEMINI_API_KEY`, optional `GEMINI_MODEL`); talks in any language and activates services itself | Owner: create a Gemini API key in Google AI Studio and add `GEMINI_API_KEY` in Vercel, then redeploy |
 | Meta / Google / YouTube approvals | ⏳ | Owner applies early (2–4 weeks) |
 
 ## Phase 0 — Foundation (1–2 weeks)
