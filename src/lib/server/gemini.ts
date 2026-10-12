@@ -136,7 +136,7 @@ const LANG_HINT: Record<string, string> = {
 /** Speech → text for the in-app mic (iPhone's browser speech recognition is unreliable). */
 export async function geminiTranscribe(wavBase64: string, lang: string): Promise<string> {
   const primary = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-  const prompt = `Transcribe this voice message from a business owner talking to their assistant. Most likely language: ${LANG_HINT[lang] ?? LANG_HINT.en}; if they clearly speak another language, use that. Write Hindi and Marathi in Devanagari and English or Hinglish in Roman letters. Return only the exact words spoken, nothing else. If there is no speech, return an empty string.`;
+  const prompt = `Transcribe this voice message from a business owner talking to their assistant. Most likely language: ${LANG_HINT[lang] ?? LANG_HINT.en}; if they clearly speak another language, use that. Write Hindi and Marathi in Devanagari and English or Hinglish in Roman letters. Return only the exact words spoken, nothing else. If there are no clear spoken words (only silence, noise, beeps or music), return an empty string — never guess.`;
   let lastError: Error & { status?: number } = new Error("Gemini unavailable");
   for (const model of [primary, ...FALLBACK_MODELS.filter((m) => m !== primary)]) {
     try {
