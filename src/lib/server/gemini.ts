@@ -168,3 +168,75 @@ export async function geminiTranscribe(wavBase64: string, lang: string): Promise
   }
   throw lastError;
 }
+
+/* ── Natural voice (Gemini text-to-speech) ── */
+
+let ttsModels: string[] | null = null;
+
+/** Text-to-speech models this key can use, best first (found once, then remembered). */
+export async function geminiTtsModels(): Promise<string[]> {
+  if (ttsModels) return ttsModels;
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000", {
+    headers: { "x-goog-api-key": process.env.GEMINI_API_KEY! },
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!res.ok) return [];
+  const data = (await res.json()) as { models?: { name: string; supportedGenerationMethods?: string[] }[] };
+  const names = (data.models ?? [])
+    .filter((m) => /tts/i.test(m.name) && (m.supportedGenerationMethods ?? []).includes("generateContent"))
+    .map((m) => m.name.replace(/^models\//, ""));
+  // Flash before Pro (quicker), newest version first.
+  const score = (n: string) => (/flash/.test(n) ? 0 : 10) + (/lite/.test(n) ? 1 : 0) - (parseFloat(n.match(/(\d+(?:\.\d+)?)/)?.[1] ?? "0") || 0) / 100;
+  ttsModels = names.sort((a, b) => score(a) - score(b));
+  return ttsModels;
+}
+
+/** 16-bit PCM from Gemini → a playable WAV file. */
+function pcmToWav(pcm: Buffer, rate: number) {
+  const head = Buffer.alloc(44);
+  head.write("RIFF", 0);
+  head.writeUInt32LE(36 + pcm.length, 4);
+  head.write("WAVE", 8);
+  head.write("fmt ", 12);
+  head.writeUInt32LE(16, 16);
+  head.writeUInt16LE(1, 20);
+  head.writeUInt16LE(1, 22);
+  head.writeUInt32LE(rate, 24);
+  head.writeUInt32LE(rate * 2, 28);
+  head.writeUInt16LE(2, 32);
+  head.writeUInt16LE(16, 34);
+  head.write("data", 36);
+  head.writeUInt32LE(pcm.length, 40);
+  return Buffer.concat([head, pcm]);
+}
+
+/** IBAX's spoken reply in a warm, natural woman's voice. Returns WAV, or null if TTS isn't available. */
+export async function geminiSpeak(text: string): Promise<Buffer | null> {
+  const voice = process.env.GEMINI_TTS_VOICE || "Sulafat";
+  const models = process.env.GEMINI_TTS_MODEL ? [process.env.GEMINI_TTS_MODEL] : await geminiTtsModels();
+  for (const model of models.slice(0, 3)) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: `Say this warmly and naturally, like a friendly young Indian woman chatting with a business owner, at a relaxed conversational pace:\n${text}` }] }],
+          generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
+        }),
+        signal: AbortSignal.timeout(25_000),
+      });
+      if (!res.ok) {
+        console.error(`[speak] ${model} ${res.status}`, (await res.text()).slice(0, 200));
+        continue;
+      }
+      const data = (await res.json()) as { candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[] };
+      const audio = data.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
+      if (!audio?.data) continue;
+      const rate = Number(audio.mimeType?.match(/rate=(\d+)/)?.[1] ?? 24000);
+      return pcmToWav(Buffer.from(audio.data, "base64"), rate);
+    } catch (error) {
+      console.error(`[speak] ${model} failed`, error instanceof Error ? error.message : error);
+    }
+  }
+  return null;
+}
