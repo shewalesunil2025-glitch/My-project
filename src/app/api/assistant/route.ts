@@ -48,7 +48,11 @@ export async function POST(request: Request) {
   if (!useClaude) {
     try {
       const turn = await geminiTurn(system, agentTools, messages);
-      return NextResponse.json({ ok: true, refused: turn.stop_reason === "refusal", content: turn.content, stop_reason: turn.stop_reason });
+      return NextResponse.json(
+        { ok: true, refused: turn.stop_reason === "refusal", content: turn.content, stop_reason: turn.stop_reason },
+        // How long Gemini took and which model answered (browser dev tools → Network → Timing).
+        { headers: { "server-timing": `gemini;dur=${turn.ms ?? 0};desc="${turn.model ?? ""}"` } },
+      );
     } catch (error) {
       const status = (error as { status?: number }).status;
       console.error("[assistant] gemini failed", error instanceof Error ? error.message : error);

@@ -65,7 +65,7 @@ function withoutSignatures(contents: GeminiContent[]): GeminiContent[] {
   }));
 }
 
-export type GeminiTurn = { content: Block[]; stop_reason: "tool_use" | "end_turn" | "refusal" };
+export type GeminiTurn = { content: Block[]; stop_reason: "tool_use" | "end_turn" | "refusal"; model?: string; ms?: number };
 
 // Free-tier models are often "experiencing high demand" (503): retry, then try lighter models.
 const FALLBACK_MODELS = ["gemini-flash-latest", "gemini-flash-lite-latest"];
@@ -77,9 +77,12 @@ export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[
   const contents = toContents(messages);
   const started = Date.now();
   let res: Response | null = null;
+  let model = primary;
+  let thinking = process.env.GEMINI_THINKING || "minimal";
   let lastError: Error & { status?: number } = new Error("Gemini unavailable");
 
-  for (const [i, model] of attempts.entries()) {
+  for (const [i, next] of attempts.entries()) {
+    model = next;
     const left = BUDGET_MS - (Date.now() - started);
     if (left < 4_000) break;
     // Another model can't check this one's thought signatures; tell it to skip the check.
@@ -92,8 +95,8 @@ export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[
           systemInstruction: { parts: [{ text: system }] },
           contents: body,
           tools: [{ functionDeclarations: tools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }],
-          // Chat replies need little "thinking"; the default level made a turn take over a minute.
-          generationConfig: { temperature: 0.6, maxOutputTokens: 2048, thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || "low" } },
+          // Chat replies need almost no "thinking": "low" still took 15–20 s a turn.
+          generationConfig: { temperature: 0.6, maxOutputTokens: 2048, thinkingConfig: { thinkingLevel: thinking } },
         }),
         signal: AbortSignal.timeout(Math.min(left, i === attempts.length - 1 ? left : 25_000)),
       });
@@ -103,7 +106,10 @@ export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[
       continue;
     }
     if (res.ok) break;
-    lastError = Object.assign(new Error(`Gemini ${res.status} (${model}): ${(await res.text()).slice(0, 300)}`), { status: res.status });
+    const detail = (await res.text()).slice(0, 300);
+    lastError = Object.assign(new Error(`Gemini ${res.status} (${model}): ${detail}`), { status: res.status });
+    // A model that doesn't know the "minimal" level: ask again with "low".
+    if (res.status === 400 && /thinking/i.test(detail)) thinking = "low";
     res = null;
     if (i === 0) await new Promise((r) => setTimeout(r, 1_200));
   }
@@ -111,7 +117,8 @@ export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[
 
   const data = (await res.json()) as { candidates?: { content?: { parts?: Part[] }; finishReason?: string }[]; promptFeedback?: { blockReason?: string } };
   const candidate = data.candidates?.[0];
-  if (data.promptFeedback?.blockReason || candidate?.finishReason === "SAFETY") return { content: [], stop_reason: "refusal" };
+  const served = { model, ms: Date.now() - started };
+  if (data.promptFeedback?.blockReason || candidate?.finishReason === "SAFETY") return { content: [], stop_reason: "refusal", ...served };
 
   const content: Block[] = [];
   let calls = 0;
@@ -124,7 +131,7 @@ export async function geminiTurn(system: string, tools: Anthropic.Beta.BetaTool[
       content.push({ type: "tool_use", id: `toolu_g${Date.now().toString(36)}${calls}`, name: call.name, input: call.args ?? {}, ...signature });
     } else if (typeof p.text === "string" && p.text.trim()) content.push({ type: "text", text: p.text, ...signature });
   }
-  return { content, stop_reason: calls ? "tool_use" : "end_turn" };
+  return { content, stop_reason: calls ? "tool_use" : "end_turn", ...served };
 }
 
 const LANG_HINT: Record<string, string> = {
@@ -193,6 +200,15 @@ export async function geminiTtsModels(): Promise<string[]> {
 
 /** 16-bit PCM from Gemini → a playable WAV file. */
 function pcmToWav(pcm: Buffer, rate: number) {
+  // A sudden start or stop of sound clicks in the speaker: fade the first and last 15 ms.
+  const samples = Math.floor(pcm.length / 2);
+  const fade = Math.min(Math.floor(rate * 0.015), Math.floor(samples / 2));
+  for (let i = 0; i < fade; i++) {
+    const k = i / fade;
+    pcm.writeInt16LE(Math.round(pcm.readInt16LE(i * 2) * k), i * 2);
+    const j = (samples - 1 - i) * 2;
+    pcm.writeInt16LE(Math.round(pcm.readInt16LE(j) * k), j);
+  }
   const head = Buffer.alloc(44);
   head.write("RIFF", 0);
   head.writeUInt32LE(36 + pcm.length, 4);

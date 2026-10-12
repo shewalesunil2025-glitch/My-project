@@ -192,8 +192,11 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
   }
 }
 
+/** Actions that only add a button to the reply: once IBAX has also written its answer, no need to ask it again. */
+const DISPLAY_ONLY = new Set(["show_link"]);
+
 /** Runs one exchange with the model. Returns false if the model can't be used. */
-async function aiTurn(ws: Workspace, userText: string): Promise<boolean> {
+async function aiTurn(ws: Workspace, userText: string, voice = false): Promise<boolean> {
   let thread = loadThread(ws);
   if (thread.length > MAX_THREAD) {
     // Start a fresh conversation instead of cutting the old one; carry a short recap.
@@ -205,7 +208,14 @@ async function aiTurn(ws: Workspace, userText: string): Promise<boolean> {
     userText = `[Recap of our earlier conversation]\n${recap}\n\n${userText}`;
   }
   const startLength = thread.length;
-  thread.push({ role: "user", content: [{ type: "text", text: userText }, { type: "text", text: snapshot(currentWorkspace() ?? ws) }] });
+  thread.push({
+    role: "user",
+    content: [
+      { type: "text", text: userText },
+      ...(voice ? [{ type: "text" as const, text: "[Voice call: the owner is talking out loud. Reply in one or two short spoken sentences, no lists.]" }] : []),
+      { type: "text", text: snapshot(currentWorkspace() ?? ws) },
+    ],
+  });
 
   const out = { text: [] as string[], cards: [] as AgentCard[], links: [] as NonNullable<ChatMessage["links"]> };
   for (let step = 0; step < MAX_STEPS; step++) {
@@ -246,31 +256,32 @@ async function aiTurn(ws: Workspace, userText: string): Promise<boolean> {
       results.push({ type: "tool_result", tool_use_id: call.id, content: r.content, ...(r.is_error ? { is_error: true } : {}) });
     }
     thread.push({ role: "user", content: results });
+    if (out.text.length && calls.every((c) => DISPLAY_ONLY.has(c.name))) break;
   }
   saveThread(ws, thread);
   postAssistant({ text: out.text.join("\n\n"), cards: out.cards, links: out.links });
   return true;
 }
 
-async function respond(ws: Workspace, modelText: string, local: () => Promise<LocalReply>) {
+async function respond(ws: Workspace, modelText: string, local: () => Promise<LocalReply>, voice = false) {
   setBusy(true);
   try {
-    const usedAi = aiAvailable !== false && (await aiTurn(ws, modelText));
+    const usedAi = aiAvailable !== false && (await aiTurn(ws, modelText, voice));
     if (!usedAi) postAssistant(await local());
   } finally {
     setBusy(false);
   }
 }
 
-/** The owner sent a message. */
-export async function sendToAgent(text: string) {
+/** The owner sent a message (`voice`: said out loud in a voice call, so keep the answer short). */
+export async function sendToAgent(text: string, voice = false) {
   const ws = currentWorkspace();
   const msg = text.trim().slice(0, 4000);
   if (!ws || !msg || busy) return;
   updateWorkspace((w) => {
     w.chat.push({ id: uid(), role: "user", text: msg, at: nowIso() });
   });
-  await respond(ws, msg, () => localTurn(currentWorkspace()!, msg));
+  await respond(ws, msg, () => localTurn(currentWorkspace()!, msg), voice);
 }
 
 function markCard(match: (c: AgentCard) => boolean) {

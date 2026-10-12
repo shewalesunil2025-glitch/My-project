@@ -633,7 +633,7 @@ export function IbaxChat({
     if (!r.ok && r.reason === "not_configured")
       return endCall("Voice abhi chalu nahi hai. Likh kar poochhiye.");
     if (!r.ok || !r.text) return void listenInCall();
-    void sendToAgent(r.text);
+    void sendToAgent(r.text, true);
   };
   useEffect(() => {
     listenRef.current = () => void listenInCall();
