@@ -11,9 +11,11 @@ import {
 } from "react";
 import { motion } from "framer-motion";
 import {
+  AudioLines,
   Check,
   Mic,
   MicOff,
+  PhoneOff,
   PlugZap,
   Send,
   ShieldCheck,
@@ -39,6 +41,7 @@ import { cn } from "@/lib/cn";
 import { ShambhuBot } from "@/components/shambhu/ShambhuBot";
 import {
   canRecord,
+  openAudio,
   startCapture,
   transcribe,
   type Capture,
@@ -166,10 +169,56 @@ function unlockAudio() {
   void player.play().catch(() => {});
 }
 
+let endPlayback: (() => void) | null = null;
+
 function stopSpeaking() {
   speakToken++;
+  endPlayback?.();
   player?.pause();
   window.speechSynthesis?.cancel();
+}
+
+/** The first sentence on its own, so IBAX starts talking while the rest is still being made. */
+function splitForSpeech(text: string) {
+  const m = text.trim().match(/^(.{12,180}?[.!?।]+)\s+(\S[\s\S]*)$/);
+  return m ? [m[1], m[2]] : [text.trim()];
+}
+
+async function naturalAudio(text: string): Promise<Blob | null> {
+  try {
+    const res = await fetch("/api/speak", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    if (res.status === 503) naturalVoice = false;
+    return res.ok ? await res.blob() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Plays one clip; true when it played to the end. */
+function play(blob: Blob, onStart?: () => void) {
+  return new Promise<boolean>((resolve) => {
+    if (!player) return resolve(false);
+    const p = player;
+    const url = URL.createObjectURL(blob);
+    const finish = (ok: boolean) => {
+      if (endPlayback !== stop) return;
+      endPlayback = null;
+      p.onplaying = p.onended = p.onerror = null;
+      URL.revokeObjectURL(url);
+      resolve(ok);
+    };
+    const stop = () => finish(false);
+    endPlayback = stop;
+    p.onplaying = () => onStart?.();
+    p.onended = () => finish(true);
+    p.onerror = () => finish(false);
+    p.src = url;
+    p.play().catch(() => finish(false));
+  });
 }
 
 /** IBAX speaks: natural voice when available, otherwise the phone's voice. */
@@ -182,31 +231,17 @@ async function speak(
   stopSpeaking();
   const token = speakToken;
   if (naturalVoice && player) {
-    try {
-      const res = await fetch("/api/speak", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
+    // Both parts are made at the same time; the first one is short, so it's ready quickly.
+    const parts = splitForSpeech(text).map(naturalAudio);
+    let played = 0;
+    for (const part of parts) {
+      const clip = await part;
       if (token !== speakToken) return;
-      if (res.ok) {
-        const url = URL.createObjectURL(await res.blob());
-        if (token !== speakToken) return URL.revokeObjectURL(url);
-        const done = () => {
-          URL.revokeObjectURL(url);
-          onEnd?.();
-        };
-        player.onplaying = () => onStart?.();
-        player.onended = player.onerror = done;
-        player.src = url;
-        await player.play();
-        return;
-      }
-      if (res.status === 503) naturalVoice = false;
-    } catch {
-      /* fall back to the phone's voice */
+      if (!clip || !(await play(clip, played ? undefined : onStart))) break;
+      if (token !== speakToken) return;
+      played++;
     }
-    if (token !== speakToken) return;
+    if (played) return onEnd?.();
   }
   speakWithPhone(text, lang, onStart, onEnd);
 }
@@ -428,6 +463,11 @@ export function IbaxChat({
     () => Boolean(getRecognition()) || canRecord(),
     () => false,
   );
+  const canCall = useSyncExternalStore(noopSubscribe, canRecord, () => false);
+  /** Voice call: IBAX listens, answers out loud, and listens again — until the owner hangs up. */
+  const [inCall, setInCall] = useState(false);
+  const callRef = useRef<{ audio: AudioContext; misses: number } | null>(null);
+  const listenRef = useRef<() => void>(() => {});
   const captureRef = useRef<Capture | null>(null);
   const recRef = useRef<Recognition | null>(null);
   const lastSpoken = useRef<string | null>(ws.chat.at(-1)?.id ?? null);
@@ -449,6 +489,8 @@ export function IbaxChat({
       recRef.current?.abort();
       captureRef.current?.cancel();
       stopSpeaking();
+      void callRef.current?.audio.close();
+      callRef.current = null;
     };
   }, []);
 
@@ -470,13 +512,18 @@ export function IbaxChat({
     if (!last || last.role !== "assistant" || last.id === lastSpoken.current)
       return;
     lastSpoken.current = last.id;
-    if (!muted && last.text)
+    const onCall = Boolean(callRef.current);
+    if ((!muted || onCall) && last.text)
       void speak(
         last.text,
         lang,
         () => setSpeaking(true),
-        () => setSpeaking(false),
+        () => {
+          setSpeaking(false);
+          if (onCall) listenRef.current();
+        },
       );
+    else if (onCall) listenRef.current();
   }, [last, muted, lang]);
 
   const send = useCallback(
@@ -541,6 +588,77 @@ export function IbaxChat({
       );
     if (!r.text) return setTip(micErrorTip("no-speech"));
     send(r.text);
+  };
+
+  const endCall = (message?: string) => {
+    const c = callRef.current;
+    callRef.current = null;
+    setInCall(false);
+    captureRef.current?.cancel();
+    stopSpeaking();
+    setSpeaking(false);
+    setListening(false);
+    setInterim("");
+    void c?.audio.close();
+    if (message) setTip(message);
+  };
+
+  /** One turn of the call: listen until the owner pauses, then send what they said. */
+  const listenInCall = async () => {
+    const c = callRef.current;
+    if (!c || captureRef.current) return;
+    let cap: Capture;
+    try {
+      cap = await startCapture(undefined, { audio: c.audio, waitMs: 12000 });
+    } catch {
+      return endCall(micErrorTip("not-allowed"));
+    }
+    if (callRef.current !== c) return cap.cancel();
+    captureRef.current = cap;
+    setListening(true);
+    const blob = await cap.done;
+    captureRef.current = null;
+    setListening(false);
+    if (callRef.current !== c) return;
+    if (!blob) {
+      if (++c.misses >= 2)
+        return endCall("Call band kar diya — kuch sunai nahi diya.");
+      return void listenInCall();
+    }
+    c.misses = 0;
+    setInterim("✍️ …");
+    const r = await transcribe(blob, lang);
+    setInterim("");
+    if (callRef.current !== c) return;
+    if (!r.ok && r.reason === "not_configured")
+      return endCall("Voice abhi chalu nahi hai. Likh kar poochhiye.");
+    if (!r.ok || !r.text) return void listenInCall();
+    void sendToAgent(r.text);
+  };
+  useEffect(() => {
+    listenRef.current = () => void listenInCall();
+  });
+
+  const startCall = () => {
+    recRef.current?.abort();
+    captureRef.current?.cancel();
+    stopSpeaking();
+    setSpeaking(false);
+    setTip("");
+    // Inside the tap: unlock the speaker and the mic's sound engine for the whole call.
+    unlockAudio();
+    callRef.current = { audio: openAudio(), misses: 0 };
+    setInCall(true);
+    // The tap's own recording may still be closing; start the call's first turn just after.
+    setTimeout(() => void listenInCall(), 50);
+  };
+
+  /** While IBAX talks, a tap lets the owner speak straight away. */
+  const interruptCall = () => {
+    if (!callRef.current || listening || busy) return;
+    stopSpeaking();
+    setSpeaking(false);
+    void listenInCall();
   };
 
   const toggleMic = () => {
@@ -814,58 +932,101 @@ export function IbaxChat({
           {tip}
         </p>
       )}
-      <form
-        onSubmit={onSubmit}
-        className="flex items-center gap-2 border-t border-white/[0.07] p-3"
-      >
-        {canListen && (
+      {inCall ? (
+        <div className="flex items-center gap-2 border-t border-white/[0.07] p-3">
           <button
             type="button"
-            onClick={toggleMic}
-            disabled={busy}
-            aria-label={listening ? "Stop listening" : `Speak to ${name}`}
-            className={cn(
-              "relative grid size-11 shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
-              listening
-                ? "bg-flow text-ink-950"
-                : "border border-flow/40 text-flow hover:bg-flow/10",
-            )}
+            onClick={interruptCall}
+            aria-live="polite"
+            className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-flow/40 bg-flow/[0.07] px-4 text-left text-sm text-flow"
           >
-            {listening && (
-              <span
-                aria-hidden
-                className="absolute inset-0 animate-ping rounded-full bg-flow/40"
-              />
-            )}
-            {listening ? (
-              <MicOff className="relative size-5" aria-hidden />
-            ) : (
-              <Mic className="size-5" aria-hidden />
-            )}
+            <Bars />
+            <span className="truncate">
+              {listening
+                ? "Boliye, main sun rahi hoon…"
+                : busy || interim
+                  ? "Jawab aa raha hai…"
+                  : speaking
+                    ? "Beech mein bolne ke liye tap kariye"
+                    : "Call chalu hai…"}
+            </span>
           </button>
-        )}
-        <input
-          ref={inputRef}
-          id="ibax-input"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          maxLength={2000}
-          placeholder={
-            canListen ? "Type or tap the mic…" : "Type your question…"
-          }
-          aria-label={`Message ${name}`}
-          autoComplete="off"
-          className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-ink-950/60 px-4 text-[16px] text-fg placeholder:text-fg-subtle focus:border-flow/50 focus:outline-none md:text-sm"
-        />
-        <button
-          type="submit"
-          disabled={!q.trim() || busy}
-          aria-label="Send"
-          className="btn-3d btn-3d-sm grid size-11 shrink-0 place-items-center rounded-full text-white disabled:opacity-40"
+          <button
+            type="button"
+            onClick={() => endCall()}
+            aria-label="End voice call"
+            className="grid size-11 shrink-0 place-items-center rounded-full bg-red-500 text-white hover:bg-red-400"
+          >
+            <PhoneOff className="size-5" aria-hidden />
+          </button>
+        </div>
+      ) : (
+        <form
+          onSubmit={onSubmit}
+          className="flex items-center gap-2 border-t border-white/[0.07] p-3"
         >
-          <Send className="size-4" aria-hidden />
-        </button>
-      </form>
+          <input
+            ref={inputRef}
+            id="ibax-input"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            maxLength={2000}
+            placeholder={
+              canListen ? "Type or tap the mic…" : "Type your question…"
+            }
+            aria-label={`Message ${name}`}
+            autoComplete="off"
+            className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-ink-950/60 px-4 text-[16px] text-fg placeholder:text-fg-subtle focus:border-flow/50 focus:outline-none md:text-sm"
+          />
+          {canListen && (
+            <button
+              type="button"
+              onClick={toggleMic}
+              disabled={busy}
+              aria-label={listening ? "Stop listening" : `Speak to ${name}`}
+              className={cn(
+                "relative grid size-11 shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
+                listening
+                  ? "bg-flow text-ink-950"
+                  : "border border-flow/40 text-flow hover:bg-flow/10",
+              )}
+            >
+              {listening && (
+                <span
+                  aria-hidden
+                  className="absolute inset-0 animate-ping rounded-full bg-flow/40"
+                />
+              )}
+              {listening ? (
+                <MicOff className="relative size-5" aria-hidden />
+              ) : (
+                <Mic className="size-5" aria-hidden />
+              )}
+            </button>
+          )}
+          {canCall && !q.trim() ? (
+            <button
+              type="button"
+              onClick={startCall}
+              disabled={busy}
+              aria-label={`Voice call with ${name}`}
+              title="Voice call — baat kariye, jaise phone par"
+              className="btn-3d btn-3d-sm grid size-11 shrink-0 place-items-center rounded-full text-white disabled:opacity-40"
+            >
+              <AudioLines className="size-5" aria-hidden />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={!q.trim() || busy}
+              aria-label="Send"
+              className="btn-3d btn-3d-sm grid size-11 shrink-0 place-items-center rounded-full text-white disabled:opacity-40"
+            >
+              <Send className="size-4" aria-hidden />
+            </button>
+          )}
+        </form>
+      )}
     </div>
   );
 }

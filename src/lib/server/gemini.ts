@@ -210,7 +210,10 @@ function pcmToWav(pcm: Buffer, rate: number) {
   return Buffer.concat([head, pcm]);
 }
 
-/** IBAX's spoken reply in a warm, natural woman's voice. Returns WAV, or null if TTS isn't available. */
+/**
+ * IBAX's spoken reply in a warm, natural woman's voice. Returns WAV, or null if TTS isn't available.
+ * Only the reply goes to the model: a style instruction in front of it sometimes gets read out loud.
+ */
 export async function geminiSpeak(text: string): Promise<Buffer | null> {
   const voice = process.env.GEMINI_TTS_VOICE || "Sulafat";
   const models = process.env.GEMINI_TTS_MODEL ? [process.env.GEMINI_TTS_MODEL] : await geminiTtsModels();
@@ -220,7 +223,7 @@ export async function geminiSpeak(text: string): Promise<Buffer | null> {
         method: "POST",
         headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: `Say this warmly and naturally, like a friendly young Indian woman chatting with a business owner, at a relaxed conversational pace:\n${text}` }] }],
+          contents: [{ role: "user", parts: [{ text }] }],
           generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
         }),
         signal: AbortSignal.timeout(25_000),

@@ -27,16 +27,26 @@ const QUIET_AFTER_SPEECH_MS = 1100;
 const NO_SPEECH_MS = 7000;
 const MAX_MS = 30000;
 
-/** Start recording. Call from a tap (iPhone only allows audio from a user gesture). */
-export async function startCapture(onSpeaking?: (level: number) => void): Promise<Capture> {
-  const Ctor = AudioCtx()!;
-  const ctx = new Ctor(); // created inside the tap, before any await, so iPhone allows it
+/** Sound engine for a whole voice call: make it inside the tap, then reuse it for every turn. */
+export function openAudio(): AudioContext {
+  const ctx = new (AudioCtx()!)();
+  void ctx.resume();
+  return ctx;
+}
+
+/**
+ * Start recording. Call from a tap (iPhone only allows audio from a user gesture), or pass an
+ * `audio` engine opened in an earlier tap (a voice call listens again without a new tap).
+ */
+export async function startCapture(onSpeaking?: (level: number) => void, opts: { audio?: AudioContext; waitMs?: number } = {}): Promise<Capture> {
+  const own = !opts.audio;
+  const ctx = opts.audio ?? openAudio(); // created inside the tap, before any await, so iPhone allows it
   void ctx.resume();
   let stream: MediaStream;
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
   } catch (error) {
-    void ctx.close();
+    if (own) void ctx.close();
     throw error;
   }
   const mime = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"].find((m) => MediaRecorder.isTypeSupported?.(m));
@@ -46,7 +56,9 @@ export async function startCapture(onSpeaking?: (level: number) => void): Promis
 
   const analyser = ctx.createAnalyser();
   analyser.fftSize = 1024;
-  ctx.createMediaStreamSource(stream).connect(analyser);
+  const source = ctx.createMediaStreamSource(stream);
+  source.connect(analyser);
+  const noSpeechMs = opts.waitMs ?? NO_SPEECH_MS;
   const samples = new Float32Array(analyser.fftSize);
   const started = Date.now();
   let heard = false;
@@ -64,14 +76,15 @@ export async function startCapture(onSpeaking?: (level: number) => void): Promis
       heard = true;
       lastLoud = now;
     }
-    if ((heard && now - lastLoud > QUIET_AFTER_SPEECH_MS) || (!heard && now - started > NO_SPEECH_MS) || now - started > MAX_MS) stop();
+    if ((heard && now - lastLoud > QUIET_AFTER_SPEECH_MS) || (!heard && now - started > noSpeechMs) || now - started > MAX_MS) stop();
   }, 100);
 
   const done = new Promise<Blob | null>((resolve) => {
     rec.onstop = () => {
       clearInterval(timer);
       stream.getTracks().forEach((t) => t.stop());
-      void ctx.close();
+      source.disconnect();
+      if (own) void ctx.close();
       resolve(cancelled || !heard || !chunks.length ? null : new Blob(chunks, { type: rec.mimeType || mime || "audio/mp4" }));
     };
   });
