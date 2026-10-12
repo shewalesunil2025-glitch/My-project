@@ -162,7 +162,12 @@ export const services: ServiceDef[] = [
       { key: "hours", label: "Working hours", type: "text", fromBusiness: "hours" },
       faq,
     ],
-    configure: [tone, handoff, { key: "followUp", label: "Follow up with new leads after 24 hours", type: "toggle", default: true }],
+    configure: [
+      tone,
+      handoff,
+      { key: "followUp", label: "Follow up with new leads after 24 hours", type: "toggle", default: true },
+      { key: "ignore", label: "Numbers IBAX should not reply to (family, friends)", type: "textarea", placeholder: "98765 43210, 91234 56789" },
+    ],
     approvalNote: "Your WhatsApp is linked like WhatsApp Web (Linked devices). Keep the phone with this number connected to the internet at least once every 14 days, and use it for replies, not bulk promotions.",
   },
   {
