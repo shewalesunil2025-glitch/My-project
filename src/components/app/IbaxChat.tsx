@@ -22,7 +22,7 @@ type Recognition = {
   interimResults: boolean;
   continuous: boolean;
   onresult: ((e: { resultIndex: number; results: ArrayLike<RecognitionResult> }) => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((e: { error?: string }) => void) | null;
   onend: (() => void) | null;
   start: () => void;
   stop: () => void;
@@ -35,6 +35,21 @@ function getRecognition(): RecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 const noopSubscribe = () => () => {};
+/**
+ * iPhone/iPad: the browser's speech recognition starts and stops in a loop (the "tuduk tidik"
+ * chimes), above all in the home-screen app. The keyboard's own mic (dictation) works well,
+ * so on Apple phones the mic button opens the keyboard instead.
+ */
+const isAppleMobile = () =>
+  typeof navigator !== "undefined" && (/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+const MIC_TIP = "iPhone par keyboard ka 🎤 dabakar boliye — IBAX sun lega. (Keyboard ke neeche, right side)";
+const micErrorTip = (error?: string) =>
+  error === "not-allowed" || error === "service-not-allowed"
+    ? "Mic ki permission nahi mili. Keyboard ka 🎤 use kariye, ya browser settings mein mic allow kariye."
+    : error === "no-speech"
+      ? "Kuch sunai nahi diya. Dobara mic dabakar boliye."
+      : "Mic abhi kaam nahi kar raha. Likh kar ya keyboard ke 🎤 se boliye.";
+
 
 type Lang = "en" | "hi" | "mr";
 const languages: { code: Lang; label: string; speech: string }[] = [
@@ -225,6 +240,7 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
   const busy = useAgentBusy();
   const [q, setQ] = useState("");
   const [interim, setInterim] = useState("");
+  const [tip, setTip] = useState("");
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [muted, setMuted] = useState(readMuted);
@@ -245,6 +261,12 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
       window.speechSynthesis?.cancel();
     };
   }, []);
+
+  useEffect(() => {
+    if (!tip) return;
+    const t = setTimeout(() => setTip(""), 9000);
+    return () => clearTimeout(t);
+  }, [tip]);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
@@ -286,6 +308,11 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
       recRef.current?.stop();
       return;
     }
+    if (isAppleMobile()) {
+      inputRef.current?.focus();
+      setTip(MIC_TIP);
+      return;
+    }
     const Ctor = getRecognition();
     if (!Ctor) return;
     window.speechSynthesis?.cancel();
@@ -304,7 +331,10 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
       }
       setInterim(finalText + live);
     };
-    rec.onerror = () => setInterim("");
+    rec.onerror = (e) => {
+      setInterim("");
+      if (e.error !== "aborted") setTip(micErrorTip(e.error));
+    };
     rec.onend = () => {
       recRef.current = null;
       setListening(false);
@@ -441,6 +471,11 @@ export function IbaxChat({ ws, onClose, className }: { ws: Workspace; onClose?: 
       </div>
 
       {/* Input */}
+      {tip && (
+        <p role="status" className="mx-3 mb-1 rounded-xl border border-flow/30 bg-flow/[0.08] px-3 py-2 text-xs leading-snug text-flow-soft">
+          {tip}
+        </p>
+      )}
       <form onSubmit={onSubmit} className="flex items-center gap-2 border-t border-white/[0.07] p-3">
         {canListen && (
           <button
