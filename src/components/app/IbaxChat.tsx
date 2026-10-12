@@ -31,6 +31,9 @@ import {
   clearAgentConversation,
   connectFromCard,
   payFromCard,
+  addVoiceMessage,
+  liveContext,
+  runLiveAction,
   sendToAgent,
   useAgentBusy,
 } from "@/lib/app/agentClient";
@@ -46,6 +49,11 @@ import {
   transcribe,
   type Capture,
 } from "@/lib/app/voiceCapture";
+import {
+  startLiveCall,
+  type LiveCall,
+  type LiveState,
+} from "@/lib/app/liveCall";
 import { Btn, Spinner } from "./ui";
 
 /* ── Voice: speak to IBAX and hear the answer (browser speech, where supported) ── */
@@ -466,6 +474,9 @@ export function IbaxChat({
   const canCall = useSyncExternalStore(noopSubscribe, canRecord, () => false);
   /** Voice call: IBAX listens, answers out loud, and listens again — until the owner hangs up. */
   const [inCall, setInCall] = useState(false);
+  /** Live call (Gemini Live, answers in about a second); null = normal voice turns. */
+  const liveRef = useRef<LiveCall | null>(null);
+  const [liveState, setLiveState] = useState<LiveState | null>(null);
   const callRef = useRef<{ audio: AudioContext; misses: number } | null>(null);
   const listenRef = useRef<() => void>(() => {});
   const captureRef = useRef<Capture | null>(null);
@@ -489,6 +500,7 @@ export function IbaxChat({
       recRef.current?.abort();
       captureRef.current?.cancel();
       stopSpeaking();
+      liveRef.current?.end();
       void callRef.current?.audio.close();
       callRef.current = null;
     };
@@ -512,6 +524,7 @@ export function IbaxChat({
     if (!last || last.role !== "assistant" || last.id === lastSpoken.current)
       return;
     lastSpoken.current = last.id;
+    if (liveRef.current) return; // a live call speaks for itself
     const onCall = Boolean(callRef.current);
     if ((!muted || onCall) && last.text)
       void speak(
@@ -594,6 +607,9 @@ export function IbaxChat({
     const c = callRef.current;
     callRef.current = null;
     setInCall(false);
+    liveRef.current?.end();
+    liveRef.current = null;
+    setLiveState(null);
     captureRef.current?.cancel();
     stopSpeaking();
     setSpeaking(false);
@@ -647,14 +663,46 @@ export function IbaxChat({
     setTip("");
     // Inside the tap: unlock the speaker and the mic's sound engine for the whole call.
     unlockAudio();
-    callRef.current = { audio: openAudio(), misses: 0 };
+    const audio = openAudio();
+    callRef.current = { audio, misses: 0 };
     setInCall(true);
-    // The tap's own recording may still be closing; start the call's first turn just after.
-    setTimeout(() => void listenInCall(), 50);
+    setLiveState("connecting");
+    const stillOn = () => callRef.current?.audio === audio;
+    const fallBack = () => {
+      liveRef.current = null;
+      setLiveState(null);
+      setSpeaking(false);
+      setListening(false);
+      if (stillOn()) void listenInCall();
+    };
+    void startLiveCall(audio, {
+      context: liveContext(),
+      onState: (st) => {
+        if (!stillOn()) return;
+        setLiveState(st);
+        setListening(st === "listening");
+        setSpeaking(st === "speaking");
+      },
+      onOwnerSaid: (text) => addVoiceMessage("user", text),
+      onIbaxSaid: (text) => addVoiceMessage("assistant", text),
+      onAction: runLiveAction,
+      onDrop: (reason) => {
+        if (!stillOn()) return;
+        if (reason === "mic") return endCall(micErrorTip("not-allowed"));
+        if (!liveRef.current) return;
+        console.warn("[ibax] live call dropped:", reason);
+        fallBack(); // carry on with normal voice turns
+      },
+    }).then((live) => {
+      if (!stillOn()) return live?.end();
+      if (live) liveRef.current = live;
+      else fallBack();
+    });
   };
 
   /** While IBAX talks, a tap lets the owner speak straight away. */
   const interruptCall = () => {
+    if (liveRef.current) return liveRef.current.interrupt();
     if (!callRef.current || listening || busy) return;
     stopSpeaking();
     setSpeaking(false);
@@ -942,13 +990,15 @@ export function IbaxChat({
           >
             <Bars />
             <span className="truncate">
-              {listening
-                ? "Boliye, main sun rahi hoon…"
-                : busy || interim
-                  ? "Jawab aa raha hai…"
-                  : speaking
-                    ? "Beech mein bolne ke liye tap kariye"
-                    : "Call chalu hai…"}
+              {liveState === "connecting"
+                ? "Call jud rahi hai…"
+                : listening
+                  ? "Boliye, main sun rahi hoon…"
+                  : busy || interim
+                    ? "Jawab aa raha hai…"
+                    : speaking
+                      ? "Beech mein bolne ke liye tap kariye"
+                      : "Call chalu hai…"}
             </span>
           </button>
           <button
