@@ -31,6 +31,8 @@ export async function POST(request: Request) {
           generationConfig: {
             responseModalities: ["AUDIO"],
             speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.GEMINI_TTS_VOICE || "Sulafat" } } },
+            // 2.5 native-audio models think before speaking by default (5 s); a call can't wait.
+            ...(/2\.5.*native-audio/.test(model) ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
           },
           systemInstruction: { parts: [{ text: agentSystemPrompt() + VOICE_RULES }] },
           tools: [{ functionDeclarations: agentTools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }],
