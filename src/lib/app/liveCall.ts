@@ -35,6 +35,16 @@ const OUT_RATE = 24000;
 /* Hands the mic's raw sound to the page in small pieces. */
 const WORKLET = `class Tap extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor("ibax-tap",Tap)`;
 
+/** Safari's audio session: one steady mode for the whole call, so the sound doesn't switch routes. */
+function setAudioSession(type: "play-and-record" | "auto") {
+  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+  try {
+    if (session) session.type = type;
+  } catch {
+    /* not supported */
+  }
+}
+
 function toBase64(bytes: Uint8Array) {
   let bin = "";
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
@@ -90,8 +100,12 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
 
   let stream: MediaStream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    // The phone's echo canceller and auto-volume also turn IBAX's voice up and down (it
+    // sounded near, then far). Not needed here: the mic is held back while IBAX speaks.
+    setAudioSession("play-and-record");
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false } });
   } catch {
+    setAudioSession("auto");
     opts.onDrop("mic");
     return { interrupt: () => {}, end: () => {} };
   }
@@ -105,6 +119,16 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   let ownerShown = false;
   let skipping = false; // the owner cut IBAX off: drop the rest of that answer
   let nextAt = 0;
+  // IBAX's voice goes through a gentle compressor so loud and soft words come out evenly.
+  const leveller = audio.createDynamicsCompressor();
+  leveller.threshold.value = -26;
+  leveller.knee.value = 20;
+  leveller.ratio.value = 4;
+  leveller.attack.value = 0.005;
+  leveller.release.value = 0.3;
+  const volume = audio.createGain();
+  volume.gain.value = 1.5;
+  leveller.connect(volume).connect(audio.destination);
   const playing = new Set<AudioBufferSourceNode>();
   let state: LiveState = "connecting";
   const setState = (s: LiveState) => {
@@ -143,6 +167,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     };
   } catch {
     stream.getTracks().forEach((t) => t.stop());
+    setAudioSession("auto");
     ws.close();
     return null;
   }
@@ -185,7 +210,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     for (let i = 0; i < samples.length; i++) ch[i] = samples[i] / 0x8000;
     const src = audio.createBufferSource();
     src.buffer = buffer;
-    src.connect(audio.destination);
+    src.connect(leveller);
     nextAt = Math.max(nextAt, audio.currentTime + 0.05);
     src.start(nextAt);
     nextAt += buffer.duration;
@@ -206,6 +231,9 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     source?.disconnect();
     tap?.disconnect();
     stream.getTracks().forEach((t) => t.stop());
+    leveller.disconnect();
+    volume.disconnect();
+    setAudioSession("auto");
     if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) ws.close();
     if (reason) opts.onDrop(reason);
   };
