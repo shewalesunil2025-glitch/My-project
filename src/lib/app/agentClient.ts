@@ -273,6 +273,41 @@ async function respond(ws: Workspace, modelText: string, local: () => Promise<Lo
   }
 }
 
+/* ── Live voice calls (liveCall.ts) ── */
+
+/** What IBAX should know about the owner's workspace at the start of a live call. */
+export function liveContext() {
+  const ws = currentWorkspace();
+  return ws ? snapshot(ws) : "";
+}
+
+/** IBAX asked for an action during a live call: do it and show any card in the chat. */
+export async function runLiveAction(name: string, input: Record<string, unknown>) {
+  const out = { cards: [] as AgentCard[], links: [] as NonNullable<ChatMessage["links"]> };
+  const r = await runTool({ type: "tool_use", id: uid(), name, input } as Anthropic.Beta.BetaToolUseBlock, out);
+  if (out.cards.length || out.links.length)
+    updateWorkspace((w) => {
+      w.chat.push({ id: uid(), role: "assistant", at: nowIso(), text: "", cards: out.cards.length ? out.cards : undefined, links: out.links.length ? out.links : undefined });
+    });
+  return r;
+}
+
+/** A line said in a live call, written into the chat (and IBAX's memory of it). */
+export function addVoiceMessage(role: "user" | "assistant", text: string) {
+  const ws = currentWorkspace();
+  if (!ws || !text) return;
+  updateWorkspace((w) => {
+    w.chat.push({ id: uid(), role, at: nowIso(), text });
+    w.chat = w.chat.slice(-100);
+  });
+  const thread = loadThread(ws);
+  const last = thread.at(-1);
+  if ((last ? last.role : "assistant") !== role) {
+    thread.push({ role, content: [{ type: "text", text }] });
+    saveThread(ws, thread);
+  }
+}
+
 /** The owner sent a message (`voice`: said out loud in a voice call, so keep the answer short). */
 export async function sendToAgent(text: string, voice = false) {
   const ws = currentWorkspace();

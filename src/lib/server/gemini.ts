@@ -15,7 +15,7 @@ type GeminiContent = { role: "user" | "model"; parts: Part[] };
 export const geminiReady = () => Boolean(process.env.GEMINI_API_KEY);
 
 /** Claude's JSON-schema tool inputs → Gemini's schema subset. */
-function toSchema(s: unknown): unknown {
+export function toSchema(s: unknown): unknown {
   if (!s || typeof s !== "object") return s;
   const src = s as Record<string, unknown>;
   const out: Record<string, unknown> = {};
@@ -258,4 +258,44 @@ export async function geminiSpeak(text: string): Promise<Buffer | null> {
     }
   }
   return null;
+}
+
+/* ── Live voice calls (Gemini Live: hears and speaks in real time) ── */
+
+let liveModels: string[] | null = null;
+
+/** Models this key can use for live voice, best first: native-audio Flash models, newest first. */
+export async function geminiLiveModels(): Promise<string[]> {
+  if (liveModels) return liveModels;
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000", {
+    headers: { "x-goog-api-key": process.env.GEMINI_API_KEY! },
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!res.ok) return [];
+  const data = (await res.json()) as { models?: { name: string; supportedGenerationMethods?: string[] }[] };
+  const names = (data.models ?? []).filter((m) => (m.supportedGenerationMethods ?? []).includes("bidiGenerateContent")).map((m) => m.name.replace(/^models\//, ""));
+  const score = (n: string) =>
+    (/native-audio/.test(n) ? 0 : 20) + (/flash/.test(n) ? 0 : 10) + (/lite/.test(n) ? 1 : 0) - (parseFloat(n.match(/(\d+(?:\.\d+)?)/)?.[1] ?? "0") || 0) / 100;
+  liveModels = names.sort((a, b) => score(a) - score(b));
+  return liveModels;
+}
+
+/**
+ * A one-time pass for the browser to open one live call straight with Google, without
+ * ever seeing our API key. It must be used within a minute and stops working after 30.
+ */
+export async function geminiLiveToken(): Promise<string | null> {
+  const now = Date.now();
+  const res = await fetch("https://generativelanguage.googleapis.com/v1alpha/auth_tokens", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
+    body: JSON.stringify({ uses: 1, expireTime: new Date(now + 30 * 60_000).toISOString(), newSessionExpireTime: new Date(now + 60_000).toISOString() }),
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!res.ok) {
+    console.error("[live] token", res.status, (await res.text()).slice(0, 200));
+    return null;
+  }
+  const data = (await res.json()) as { name?: string };
+  return data.name ?? null;
 }
