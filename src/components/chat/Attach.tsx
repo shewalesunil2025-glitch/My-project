@@ -133,3 +133,31 @@ export function SentFile({ file }: { file: { name: string; kind: string; thumb?:
     </span>
   );
 }
+
+/** While an image is being made: a glowing placeholder with a timer, like ChatGPT shows. */
+export function ImageInProgress({ since }: { since: number }) {
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    const tick = () => setSeconds(Math.max(0, Math.round((Date.now() - since) / 1000)));
+    const t = window.setInterval(tick, 500);
+    return () => window.clearInterval(t);
+  }, [since]);
+  const step = seconds < 4 ? "Understanding your idea…" : seconds < 12 ? "Creating your image…" : "Adding the final touches…";
+  return (
+    <div className="flex justify-start" role="status" aria-live="polite">
+      <div className="w-full max-w-[85%] rounded-2xl rounded-bl-sm border border-white/[0.06] bg-white/[0.05] p-2.5">
+        <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-[linear-gradient(135deg,rgb(102_211_76/0.25),rgb(56_189_248/0.2),rgb(232_121_249/0.25))]">
+          <div aria-hidden className="absolute inset-0 animate-pulse bg-[radial-gradient(60%_60%_at_30%_30%,rgb(255_255_255/0.25),transparent_70%)]" />
+          <div aria-hidden className="ibax-shimmer absolute inset-0" />
+          <div className="absolute inset-0 grid place-items-center">
+            <Sparkles className="size-10 animate-pulse text-white/90" aria-hidden />
+          </div>
+        </div>
+        <p className="mt-2 flex items-center justify-between gap-2 px-1 text-xs text-fg-muted">
+          <span>{step}</span>
+          <span className="tabular-nums">{seconds}s</span>
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -37,8 +37,9 @@ import {
   makeImageFromChat,
   sendToAgent,
   useAgentBusy,
+  useImagePending,
 } from "@/lib/app/agentClient";
-import { AttachMenu, AttachmentChip, SentFile } from "@/components/chat/Attach";
+import { AttachMenu, AttachmentChip, ImageInProgress, SentFile } from "@/components/chat/Attach";
 import type { Attachment } from "@/lib/attachments";
 import { takePending } from "@/lib/app/ibaxEvents";
 import { waAccount, whatsappLinkAvailable } from "@/lib/app/whatsappLink";
@@ -54,6 +55,7 @@ import {
   type Capture,
 } from "@/lib/app/voiceCapture";
 import {
+  prefetchLive,
   startLiveCall,
   type LiveCall,
   type LiveState,
@@ -388,6 +390,7 @@ export function IbaxChat({
 }) {
   const busy = useAgentBusy();
   const [q, setQ] = useState("");
+  const imageSince = useImagePending();
   // A file or "Create image" may arrive from the + on the Ask bar (Home, IBAX Hub).
   const [handoff] = useState(() => takePending());
   const [file, setFile] = useState<Attachment | null>(handoff?.file ?? null);
@@ -415,6 +418,13 @@ export function IbaxChat({
     () => false,
   );
   const canCall = useSyncExternalStore(noopSubscribe, canRecord, () => false);
+  // Get the call's pass ready while the chat is open, so a call starts at once.
+  useEffect(() => {
+    if (!canCall) return;
+    prefetchLive("app");
+    const t = window.setInterval(() => prefetchLive("app"), 3 * 60_000);
+    return () => window.clearInterval(t);
+  }, [canCall]);
   /** Voice call: IBAX listens, answers out loud, and listens again — until the owner hangs up. */
   const [inCall, setInCall] = useState(false);
   /** Live call (Gemini Live, answers in about a second); null = normal voice turns. */
@@ -876,7 +886,8 @@ export function IbaxChat({
             </div>
           </div>
         )}
-        {busy && (
+        {imageSince > 0 && <ImageInProgress since={imageSince} />}
+        {busy && !imageSince && (
           <div
             className="flex w-fit gap-1 rounded-2xl rounded-bl-sm bg-white/[0.05] px-4 py-3"
             role="status"

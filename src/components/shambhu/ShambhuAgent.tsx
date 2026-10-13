@@ -45,6 +45,7 @@ import {
   type Capture,
 } from "@/lib/app/voiceCapture";
 import {
+  prefetchLive,
   startLiveCall,
   type LiveCall,
   type LiveState,
@@ -159,6 +160,13 @@ export function ShambhuAgent() {
     () => false,
   );
   const canCall = useSyncExternalStore(noopSubscribe, canRecord, () => false);
+  // Get the call's pass ready once the chat is open, so a call starts at once.
+  useEffect(() => {
+    if (!open || !canCall) return;
+    prefetchLive("site");
+    const t = window.setInterval(() => prefetchLive("site"), 3 * 60_000);
+    return () => window.clearInterval(t);
+  }, [open, canCall]);
   const captureRef = useRef<Capture | null>(null);
   /** Live voice call (Gemini Live, answers in about a second), as in the app. */
   const liveRef = useRef<LiveCall | null>(null);
