@@ -6,6 +6,7 @@ import { product } from "@/config/product";
 import { isLive, providerInfo, serviceById } from "@/content/app/services";
 import { askForReview, askMessages } from "./reviewRequests";
 import { money } from "./money";
+import { collectPayment } from "./payment";
 import { cloudAuthHeader, cloudEnabled } from "./cloud";
 import type { Attachment } from "@/lib/attachments";
 import { activateService, automationFor, buyService, joinWaitlist, connectProvider, periodFor, priceFor, saveServiceDetails, servicesSnapshot, setServiceState } from "./agentActions";
@@ -450,16 +451,21 @@ function markCard(match: (c: AgentCard) => boolean) {
 }
 
 /** The owner paid on a payment card. */
-export async function payFromCard(card: Extract<AgentCard, { type: "pay" }>) {
+export async function payFromCard(card: Extract<AgentCard, { type: "pay" }>): Promise<string | null> {
   const svc = serviceById(card.serviceId);
-  if (!svc || busy) return;
-  if (!buyService(svc.id, card.period)) return;
+  if (!svc || busy) return null;
+  // Razorpay's checkout (a test payment in preview mode).
+  const paid = await collectPayment(svc.id, card.period);
+  if (paid.status === "cancelled") return null;
+  if (paid.status === "error") return paid.message;
+  if (!buyService(svc.id, card.period)) return null;
   markCard((c) => c.type === "pay" && c.serviceId === svc.id);
   const ws = currentWorkspace()!;
   const lang = ws.agentFlow?.lang ?? detectLang(ws.chat.filter((m) => m.role === "user").at(-1)?.text ?? "");
   await respond(ws, `[App event] Payment confirmed: ${svc.name} (${svc.id}), ${money(priceFor(svc, card.period))}, ${card.period}. Continue the setup.`, () =>
     flowNext(svc, { serviceId: svc.id, lang, skipped: ws.agentFlow?.serviceId === svc.id ? ws.agentFlow.skipped : undefined }),
   );
+  return null;
 }
 
 /** The owner connected an account on a connect card. */

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { FileText, X } from "lucide-react";
 import { product } from "@/config/product";
 import { annualPrice, priceIn, serviceById } from "@/content/app/services";
+import { paymentsAreLive } from "@/lib/app/payment";
 import { audit, logActivity, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { Invoice } from "@/lib/app/types";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
@@ -58,7 +59,7 @@ export default function BillingPage() {
   return (
     <div>
       <PageHeader eyebrow="Billing & Subscriptions" title="Billing" subtitle="Your services, renewals and invoices." />
-      {product.previewMode && <Notice tone="amber" className="mb-6">Preview mode — invoices are test invoices; no money has been charged.</Notice>}
+      {product.previewMode && !paymentsAreLive() && <Notice tone="amber" className="mb-6">Preview mode — invoices are test invoices; no money has been charged.</Notice>}
 
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Active services" value={active.length} />

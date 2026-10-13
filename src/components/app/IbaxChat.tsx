@@ -27,6 +27,7 @@ import {
 import { product } from "@/config/product";
 import { providerInfo, serviceById } from "@/content/app/services";
 import { priceLabel } from "@/lib/app/agentActions";
+import { paymentsAreLive } from "@/lib/app/payment";
 import {
   clearAgentConversation,
   connectFromCard,
@@ -190,6 +191,7 @@ async function speak(
 function PayCard({ card }: { card: Extract<AgentCard, { type: "pay" }> }) {
   const busy = useAgentBusy();
   const [paying, setPaying] = useState(false);
+  const [error, setError] = useState("");
   const svc = serviceById(card.serviceId);
   if (!svc) return null;
   return (
@@ -209,16 +211,17 @@ function PayCard({ card }: { card: Extract<AgentCard, { type: "pay" }> }) {
             disabled={paying || busy}
             onClick={() => {
               setPaying(true);
-              // Preview mode: simulated payment. Production opens the payment provider's checkout.
-              setTimeout(
-                () => void payFromCard(card).finally(() => setPaying(false)),
-                700,
-              );
+              setError("");
+              // Opens Razorpay's checkout (a simulated payment in preview mode).
+              void payFromCard(card)
+                .then((message) => message && setError(message))
+                .finally(() => setPaying(false));
             }}
           >
             {paying ? <Spinner /> : "Pay"}
           </Btn>
-          {product.previewMode && (
+          {error && <p className="mt-2 text-xs text-amber-200">{error}</p>}
+          {product.previewMode && !paymentsAreLive() && (
             <p className="mt-2 text-[0.68rem] leading-snug text-amber-200/90">
               Preview mode — test payment, nothing is charged.
             </p>
