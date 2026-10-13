@@ -230,8 +230,8 @@ export type DailyMetric = {
   conversions: number;
 };
 
-/** Premium website templates (older projects may still say classic/bold/minimal/elegant). */
-export type SiteTemplate = "aurora" | "prism" | "glass" | "luxe" | "neon" | "classic" | "bold" | "minimal" | "elegant";
+/** Premium website template id (see src/lib/sites/themes.ts; older projects may say classic/bold/minimal/elegant). */
+export type SiteTemplate = string;
 export type SiteSection = "services" | "hours" | "faq" | "enquiry" | "whatsapp";
 
 export type WebsiteProject = {

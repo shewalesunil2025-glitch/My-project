@@ -1,4 +1,5 @@
 import type { Business, SiteSection, WebsiteProject } from "@/lib/app/types";
+import { themeFor, themes } from "./themes";
 
 /**
  * A client's published website: everything the public page needs, and nothing private.
@@ -34,18 +35,12 @@ export const allSections: { id: SiteSection; label: string }[] = [
   { id: "whatsapp", label: "WhatsApp button" },
 ];
 
-export type PremiumTemplate = "aurora" | "prism" | "glass" | "luxe" | "neon";
+/** Template id: one of the premium templates in ./themes. */
+export type PremiumTemplate = string;
 
-export const templates: { id: PremiumTemplate; label: string; note: string }[] = [
-  { id: "aurora", label: "Aurora", note: "Dark, glowing colour waves" },
-  { id: "prism", label: "Prism", note: "Bright, bold, 3D cards" },
-  { id: "glass", label: "Glass", note: "Frosted glass, floating 3D orb" },
-  { id: "luxe", label: "Luxe", note: "Clean, elegant, premium" },
-  { id: "neon", label: "Neon", note: "Night look, 3D neon grid" },
-];
+export const templates: { id: PremiumTemplate; label: string; note: string }[] = themes.map(({ id, label, note }) => ({ id, label, note }));
 
-const legacy: Record<string, PremiumTemplate> = { classic: "aurora", bold: "prism", minimal: "luxe", elegant: "glass" };
-export const premiumTemplate = (t: string): PremiumTemplate => (templates.some((x) => x.id === t) ? (t as PremiumTemplate) : (legacy[t] ?? "aurora"));
+export const premiumTemplate = (t: string): PremiumTemplate => themeFor(t).id;
 
 export const accents = ["#15803d", "#0f766e", "#2563eb", "#7c3aed", "#e11d48", "#ea580c", "#ca8a04", "#111111"];
 
