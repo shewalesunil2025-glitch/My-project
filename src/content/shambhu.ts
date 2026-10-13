@@ -57,6 +57,8 @@ export type StoreItem = {
   premium?: boolean;
   /** Free for the first 3 days (messaging automations only). */
   trial?: boolean;
+  /** A bundle of several services, shown as a wide card. */
+  bundle?: boolean;
 };
 
 /** The Automation Store: every service can be bought on its own. */
@@ -66,16 +68,24 @@ export const store: StoreItem[] = [
   { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹699", billing: "monthly", trial: true },
   { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹599", billing: "monthly", trial: true },
   { title: "Lead Follow-up", body: "Every enquiry followed up on time.", icon: UserRoundCheck, price: "₹499", billing: "monthly", trial: true },
-  { title: "Instagram Automation", body: "DMs, comments and post planning.", icon: Camera, price: "₹499", billing: "monthly" },
-  { title: "Facebook Automation", body: "Page messages, comments and posts.", icon: ThumbsUp, price: "₹499", billing: "monthly" },
-  { title: "YouTube Automation", body: "Video planning and comment replies.", icon: Clapperboard, price: "₹499", billing: "monthly" },
+  { title: "Instagram Automation", body: "12 AI posts + 4 reels a month, DMs and comments.", icon: Camera, price: "₹1,999", billing: "monthly" },
+  { title: "Facebook Automation", body: "12 AI posts + 4 videos a month, page messages.", icon: ThumbsUp, price: "₹1,999", billing: "monthly" },
+  { title: "YouTube Automation", body: "8 AI Shorts a month, titles and comment replies.", icon: Clapperboard, price: "₹2,999", billing: "monthly" },
   { title: "Email Automation", body: "Inbox sorting, drafts and follow-ups.", icon: Mail, price: "₹499", billing: "monthly", trial: true },
   { title: "Google Review Management", body: "Review requests and reply drafts. Never fake reviews.", icon: Star, price: "₹499", billing: "monthly", trial: true },
+  {
+    title: "Social Pack",
+    body: "Instagram, Facebook and YouTube together: 12 AI posts + 4 reels on Instagram & Facebook and 8 Shorts on YouTube every month, with DM and comment replies. Saves ₹998 a month.",
+    icon: Clapperboard,
+    price: "₹5,999",
+    billing: "monthly",
+    bundle: true,
+  },
   {
     title: "Digital Marketing",
     body: "The premium package: content, social media, campaigns and reporting, run together.",
     icon: Megaphone,
-    price: "₹4,999",
+    price: "₹9,999",
     billing: "monthly",
     premium: true,
   },

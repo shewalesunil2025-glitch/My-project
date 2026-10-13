@@ -25,6 +25,8 @@ const P = {
   support: price("Customer Support"),
   leads: price("Lead Follow-up"),
   social: price("Instagram Automation"),
+  fb: price("Facebook Automation"),
+  yt: price("YouTube Automation"),
   email: price("Email Automation"),
   reviews: price("Google Review Management"),
   dm: `${digitalMarketing.price}${digitalMarketing.billing}`,
@@ -77,9 +79,9 @@ const intents: Intent[] = [
   {
     keys: /(instagram|insta|facebook|youtube|social|इंस्टाग्राम|इन्स्टाग्राम|फेसबुक|यूट्यूब|युट्यूब|सोशल)/i,
     answers: {
-      en: `IBAX replies to DMs and comments and plans posts for Instagram, Facebook and YouTube — ${P.social} per channel. For everything together, choose Digital Marketing at ${P.dm}.`,
-      hi: `आइबैक्स Instagram, Facebook और YouTube पर DM और कमेंट का जवाब देता है और पोस्ट प्लान करता है — हर चैनल ${P.social}। सब कुछ एक साथ चाहिए तो डिजिटल मार्केटिंग ${P.dm} लीजिए।`,
-      mr: `आइबैक्स Instagram, Facebook आणि YouTube वर DM आणि कमेंटला उत्तर देतो आणि पोस्ट प्लॅन करतो — प्रत्येक चॅनेल ${P.social}. सगळं एकत्र हवं असेल तर डिजिटल मार्केटिंग ${P.dm} घ्या.`,
+      en: `IBAX makes AI photos, reels and Shorts, posts them and replies to DMs and comments. Instagram ${P.social} (12 posts + 4 reels a month), Facebook ${P.fb}, YouTube ${P.yt} (8 Shorts a month), or all three in the Social Pack at ₹5,999/mo. For ads and SEO too, choose Digital Marketing at ${P.dm}.`,
+      hi: `आइबैक्स Instagram, Facebook और YouTube पर DM और कमेंट का जवाब देता है और पोस्ट प्लान करता है — Instagram ${P.social} (महीने में 12 पोस्ट + 4 रील), Facebook ${P.fb}, YouTube ${P.yt} (महीने में 8 Shorts), तीनों एक साथ सोशल पैक ₹5,999/mo में। विज्ञापन और SEO भी चाहिए तो डिजिटल मार्केटिंग ${P.dm} लीजिए।`,
+      mr: `आइबैक्स Instagram, Facebook आणि YouTube वर DM आणि कमेंटला उत्तर देतो आणि पोस्ट प्लॅन करतो — Instagram ${P.social} (महिन्याला 12 पोस्ट + 4 रील), Facebook ${P.fb}, YouTube ${P.yt} (महिन्याला 8 Shorts), तिन्ही एकत्र सोशल पॅक ₹5,999/mo मध्ये. जाहिराती आणि SEO पण हवं असेल तर डिजिटल मार्केटिंग ${P.dm} घ्या.`,
     },
   },
   {
@@ -117,9 +119,9 @@ const intents: Intent[] = [
   {
     keys: /(price|pricing|cost|charge|\bfees?\b|\brates?\b|how much|kitna|kitne|kitni|keemat|kimat|daam|paisa|kharcha|कीमत|किंमत|दाम|पैसे|खर्च|शुल्क)/i,
     answers: {
-      en: `Every service can be bought on its own. Website from ${P.web} one-time, AI Voice Assistant ${P.voice}, WhatsApp ${P.wa}, Customer Support ${P.support}, Lead Follow-up and each social channel ${P.leads}, Email and Google Reviews ${P.email}, and Digital Marketing ${P.dm}. All prices are in Indian rupees, all-inclusive, and yearly plans get 2 months free. New accounts get a 3-day FREE trial of the messaging automations (WhatsApp, Support, Lead Follow-up, Email, Reviews) and the website builder.`,
-      hi: `हर सर्विस अलग से ले सकते हैं। वेबसाइट ${P.web} एक बार, AI वॉइस असिस्टेंट ${P.voice}, WhatsApp ${P.wa}, कस्टमर सपोर्ट ${P.support}, लीड फॉलो-अप और हर सोशल चैनल ${P.leads}, ईमेल और गूगल रिव्यू ${P.email}, और डिजिटल मार्केटिंग ${P.dm}। सभी कीमतें रुपये में हैं, सब कुछ शामिल, और सालाना प्लान में 2 महीने मुफ़्त।`,
-      mr: `प्रत्येक सेवा वेगळी घेता येते. वेबसाईट ${P.web} एकदाच, AI व्हॉइस असिस्टंट ${P.voice}, WhatsApp ${P.wa}, कस्टमर सपोर्ट ${P.support}, लीड फॉलो-अप आणि प्रत्येक सोशल चॅनेल ${P.leads}, ईमेल आणि गूगल रिव्ह्यू ${P.email}, आणि डिजिटल मार्केटिंग ${P.dm}. सर्व किंमती रुपयांमध्ये आहेत, सर्व काही समाविष्ट, आणि वार्षिक प्लॅनमध्ये 2 महिने मोफत.`,
+      en: `Every service can be bought on its own. Website from ${P.web} one-time, AI Voice Assistant ${P.voice}, WhatsApp ${P.wa}, Customer Support ${P.support}, Lead Follow-up ${P.leads}, Instagram and Facebook ${P.social} each, YouTube ${P.yt}, Social Pack (all three) ₹5,999/mo, Email and Google Reviews ${P.email}, and Digital Marketing ${P.dm}. All prices are in Indian rupees, all-inclusive, and yearly plans get 2 months free. New accounts get a 3-day FREE trial of the messaging automations (WhatsApp, Support, Lead Follow-up, Email, Reviews) and the website builder.`,
+      hi: `हर सर्विस अलग से ले सकते हैं। वेबसाइट ${P.web} एक बार, AI वॉइस असिस्टेंट ${P.voice}, WhatsApp ${P.wa}, कस्टमर सपोर्ट ${P.support}, लीड फॉलो-अप ${P.leads}, Instagram और Facebook ${P.social} हर एक, YouTube ${P.yt}, सोशल पैक (तीनों) ₹5,999/mo, ईमेल और गूगल रिव्यू ${P.email}, और डिजिटल मार्केटिंग ${P.dm}। सभी कीमतें रुपये में हैं, सब कुछ शामिल, और सालाना प्लान में 2 महीने मुफ़्त।`,
+      mr: `प्रत्येक सेवा वेगळी घेता येते. वेबसाईट ${P.web} एकदाच, AI व्हॉइस असिस्टंट ${P.voice}, WhatsApp ${P.wa}, कस्टमर सपोर्ट ${P.support}, लीड फॉलो-अप ${P.leads}, Instagram आणि Facebook ${P.social} प्रत्येकी, YouTube ${P.yt}, सोशल पॅक (तिन्ही) ₹5,999/mo, ईमेल आणि गूगल रिव्ह्यू ${P.email}, आणि डिजिटल मार्केटिंग ${P.dm}. सर्व किंमती रुपयांमध्ये आहेत, सर्व काही समाविष्ट, आणि वार्षिक प्लॅनमध्ये 2 महिने मोफत.`,
     },
   },
   {
