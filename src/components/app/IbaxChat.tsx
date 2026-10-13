@@ -40,6 +40,7 @@ import {
 } from "@/lib/app/agentClient";
 import { AttachMenu, AttachmentChip, SentFile } from "@/components/chat/Attach";
 import type { Attachment } from "@/lib/attachments";
+import { takePending } from "@/lib/app/ibaxEvents";
 import { waAccount, whatsappLinkAvailable } from "@/lib/app/whatsappLink";
 import { WhatsAppLink } from "./WhatsAppLink";
 import type { AgentCard, Workspace } from "@/lib/app/types";
@@ -387,8 +388,19 @@ export function IbaxChat({
 }) {
   const busy = useAgentBusy();
   const [q, setQ] = useState("");
-  const [file, setFile] = useState<Attachment | null>(null);
-  const [imageMode, setImageMode] = useState(false);
+  // A file or "Create image" may arrive from the + on the Ask bar (Home, IBAX Hub).
+  const [handoff] = useState(() => takePending());
+  const [file, setFile] = useState<Attachment | null>(handoff?.file ?? null);
+  const [imageMode, setImageMode] = useState(Boolean(handoff?.imageMode));
+  useEffect(() => {
+    const take = () => {
+      const p = takePending();
+      if (p?.file) setFile(p.file);
+      if (p?.imageMode) setImageMode(true);
+    };
+    window.addEventListener("ibax:pending", take);
+    return () => window.removeEventListener("ibax:pending", take);
+  }, []);
   const [interim, setInterim] = useState("");
   const [tip, setTip] = useState("");
   const [listening, setListening] = useState(false);
