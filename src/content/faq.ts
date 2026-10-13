@@ -13,7 +13,7 @@ export const faqs = [
   },
   {
     q: "How much does it cost?",
-    a: "Each service has a clear starting price in Indian rupees, shown in the Automation Store — for example Email Automation from ₹499/mo, WhatsApp Automation from ₹699/mo and a Website from ₹2,999 one-time. Pay yearly and get 2 months free.",
+    a: "Each service has a clear starting price in Indian rupees, shown in the Automation Store — for example Email Automation from ₹499/mo, WhatsApp Automation from ₹699/mo and a Website from ₹2,999 one-time. Pay yearly and get 2 months free. Messaging automations (WhatsApp, Customer Support, Lead Follow-up, Email and Google Reviews) are free for the first 3 days.",
   },
   {
     q: "How fast can I go live?",

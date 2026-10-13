@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { PlanPeriod } from "@/lib/app/types";
-import { ArrowLeft, Check, Clock, Info, Link2 } from "lucide-react";
+import { ArrowLeft, Check, Clock, Gift, Info, Link2 } from "lucide-react";
 import { formatPrice } from "@/config/product";
-import { annualPrice, isLive, providerInfo, serviceById, services } from "@/content/app/services";
-import { joinWaitlist, onWaitlist } from "@/lib/app/agentActions";
+import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, TRIAL_DAYS } from "@/content/app/services";
+import { joinWaitlist, onWaitlist, startTrialService } from "@/lib/app/agentActions";
+import { timeLeft, trialOver, trialState } from "@/lib/app/trial";
 import { audit, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
 import { useWorkspace } from "@/components/app/AppShell";
 import { automationStatus } from "@/components/app/status";
@@ -29,6 +30,51 @@ export default function ServiceDetailPage() {
   const owned = ws.automations.find((a) => a.serviceId === svc.id);
   const included = svc.includes?.map((i) => serviceById(i)!).filter(Boolean) ?? [];
   const coveredBy = ws.automations.find((a) => serviceById(a.serviceId)?.includes?.includes(svc.id));
+  const trial = trialState(ws);
+  const canTrial = !owned && !ws.sample && isLive(svc.id) && inTrial(svc.id) && trial.phase !== "over";
+
+  function startTrial() {
+    const id = startTrialService(svc!.id);
+    if (id) router.push(`/app/automations/${id}`);
+  }
+
+  const planChooser = (label: string) => (
+      <>
+        <fieldset>
+          <legend className="mb-2 text-sm font-semibold">Choose a plan</legend>
+          <div className="space-y-2">
+            {(svc.billing === "one-time" ? (["one-time"] as const) : (["monthly", "annual"] as const)).map((p) => {
+              const amount = p === "annual" ? annualPrice(svc.price!) : svc.price!;
+              return (
+                <label
+                  key={p}
+                  className={cn(
+                    "flex cursor-pointer items-center justify-between rounded-xl border p-3.5 text-sm",
+                    period === p ? "border-flow/60 bg-flow/10" : "border-white/10 bg-ink-900",
+                  )}
+                >
+                  <span className="flex items-center gap-3">
+                    <input type="radio" name="period" value={p} checked={period === p} onChange={() => setPeriod(p)} className="accent-[var(--color-flow)]" />
+                    <span>
+                      <span className="font-medium capitalize">{p === "one-time" ? "One-time payment" : p}</span>
+                      {p === "annual" && <span className="ml-2 text-xs text-emerald-300">2 months free</span>}
+                    </span>
+                  </span>
+                  <span className="font-semibold">
+                    {formatPrice(amount)}
+                    {p !== "one-time" && <span className="text-xs font-normal text-fg-muted">/{p === "monthly" ? "mo" : "yr"}</span>}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+        <Btn className="w-full" size="lg" variant={canTrial ? "ghost" : "primary"} onClick={() => router.push(`/app/services/${svc.id}/checkout?period=${period}`)}>
+          {label}
+        </Btn>
+        <p className="text-center text-xs text-fg-subtle">{svc.billing === "one-time" ? "Paid once — no monthly fee." : "Cancel anytime from Billing."}</p>
+      </>
+  );
 
   function requestCustom() {
     if (!request.trim()) return;
@@ -137,7 +183,22 @@ export default function ServiceDetailPage() {
 
         <aside className="lg:sticky lg:top-20 lg:self-start">
           <Card className="space-y-4">
-            {owned ? (
+            {owned?.trialEndsAt ? (
+              <>
+                {trialOver(owned) ? <Pill tone="amber">Free trial ended</Pill> : <Pill tone="green">🎁 Free trial · {trial.phase === "on" ? timeLeft(trial.msLeft) : "ends soon"}</Pill>}
+                <p className="text-sm text-fg-muted">
+                  {trialOver(owned)
+                    ? `Your free trial has ended and ${svc.name} is paused. Pay to switch it back on — your settings are kept.`
+                    : `${svc.name} is free until your trial ends. Pay now to keep it running without a break.`}
+                </p>
+                {!trialOver(owned) && (
+                  <BtnLink variant="ghost" href={`/app/automations/${owned.id}`} className="w-full">
+                    {owned.status === "setup" ? "Continue setup" : "Manage"}
+                  </BtnLink>
+                )}
+                {planChooser(`Pay & keep ${svc.name}`)}
+              </>
+            ) : owned ? (
               <>
                 <Pill tone={automationStatus[owned.status].tone}>{automationStatus[owned.status].label}</Pill>
                 <p className="text-sm text-fg-muted">You already have this service.</p>
@@ -182,39 +243,20 @@ export default function ServiceDetailPage() {
             ) : (
               <>
                 {coveredBy && <Notice tone="blue">Already included in your {serviceById(coveredBy.serviceId)?.name} plan.</Notice>}
-                <fieldset>
-                  <legend className="mb-2 text-sm font-semibold">Choose a plan</legend>
-                  <div className="space-y-2">
-                    {(svc.billing === "one-time" ? (["one-time"] as const) : (["monthly", "annual"] as const)).map((p) => {
-                      const amount = p === "annual" ? annualPrice(svc.price!) : svc.price!;
-                      return (
-                        <label
-                          key={p}
-                          className={cn(
-                            "flex cursor-pointer items-center justify-between rounded-xl border p-3.5 text-sm",
-                            period === p ? "border-flow/60 bg-flow/10" : "border-white/10 bg-ink-900",
-                          )}
-                        >
-                          <span className="flex items-center gap-3">
-                            <input type="radio" name="period" value={p} checked={period === p} onChange={() => setPeriod(p)} className="accent-[var(--color-flow)]" />
-                            <span>
-                              <span className="font-medium capitalize">{p === "one-time" ? "One-time payment" : p}</span>
-                              {p === "annual" && <span className="ml-2 text-xs text-emerald-300">2 months free</span>}
-                            </span>
-                          </span>
-                          <span className="font-semibold">
-                            {formatPrice(amount)}
-                            {p !== "one-time" && <span className="text-xs font-normal text-fg-muted">/{p === "monthly" ? "mo" : "yr"}</span>}
-                          </span>
-                        </label>
-                      );
-                    })}
+                {canTrial && (
+                  <div className="rounded-2xl border border-flow/40 bg-[linear-gradient(135deg,rgb(102_211_76/0.22),rgb(102_211_76/0.04))] p-4">
+                    <p className="flex items-center gap-2 font-semibold">
+                      <Gift className="size-4 text-flow" aria-hidden /> {TRIAL_DAYS}-day FREE trial
+                    </p>
+                    <p className="mt-1 text-sm text-fg-muted">
+                      Try {svc.name} free for {TRIAL_DAYS} days{trial.phase === "on" ? ` (${timeLeft(trial.msLeft)} on your trial)` : ""}. No payment now — pay only if you want to keep it.
+                    </p>
+                    <Btn className="mt-3 w-full" size="lg" onClick={startTrial}>
+                      Start free trial
+                    </Btn>
                   </div>
-                </fieldset>
-                <Btn className="w-full" size="lg" onClick={() => router.push(`/app/services/${svc.id}/checkout?period=${period}`)}>
-                  Buy {svc.name}
-                </Btn>
-                <p className="text-center text-xs text-fg-subtle">{svc.billing === "one-time" ? "Paid once — no monthly fee." : "Cancel anytime from Billing."}</p>
+                )}
+                {planChooser(canTrial ? `Or buy ${svc.name} now` : `Buy ${svc.name}`)}
               </>
             )}
           </Card>

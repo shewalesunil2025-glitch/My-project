@@ -89,11 +89,23 @@ export default function BillingPage() {
                         {svc.name} {s.serviceId === "digital-marketing" && <Pill tone="ember">Package</Pill>}
                       </p>
                       <p className="text-xs text-fg-subtle">
-                        {s.period === "one-time" ? `${formatPrice(s.price)} · paid once on ${fmtDate(s.startedAt)}` : `${formatPrice(s.price)} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
+                        {s.status === "trial" || s.status === "expired" ? `Free trial · ${s.status === "trial" ? "ends" : "ended"} ${fmtDate(s.renewsAt)}` : s.period === "one-time" ? `${formatPrice(s.price)} · paid once on ${fmtDate(s.startedAt)}` : `${formatPrice(s.price)} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
                       </p>
                     </div>
-                    <Pill tone={s.status === "active" ? "green" : "gray"}>{s.period === "one-time" ? "Paid" : s.status === "active" ? "Active" : "Cancelled"}</Pill>
+                    {s.status === "trial" || s.status === "expired" ? (
+                      <Pill tone={s.status === "trial" ? "green" : "amber"}>{s.status === "trial" ? "Free trial" : "Trial ended"}</Pill>
+                    ) : (
+                      <Pill tone={s.status === "active" ? "green" : "gray"}>{s.period === "one-time" ? "Paid" : s.status === "active" ? "Active" : "Cancelled"}</Pill>
+                    )}
                   </div>
+                  {(s.status === "trial" || s.status === "expired") && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3">
+                      <BtnLink size="sm" href={`/app/services/${s.serviceId}`}>
+                        Pay & keep {svc.name}
+                      </BtnLink>
+                      <span className="text-xs text-fg-subtle">{s.status === "trial" ? `Free until ${fmtDate(s.renewsAt)}, then ${formatPrice(svc.price ?? s.price)}/month.` : "Paused — pay to switch it back on."}</span>
+                    </div>
+                  )}
                   {s.status === "active" && s.period !== "one-time" && (
                     <div className="mt-3 flex flex-wrap gap-2 border-t border-white/[0.06] pt-3">
                       <Btn size="sm" variant="ghost" onClick={() => switchPeriod(s.id)}>

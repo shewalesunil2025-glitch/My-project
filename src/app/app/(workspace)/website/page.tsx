@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, ExternalLink, Monitor, Rocket, Smartphone } from "lucide-react";
+import { Check, Copy, ExternalLink, Gift, Lock, Monitor, Rocket, Smartphone } from "lucide-react";
 import { formatPrice } from "@/config/product";
-import { serviceById } from "@/content/app/services";
+import { serviceById, TRIAL_DAYS } from "@/content/app/services";
+import { beginTrial, timeLeft, trialState, websiteAccess } from "@/lib/app/trial";
 import { setAutomationStatus } from "@/lib/app/automation";
 import { cloudEnabled, cloudPublishSite, cloudUnpublishSite } from "@/lib/app/cloud";
 import { openIbaxChat } from "@/lib/app/ibaxEvents";
@@ -99,6 +100,44 @@ export default function WebsitePage() {
     );
   }
 
+  // The builder is open on the free trial (build and preview only) and once the Website is bought.
+  const access = websiteAccess(ws);
+  if (access === "unused" || access === "over") {
+    return (
+      <div>
+        <PageHeader eyebrow="Website builder" title="Build your website" subtitle="Premium templates with 3D effects — your business details filled in for you." />
+        <Card className="relative mx-auto max-w-xl overflow-hidden border-flow/30 p-6 text-center sm:p-8">
+          <div aria-hidden className="absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-flow/20 blur-3xl" />
+          <span className="relative mx-auto grid size-14 place-items-center rounded-2xl bg-flow text-ink-950">
+            {access === "unused" ? <Gift className="size-7" aria-hidden /> : <Lock className="size-7" aria-hidden />}
+          </span>
+          {access === "unused" ? (
+            <>
+              <h2 className="display relative mt-4 text-2xl">Build your website free for {TRIAL_DAYS} days</h2>
+              <p className="relative mt-2 text-sm leading-relaxed text-fg-muted">
+                Start your free trial to pick a premium template and see your website exactly as customers will. Publishing it on the internet needs the Website service ({formatPrice(svc.price!)} one-time).
+              </p>
+              <Btn size="lg" className="relative mt-5" onClick={() => beginTrial()}>
+                <Gift className="size-4" aria-hidden /> Start free trial
+              </Btn>
+            </>
+          ) : (
+            <>
+              <h2 className="display relative mt-4 text-2xl">Your free trial has ended</h2>
+              <p className="relative mt-2 text-sm leading-relaxed text-fg-muted">
+                Get the Website service ({formatPrice(svc.price!)} one-time) to keep building and publish your website — your design is saved.
+              </p>
+              <BtnLink size="lg" className="relative mt-5" href="/app/services/website">
+                <Rocket className="size-4" aria-hidden /> Get the Website — {formatPrice(svc.price!)}
+              </BtnLink>
+            </>
+          )}
+        </Card>
+      </div>
+    );
+  }
+  const trial = trialState(ws);
+
   const toggle = (s: SiteSection) => set({ sections: site.sections!.includes(s) ? site.sections!.filter((x) => x !== s) : [...site.sections!, s] });
 
   return (
@@ -109,6 +148,18 @@ export default function WebsitePage() {
         subtitle="Pick a premium template — your business details are already filled in. Change anything, then publish in one click."
         action={live ? <Pill tone="green">Live</Pill> : <Pill tone="gray">Draft</Pill>}
       />
+
+      {access === "trial" && trial.phase === "on" && (
+        <Notice className="mb-6 flex flex-wrap items-center gap-3">
+          <Gift className="size-4 shrink-0" aria-hidden />
+          <span className="min-w-0 flex-1">
+            <strong>Free trial · {timeLeft(trial.msLeft)}.</strong> Build and preview your website free. To put it on the internet, get the Website service ({formatPrice(svc.price!)} one-time).
+          </span>
+          <BtnLink size="sm" href="/app/services/website">
+            Get the Website
+          </BtnLink>
+        </Notice>
+      )}
 
       {live && (
         <Card className="mb-6 flex flex-wrap items-center gap-3 border-flow/30">

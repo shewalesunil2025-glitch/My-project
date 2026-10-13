@@ -27,6 +27,12 @@ export function AutomationStore() {
         <SubHead label="Automation Store" title="Pick only what you need." />
         <Reveal delay={0.1}>
           <p className="mx-auto mt-4 max-w-md text-center text-fg-muted">Every service works on its own. Add more any time.</p>
+          <p className="mx-auto mt-5 w-fit rounded-full border border-flow/40 bg-flow/10 px-4 py-1.5 text-center text-sm font-medium text-flow-soft">
+            🎁 Messaging automations are <strong className="text-flow">FREE for 3 days</strong> —{" "}
+            <a href="/app/signup" className="underline underline-offset-4">
+              start your trial
+            </a>
+          </p>
         </Reveal>
 
         <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
@@ -35,8 +41,13 @@ export function AutomationStore() {
               <button
                 type="button"
                 onClick={() => openDemo(s.title)}
-                className="glass group flex h-full w-full flex-col rounded-2xl p-4 text-left transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-flow/40 md:p-5"
+                className="glass group relative flex h-full w-full flex-col rounded-2xl p-4 text-left transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-flow/40 md:p-5"
               >
+                {s.trial && (
+                  <span className="absolute top-3 right-3 rounded-full bg-flow px-2 py-0.5 text-[0.62rem] font-bold tracking-wide text-ink-950 uppercase shadow-[0_6px_18px_-6px_rgb(125_255_58/0.9)]">
+                    3 days free
+                  </span>
+                )}
                 <span className="grid size-10 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                   <s.icon className="size-4" aria-hidden />
                 </span>
@@ -96,7 +107,7 @@ export function AutomationStore() {
           </Reveal>
         )}
 
-        <p className="mt-6 text-center text-sm text-fg-subtle">Prices in Indian rupees, all-inclusive. Pay yearly and get 2 months free.</p>
+        <p className="mt-6 text-center text-sm text-fg-subtle">Prices in Indian rupees, all-inclusive. Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
       </div>
     </section>
   );

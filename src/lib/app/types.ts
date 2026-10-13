@@ -47,7 +47,8 @@ export type Subscription = {
   serviceId: string;
   period: PlanPeriod;
   price: number;
-  status: "active" | "cancelled";
+  /** "trial": the free 3-day trial (nothing paid); "expired": the trial ended unpaid. */
+  status: "active" | "cancelled" | "trial" | "expired";
   startedAt: string;
   renewsAt: string;
 };
@@ -80,6 +81,8 @@ export type Automation = {
   activatedAt?: string;
   lastRunAt?: string;
   note?: string;
+  /** Set while the service runs on the free trial: it stops at this time unless paid. */
+  trialEndsAt?: string;
   logs: LogEntry[];
 };
 
@@ -283,6 +286,8 @@ export type Workspace = {
   agentFlow?: AgentFlow | null;
   /** Services the owner asked to be told about when they launch. */
   waitlist?: { serviceId: string; at: string }[];
+  /** The account's one free trial (3 days of messaging automations and the website builder). */
+  trial?: { startedAt: string; endsAt: string } | null;
   metrics: DailyMetric[];
   website: WebsiteProject | null;
   team: { id: string; name: string; email: string; role: TeamRole }[];

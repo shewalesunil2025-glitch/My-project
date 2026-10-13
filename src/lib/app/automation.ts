@@ -2,12 +2,14 @@ import { product } from "@/config/product";
 import { serviceById, type ServiceDef } from "@/content/app/services";
 import { contentIdea } from "./assistant";
 import { audit, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
+import { trialOver } from "./trial";
 import type { Automation, AutomationStatus, ContentItem, Workspace } from "./types";
 
 export function setAutomationStatus(id: string, status: AutomationStatus, message: string) {
   updateWorkspace((ws) => {
     const a = ws.automations.find((x) => x.id === id);
-    if (!a) return;
+    // A service whose free trial ended stays off until it's paid.
+    if (!a || (status === "active" && trialOver(a))) return;
     a.status = status;
     a.note = status === "paused" ? `Paused by you on ${new Date().toLocaleDateString()}` : undefined;
     a.logs.unshift({ at: nowIso(), level: status === "active" ? "success" : "info", message });
@@ -36,7 +38,7 @@ export function missingConnections(ws: Workspace, svc: ServiceDef) {
 export function activate(id: string) {
   updateWorkspace((ws) => {
     const a = ws.automations.find((x) => x.id === id);
-    if (!a) return;
+    if (!a || trialOver(a)) return;
     const svc = serviceById(a.serviceId)!;
     const blocked = missingConnections(ws, svc);
     if (blocked.length) {
