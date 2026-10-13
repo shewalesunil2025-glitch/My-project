@@ -4,11 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ArrowUp } from "lucide-react";
 import { LumiMark } from "./ui";
+import { AttachMenu } from "@/components/chat/Attach";
+import { openIbaxChatWith } from "@/lib/app/ibaxEvents";
 
 /** "Ask <assistant> anything…" — opens the conversation inside the app. */
 export function AskBar({ name, examples }: { name: string; examples: string[] }) {
   const router = useRouter();
   const [q, setQ] = useState("");
+  const [error, setError] = useState("");
   const go = (text: string) => text.trim() && router.push(`/app/assistant?q=${encodeURIComponent(text.trim())}`);
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -19,6 +22,7 @@ export function AskBar({ name, examples }: { name: string; examples: string[] })
     <div>
       <form onSubmit={onSubmit} className="glass flex items-center gap-2 rounded-full p-1.5 pl-2 focus-within:border-flow/50">
         <LumiMark className="size-9 shrink-0" glow={false} />
+        <AttachMenu onFile={(file) => openIbaxChatWith({ file })} onError={setError} onImageMode={(on) => on && openIbaxChatWith({ imageMode: true })} />
         <label htmlFor="ask" className="sr-only">
           Ask {name} anything
         </label>
@@ -34,6 +38,7 @@ export function AskBar({ name, examples }: { name: string; examples: string[] })
           <ArrowUp className="size-4" aria-hidden />
         </button>
       </form>
+      {error && <p className="mt-2 text-xs text-amber-200">{error}</p>}
       <ul className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1">
         {examples.map((s) => (
           <li key={s} className="shrink-0">
