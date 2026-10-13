@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { formatPrice, product } from "@/config/product";
+import { product } from "@/config/product";
 import { annualPrice, isLive, serviceById } from "@/content/app/services";
 import { activateService, buyService } from "@/lib/app/agentActions";
 import { currentWorkspace } from "@/lib/app/store";
 import type { PlanPeriod } from "@/lib/app/types";
+import { appCurrency, inrNote, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { Btn, BtnLink, Card, EmptyState, Icon, Notice, Spinner } from "@/components/app/ui";
 
@@ -27,7 +28,9 @@ function Checkout() {
   const existing = ws.automations.find((a) => a.serviceId === svc.id);
   if (existing && !existing.trialEndsAt) return <EmptyState title={`You already have ${svc.name}`} action={<BtnLink href={`/app/automations/${existing.id}`}>Manage it</BtnLink>} />;
 
-  const amount = period === "annual" ? annualPrice(svc.price) : svc.price;
+  const cur = appCurrency(ws);
+  const base = svcPrice(svc, ws) ?? svc.price;
+  const amount = period === "annual" ? annualPrice(base) : base;
   const renews = new Date();
   if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
   else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
@@ -66,7 +69,7 @@ function Checkout() {
           <div className="flex justify-between">
             <dt className="text-fg-muted">Plan</dt>
             <dd>
-              {formatPrice(amount)}
+              {money(amount, cur)}
               {period !== "one-time" && ` / ${period === "monthly" ? "month" : "year"}`}
             </dd>
           </div>
@@ -78,8 +81,9 @@ function Checkout() {
           )}
           <div className="flex justify-between border-t border-white/[0.06] pt-3 text-base font-semibold">
             <dt>Due today</dt>
-            <dd>{formatPrice(amount)}</dd>
+            <dd>{money(amount, cur)}</dd>
           </div>
+          {cur !== "INR" && <p className="text-right text-xs text-fg-subtle">{inrNote(amount, cur)} (all payments are in rupees)</p>}
         </dl>
       </Card>
 

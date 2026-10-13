@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { ArrowRight, ChevronRight, CreditCard, Crown, Globe, LifeBuoy, Link2, Mail, MessageCircle, Sparkles } from "lucide-react";
-import { formatPrice, product } from "@/config/product";
+import { product } from "@/config/product";
 import { isLive, services } from "@/content/app/services";
+import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { automationStatus } from "@/components/app/status";
 import { Icon, LumiMark, Pill, SectionTitle, withinDays } from "@/components/app/ui";
@@ -131,7 +132,7 @@ export default function IbaxHubPage() {
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-2">
                   <p className="text-sm">
-                    <span className="font-semibold">{formatPrice(s.price!)}</span>
+                    <span className="font-semibold">{money(svcPrice(s, ws)!, appCurrency(ws))}</span>
                     <span className="text-xs text-fg-subtle">{s.billing === "one-time" ? " one-time" : " /month"}</span>
                   </p>
                   {available ? (

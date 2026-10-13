@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check, Gift, X } from "lucide-react";
 import { Reveal } from "@/components/effects/Reveal";
+import { Money } from "@/components/cta/Money";
 
 const included = ["WhatsApp Automation", "Customer Support", "Lead Follow-up", "Email Automation", "Google Review replies", "Website builder (build & preview)"];
 const notIncluded = ["Instagram, Facebook & YouTube content", "AI Voice calls", "Digital Marketing & ads", "Publishing your website"];
@@ -24,7 +25,7 @@ export function FreeTrial() {
                   Try it before you pay.
                 </h2>
                 <p className="mt-5 max-w-lg text-fg-muted md:text-lg">
-                  Switch on every messaging automation free for 3 days — on your own WhatsApp, with your own customers — and build your website. Love it? Continue from just ₹499/month.
+                  Switch on every messaging automation free for 3 days — on your own WhatsApp, with your own customers — and build your website. Love it? Continue from just <Money inr="₹499" usd="$6" />/month.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Link

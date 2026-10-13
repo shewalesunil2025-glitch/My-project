@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Check, Copy, ExternalLink, Gift, Lock, Monitor, Rocket, Smartphone } from "lucide-react";
-import { formatPrice } from "@/config/product";
 import { serviceById, TRIAL_DAYS } from "@/content/app/services";
 import { beginTrial, timeLeft, trialState, websiteAccess } from "@/lib/app/trial";
 import { setAutomationStatus } from "@/lib/app/automation";
@@ -11,6 +10,7 @@ import { openIbaxChat } from "@/lib/app/ibaxEvents";
 import { audit, logActivity, nowIso, updateWorkspace, useSession } from "@/lib/app/store";
 import type { SiteSection, WebsiteProject } from "@/lib/app/types";
 import { accents, allSections, buildSite, premiumTemplate, slugify, templates, validSlug, withDefaults } from "@/lib/sites/site";
+import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { SiteView } from "@/components/sites/SiteView";
 import { themeFor } from "@/lib/sites/themes";
@@ -115,7 +115,7 @@ export default function WebsitePage() {
             <>
               <h2 className="display relative mt-4 text-2xl">Build your website free for {TRIAL_DAYS} days</h2>
               <p className="relative mt-2 text-sm leading-relaxed text-fg-muted">
-                Start your free trial to pick a premium template and see your website exactly as customers will. Publishing it on the internet needs the Website service ({formatPrice(svc.price!)} one-time).
+                Start your free trial to pick a premium template and see your website exactly as customers will. Publishing it on the internet needs the Website service ({money(svcPrice(svc, ws)!, appCurrency(ws))} one-time).
               </p>
               <Btn size="lg" className="relative mt-5" onClick={() => beginTrial()}>
                 <Gift className="size-4" aria-hidden /> Start free trial
@@ -125,10 +125,10 @@ export default function WebsitePage() {
             <>
               <h2 className="display relative mt-4 text-2xl">Your free trial has ended</h2>
               <p className="relative mt-2 text-sm leading-relaxed text-fg-muted">
-                Get the Website service ({formatPrice(svc.price!)} one-time) to keep building and publish your website — your design is saved.
+                Get the Website service ({money(svcPrice(svc, ws)!, appCurrency(ws))} one-time) to keep building and publish your website — your design is saved.
               </p>
               <BtnLink size="lg" className="relative mt-5" href="/app/services/website">
-                <Rocket className="size-4" aria-hidden /> Get the Website — {formatPrice(svc.price!)}
+                <Rocket className="size-4" aria-hidden /> Get the Website — {money(svcPrice(svc, ws)!, appCurrency(ws))}
               </BtnLink>
             </>
           )}
@@ -153,7 +153,7 @@ export default function WebsitePage() {
         <Notice className="mb-6 flex flex-wrap items-center gap-3">
           <Gift className="size-4 shrink-0" aria-hidden />
           <span className="min-w-0 flex-1">
-            <strong>Free trial · {timeLeft(trial.msLeft)}.</strong> Build and preview your website free. To put it on the internet, get the Website service ({formatPrice(svc.price!)} one-time).
+            <strong>Free trial · {timeLeft(trial.msLeft)}.</strong> Build and preview your website free. To put it on the internet, get the Website service ({money(svcPrice(svc, ws)!, appCurrency(ws))} one-time).
           </span>
           <BtnLink size="sm" href="/app/services/website">
             Get the Website
@@ -284,7 +284,7 @@ export default function WebsitePage() {
                   openIbaxChat("I want the Website service");
                 }}
               >
-                <Rocket className="size-4" aria-hidden /> Get the Website service — {formatPrice(svc.price!)}
+                <Rocket className="size-4" aria-hidden /> Get the Website service — {money(svcPrice(svc, ws)!, appCurrency(ws))}
               </Btn>
             )}
             {live && (

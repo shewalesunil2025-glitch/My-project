@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { formatPrice, product } from "@/config/product";
+import { product } from "@/config/product";
 import { inTrial, isLive, services, TRIAL_DAYS, type ServiceDef } from "@/content/app/services";
 import { onWaitlist } from "@/lib/app/agentActions";
+import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { TrialBanner } from "@/components/app/TrialBanner";
 import { trialState } from "@/lib/app/trial";
@@ -27,6 +28,7 @@ export default function ServicesPage() {
 
   const owned = (id: string) => ws.automations.find((a) => a.serviceId === id);
   const premium = services.find((s) => s.group === "premium")!;
+  const cur = appCurrency(ws);
   const trialOpen = !ws.sample && trialState(ws).phase !== "over";
   const list = services.filter((s) => s.group !== "premium" && (group === "all" || s.group === group));
 
@@ -51,7 +53,7 @@ export default function ServicesPage() {
             <h2 className="display mt-3 text-2xl sm:text-3xl">{premium.name}</h2>
             <p className="mt-2 max-w-lg text-sm text-fg-muted">{premium.description}</p>
             <p className="mt-4 text-sm">
-              <span className="text-2xl font-semibold">{formatPrice(premium.price!)}</span>
+              <span className="text-2xl font-semibold">{money(svcPrice(premium, ws)!, cur)}</span>
               <span className="text-fg-muted"> / month</span>
             </p>
             {owned(premium.id) ? (
@@ -113,7 +115,7 @@ export default function ServicesPage() {
                   <>
                     <p className="mt-5 font-mono text-[0.65rem] tracking-[0.2em] text-fg-subtle uppercase">Starting at</p>
                     <p className="mt-1">
-                      <span className="text-3xl font-semibold tracking-tight tabular-nums group-hover:text-flow">{formatPrice(s.price)}</span>
+                      <span className="text-3xl font-semibold tracking-tight tabular-nums group-hover:text-flow">{money(svcPrice(s, ws)!, cur)}</span>
                       <span className="text-sm text-fg-muted">{s.billing === "one-time" ? " one-time" : " /mo"}</span>
                     </p>
                   </>

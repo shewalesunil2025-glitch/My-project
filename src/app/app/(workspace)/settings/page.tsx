@@ -8,6 +8,7 @@ import { businessCategories, providerInfo } from "@/content/app/services";
 import { audit, changePassword, deleteAccount, uid, updateWorkspace, useSession } from "@/lib/app/store";
 import type { AssistantProfile, Business, NotificationKind, ProviderId, TeamRole } from "@/lib/app/types";
 import { ConnectAccount } from "@/components/app/ConnectAccount";
+import { PhoneInput } from "@/components/app/PhoneInput";
 import { Btn, Card, Field, Input, Notice, PageHeader, Pill, Select, TextArea, Toggle, fmtDateTime } from "@/components/app/ui";
 
 function Section({ id, title, subtitle, children }: { id: string; title: string; subtitle?: string; children: ReactNode }) {
@@ -118,7 +119,7 @@ export default function SettingsPage() {
             </Select>
           </Field>
           <Field label="Phone" htmlFor="s-phone">
-            <Input id="s-phone" value={biz.phone} onChange={setB("phone")} />
+            <PhoneInput id="s-phone" value={biz.phone} country={biz.country} onChange={(v) => setBiz({ ...biz, phone: v })} onCountry={(c) => setBiz({ ...biz, phone: biz.phone, country: c })} />
           </Field>
           <Field label="Email" htmlFor="s-email">
             <Input id="s-email" value={biz.email} onChange={setB("email")} />

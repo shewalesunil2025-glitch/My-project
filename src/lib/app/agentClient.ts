@@ -2,9 +2,10 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 import { useSyncExternalStore } from "react";
-import { formatPrice, product } from "@/config/product";
+import { product } from "@/config/product";
 import { isLive, providerInfo, serviceById } from "@/content/app/services";
 import { askForReview, askMessages } from "./reviewRequests";
+import { money } from "./money";
 import { activateService, automationFor, buyService, joinWaitlist, connectProvider, periodFor, priceFor, saveServiceDetails, servicesSnapshot, setServiceState } from "./agentActions";
 import { detectLang, flowNext, localTurn, type LocalReply } from "./agentLocal";
 import { workspaceContext } from "./assistant";
@@ -128,7 +129,7 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
       if (!isLive(svc.id)) return { content: `${svc.name} is COMING SOON and can't be bought yet. Offer join_waitlist instead.`, is_error: true };
       const period = periodFor(svc, String(input.period));
       out.cards.push({ type: "pay", serviceId: svc.id, period });
-      return { content: `Payment card shown: ${svc.name}, ${formatPrice(priceFor(svc, period))} (${period}). Not paid yet — wait for "[App event] Payment confirmed".` };
+      return { content: `Payment card shown: ${svc.name}, ${money(priceFor(svc, period))} (${period}). Not paid yet — wait for "[App event] Payment confirmed".` };
     }
     case "save_service_details": {
       if (!svc) return { content: "Unknown service.", is_error: true };
@@ -354,7 +355,7 @@ export async function payFromCard(card: Extract<AgentCard, { type: "pay" }>) {
   markCard((c) => c.type === "pay" && c.serviceId === svc.id);
   const ws = currentWorkspace()!;
   const lang = ws.agentFlow?.lang ?? detectLang(ws.chat.filter((m) => m.role === "user").at(-1)?.text ?? "");
-  await respond(ws, `[App event] Payment confirmed: ${svc.name} (${svc.id}), ${formatPrice(priceFor(svc, card.period))}, ${card.period}. Continue the setup.`, () =>
+  await respond(ws, `[App event] Payment confirmed: ${svc.name} (${svc.id}), ${money(priceFor(svc, card.period))}, ${card.period}. Continue the setup.`, () =>
     flowNext(svc, { serviceId: svc.id, lang, skipped: ws.agentFlow?.serviceId === svc.id ? ws.agentFlow.skipped : undefined }),
   );
 }

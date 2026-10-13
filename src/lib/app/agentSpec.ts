@@ -36,8 +36,9 @@ export const agentPages = [
 function catalogue() {
   return services
     .map((s) => {
-      const price =
-        s.price === null ? "custom quote" : s.billing === "one-time" ? `${formatPrice(s.price)} one-time` : `${formatPrice(s.price)}/month (or ${formatPrice(annualPrice(s.price))}/year)`;
+      const one = (amount: number, cur: "INR" | "USD") =>
+        s.billing === "one-time" ? `${formatPrice(amount, cur)} one-time` : `${formatPrice(amount, cur)}/month (or ${formatPrice(annualPrice(amount), cur)}/year)`;
+      const price = s.price === null ? "custom quote" : `India: ${one(s.price, "INR")}; outside India: ${s.usd ? one(s.usd, "USD") : "ask"}`;
       const info = s.info.map((f) => `${f.key}${f.required ? "*" : ""} = ${f.label}`).join("; ");
       const configure = s.configure.map((f) => `${f.key} = ${f.label}${f.options ? ` [${f.options.join(" | ")}]` : f.type === "toggle" ? " [yes/no]" : ""}`).join("; ");
       return [

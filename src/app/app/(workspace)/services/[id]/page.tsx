@@ -5,11 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { PlanPeriod } from "@/lib/app/types";
 import { ArrowLeft, Check, Clock, Gift, Info, Link2 } from "lucide-react";
-import { formatPrice } from "@/config/product";
 import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, TRIAL_DAYS } from "@/content/app/services";
 import { joinWaitlist, onWaitlist, startTrialService } from "@/lib/app/agentActions";
 import { timeLeft, trialOver, trialState } from "@/lib/app/trial";
 import { audit, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
+import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { automationStatus } from "@/components/app/status";
 import { Btn, BtnLink, Card, EmptyState, Field, Icon, Notice, Pill, TextArea } from "@/components/app/ui";
@@ -31,6 +31,7 @@ export default function ServiceDetailPage() {
   const included = svc.includes?.map((i) => serviceById(i)!).filter(Boolean) ?? [];
   const coveredBy = ws.automations.find((a) => serviceById(a.serviceId)?.includes?.includes(svc.id));
   const trial = trialState(ws);
+  const cur = appCurrency(ws);
   const canTrial = !owned && !ws.sample && isLive(svc.id) && inTrial(svc.id) && trial.phase !== "over";
 
   function startTrial() {
@@ -44,7 +45,8 @@ export default function ServiceDetailPage() {
           <legend className="mb-2 text-sm font-semibold">Choose a plan</legend>
           <div className="space-y-2">
             {(svc.billing === "one-time" ? (["one-time"] as const) : (["monthly", "annual"] as const)).map((p) => {
-              const amount = p === "annual" ? annualPrice(svc.price!) : svc.price!;
+              const base = svcPrice(svc, ws)!;
+              const amount = p === "annual" ? annualPrice(base) : base;
               return (
                 <label
                   key={p}
@@ -61,7 +63,7 @@ export default function ServiceDetailPage() {
                     </span>
                   </span>
                   <span className="font-semibold">
-                    {formatPrice(amount)}
+                    {money(amount, cur)}
                     {p !== "one-time" && <span className="text-xs font-normal text-fg-muted">/{p === "monthly" ? "mo" : "yr"}</span>}
                   </span>
                 </label>
@@ -153,7 +155,7 @@ export default function ServiceDetailPage() {
                 ))}
               </ul>
               <p className="mt-3 text-xs text-fg-subtle">
-                Bought separately: {formatPrice(included.reduce((sum, s) => sum + (s.price ?? 0), 0))}/month.
+                Bought separately: {money(included.reduce((sum, s) => sum + (svcPrice(s, ws) ?? 0), 0), cur)}/month.
               </p>
             </Card>
           )}
@@ -213,7 +215,7 @@ export default function ServiceDetailPage() {
                   We&apos;re finishing {svc.name}. Join the waitlist and we&apos;ll tell you here the day it launches — no payment now.
                 </p>
                 <p className="text-sm">
-                  <span className="text-2xl font-semibold">{formatPrice(svc.price!)}</span>
+                  <span className="text-2xl font-semibold">{money(svcPrice(svc, ws)!, cur)}</span>
                   <span className="text-fg-muted">{svc.billing === "one-time" ? " one-time" : " / month"} at launch</span>
                 </p>
                 {onWaitlist(ws, svc.id) ? (

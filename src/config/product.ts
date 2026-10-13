@@ -31,6 +31,19 @@ export const product = {
   previewMode: true,
 } as const;
 
-export function formatPrice(amount: number) {
-  return new Intl.NumberFormat("en-IN", { style: "currency", currency: product.currency, maximumFractionDigits: 0 }).format(amount);
+export type Currency = "INR" | "USD";
+
+/** "₹699" or "$9". Prices are whole numbers in both currencies. */
+export function formatPrice(amount: number, currency: Currency = "INR") {
+  return new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 }
+
+/**
+ * Customers outside India see US-dollar prices (round figures), but every payment is taken in
+ * Indian rupees: a dollar price is charged as its rupee value at this rate.
+ */
+export const USD_TO_INR = 85;
+export const chargeInInr = (amount: number, currency: Currency) => (currency === "INR" ? amount : Math.round(amount * USD_TO_INR));
+
+/** India pays in rupees; every other country sees dollars. */
+export const currencyForCountry = (country?: string | null): Currency => (!country || /^(india|in)$/i.test(country.trim()) ? "INR" : "USD");
