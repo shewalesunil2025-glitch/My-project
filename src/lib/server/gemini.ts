@@ -44,6 +44,10 @@ function toContents(messages: Anthropic.Beta.BetaMessageParam[]): GeminiContent[
       else if (b.type === "tool_use") {
         toolNames.set(String(b.id), String(b.name));
         parts.push({ functionCall: { name: b.name, args: b.input ?? {} }, ...signature });
+      } else if ((b.type === "image" || b.type === "document") && b.source && typeof b.source === "object") {
+        // A photo or PDF the owner attached: Gemini reads it as inline data.
+        const src = b.source as { type?: string; media_type?: string; data?: string };
+        if (src.type === "base64" && src.media_type && src.data) parts.push({ inlineData: { mimeType: src.media_type, data: src.data } });
       } else if (b.type === "tool_result") {
         const content = typeof b.content === "string" ? b.content : JSON.stringify(b.content ?? "");
         parts.push({ functionResponse: { name: toolNames.get(String(b.tool_use_id)) ?? "tool", response: { result: content, is_error: b.is_error === true } } });
@@ -308,10 +312,16 @@ export async function geminiLiveToken(): Promise<string | null> {
  * One JSON answer from Gemini for a plain text conversation (the website assistant).
  * Same quick setup as IBAX in the app: minimal thinking, lighter models when busy.
  */
-export async function geminiJson(system: string, messages: { role: "user" | "assistant"; content: string }[], schema: unknown): Promise<unknown> {
+/** A photo or PDF sent with a message (base64). */
+export type InlineFile = { mime: string; data: string };
+
+export async function geminiJson(system: string, messages: { role: "user" | "assistant"; content: string; files?: InlineFile[] }[], schema: unknown): Promise<unknown> {
   const primary = process.env.GEMINI_MODEL || "gemini-3.8-flash";
   const models = [...new Set([primary, ...FALLBACK_MODELS])];
-  const contents = messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }));
+  const contents = messages.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [...(m.files ?? []).map((f) => ({ inlineData: { mimeType: f.mime, data: f.data } })), { text: m.content }],
+  }));
   let thinking = process.env.GEMINI_THINKING || "minimal";
   let lastError: Error & { status?: number } = new Error("Gemini unavailable");
   for (const model of models) {
@@ -324,7 +334,8 @@ export async function geminiJson(system: string, messages: { role: "user" | "ass
           contents,
           generationConfig: { temperature: 0.6, maxOutputTokens: 1024, responseMimeType: "application/json", responseSchema: toSchema(schema), thinkingConfig: { thinkingLevel: thinking } },
         }),
-        signal: AbortSignal.timeout(15_000),
+        // Reading a photo or a long PDF takes longer than a text answer.
+        signal: AbortSignal.timeout(messages.some((m) => m.files?.length) ? 40_000 : 15_000),
       });
       if (!res.ok) {
         const detail = (await res.text()).slice(0, 300);
@@ -341,6 +352,80 @@ export async function geminiJson(system: string, messages: { role: "user" | "ass
     } catch (error) {
       lastError = error instanceof Error ? error : lastError;
     }
+  }
+  throw lastError;
+}
+
+/* ── AI images (Gemini image models; Imagen as a fallback) ── */
+
+let imageModels: { at: number; gemini: string[]; imagen: string[] } | null = null;
+
+/** Image models this key can use, best first (looked up once an hour). */
+export async function geminiImageModels() {
+  if (imageModels && Date.now() - imageModels.at < 3_600_000) return imageModels;
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000", { headers: { "x-goog-api-key": process.env.GEMINI_API_KEY! } });
+  const data = (await res.json().catch(() => ({}))) as { models?: { name: string; supportedGenerationMethods?: string[] }[] };
+  const all = data.models ?? [];
+  const name = (m: { name: string }) => m.name.replace(/^models\//, "");
+  const rank = (n: string) => (/flash/.test(n) ? 0 : 1) + (/preview|exp/.test(n) ? 0.5 : 0);
+  const gemini = all
+    .filter((m) => /gemini.*image/i.test(m.name) && !/tts|live/i.test(m.name) && m.supportedGenerationMethods?.includes("generateContent"))
+    .map(name)
+    .sort((a, b) => rank(a) - rank(b));
+  const imagen = all.filter((m) => /imagen/i.test(m.name) && m.supportedGenerationMethods?.includes("predict")).map(name).sort((a, b) => rank(a) - rank(b));
+  imageModels = { at: Date.now(), gemini, imagen };
+  return imageModels;
+}
+
+/**
+ * Makes one image from a description, or edits the given photo. Returns a base64 image.
+ * Image models are paid on Google's side (no free tier): about ₹3–4 an image.
+ */
+export async function geminiImage(prompt: string, photo?: InlineFile): Promise<{ mime: string; data: string; model: string }> {
+  const { gemini, imagen } = await geminiImageModels();
+  let lastError: Error & { status?: number } = new Error("No image model is available for this Gemini key.");
+  for (const model of gemini.slice(0, 3)) {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [...(photo ? [{ inlineData: { mimeType: photo.mime, data: photo.data } }] : []), { text: prompt }] }],
+        generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+      }),
+      signal: AbortSignal.timeout(50_000),
+    }).catch((e: Error) => e);
+    if (res instanceof Error) {
+      lastError = res;
+      continue;
+    }
+    if (!res.ok) {
+      lastError = Object.assign(new Error(`Gemini ${res.status} (${model}): ${(await res.text()).slice(0, 300)}`), { status: res.status });
+      continue;
+    }
+    const data = (await res.json()) as { candidates?: { content?: { parts?: Part[] } }[] };
+    const img = (data.candidates?.[0]?.content?.parts ?? []).map((p) => p.inlineData as { mimeType?: string; data?: string } | undefined).find((x) => x?.data);
+    if (img?.data) return { mime: img.mimeType ?? "image/png", data: img.data, model };
+    lastError = new Error(`No image in the answer (${model})`);
+  }
+  // Imagen makes new images only (no photo editing).
+  for (const model of photo ? [] : imagen.slice(0, 2)) {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:predict`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
+      body: JSON.stringify({ instances: [{ prompt }], parameters: { sampleCount: 1 } }),
+      signal: AbortSignal.timeout(50_000),
+    }).catch((e: Error) => e);
+    if (res instanceof Error) {
+      lastError = res;
+      continue;
+    }
+    if (!res.ok) {
+      lastError = Object.assign(new Error(`Imagen ${res.status} (${model}): ${(await res.text()).slice(0, 300)}`), { status: res.status });
+      continue;
+    }
+    const data = (await res.json()) as { predictions?: { bytesBase64Encoded?: string; mimeType?: string }[] };
+    const p = data.predictions?.[0];
+    if (p?.bytesBase64Encoded) return { mime: p.mimeType ?? "image/png", data: p.bytesBase64Encoded, model };
   }
   throw lastError;
 }

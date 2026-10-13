@@ -86,6 +86,10 @@ const sections: LegalSection[] = [
           customers&apos; data to train our own models, and we use AI providers under terms that do not allow them to train on it.
         </p>
         <p>
+          Photos, PDFs and documents you attach in an IBAX chat are sent to the AI provider only to read them for that answer; we keep a small
+          preview in your chat history, not the file. Images you ask IBAX to create are stored in your account so you can download them.
+        </p>
+        <p>
           AI can make mistakes. You can review and change your business details at any time. The assistant hands over to you when it cannot
           answer or when a customer asks for a person.
         </p>
