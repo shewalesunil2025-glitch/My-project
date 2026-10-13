@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/server/followup";
 import { geminiImage, geminiImageModels, geminiJson, geminiReady, type InlineFile } from "@/lib/server/gemini";
-import { freeImage } from "@/lib/server/freeImage";
+import { cloudflareImage, freeImage, sizeFor } from "@/lib/server/freeImage";
 import { userFromRequest } from "@/lib/server/whatsapp";
 
 /**
@@ -54,9 +54,11 @@ export async function POST(request: Request) {
   try {
     image = await geminiImage(prompt, photo);
   } catch (error) {
-    console.warn("[image] gemini unavailable, using the free model:", (error instanceof Error ? error.message : String(error)).slice(0, 200));
+    console.warn("[image] gemini image model unavailable:", (error instanceof Error ? error.message : String(error)).slice(0, 200));
+    // Other models can't see photos and need precise English prompts: Gemini (free) writes one.
+    const better = await enhance(prompt, photo);
     try {
-      image = await freeImage(photo ? await withPhoto(prompt, photo) : prompt);
+      image = (await cloudflareImage(better).catch((e) => (console.warn("[image] cloudflare failed:", String(e).slice(0, 200)), null))) ?? (await freeImage(better));
     } catch (e) {
       console.error("[image] free model failed", e instanceof Error ? e.message.slice(0, 200) : e);
       return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });
@@ -77,15 +79,19 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, url, image: url ? undefined : `data:${image.mime};base64,${image.data}`, left: limit - used - 1, limit });
 }
 
-/** The free model can't see photos: Gemini (free) describes the photo, and the image is made from that. */
-async function withPhoto(prompt: string, photo: InlineFile) {
+/**
+ * Turns the owner's request (any language, maybe a few words) into a detailed English prompt
+ * for a professional-looking result; with a photo, describes it so it can be redrawn.
+ */
+async function enhance(prompt: string, photo?: InlineFile) {
+  const { width, height } = sizeFor(prompt);
   try {
     const out = (await geminiJson(
-      "Describe this photo for an image generator so it can be redrawn: the people (age, look, clothes, pose, expression), objects, place, colours and lighting. One paragraph, under 90 words, English. No names.",
-      [{ role: "user", content: "Describe the photo.", files: [photo] }],
-      { type: "object", properties: { description: { type: "string" } }, required: ["description"] },
-    )) as { description?: string };
-    return out.description ? `${prompt}. Redraw this photo: ${out.description}` : prompt;
+      `You write prompts for a high-end AI image model (FLUX). Turn the request into one detailed English prompt of 60-120 words: subject, setting, composition, camera / art style (respect the asked style: photo, 3D cartoon like Pixar, anime, watercolour, flat illustration, poster…), lighting, colours, mood, and "high detail, sharp focus, professional quality". Format ${width}x${height}. If the request needs words on the image (offer, shop name, price), keep them very short and put them in double quotes. Indian context when relevant. ${photo ? "A photo is attached: describe the people (age, look, clothes, pose, expression), objects and place from it in detail so the image redraws that photo in the asked style. No real names." : ""} Never add violence, nudity, real people's names or brand logos.`,
+      [{ role: "user", content: prompt, files: photo ? [photo] : undefined }],
+      { type: "object", properties: { prompt: { type: "string" } }, required: ["prompt"] },
+    )) as { prompt?: string };
+    return out.prompt?.trim() || prompt;
   } catch {
     return prompt;
   }

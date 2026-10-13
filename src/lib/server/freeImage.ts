@@ -1,8 +1,29 @@
 /**
- * Free AI images (Pollinations): no key needed, so every customer can make posters, posts and
- * cartoons at no cost. With POLLINATIONS_TOKEN (free account at enter.pollinations.ai) the
- * better "flux" model is used and the small Pollinations logo is left off.
+ * AI images without Gemini billing:
+ *  1. Cloudflare Workers AI (FLUX.1 schnell): high quality, about 100 images a day free, then
+ *     about ₹0.10 an image. Needs CF_ACCOUNT_ID and CF_AI_TOKEN (Workers AI permission).
+ *  2. Pollinations: no key at all, lower quality with a small logo; the last resort.
  */
+
+/** High-quality FLUX images from Cloudflare Workers AI (when CF_ACCOUNT_ID and CF_AI_TOKEN are set). */
+export async function cloudflareImage(prompt: string): Promise<{ mime: string; data: string; model: string } | null> {
+  const account = process.env.CF_ACCOUNT_ID;
+  const token = process.env.CF_AI_TOKEN;
+  if (!account || !token) return null;
+  const model = process.env.CF_IMAGE_MODEL || "@cf/black-forest-labs/flux-1-schnell";
+  const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(account)}/ai/run/${model}`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ prompt: prompt.slice(0, 2000), steps: 8 }),
+    signal: AbortSignal.timeout(45_000),
+  });
+  if (!res.ok) throw new Error(`Cloudflare ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const type = res.headers.get("content-type") ?? "";
+  if (type.startsWith("image/")) return { mime: type.split(";")[0], data: Buffer.from(await res.arrayBuffer()).toString("base64"), model };
+  const data = (await res.json()) as { result?: { image?: string } };
+  if (!data.result?.image) throw new Error("Cloudflare returned no image");
+  return { mime: "image/jpeg", data: data.result.image, model };
+}
 
 /** Picks the image size from the request: stories / reels tall, banners wide, posts square. */
 export function sizeFor(prompt: string) {
