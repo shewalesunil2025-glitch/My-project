@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Check, CircleCheck, FlaskConical, Pause, Pencil,
 import { product } from "@/config/product";
 import { providerInfo, serviceById, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { activateService } from "@/lib/app/agentActions";
-import { reviewMessage } from "@/lib/reviewMessage";
+import { isDirectReviewLink, reviewMessage } from "@/lib/reviewMessage";
 import { contentIdea } from "@/lib/app/assistant";
 import { activate, missingConnections, runTest, setAutomationStatus } from "@/lib/app/automation";
 import { audit, nowIso, updateWorkspace } from "@/lib/app/store";
@@ -232,6 +232,11 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
                 <div className="rounded-xl border border-white/10 bg-ink-900 p-4 text-sm whitespace-pre-line text-fg-muted">
                   {reviewMessage("Priya", ws.business?.name ?? "", String(values.reviewLink || "https://g.page/r/…"), String(values.message ?? ""))}
                 </div>
+                {values.reviewLink && !isDirectReviewLink(String(values.reviewLink)) && (
+                  <Notice tone="amber" className="mt-3">
+                    This link opens your Google page, so customers need extra taps to review. For one tap, use the link from Google Business Profile → Ask for reviews (g.page/r/…/review).
+                  </Notice>
+                )}
                 <Btn className="mt-4" variant={a.tested ? "ghost" : "primary"} onClick={() => (save(i), runTest(a.id))}>
                   {a.tested ? <Check className="size-4" aria-hidden /> : <FlaskConical className="size-4" aria-hidden />} {a.tested ? "Looks good" : "Approve this style"}
                 </Btn>
