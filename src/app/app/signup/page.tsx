@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { product } from "@/config/product";
-import { countries } from "@/content/app/countries";
+import { PhoneInput } from "@/components/app/PhoneInput";
 import { cloudEnabled } from "@/lib/app/cloud";
 import { signUp } from "@/lib/app/store";
 import { AuthFrame } from "@/components/app/AuthFrame";
@@ -25,7 +25,7 @@ export default function SignUpPage() {
     if (get("password") !== get("confirm")) return setError("The two passwords don't match.");
     if (!f.get("terms")) return setError("Please accept the Terms and Privacy Policy.");
     setBusy(true);
-    const res = await signUp({ name: get("name"), email: get("email"), phone: get("phone"), country: get("country"), password: get("password") });
+    const res = await signUp({ name: get("name"), email: get("email"), phone: get("phone"), country: get("phoneCountry") || "India", password: get("password") });
     setBusy(false);
     if (!res.ok) return setError(res.error);
     if (res.confirmEmail) return setSentTo(get("email"));
@@ -63,8 +63,8 @@ export default function SignUpPage() {
         <Field label="Email" htmlFor="email" required>
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </Field>
-        <Field label="Mobile number" htmlFor="phone" required>
-          <Input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="+1 555 0100" required />
+        <Field label="Mobile number" htmlFor="phone" required help="Pick your country — prices show in ₹ for India and in $ for other countries.">
+          <PhoneInput id="phone" name="phone" required />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Password" htmlFor="password" required help="At least 8 characters">
@@ -74,13 +74,6 @@ export default function SignUpPage() {
             <Input id="confirm" name="confirm" type="password" autoComplete="new-password" required />
           </Field>
         </div>
-        <Field label="Country" htmlFor="country" required>
-          <Select id="country" name="country" defaultValue="United States" required>
-            {countries.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </Select>
-        </Field>
         <label className="flex items-start gap-3 text-sm text-fg-muted">
           <input type="checkbox" name="terms" className="mt-0.5 size-4 accent-[var(--color-flow)]" required />
           <span>

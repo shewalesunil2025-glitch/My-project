@@ -1,5 +1,6 @@
 "use client";
 
+import { Money } from "@/components/cta/Money";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Camera, Check, MapPin, Megaphone, MessageCircle, SquarePlay, Target, ThumbsUp } from "lucide-react";
@@ -59,7 +60,7 @@ export function DigitalMarketing() {
               <div>
                 <p className="font-mono text-[0.62rem] tracking-[0.16em] text-fg-subtle uppercase">Starting at</p>
                 <p className="mt-1 flex items-baseline gap-1">
-                  <span className="display text-[3.4rem] leading-none text-flow-soft">{digitalMarketing.price}</span>
+                  <span className="display text-[3.4rem] leading-none text-flow-soft"><Money inr={digitalMarketing.price} usd={digitalMarketing.usd} /></span>
                   <span className="text-fg-muted">{digitalMarketing.billing}</span>
                 </p>
               </div>

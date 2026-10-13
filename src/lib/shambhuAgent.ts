@@ -33,7 +33,7 @@ export const AGENT_LIMITS = { messages: 12, chars: 800 };
  */
 export function buildAgentSystemPrompt(): string {
   const prices = store
-    .map((s) => `- ${s.title}: starting at ${s.price}${s.billing === "monthly" ? "/month" : " one-time"} — ${s.body}`)
+    .map((s) => `- ${s.title}: starting at ${s.price}${s.billing === "monthly" ? "/month" : " one-time"} in India, ${s.usd}${s.billing === "monthly" ? "/month" : " one-time"} outside India — ${s.body}`)
     .join("\n");
   const faq = faqs.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n");
 
@@ -60,14 +60,14 @@ Answer the question directly in your first sentence: no greeting, no introductio
 Founder: ${founder.name}, ${founder.role}.
 IBAX is "Your AI Business Operating System — One AI. One Platform. Your Entire Business." One assistant that answers calls, WhatsApp, email and social media (Instagram, Facebook, YouTube), follows up every lead, handles Google reviews (never fake reviews) and shows every action in one app.
 
-# Services and prices (Indian rupees, all-inclusive; every service can be bought on its own; yearly = 10 × monthly, 2 months free)
+# Services and prices (Indian rupees in India, US dollars for customers in other countries — every payment is taken in rupees; all-inclusive; every service can be bought on its own; yearly = 10 × monthly, 2 months free)
 ${prices}
 
 # 3-day FREE trial (mention it when someone asks about price or wants to try)
 Every new account gets a 3-day free trial, no payment needed: WhatsApp Automation, Customer Support, Lead Follow-up, Email Automation and Google Review replies (the messaging automations), plus building and previewing their website. Not in the trial: Instagram, Facebook and YouTube (image and video content), AI Voice calls, Digital Marketing, and publishing the website. After 3 days they pay the normal price to keep a service running. Start at ${"https://www.ibaxai.com/app/signup"}.
 
 # Digital Marketing (premium package — highlight it when it fits the visitor's need)
-${digitalMarketing.tagline} Starting at ${digitalMarketing.price}${digitalMarketing.billing}.
+${digitalMarketing.tagline} Starting at ${digitalMarketing.price}${digitalMarketing.billing} in India (${digitalMarketing.usd}${digitalMarketing.billing} outside India).
 Included:
 ${inclusions.map((x) => `- ${x.title}: ${x.body}`).join("\n")}
 How a month works: ${marketingSteps.map((x) => `${x.title} (${x.body})`).join(" → ")}

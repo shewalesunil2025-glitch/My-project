@@ -1,7 +1,8 @@
-import { formatPrice, product } from "@/config/product";
+import { product } from "@/config/product";
 import { isLive, serviceById, services } from "@/content/app/services";
 import type { ChatMessage, ContentItem, Workspace } from "./types";
 import { logActivity, nowIso, uid } from "./store";
+import { money, svcPrice } from "./money";
 
 export type Reply = {
   text: string;
@@ -248,7 +249,7 @@ export function localAnswer(ws: Workspace, raw: string): Reply {
     const priced = services.filter((s) => s.price !== null);
     return {
       matched: true,
-      text: `I can run these for ${biz} (starting prices):\n${priced.map((s) => `• ${s.name} — ${formatPrice(s.price!)}${s.billing === "one-time" ? " one-time" : "/mo"}${isLive(s.id) ? "" : " (coming soon)"} · ${s.short}`).join("\n")}\n\nTell me which one you want — I'll set it up here, or add you to the waitlist if it's coming soon.`,
+      text: `I can run these for ${biz} (starting prices):\n${priced.map((s) => `• ${s.name} — ${money(svcPrice(s)!)}${s.billing === "one-time" ? " one-time" : "/mo"}${isLive(s.id) ? "" : " (coming soon)"} · ${s.short}`).join("\n")}\n\nTell me which one you want — I'll set it up here, or add you to the waitlist if it's coming soon.`,
       links: [{ label: "Browse services", href: "/app/services" }],
     };
   }

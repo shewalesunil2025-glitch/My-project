@@ -6,6 +6,7 @@ import { BookDemoButton } from "@/components/cta/BookDemoButton";
 import { Reveal } from "@/components/effects/Reveal";
 import { useDemo } from "@/components/cta/DemoProvider";
 import { cn } from "@/lib/cn";
+import { CurrencySwitch, useCurrency } from "@/components/cta/Money";
 import { SubHead } from "./Shambhu";
 
 /**
@@ -13,10 +14,15 @@ import { SubHead } from "./Shambhu";
  * "Starting at" price in INR. Digital Marketing is the premium package.
  */
 /** Yearly price for a monthly "₹699": 10 months, so 2 months free. */
-const yearly = (monthly: string) => `₹${(Number(monthly.replace(/\D/g, "")) * 10).toLocaleString("en-IN")}`;
+const yearly = (monthly: string) => {
+  const n = Number(monthly.replace(/\D/g, "")) * 10;
+  return monthly.startsWith("$") ? `$${n.toLocaleString("en-US")}` : `₹${n.toLocaleString("en-IN")}`;
+};
 
 export function AutomationStore() {
   const { openDemo } = useDemo();
+  const [currency] = useCurrency();
+  const p = (x: { price: string; usd: string }) => (currency === "USD" ? x.usd : x.price);
   const regular = store.filter((s) => !s.premium && !s.bundle);
   const bundles = store.filter((s) => s.bundle);
   const premium = store.find((s) => s.premium);
@@ -28,6 +34,9 @@ export function AutomationStore() {
         <SubHead label="Automation Store" title="Pick only what you need." />
         <Reveal delay={0.1}>
           <p className="mx-auto mt-4 max-w-md text-center text-fg-muted">Every service works on its own. Add more any time.</p>
+          <div className="mt-4 flex justify-center">
+            <CurrencySwitch />
+          </div>
           <p className="mx-auto mt-5 w-fit rounded-full border border-flow/40 bg-flow/10 px-4 py-1.5 text-center text-sm font-medium text-flow-soft">
             🎁 Messaging automations are <strong className="text-flow">FREE for 3 days</strong> —{" "}
             <a href="/app/signup" className="underline underline-offset-4">
@@ -58,11 +67,11 @@ export function AutomationStore() {
                   <span className="block font-mono text-[0.58rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
                   <span className="mt-1 flex flex-wrap items-baseline gap-x-1">
                     <span className="display text-[1.9rem] leading-none text-fg transition-colors duration-300 group-hover:text-flow-soft">
-                      {s.price}
+                      {p(s)}
                     </span>
                     <span className="text-xs whitespace-nowrap text-fg-muted">{s.billing === "monthly" ? "/mo" : "one-time"}</span>
                   </span>
-                  {s.billing === "monthly" && <span className="mt-1 block text-[0.7rem] text-flow-soft">or {yearly(s.price)}/year · 2 months free</span>}
+                  {s.billing === "monthly" && <span className="mt-1 block text-[0.7rem] text-flow-soft">or {yearly(p(s))}/year · 2 months free</span>}
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-flow">
                     Get started <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                   </span>
@@ -90,9 +99,9 @@ export function AutomationStore() {
                 <span className="mt-1 block max-w-2xl text-sm text-fg-muted">{b.body}</span>
               </span>
               <span className="md:text-right">
-                <span className="display text-[2rem] leading-none">{b.price}</span>
+                <span className="display text-[2rem] leading-none">{p(b)}</span>
                 <span className="text-sm text-fg-muted">/mo</span>
-                <span className="mt-1 block text-xs text-flow-soft">or {yearly(b.price)}/year · 2 months free</span>
+                <span className="mt-1 block text-xs text-flow-soft">or {yearly(p(b))}/year · 2 months free</span>
               </span>
             </button>
           </Reveal>
@@ -120,9 +129,9 @@ export function AutomationStore() {
               </div>
               <p className="md:text-right">
                 <span className="block font-mono text-[0.58rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
-                <span className="display text-[2.4rem] leading-none">{premium.price}</span>
+                <span className="display text-[2.4rem] leading-none">{p(premium)}</span>
                 <span className="text-sm text-fg-muted">/mo</span>
-                <span className="mt-1 block text-xs text-flow-soft">or {yearly(premium.price)}/year · 2 months free</span>
+                <span className="mt-1 block text-xs text-flow-soft">or {yearly(p(premium))}/year · 2 months free</span>
               </p>
               <div className="flex flex-col items-start gap-2">
                 <BookDemoButton label="Get started" interest={premium.title} icon className="w-fit" />
@@ -134,7 +143,7 @@ export function AutomationStore() {
           </Reveal>
         )}
 
-        <p className="mt-6 text-center text-sm text-fg-subtle">Prices in Indian rupees, all-inclusive. Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
+        <p className="mt-6 text-center text-sm text-fg-subtle">{currency === "USD" ? "Prices in US dollars for customers outside India; payment is taken in Indian rupees at the same value." : "Prices in Indian rupees, all-inclusive."} Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
       </div>
     </section>
   );

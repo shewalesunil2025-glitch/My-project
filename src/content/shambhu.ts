@@ -53,6 +53,8 @@ export type StoreItem = {
   icon: LucideIcon;
   /** "Starting at" price in INR (all-inclusive). */
   price: string;
+  /** The same price in US dollars, shown to visitors outside India. */
+  usd: string;
   billing: "monthly" | "one-time";
   premium?: boolean;
   /** Free for the first 3 days (messaging automations only). */
@@ -63,21 +65,21 @@ export type StoreItem = {
 
 /** The Automation Store: every service can be bought on its own. */
 export const store: StoreItem[] = [
-  { title: "Website", body: "A fast, modern website with ibaxai built in.", icon: Globe, price: "₹2,999", billing: "one-time" },
-  { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "₹1,499", billing: "monthly" },
-  { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹699", billing: "monthly", trial: true },
-  { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹599", billing: "monthly", trial: true },
-  { title: "Lead Follow-up", body: "Every enquiry followed up on time.", icon: UserRoundCheck, price: "₹499", billing: "monthly", trial: true },
-  { title: "Instagram Automation", body: "12 AI posts + 4 reels a month, DMs and comments.", icon: Camera, price: "₹1,999", billing: "monthly" },
-  { title: "Facebook Automation", body: "12 AI posts + 4 videos a month, page messages.", icon: ThumbsUp, price: "₹1,999", billing: "monthly" },
-  { title: "YouTube Automation", body: "8 AI Shorts a month, titles and comment replies.", icon: Clapperboard, price: "₹2,999", billing: "monthly" },
-  { title: "Email Automation", body: "Inbox sorting, drafts and follow-ups.", icon: Mail, price: "₹499", billing: "monthly", trial: true },
-  { title: "Google Review Management", body: "Review requests on WhatsApp after every sale. Never fake reviews.", icon: Star, price: "₹499", billing: "monthly", trial: true },
+  { title: "Website", body: "A fast, modern website with ibaxai built in.", icon: Globe, price: "₹2,999", usd: "$39", billing: "one-time" },
+  { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "₹1,499", usd: "$19", billing: "monthly" },
+  { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹699", usd: "$9", billing: "monthly", trial: true },
+  { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹599", usd: "$7", billing: "monthly", trial: true },
+  { title: "Lead Follow-up", body: "Every enquiry followed up on time.", icon: UserRoundCheck, price: "₹499", usd: "$6", billing: "monthly", trial: true },
+  { title: "Instagram Automation", body: "12 AI posts + 4 reels a month, DMs and comments.", icon: Camera, price: "₹1,999", usd: "$24", billing: "monthly" },
+  { title: "Facebook Automation", body: "12 AI posts + 4 videos a month, page messages.", icon: ThumbsUp, price: "₹1,999", usd: "$24", billing: "monthly" },
+  { title: "YouTube Automation", body: "8 AI Shorts a month, titles and comment replies.", icon: Clapperboard, price: "₹2,999", usd: "$35", billing: "monthly" },
+  { title: "Email Automation", body: "Inbox sorting, drafts and follow-ups.", icon: Mail, price: "₹499", usd: "$6", billing: "monthly", trial: true },
+  { title: "Google Review Management", body: "Review requests on WhatsApp after every sale. Never fake reviews.", icon: Star, price: "₹499", usd: "$6", billing: "monthly", trial: true },
   {
     title: "Social Pack",
-    body: "Instagram, Facebook and YouTube together: 12 AI posts + 4 reels on Instagram & Facebook and 8 Shorts on YouTube every month, with DM and comment replies. Saves ₹998 a month.",
+    body: "Instagram, Facebook and YouTube together: 12 AI posts + 4 reels on Instagram & Facebook and 8 Shorts on YouTube every month, with DM and comment replies. Cheaper than buying all three separately.",
     icon: Clapperboard,
-    price: "₹5,999",
+    price: "₹5,999", usd: "$69",
     billing: "monthly",
     bundle: true,
   },
@@ -85,7 +87,7 @@ export const store: StoreItem[] = [
     title: "Digital Marketing",
     body: "The premium package: content, social media, campaigns and reporting, run together.",
     icon: Megaphone,
-    price: "₹9,999",
+    price: "₹9,999", usd: "$119",
     billing: "monthly",
     premium: true,
   },

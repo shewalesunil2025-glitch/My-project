@@ -51,6 +51,8 @@ export type Subscription = {
   status: "active" | "cancelled" | "trial" | "expired";
   startedAt: string;
   renewsAt: string;
+  /** Currency of `price` (default INR). */
+  currency?: "INR" | "USD";
 };
 
 export type Invoice = {
@@ -61,6 +63,8 @@ export type Invoice = {
   amount: number;
   date: string;
   status: "paid" | "test";
+  /** Currency of `amount` (default INR); payment is always taken in rupees. */
+  currency?: "INR" | "USD";
 };
 
 export type AutomationStatus = "setup" | "active" | "paused" | "scheduled" | "failed" | "attention";

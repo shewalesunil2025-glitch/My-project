@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Check, Globe } from "lucide-react";
 import { product } from "@/config/product";
 import { businessCategories } from "@/content/app/services";
 import { countries } from "@/content/app/countries";
+import { PhoneInput } from "@/components/app/PhoneInput";
 import { audit, logActivity, nowIso, updateWorkspace, useSession } from "@/lib/app/store";
 import type { AssistantProfile, Business, User } from "@/lib/app/types";
 import { BrandLogo, Btn, Field, FullScreenLoader, Input, Notice, Select, TextArea } from "@/components/app/ui";
@@ -135,7 +136,7 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
                   <Input id="b-owner" value={biz.ownerName} onChange={set("ownerName")} />
                 </Field>
                 <Field label="Business phone" htmlFor="b-phone" required>
-                  <Input id="b-phone" type="tel" value={biz.phone} onChange={set("phone")} />
+                  <PhoneInput id="b-phone" value={biz.phone} country={biz.country} onChange={(v) => setBiz((b) => ({ ...b, phone: v }))} onCountry={(c) => setBiz((b) => ({ ...b, country: c }))} />
                 </Field>
               </div>
               <Field label="Business email" htmlFor="b-email">

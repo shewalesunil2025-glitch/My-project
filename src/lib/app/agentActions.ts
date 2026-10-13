@@ -1,8 +1,9 @@
-import { formatPrice, product } from "@/config/product";
+import { product } from "@/config/product";
 import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { activate, missingConnections, runTest, setAutomationStatus } from "./automation";
 import { cloudAuthHeader } from "./cloud";
 import { beginTrial, trialOver } from "./trial";
+import { appCurrency, money, svcPrice } from "./money";
 import { audit, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
 import type { Automation, PlanPeriod, ProviderId, Workspace } from "./types";
 
@@ -21,11 +22,12 @@ export function periodFor(svc: ServiceDef, requested?: string): PlanPeriod {
 }
 
 export function priceFor(svc: ServiceDef, period: PlanPeriod) {
-  return period === "annual" ? annualPrice(svc.price ?? 0) : (svc.price ?? 0);
+  const base = svcPrice(svc) ?? 0;
+  return period === "annual" ? annualPrice(base) : base;
 }
 
 export function priceLabel(svc: ServiceDef, period: PlanPeriod) {
-  const amount = formatPrice(priceFor(svc, period));
+  const amount = money(priceFor(svc, period));
   return period === "one-time" ? `${amount} one-time` : `${amount}/${period === "annual" ? "year" : "month"}`;
 }
 
@@ -66,8 +68,8 @@ export function buyService(serviceId: string, requested?: string): string | null
       const a = automationFor(w, svc.id);
       const sub = a && w.subscriptions.find((x) => x.id === a.subscriptionId);
       if (!a || !sub) return;
-      Object.assign(sub, { period, price: amount, status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
-      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, date: nowIso(), status: product.previewMode ? "test" : "paid" });
+      Object.assign(sub, { period, price: amount, currency: appCurrency(), status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
+      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode ? "test" : "paid" });
       const wasOver = trialOver(a);
       delete a.trialEndsAt;
       if (wasOver && a.status === "paused") {
@@ -75,8 +77,8 @@ export function buyService(serviceId: string, requested?: string): string | null
         a.note = undefined;
       }
       a.logs.unshift({ at: nowIso(), level: "success", message: "Payment confirmed — free trial converted to a paid plan" });
-      logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc.name}`, detail: `${formatPrice(amount)} · ${period}`, href: "/app/billing" });
-      notify(w, { kind: "payment", title: "Payment confirmed", detail: `${svc.name} — ${formatPrice(amount)}. It keeps running after your trial.`, href: `/app/automations/${a.id}` });
+      logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc.name}`, detail: `${money(amount)} · ${period}`, href: "/app/billing" });
+      notify(w, { kind: "payment", title: "Payment confirmed", detail: `${svc.name} — ${money(amount)}. It keeps running after your trial.`, href: `/app/automations/${a.id}` });
       audit(w, `Purchased ${svc.name} (${period}) after the free trial`);
     });
     return existing.id;
@@ -85,13 +87,14 @@ export function buyService(serviceId: string, requested?: string): string | null
 
   updateWorkspace((w) => {
     const subId = uid();
-    w.subscriptions.push({ id: subId, serviceId: svc.id, period, price: amount, status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
+    w.subscriptions.push({ id: subId, serviceId: svc.id, period, price: amount, currency: appCurrency(), status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
     w.invoices.unshift({
       id: uid(),
       number: `LUMI-${1000 + w.invoices.length + 1}`,
       serviceId: svc.id,
       period,
       amount,
+      currency: appCurrency(),
       date: nowIso(),
       status: product.previewMode ? "test" : "paid",
     });
@@ -106,8 +109,8 @@ export function buyService(serviceId: string, requested?: string): string | null
       createdAt: nowIso(),
       logs: [{ at: nowIso(), level: "info", message: "Payment confirmed — waiting for setup" }],
     });
-    logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc.name}`, detail: `${formatPrice(amount)} · ${period}`, href: "/app/billing" });
-    notify(w, { kind: "payment", title: "Payment confirmed", detail: `${svc.name} — ${formatPrice(amount)}. Let's activate it.`, href: `/app/automations/${automationId}` });
+    logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc.name}`, detail: `${money(amount)} · ${period}`, href: "/app/billing" });
+    notify(w, { kind: "payment", title: "Payment confirmed", detail: `${svc.name} — ${money(amount)}. Let's activate it.`, href: `/app/automations/${automationId}` });
     audit(w, `Purchased ${svc.name} (${period})`);
   });
   return automationId;
@@ -129,7 +132,7 @@ export function startTrialService(serviceId: string): string | null {
   const automationId = uid();
   updateWorkspace((w) => {
     const subId = uid();
-    w.subscriptions.push({ id: subId, serviceId: svc.id, period: "monthly", price: svc.price!, status: "trial", startedAt: nowIso(), renewsAt: endsAt });
+    w.subscriptions.push({ id: subId, serviceId: svc.id, period: "monthly", price: svcPrice(svc) ?? svc.price!, currency: appCurrency(), status: "trial", startedAt: nowIso(), renewsAt: endsAt });
     w.automations.push({
       id: automationId,
       serviceId: svc.id,
@@ -275,7 +278,8 @@ export function setServiceState(serviceId: string, state: "pause" | "resume") {
 
 /** One line per service the owner has, for the assistant to see where each one is up to. */
 export function servicesSnapshot(ws: Workspace) {
-  if (!ws.automations.length) return "Services bought: none yet.";
+  const cur = appCurrency(ws) === "INR" ? "Owner's currency: Indian rupees (₹) — quote ₹ prices." : "Owner's currency: US dollars ($) — quote the $ prices; payment is taken in rupees at their rupee value.";
+  if (!ws.automations.length) return `${cur}\nServices bought: none yet.`;
   return ws.automations
     .map((a) => {
       const svc = serviceById(a.serviceId);
@@ -285,5 +289,6 @@ export function servicesSnapshot(ws: Workspace) {
       return `- ${svc.id} (${svc.name}): paid; status ${a.status}; missing details: ${missing.join(", ") || "none"}; accounts to connect: ${accounts.join(", ") || "none"}.`;
     })
     .filter(Boolean)
-    .join("\n");
+    .join("\n")
+    .replace(/^/, `${cur}\n`);
 }

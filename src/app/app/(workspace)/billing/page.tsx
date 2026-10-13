@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { FileText, X } from "lucide-react";
-import { formatPrice, product } from "@/config/product";
-import { annualPrice, serviceById } from "@/content/app/services";
+import { product } from "@/config/product";
+import { annualPrice, priceIn, serviceById } from "@/content/app/services";
 import { audit, logActivity, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { Invoice } from "@/lib/app/types";
+import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { Btn, BtnLink, Card, EmptyState, Notice, PageHeader, Pill, SectionTitle, Stat, fmtDate } from "@/components/app/ui";
 
@@ -18,7 +19,8 @@ export default function BillingPage() {
 
   const active = ws.subscriptions.filter((s) => s.status === "active");
   const recurring = active.filter((s) => s.period !== "one-time");
-  const monthly = recurring.reduce((s, x) => s + (x.period === "monthly" ? x.price : x.price / 12), 0);
+  const cur = appCurrency(ws);
+  const monthly = recurring.filter((x) => (x.currency ?? "INR") === cur).reduce((s, x) => s + (x.period === "monthly" ? x.price : x.price / 12), 0);
   const nextRenewal = [...recurring].sort((a, b) => a.renewsAt.localeCompare(b.renewsAt))[0];
   const dm = active.find((s) => s.serviceId === "digital-marketing");
   const covered = active.filter((s) => serviceById("digital-marketing")!.includes!.includes(s.serviceId));
@@ -27,9 +29,10 @@ export default function BillingPage() {
     updateWorkspace((w) => {
       const s = w.subscriptions.find((x) => x.id === id);
       const svc = s && serviceById(s.serviceId);
-      if (!s || !svc?.price) return;
+      const base = svc && priceIn(svc, s?.currency ?? "INR");
+      if (!s || !svc || !base) return;
       s.period = s.period === "monthly" ? "annual" : "monthly";
-      s.price = s.period === "annual" ? annualPrice(svc.price) : svc.price;
+      s.price = s.period === "annual" ? annualPrice(base) : base;
       audit(w, `${svc.name}: switched to ${s.period} billing from next renewal`);
     });
   }
@@ -59,7 +62,7 @@ export default function BillingPage() {
 
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Active services" value={active.length} />
-        <Stat label="Monthly total" value={formatPrice(monthly)} hint="Recurring plans; annual spread per month" />
+        <Stat label="Monthly total" value={money(monthly, cur)} hint="Recurring plans; annual spread per month" />
         <Stat label="Next renewal" value={nextRenewal ? fmtDate(nextRenewal.renewsAt) : "—"} hint={nextRenewal && serviceById(nextRenewal.serviceId)?.name} />
       </div>
 
@@ -69,7 +72,7 @@ export default function BillingPage() {
           <Link href="/app/services/digital-marketing" className="font-semibold underline">
             Digital Marketing
           </Link>{" "}
-          — together with ads, SEO, content and a monthly report — for {formatPrice(serviceById("digital-marketing")!.price!)}/month.
+          — together with ads, SEO, content and a monthly report — for {money(svcPrice(serviceById("digital-marketing")!, ws)!, cur)}/month.
         </Notice>
       )}
 
@@ -89,7 +92,7 @@ export default function BillingPage() {
                         {svc.name} {s.serviceId === "digital-marketing" && <Pill tone="ember">Package</Pill>}
                       </p>
                       <p className="text-xs text-fg-subtle">
-                        {s.status === "trial" || s.status === "expired" ? `Free trial · ${s.status === "trial" ? "ends" : "ended"} ${fmtDate(s.renewsAt)}` : s.period === "one-time" ? `${formatPrice(s.price)} · paid once on ${fmtDate(s.startedAt)}` : `${formatPrice(s.price)} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
+                        {s.status === "trial" || s.status === "expired" ? `Free trial · ${s.status === "trial" ? "ends" : "ended"} ${fmtDate(s.renewsAt)}` : s.period === "one-time" ? `${money(s.price, s.currency ?? "INR")} · paid once on ${fmtDate(s.startedAt)}` : `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
                       </p>
                     </div>
                     {s.status === "trial" || s.status === "expired" ? (
@@ -103,7 +106,7 @@ export default function BillingPage() {
                       <BtnLink size="sm" href={`/app/services/${s.serviceId}`}>
                         Pay & keep {svc.name}
                       </BtnLink>
-                      <span className="text-xs text-fg-subtle">{s.status === "trial" ? `Free until ${fmtDate(s.renewsAt)}, then ${formatPrice(svc.price ?? s.price)}/month.` : "Paused — pay to switch it back on."}</span>
+                      <span className="text-xs text-fg-subtle">{s.status === "trial" ? `Free until ${fmtDate(s.renewsAt)}, then ${money(priceIn(svc, s.currency ?? "INR") ?? s.price, s.currency)}/month.` : "Paused — pay to switch it back on."}</span>
                     </div>
                   )}
                   {s.status === "active" && s.period !== "one-time" && (
@@ -161,7 +164,7 @@ export default function BillingPage() {
                     <td className="px-4 py-3 font-mono text-xs">{inv.number}</td>
                     <td className="px-4 py-3">{serviceById(inv.serviceId)?.name}</td>
                     <td className="px-4 py-3 text-fg-muted">{fmtDate(inv.date)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{formatPrice(inv.amount)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{money(inv.amount, inv.currency ?? "INR")}</td>
                     <td className="px-4 py-3 text-right">
                       <Btn size="sm" variant="subtle" onClick={() => setInvoice(inv)}>
                         <FileText className="size-3.5" aria-hidden /> View
@@ -207,11 +210,11 @@ export default function BillingPage() {
                   <td className="py-2">
                     {serviceById(invoice.serviceId)?.name} — {invoice.period}
                   </td>
-                  <td className="py-2 text-right">{formatPrice(invoice.amount)}</td>
+                  <td className="py-2 text-right">{money(invoice.amount, invoice.currency ?? "INR")}</td>
                 </tr>
                 <tr className="font-semibold">
                   <td className="py-2">Total</td>
-                  <td className="py-2 text-right">{formatPrice(invoice.amount)}</td>
+                  <td className="py-2 text-right">{money(invoice.amount, invoice.currency ?? "INR")}</td>
                 </tr>
               </tbody>
             </table>

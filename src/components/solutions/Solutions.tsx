@@ -1,5 +1,6 @@
 "use client";
 
+import { Money } from "@/components/cta/Money";
 import { useRef, type ReactNode } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -249,7 +250,7 @@ function SolutionCard({ solution: s, number }: { solution: Solution; number: num
         <p className="mt-3 text-[0.8rem] leading-relaxed text-fg-muted">{s.summary}</p>
         <p className="mt-4 flex items-baseline gap-1.5">
           <span className="font-mono text-[0.6rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
-          <span className="text-lg font-semibold text-flow-soft">{s.price}</span>
+          <span className="text-lg font-semibold text-flow-soft"><Money inr={s.price} usd={s.usd} /></span>
         </p>
       </div>
       <div className="relative mx-4 mb-4 h-[8.5rem] overflow-hidden rounded-2xl opacity-90" aria-hidden>
