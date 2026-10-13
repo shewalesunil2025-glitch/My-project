@@ -95,9 +95,9 @@ const intents: Intent[] = [
   {
     keys: /(review|rating|रिव्यू|रिव्ह्यू|रेटिंग)/i,
     answers: {
-      en: `Google Review Management asks happy customers for a review and drafts replies for you. We never create fake reviews. Starting at ${P.reviews}.`,
-      hi: `गूगल रिव्यू मैनेजमेंट खुश ग्राहकों से रिव्यू माँगता है और आपके लिए जवाब तैयार करता है। हम कभी नकली रिव्यू नहीं बनाते। ${P.reviews} से शुरू।`,
-      mr: `गूगल रिव्ह्यू मॅनेजमेंट खूश ग्राहकांकडे रिव्ह्यू मागतो आणि तुमच्यासाठी उत्तर तयार करतो. आम्ही कधीही खोटे रिव्ह्यू बनवत नाही. ${P.reviews} पासून.`,
+      en: `Google Review Management asks your customers for a Google review on your own WhatsApp, automatically after a sale or with one tap in the app. We never create fake reviews. Starting at ${P.reviews}.`,
+      hi: `गूगल रिव्यू मैनेजमेंट आपके ग्राहकों से आपके WhatsApp पर Google रिव्यू माँगता है — बिक्री के बाद अपने आप या ऐप में एक टैप से। हम कभी नकली रिव्यू नहीं बनाते। ${P.reviews} से शुरू।`,
+      mr: `गूगल रिव्ह्यू मॅनेजमेंट तुमच्या ग्राहकांकडे तुमच्या WhatsApp वर Google रिव्ह्यू मागतो — विक्रीनंतर आपोआप किंवा ॲपमध्ये एका टॅपने. आम्ही कधीही खोटे रिव्ह्यू बनवत नाही. ${P.reviews} पासून.`,
     },
   },
   {

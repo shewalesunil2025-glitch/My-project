@@ -185,6 +185,18 @@ export const agentTools: Anthropic.Beta.BetaTool[] = [
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
+    name: "ask_review",
+    description:
+      "Sends one real customer a Google review request on the owner's WhatsApp (Google Review Management must be on). Use only when the owner asks to request a review from a specific customer and gives their WhatsApp number. Never for fake reviews or bulk lists.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: { name: { type: "string", description: "Customer's name (empty if not given)." }, phone: { type: "string", description: "Customer's WhatsApp number." } },
+      required: ["name", "phone"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "show_link",
     description: "Adds a button under your reply that opens a page in the app.",
     strict: true,

@@ -1,12 +1,78 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Send, Star } from "lucide-react";
 import { product } from "@/config/product";
 import { audit, updateWorkspace } from "@/lib/app/store";
-import type { Review } from "@/lib/app/types";
+import { askForReview, askMessages, reviewsOn } from "@/lib/app/reviewRequests";
+import type { Review, Workspace } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
-import { Btn, BtnLink, Card, EmptyState, Notice, PageHeader, Stat, TextArea, relTime, withinDays } from "@/components/app/ui";
+import { Btn, BtnLink, Card, EmptyState, Field, Input, Notice, PageHeader, Pill, SectionTitle, Spinner, Stat, TextArea, relTime, withinDays } from "@/components/app/ui";
+
+/** Ask a customer for a Google review on WhatsApp, and the requests sent so far. */
+function AskForReview({ ws }: { ws: Workspace }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const sent = (ws.reviewRequests ?? []).filter((r) => r.status === "sent");
+
+  async function ask() {
+    setBusy(true);
+    setMsg(null);
+    const result = await askForReview(name, phone, "manual");
+    setBusy(false);
+    setMsg({ ok: result === "sent", text: askMessages[result] });
+    if (result === "sent") {
+      setName("");
+      setPhone("");
+    }
+  }
+
+  return (
+    <section className="mb-8 grid gap-4 lg:grid-cols-[1fr_1fr]">
+      <Card className="border-flow/30">
+        <h2 className="flex items-center gap-2 font-semibold">
+          <Send className="size-4 text-flow" aria-hidden /> Ask a customer for a review
+        </h2>
+        <p className="mt-1 text-sm text-fg-muted">IBAX sends a thank-you with your Google review link on your WhatsApp. Ask only real customers.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <Field label="Customer name" htmlFor="rv-name">
+            <Input id="rv-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Priya" maxLength={80} />
+          </Field>
+          <Field label="WhatsApp number" htmlFor="rv-phone">
+            <Input id="rv-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="98765 43210" inputMode="tel" maxLength={20} />
+          </Field>
+        </div>
+        {msg && (
+          <Notice tone={msg.ok ? "ember" : "amber"} className="mt-3">
+            {msg.text}
+          </Notice>
+        )}
+        <Btn className="mt-4 w-full sm:w-auto" onClick={ask} disabled={busy || phone.replace(/\D/g, "").length < 10}>
+          {busy ? <Spinner /> : <Send className="size-4" aria-hidden />} Send review request
+        </Btn>
+      </Card>
+      <Card>
+        <SectionTitle action={<Pill tone="green">{sent.filter((r) => withinDays(r.at, 30)).length} this month</Pill>}>Review requests</SectionTitle>
+        {sent.length === 0 ? (
+          <p className="text-sm text-fg-muted">None yet. Send one here, or mark a lead as Converted — IBAX asks them automatically.</p>
+        ) : (
+          <ul className="max-h-64 space-y-2 overflow-y-auto text-sm">
+            {(ws.reviewRequests ?? []).slice(0, 30).map((r) => (
+              <li key={r.id} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] px-3 py-2">
+                <span className="min-w-0 truncate">
+                  {r.name} <span className="text-fg-subtle">· {r.phone}</span>
+                </span>
+                <span className="shrink-0 text-xs text-fg-subtle">{r.status === "sent" ? relTime(r.at) : "Not sent"}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </section>
+  );
+}
 
 function Stars({ n }: { n: number }) {
   return (
@@ -76,12 +142,23 @@ export default function ReviewsPage() {
   return (
     <div>
       <PageHeader eyebrow="Google Review Assistant" title="Reviews" subtitle="New reviews, suggested replies and your rating over time." />
+      {reviewsOn(ws) ? (
+        <AskForReview ws={ws} />
+      ) : (
+        <Card className="mb-6 flex flex-wrap items-center gap-4 border-flow/30">
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold">Get more real Google reviews</p>
+            <p className="mt-1 text-sm text-fg-muted">IBAX asks your customers for a review on your WhatsApp — automatically after a sale, or with one tap.</p>
+          </div>
+          <BtnLink href="/app/services/reviews">{active ? "Finish setup" : "Get Google Review Management"}</BtnLink>
+        </Card>
+      )}
       <Notice tone="blue" className="mb-6">
         {product.name} only works with genuine reviews from real customers. It never writes fake reviews or manipulates ratings.
       </Notice>
       {ws.reviews.length === 0 ? (
-        <EmptyState title={active ? "No reviews yet" : "Watch and answer your Google reviews"} action={!active && <BtnLink href="/app/services/reviews">Get Google Review Assistant</BtnLink>}>
-          {active ? "You'll be notified the moment a new review arrives." : "Get alerts, suggested replies and review requests to happy customers."}
+        <EmptyState title="New-review alerts are coming soon">
+          Soon IBAX will also show your Google reviews here and draft replies — once Google approves our connection.
         </EmptyState>
       ) : (
         <>

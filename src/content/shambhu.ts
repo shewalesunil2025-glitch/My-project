@@ -72,7 +72,7 @@ export const store: StoreItem[] = [
   { title: "Facebook Automation", body: "12 AI posts + 4 videos a month, page messages.", icon: ThumbsUp, price: "₹1,999", billing: "monthly" },
   { title: "YouTube Automation", body: "8 AI Shorts a month, titles and comment replies.", icon: Clapperboard, price: "₹2,999", billing: "monthly" },
   { title: "Email Automation", body: "Inbox sorting, drafts and follow-ups.", icon: Mail, price: "₹499", billing: "monthly", trial: true },
-  { title: "Google Review Management", body: "Review requests and reply drafts. Never fake reviews.", icon: Star, price: "₹499", billing: "monthly", trial: true },
+  { title: "Google Review Management", body: "Review requests on WhatsApp after every sale. Never fake reviews.", icon: Star, price: "₹499", billing: "monthly", trial: true },
   {
     title: "Social Pack",
     body: "Instagram, Facebook and YouTube together: 12 AI posts + 4 reels on Instagram & Facebook and 8 Shorts on YouTube every month, with DM and comment replies. Saves ₹998 a month.",
