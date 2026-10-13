@@ -93,7 +93,7 @@ export function AttachMenu({
             <Sparkles className="size-4 text-flow" aria-hidden />
             <span>
               <span className="block font-medium">{imageMode ? "Stop creating images" : "Create image"}</span>
-              <span className="block text-xs text-fg-subtle">Posters, posts, banners — with AI</span>
+              <span className="block text-xs text-fg-subtle">Posters, cartoons, posts — free</span>
             </span>
           </button>
         </div>

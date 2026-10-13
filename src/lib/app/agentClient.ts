@@ -384,8 +384,7 @@ let lastPhoto: { mime: string; data: string } | null = null;
 export type ImageResult = { ok: true; url: string; left: number } | { ok: false; reason: string; message: string };
 
 const imageErrors: Record<string, string> = {
-  limit: "Aaj ki photo limit poori ho gayi (free trial: 3 photo/din, paid plan: 10 photo/din). Kal phir banaiye.",
-  billing: "Photo banane wali AI abhi chalu nahi hai — ibaxai team ise jaldi chalu karegi.",
+  limit: "Aaj ki 20 free photo poori ho gayi. Kal phir banaiye.",
   unauthorized: "Photo banane ke liye apne ibaxai account se login kariye.",
   not_configured: "Photo banane ke liye apne ibaxai account se login kariye.",
   invalid: "Batayiye kaisi photo chahiye.",

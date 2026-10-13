@@ -381,7 +381,11 @@ export async function geminiImageModels() {
  * Makes one image from a description, or edits the given photo. Returns a base64 image.
  * Image models are paid on Google's side (no free tier): about ₹3–4 an image.
  */
+/** Set when Google refuses image models for this key (no billing): skip them for an hour. */
+let imageBlockedUntil = 0;
+
 export async function geminiImage(prompt: string, photo?: InlineFile): Promise<{ mime: string; data: string; model: string }> {
+  if (Date.now() < imageBlockedUntil) throw Object.assign(new Error("Gemini image models need billing on this key"), { status: 429 });
   const { gemini, imagen } = await geminiImageModels();
   let lastError: Error & { status?: number } = new Error("No image model is available for this Gemini key.");
   for (const model of gemini.slice(0, 3)) {
@@ -427,5 +431,6 @@ export async function geminiImage(prompt: string, photo?: InlineFile): Promise<{
     const p = data.predictions?.[0];
     if (p?.bytesBase64Encoded) return { mime: p.mimeType ?? "image/png", data: p.bytesBase64Encoded, model };
   }
+  if (lastError.status === 429 || lastError.status === 403 || /billing|quota|limit: 0|free_tier|RESOURCE_EXHAUSTED/i.test(lastError.message)) imageBlockedUntil = Date.now() + 3_600_000;
   throw lastError;
 }
