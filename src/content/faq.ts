@@ -5,7 +5,7 @@ export const faqs = [
   },
   {
     q: "What do I get with Digital Marketing?",
-    a: "Social media management for Instagram, Facebook and YouTube, content creation with a monthly calendar, Meta and Google ad campaigns, local SEO and Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report — starting at ₹4,999/mo. Ad spend is paid separately to the platforms.",
+    a: "Social media management for Instagram, Facebook and YouTube, content creation with a monthly calendar, Meta and Google ad campaigns, local SEO and Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report — starting at ₹9,999/mo. Ad spend is paid separately to the platforms.",
   },
   {
     q: "Do I have to buy every service?",

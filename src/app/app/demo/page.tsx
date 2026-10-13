@@ -73,7 +73,7 @@ const steps: { title: string; text: string; screen: ReactNode }[] = [
     text: "Open the Automation Store. Every service has its features, price and setup time. Buy one, a few, or Digital Marketing for everything.",
     screen: (
       <div className="space-y-2">
-        {["WhatsApp AI Assistant · ₹699/mo", "AI Voice Assistant · ₹1,499/mo", "YouTube Automation · ₹499/mo", "Digital Marketing · ₹4,999/mo"].map((s, i) => (
+        {["WhatsApp AI Assistant · ₹699/mo", "AI Voice Assistant · ₹1,499/mo", "YouTube Automation · ₹2,999/mo", "Digital Marketing · ₹9,999/mo"].map((s, i) => (
           <Row key={s} className={i === 2 ? "ring-1 ring-flow" : ""}>{s}</Row>
         ))}
       </div>

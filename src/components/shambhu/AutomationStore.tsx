@@ -17,7 +17,8 @@ const yearly = (monthly: string) => `₹${(Number(monthly.replace(/\D/g, "")) * 
 
 export function AutomationStore() {
   const { openDemo } = useDemo();
-  const regular = store.filter((s) => !s.premium);
+  const regular = store.filter((s) => !s.premium && !s.bundle);
+  const bundles = store.filter((s) => s.bundle);
   const premium = store.find((s) => s.premium);
 
   return (
@@ -70,6 +71,32 @@ export function AutomationStore() {
             </Reveal>
           ))}
         </ul>
+
+        {bundles.map((b) => (
+          <Reveal key={b.title} delay={0.05} className="mt-4">
+            <button
+              type="button"
+              onClick={() => openDemo(b.title)}
+              className="glass group grid w-full items-center gap-4 rounded-2xl p-5 text-left transition-[border-color] duration-300 hover:border-flow/40 md:grid-cols-[auto_1fr_auto] md:p-6"
+            >
+              <span className="grid size-12 place-items-center rounded-2xl border border-flow/30 bg-flow/10 text-flow">
+                <b.icon className="size-5" aria-hidden />
+              </span>
+              <span>
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="text-lg font-semibold">{b.title}</span>
+                  <span className="rounded-full border border-flow/40 px-2 py-0.5 text-[0.65rem] font-semibold text-flow uppercase">Best value</span>
+                </span>
+                <span className="mt-1 block max-w-2xl text-sm text-fg-muted">{b.body}</span>
+              </span>
+              <span className="md:text-right">
+                <span className="display text-[2rem] leading-none">{b.price}</span>
+                <span className="text-sm text-fg-muted">/mo</span>
+                <span className="mt-1 block text-xs text-flow-soft">or {yearly(b.price)}/year · 2 months free</span>
+              </span>
+            </button>
+          </Reveal>
+        ))}
 
         {premium && (
           <Reveal delay={0.1} className="mt-4">

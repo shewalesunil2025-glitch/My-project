@@ -16,7 +16,7 @@ export const solutions: Solution[] = [
     title: "Digital Marketing · Premium",
     headline: "More of the right customers finding you.",
     summary: "Social media, content, ads, local SEO and a monthly report — one package.",
-    price: "₹4,999/mo",
+    price: "₹9,999/mo",
   },
   {
     id: "website",
@@ -65,7 +65,7 @@ export const solutions: Solution[] = [
     title: "Instagram · Facebook · YouTube",
     headline: "Your social media, on autopilot.",
     summary: "Replies to DMs and comments, and plans posts in your brand voice.",
-    price: "₹499/mo each",
+    price: "from ₹1,999/mo",
   },
   {
     id: "email",
