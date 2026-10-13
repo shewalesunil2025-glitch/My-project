@@ -212,6 +212,10 @@ export type ChatMessage = {
   text: string;
   at: string;
   links?: { label: string; href: string }[];
+  /** A photo or document the owner attached (only its name and a small preview are kept). */
+  file?: { name: string; kind: "image" | "pdf" | "text"; thumb?: string };
+  /** An image IBAX made (public URL, or a data URL when it couldn't be stored). */
+  image?: string;
   /** Action cards IBAX shows in the chat (pay, connect an account, activated). */
   cards?: AgentCard[];
 };

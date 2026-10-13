@@ -30,6 +30,8 @@ import { answerLocally } from "@/lib/shambhuLocal";
 import { cn } from "@/lib/cn";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { ShambhuBot } from "./ShambhuBot";
+import { AttachMenu, AttachmentChip, SentFile } from "@/components/chat/Attach";
+import type { Attachment } from "@/lib/attachments";
 import {
   speakNaturally,
   stopNaturalVoice,
@@ -77,7 +79,7 @@ function getRecognition(): RecognitionCtor | null {
 }
 
 type Status = "idle" | "listening" | "thinking" | "speaking";
-type ChatLine = AgentMessage & { lang?: AgentLang };
+type ChatLine = AgentMessage & { lang?: AgentLang; file?: { name: string; kind: string; thumb?: string } };
 
 /** The phone's own voice (only when the natural voice isn't available): as in the app. */
 const PHONE_PITCH = 1.08;
@@ -145,6 +147,7 @@ export function ShambhuAgent() {
     { role: "assistant", content: GREETING, lang: "hi" },
   ]);
   const [input, setInput] = useState("");
+  const [file, setFile] = useState<Attachment | null>(null);
   const [interim, setInterim] = useState("");
   const [tip, setTip] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -272,7 +275,9 @@ export function ShambhuAgent() {
 
   const ask = useCallback(
     async (question: string) => {
-      const text = question.trim();
+      const attached = file;
+      // A file on its own: ask IBAX what it is about.
+      const text = question.trim() || (attached ? "Is file ke baare me batao." : "");
       if (!text || busy) return;
       // A tap counts as a user gesture: unlock audio so the reply may play on iOS.
       if (!muted) {
@@ -282,10 +287,11 @@ export function ShambhuAgent() {
       }
       const history: ChatLine[] = [
         ...linesRef.current,
-        { role: "user", content: text },
+        { role: "user", content: text, file: attached ? { name: attached.name, kind: attached.kind, thumb: attached.thumb } : undefined },
       ];
       setLines(history);
       setInput("");
+      setFile(null);
       setInterim("");
       setStatus("thinking");
       let data: AgentReply | null = null;
@@ -299,6 +305,8 @@ export function ShambhuAgent() {
             messages: history
               .slice(1)
               .map(({ role, content }) => ({ role, content })),
+            // The photo or PDF goes with the latest question only; a text file is sent as text.
+            attachment: attached ? { kind: attached.kind, name: attached.name, mime: attached.mime, data: attached.data } : undefined,
           }),
         });
         if (res.status === 503 || res.status === 404) localRef.current = true;
@@ -317,7 +325,7 @@ export function ShambhuAgent() {
       setLang(reply.lang);
       void speak(reply.reply, reply.lang);
     },
-    [busy, lang, muted, speak],
+    [busy, lang, muted, speak, file],
   );
 
   /** Record → our server turns it into text → ask. Works on iPhone, where browser recognition doesn't. */
@@ -612,6 +620,7 @@ export function ShambhuAgent() {
                         : "rounded-bl-sm border border-white/[0.06] bg-white/[0.05] text-fg",
                     )}
                   >
+                    {line.file && <SentFile file={line.file} />}
                     {line.content}
                     {line.role === "assistant" && i > 0 && !muted && (
                       <button
@@ -723,17 +732,20 @@ export function ShambhuAgent() {
                 </button>
               </div>
             ) : (
+              <>
+              {file && <AttachmentChip file={file} onRemove={() => setFile(null)} />}
               <form
                 onSubmit={onSubmit}
                 className="flex items-center gap-2 border-t border-white/[0.07] p-3"
               >
+                <AttachMenu onFile={(f) => (setFile(f), setTip(""))} onError={(m) => setTip(m)} disabled={busy} />
                 <input
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   maxLength={800}
                   placeholder={
-                    canListen ? "Type or tap the mic…" : "Type your question…"
+                    file ? "Ask about this file…" : canListen ? "Type or tap the mic…" : "Type your question…"
                   }
                   aria-label="Your question"
                   className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-ink-950/60 px-4 text-[16px] text-fg placeholder:text-fg-subtle focus:border-flow/50 focus:outline-none md:text-sm"
@@ -768,7 +780,7 @@ export function ShambhuAgent() {
                     )}
                   </button>
                 )}
-                {canCall && !input.trim() ? (
+                {canCall && !input.trim() && !file ? (
                   <button
                     type="button"
                     onClick={startCall}
@@ -782,7 +794,7 @@ export function ShambhuAgent() {
                 ) : (
                   <button
                     type="submit"
-                    disabled={!input.trim() || busy}
+                    disabled={(!input.trim() && !file) || busy}
                     aria-label="Send"
                     className="btn-3d btn-3d-sm grid size-11 shrink-0 place-items-center rounded-full text-white disabled:opacity-40"
                   >
@@ -790,6 +802,7 @@ export function ShambhuAgent() {
                   </button>
                 )}
               </form>
+              </>
             )}
           </motion.section>
         )}

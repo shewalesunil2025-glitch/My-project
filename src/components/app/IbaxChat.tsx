@@ -34,9 +34,12 @@ import {
   addVoiceMessage,
   liveContext,
   runLiveAction,
+  makeImageFromChat,
   sendToAgent,
   useAgentBusy,
 } from "@/lib/app/agentClient";
+import { AttachMenu, AttachmentChip, SentFile } from "@/components/chat/Attach";
+import type { Attachment } from "@/lib/attachments";
 import { waAccount, whatsappLinkAvailable } from "@/lib/app/whatsappLink";
 import { WhatsAppLink } from "./WhatsAppLink";
 import type { AgentCard, Workspace } from "@/lib/app/types";
@@ -384,6 +387,8 @@ export function IbaxChat({
 }) {
   const busy = useAgentBusy();
   const [q, setQ] = useState("");
+  const [file, setFile] = useState<Attachment | null>(null);
+  const [imageMode, setImageMode] = useState(false);
   const [interim, setInterim] = useState("");
   const [tip, setTip] = useState("");
   const [listening, setListening] = useState(false);
@@ -468,7 +473,15 @@ export function IbaxChat({
   const send = useCallback(
     (text: string) => {
       const t = text.trim();
-      if (!t || busy) return;
+      if ((!t && !file) || busy) return;
+      // "Create image" mode: straight to the image model; otherwise IBAX reads any attached file.
+      if (imageMode) {
+        if (!t) return;
+        setQ("");
+        setFile(null);
+        void makeImageFromChat(t, file ?? undefined);
+        return;
+      }
       // A tap counts as a user gesture: unlock audio so the spoken reply can play on iPhone.
       if (!muted) {
         unlockAudio();
@@ -476,9 +489,10 @@ export function IbaxChat({
           window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
       }
       setQ("");
-      void sendToAgent(t);
+      setFile(null);
+      void sendToAgent(t, false, file ?? undefined);
     },
-    [busy, muted],
+    [busy, muted, file, imageMode],
   );
 
   const toggleMute = () => {
@@ -797,7 +811,17 @@ export function IbaxChat({
                   : "rounded-bl-sm border border-white/[0.06] bg-white/[0.05] text-fg",
               )}
             >
+              {m.file && <SentFile file={m.file} />}
               {m.text && <p className="whitespace-pre-line">{m.text}</p>}
+              {m.image && (
+                <div className="mt-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={m.image} alt="Image made by IBAX" className="w-full max-w-xs rounded-xl" />
+                  <a href={m.image} download="ibax-image.png" target="_blank" rel="noopener noreferrer" className="mt-1.5 inline-flex text-xs font-semibold text-flow hover:underline">
+                    Download ↓
+                  </a>
+                </div>
+              )}
               {m.cards && <Cards cards={m.cards} />}
               {m.links && m.links.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -898,6 +922,12 @@ export function IbaxChat({
           {tip}
         </p>
       )}
+      {!inCall && file && <AttachmentChip file={file} onRemove={() => setFile(null)} />}
+      {!inCall && imageMode && (
+        <p className="mx-3 mb-1 rounded-xl border border-flow/30 bg-flow/[0.08] px-3 py-2 text-xs text-flow-soft">
+          🎨 Create image: describe the poster, post or photo you want{file?.kind === "image" ? " — or how to change the attached photo" : ""}. Free trial 3 / day, paid plans 10 / day.
+        </p>
+      )}
       {inCall ? (
         <div className="flex items-center gap-2 border-t border-white/[0.07] p-3">
           <div
@@ -924,6 +954,16 @@ export function IbaxChat({
           onSubmit={onSubmit}
           className="flex items-center gap-2 border-t border-white/[0.07] p-3"
         >
+          <AttachMenu
+            onFile={(f) => {
+              setFile(f);
+              setTip("");
+            }}
+            onError={(m) => setTip(m)}
+            onImageMode={setImageMode}
+            imageMode={imageMode}
+            disabled={busy}
+          />
           <input
             ref={inputRef}
             id="ibax-input"
@@ -931,7 +971,13 @@ export function IbaxChat({
             onChange={(e) => setQ(e.target.value)}
             maxLength={2000}
             placeholder={
-              canListen ? "Type or tap the mic…" : "Type your question…"
+              imageMode
+                ? "Describe the image… e.g. Diwali offer poster"
+                : file
+                  ? "Ask about this file…"
+                  : canListen
+                    ? "Type or tap the mic…"
+                    : "Type your question…"
             }
             aria-label={`Message ${name}`}
             autoComplete="off"
@@ -963,7 +1009,7 @@ export function IbaxChat({
               )}
             </button>
           )}
-          {canCall && !q.trim() ? (
+          {canCall && !q.trim() && !file ? (
             <button
               type="button"
               onClick={startCall}
@@ -977,7 +1023,7 @@ export function IbaxChat({
           ) : (
             <button
               type="submit"
-              disabled={!q.trim() || busy}
+              disabled={(!q.trim() && !(file && !imageMode)) || busy}
               aria-label="Send"
               className="btn-3d btn-3d-sm grid size-11 shrink-0 place-items-center rounded-full text-white disabled:opacity-40"
             >

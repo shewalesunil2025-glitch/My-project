@@ -77,6 +77,8 @@ The owner can buy and switch on any AVAILABLE NOW service just by talking to you
 3. After payment, collect the missing details the snapshot lists for that service. Ask naturally, one or two at a time, and offer an example. Call save_service_details as soon as the owner answers, using the exact detail keys. Optional details (without *) can be skipped if the owner says so. Preferences have sensible defaults; ask only if the owner wants to change them.
 4. If an account still needs connecting, call request_connection. It shows a secure connect card. Wait for "[App event] … connected". For WhatsApp, the card asks for their WhatsApp number and gives a link code: on the phone with that number they open WhatsApp → Linked devices → Link a device → "Link with phone number instead" and type the code. Help them through these steps if they ask.
 5. When nothing is missing, call activate_service and tell the owner the result honestly, including any "Good to know" step (for example, how WhatsApp stays linked). If the result says preview mode, tell them the setup is saved and the ${product.name} team will switch on live messages.
+- Files: the owner can attach a photo, PDF or text file with the + button. Read it carefully and use it: a menu / price list / brochure → offer to save the services, prices and FAQs into the right service details (save_service_details) so the WhatsApp and website bots answer from them; a visiting card → read the name and number; a screenshot → explain what it shows and what to do; a product or shop photo → offer a caption or post (save_content_draft) or a poster (create_image). Never invent what isn't in the file.
+- Images: when the owner asks for a poster, post, banner, product photo or logo idea, or to change a photo they attached, call create_image. Never make fake reviews, fake documents, IDs or other people's logos or faces.
 - 3-day FREE trial: messaging services (WhatsApp, Lead Follow-up, Customer Support, Email, Google Reviews) can be tried free for 3 days, once per account, no payment. If the owner wants to try one first, call show_link to /app/services/<id> and tell them to tap "Start free trial"; then help with steps 3–5 as usual. Instagram, Facebook, YouTube, AI Voice and Digital Marketing are not in the trial. After the trial a service pauses until it is paid.
 - To pause or resume a service, call set_service_state. To create a post, reel, Short or caption, write it and call save_content_draft. To send the owner to a page, call show_link — and write your answer in that same reply, so the owner isn't kept waiting.
 - A custom automation needs a quote: give the support contact ${product.supportEmail} or WhatsApp ${product.supportPhoneDisplay}.
@@ -184,6 +186,21 @@ export const agentTools: Anthropic.Beta.BetaTool[] = [
       "Checks right now whether the owner's WhatsApp is linked and working (WhatsApp automation, Lead Follow-up). Use it whenever the owner says WhatsApp replies or follow-ups are not going, or asks if WhatsApp is connected.",
     strict: true,
     input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "create_image",
+    description:
+      "Makes one AI image for the owner's business — an offer poster, social media post, banner, product photo or logo idea — or edits the photo the owner attached last (change background, make it brighter, add text). Limited per day (3 on the free trial, 10 with a paid service). Write a detailed English prompt: subject, style, colours, any text to show (keep text short), format (square post, 9:16 story, wide banner).",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        prompt: { type: "string", description: "Detailed description of the image to make, in English." },
+        edit_last_photo: { type: "boolean", description: "True to edit the photo the owner attached last instead of making a new image." },
+      },
+      required: ["prompt", "edit_last_photo"],
+      additionalProperties: false,
+    },
   },
   {
     name: "ask_review",

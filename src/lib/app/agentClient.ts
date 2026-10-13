@@ -6,6 +6,8 @@ import { product } from "@/config/product";
 import { isLive, providerInfo, serviceById } from "@/content/app/services";
 import { askForReview, askMessages } from "./reviewRequests";
 import { money } from "./money";
+import { cloudAuthHeader, cloudEnabled } from "./cloud";
+import type { Attachment } from "@/lib/attachments";
 import { activateService, automationFor, buyService, joinWaitlist, connectProvider, periodFor, priceFor, saveServiceDetails, servicesSnapshot, setServiceState } from "./agentActions";
 import { detectLang, flowNext, localTurn, type LocalReply } from "./agentLocal";
 import { workspaceContext } from "./assistant";
@@ -107,16 +109,16 @@ function snapshot(ws: Workspace) {
     .join("\n");
 }
 
-function postAssistant(reply: LocalReply) {
-  if (!reply.text && !reply.cards?.length) return;
+function postAssistant(reply: LocalReply & { image?: string }) {
+  if (!reply.text && !reply.cards?.length && !reply.image) return;
   updateWorkspace((w) => {
-    w.chat.push({ id: uid(), role: "assistant", at: nowIso(), text: reply.text, links: reply.links?.length ? reply.links : undefined, cards: reply.cards?.length ? reply.cards : undefined });
+    w.chat.push({ id: uid(), role: "assistant", at: nowIso(), text: reply.text, links: reply.links?.length ? reply.links : undefined, cards: reply.cards?.length ? reply.cards : undefined, image: reply.image });
     w.chat = w.chat.slice(-100);
   });
 }
 
 /** Carries out one action IBAX asked for. Returns the result IBAX sees. */
-async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pick<LocalReply, "cards" | "links">>): Promise<{ content: string; is_error?: boolean }> {
+async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pick<LocalReply, "cards" | "links">> & { image?: string }): Promise<{ content: string; is_error?: boolean }> {
   const input = (block.input ?? {}) as Record<string, unknown>;
   const ws = currentWorkspace();
   if (!ws) return { content: "The owner is signed out.", is_error: true };
@@ -185,6 +187,14 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
       out.links.push({ href: "/app/content", label: "Content Centre" });
       return { content: "Draft saved in the Content Centre, waiting for the owner's approval." };
     }
+    case "create_image": {
+      const r = await createImage(String(input.prompt ?? ""), input.edit_last_photo === true);
+      if (r.ok) {
+        out.image = r.url;
+        return { content: `Image created and shown to the owner (${r.left} more allowed today). Don't describe it at length — one short line is enough.` };
+      }
+      return { content: `${r.message} (reason: ${r.reason})`, is_error: true };
+    }
     case "ask_review": {
       const result = await askForReview(String(input.name ?? ""), String(input.phone ?? ""), "manual");
       if (result !== "sent") out.links.push({ href: "/app/services/reviews", label: "Google Review Management" });
@@ -218,8 +228,28 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
 const DISPLAY_ONLY = new Set(["show_link"]);
 
 /** Runs one exchange with the model. Returns false if the model can't be used. */
-async function aiTurn(ws: Workspace, userText: string, voice = false): Promise<boolean> {
-  let thread = loadThread(ws);
+/** Photos and PDFs stay in the conversation for one turn only (they're large); later turns keep a note. */
+function withoutOldFiles(thread: Thread): Thread {
+  return thread.map((m) =>
+    typeof m.content === "string"
+      ? m
+      : {
+          ...m,
+          content: (m.content as Anthropic.Beta.BetaContentBlockParam[]).map((b) =>
+            b.type === "image" || b.type === "document" ? { type: "text" as const, text: "[A file the owner shared earlier — ask them to attach it again if you need to look at it.]" } : b,
+          ),
+        },
+  );
+}
+
+function fileBlocks(file: Attachment): Anthropic.Beta.BetaContentBlockParam[] {
+  if (file.kind === "image") return [{ type: "image", source: { type: "base64", media_type: "image/jpeg", data: file.data } }];
+  if (file.kind === "pdf") return [{ type: "document", source: { type: "base64", media_type: "application/pdf", data: file.data } }];
+  return [{ type: "text", text: `[File "${file.name}"]\n${file.data}` }];
+}
+
+async function aiTurn(ws: Workspace, userText: string, voice = false, file?: Attachment): Promise<boolean> {
+  let thread = withoutOldFiles(loadThread(ws));
   if (thread.length > MAX_THREAD) {
     // Start a fresh conversation instead of cutting the old one; carry a short recap.
     const recap = ws.chat
@@ -233,13 +263,14 @@ async function aiTurn(ws: Workspace, userText: string, voice = false): Promise<b
   thread.push({
     role: "user",
     content: [
+      ...(file ? [...fileBlocks(file), { type: "text" as const, text: `[The owner attached "${file.name}" (${file.kind === "image" ? "photo" : file.kind === "pdf" ? "PDF" : "text file"}). Read it and help with it.]` }] : []),
       { type: "text", text: userText },
       ...(voice ? [{ type: "text" as const, text: "[Voice call: the owner is talking out loud. Reply in one or two short spoken sentences, no lists.]" }] : []),
       { type: "text", text: snapshot(currentWorkspace() ?? ws) },
     ],
   });
 
-  const out = { text: [] as string[], cards: [] as AgentCard[], links: [] as NonNullable<ChatMessage["links"]> };
+  const out = { text: [] as string[], cards: [] as AgentCard[], links: [] as NonNullable<ChatMessage["links"]>, image: undefined as string | undefined };
   for (let step = 0; step < MAX_STEPS; step++) {
     let data: { ok?: boolean; content?: Block[]; stop_reason?: string; refused?: boolean } | null = null;
     try {
@@ -280,15 +311,15 @@ async function aiTurn(ws: Workspace, userText: string, voice = false): Promise<b
     thread.push({ role: "user", content: results });
     if (out.text.length && calls.every((c) => DISPLAY_ONLY.has(c.name))) break;
   }
-  saveThread(ws, thread);
-  postAssistant({ text: out.text.join("\n\n"), cards: out.cards, links: out.links });
+  saveThread(ws, withoutOldFiles(thread));
+  postAssistant({ text: out.text.join("\n\n"), cards: out.cards, links: out.links, image: out.image });
   return true;
 }
 
-async function respond(ws: Workspace, modelText: string, local: () => Promise<LocalReply>, voice = false) {
+async function respond(ws: Workspace, modelText: string, local: () => Promise<LocalReply>, voice = false, file?: Attachment) {
   setBusy(true);
   try {
-    const usedAi = aiAvailable !== false && (await aiTurn(ws, modelText, voice));
+    const usedAi = aiAvailable !== false && (await aiTurn(ws, modelText, voice, file));
     if (!usedAi) postAssistant(await local());
   } finally {
     setBusy(false);
@@ -305,11 +336,11 @@ export function liveContext() {
 
 /** IBAX asked for an action during a live call: do it and show any card in the chat. */
 export async function runLiveAction(name: string, input: Record<string, unknown>) {
-  const out = { cards: [] as AgentCard[], links: [] as NonNullable<ChatMessage["links"]> };
+  const out = { cards: [] as AgentCard[], links: [] as NonNullable<ChatMessage["links"]>, image: undefined as string | undefined };
   const r = await runTool({ type: "tool_use", id: uid(), name, input } as Anthropic.Beta.BetaToolUseBlock, out);
-  if (out.cards.length || out.links.length)
+  if (out.cards.length || out.links.length || out.image)
     updateWorkspace((w) => {
-      w.chat.push({ id: uid(), role: "assistant", at: nowIso(), text: "", cards: out.cards.length ? out.cards : undefined, links: out.links.length ? out.links : undefined });
+      w.chat.push({ id: uid(), role: "assistant", at: nowIso(), text: "", cards: out.cards.length ? out.cards : undefined, links: out.links.length ? out.links : undefined, image: out.image });
     });
   return r;
 }
@@ -330,15 +361,68 @@ export function addVoiceMessage(role: "user" | "assistant", text: string) {
   }
 }
 
-/** The owner sent a message (`voice`: said out loud in a voice call, so keep the answer short). */
-export async function sendToAgent(text: string, voice = false) {
+/** The owner sent a message (`voice`: said out loud in a voice call, so keep the answer short), maybe with a file. */
+export async function sendToAgent(text: string, voice = false, file?: Attachment) {
   const ws = currentWorkspace();
   const msg = text.trim().slice(0, 4000);
-  if (!ws || !msg || busy) return;
+  if (!ws || (!msg && !file) || busy) return;
+  if (file?.kind === "image") lastPhoto = { mime: "image/jpeg", data: file.data };
   updateWorkspace((w) => {
-    w.chat.push({ id: uid(), role: "user", text: msg, at: nowIso() });
+    w.chat.push({ id: uid(), role: "user", text: msg, at: nowIso(), file: file ? { name: file.name, kind: file.kind, thumb: file.thumb } : undefined });
   });
-  await respond(ws, msg, () => localTurn(currentWorkspace()!, msg), voice);
+  const ask = msg || "Please look at this file and tell me what's in it and how it can help my business.";
+  const offline = async (): Promise<LocalReply> =>
+    file ? { text: "Files padhne ke liye AI abhi connect nahi ho pa raha. Thodi der baad dobara bhejiye." } : localTurn(currentWorkspace()!, msg);
+  await respond(ws, ask, offline, voice, file);
+}
+
+/* ── AI images ── */
+
+/** The last photo the owner attached, for "edit this photo" requests. */
+let lastPhoto: { mime: string; data: string } | null = null;
+
+export type ImageResult = { ok: true; url: string; left: number } | { ok: false; reason: string; message: string };
+
+const imageErrors: Record<string, string> = {
+  limit: "Aaj ki photo limit poori ho gayi (free trial: 3 photo/din, paid plan: 10 photo/din). Kal phir banaiye.",
+  billing: "Photo banane wali AI abhi chalu nahi hai — ibaxai team ise jaldi chalu karegi.",
+  unauthorized: "Photo banane ke liye apne ibaxai account se login kariye.",
+  not_configured: "Photo banane ke liye apne ibaxai account se login kariye.",
+  invalid: "Batayiye kaisi photo chahiye.",
+  upstream: "Photo abhi nahi ban paayi. Thodi der baad dobara try kariye.",
+};
+
+/** Makes an image (or edits the last attached photo) on the server. */
+export async function createImage(prompt: string, editLastPhoto = false): Promise<ImageResult> {
+  if (!cloudEnabled) return { ok: false, reason: "not_configured", message: imageErrors.not_configured };
+  const res = await fetch("/api/image", {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(await cloudAuthHeader()) },
+    body: JSON.stringify({ prompt, photo: editLastPhoto && lastPhoto ? lastPhoto : undefined }),
+  }).catch(() => null);
+  const data = (await res?.json().catch(() => null)) as { ok?: boolean; url?: string | null; image?: string; left?: number; reason?: string } | null;
+  const url = data?.url || data?.image;
+  if (data?.ok && url) return { ok: true, url, left: data.left ?? 0 };
+  const reason = data?.reason ?? "upstream";
+  return { ok: false, reason, message: imageErrors[reason] ?? imageErrors.upstream };
+}
+
+/** "Create image" from the + menu: straight to the image model, no chat model in between. */
+export async function makeImageFromChat(prompt: string, file?: Attachment) {
+  const ws = currentWorkspace();
+  const text = prompt.trim().slice(0, 1500);
+  if (!ws || !text || busy) return;
+  if (file?.kind === "image") lastPhoto = { mime: "image/jpeg", data: file.data };
+  updateWorkspace((w) => {
+    w.chat.push({ id: uid(), role: "user", text: `🎨 ${text}`, at: nowIso(), file: file ? { name: file.name, kind: file.kind, thumb: file.thumb } : undefined });
+  });
+  setBusy(true);
+  try {
+    const r = await createImage(text, file?.kind === "image");
+    postAssistant(r.ok ? { text: `Ye rahi aapki photo ✨ (aaj ${r.left} aur bana sakte hain)`, image: r.url } : { text: r.message });
+  } finally {
+    setBusy(false);
+  }
 }
 
 function markCard(match: (c: AgentCard) => boolean) {

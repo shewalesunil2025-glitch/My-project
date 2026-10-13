@@ -81,9 +81,21 @@ export async function POST(request: Request) {
   const messages = validate(body);
   if (!messages) return NextResponse.json({ error: "invalid" }, { status: 400 });
 
+  // A photo or PDF (or a text file) the visitor attached to their latest question.
+  const att = (body as { attachment?: { kind?: unknown; name?: unknown; mime?: unknown; data?: unknown } }).attachment;
+  const fileName = typeof att?.name === "string" ? att.name.slice(0, 120) : "file";
+  const inline =
+    att && typeof att.data === "string" && att.data.length < 4_300_000 && typeof att.mime === "string" && /^(image\/(jpeg|png|webp)|application\/pdf)$/.test(att.mime)
+      ? { mime: att.mime, data: att.data }
+      : undefined;
+  const last = messages[messages.length - 1];
+  if (att?.kind === "text" && typeof att.data === "string") last.content = `${last.content}\n\n[File "${fileName}"]\n${att.data.slice(0, 60_000)}`;
+  else if (inline) last.content = `[The visitor attached "${fileName}" (${inline.mime === "application/pdf" ? "PDF" : "photo"}).]\n${last.content}`;
+
   if (!useClaude) {
     try {
-      const parsed = (await geminiJson(SYSTEM_PROMPT, messages, REPLY_SCHEMA)) as { reply?: unknown; lang?: unknown };
+      const withFile = messages.map((m, i) => (i === messages.length - 1 && inline ? { ...m, files: [inline] } : m));
+      const parsed = (await geminiJson(SYSTEM_PROMPT, withFile, REPLY_SCHEMA)) as { reply?: unknown; lang?: unknown };
       if (typeof parsed.reply !== "string" || !parsed.reply.trim()) throw new Error("Empty reply");
       const lang = (agentLangCodes as string[]).includes(String(parsed.lang)) ? (parsed.lang as AgentLang) : "en";
       return NextResponse.json({ reply: parsed.reply.trim(), lang } satisfies AgentReply);
@@ -105,7 +117,19 @@ export async function POST(request: Request) {
       // Short spoken answers: low effort keeps replies quick.
       output_config: { effort: "low", format: { type: "json_schema", schema: REPLY_SCHEMA } },
       system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
-      messages,
+      messages: messages.map((m, i) =>
+        i === messages.length - 1 && inline
+          ? {
+              role: m.role,
+              content: [
+                inline.mime === "application/pdf"
+                  ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: inline.data } }
+                  : { type: "image" as const, source: { type: "base64" as const, media_type: inline.mime as "image/jpeg" | "image/png" | "image/webp", data: inline.data } },
+                { type: "text" as const, text: m.content },
+              ],
+            }
+          : m,
+      ),
     });
 
     if (response.stop_reason === "refusal") {

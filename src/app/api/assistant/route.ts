@@ -15,7 +15,8 @@ import { geminiReady, geminiTurn } from "@/lib/server/gemini";
 
 export const maxDuration = 60;
 
-const MAX_BODY = 400_000;
+// A photo or PDF can ride along (Vercel accepts request bodies up to 4.5 MB).
+const MAX_BODY = 4_400_000;
 const MAX_MESSAGES = 120;
 const system = agentSystemPrompt();
 
