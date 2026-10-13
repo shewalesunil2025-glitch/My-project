@@ -2,14 +2,14 @@
 
 import { product } from "@/config/product";
 import { useEffect, useState, type FormEvent } from "react";
-import { MessageCircle, Plus, Sparkles, X } from "lucide-react";
+import { MessageCircle, Plus, Sparkles, Star, X } from "lucide-react";
 import { cloudEnabled, cloudFollowupAction } from "@/lib/app/cloud";
-import { askForReview, reviewsOn } from "@/lib/app/reviewRequests";
+import { askForReview, askMessages, reviewsOn } from "@/lib/app/reviewRequests";
 import { audit, logActivity, notify, nowIso, syncFollowups, syncSiteLeads, uid, updateWorkspace } from "@/lib/app/store";
 import type { Lead, LeadStatus } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
 import { leadStatus } from "@/components/app/status";
-import { Btn, Card, EmptyState, Field, Input, Notice, PageHeader, Pill, Segmented, Select, TextArea, relTime } from "@/components/app/ui";
+import { Btn, Card, EmptyState, Field, Input, Notice, PageHeader, Pill, Segmented, Select, TextArea, relTime, withinDays } from "@/components/app/ui";
 
 type Tab = "all" | LeadStatus | "returning";
 
@@ -25,6 +25,8 @@ export default function LeadsPage() {
   const ws = useWorkspace();
   const [tab, setTab] = useState<Tab>("all");
   const [adding, setAdding] = useState(false);
+  const [asking, setAsking] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
     void syncSiteLeads().then(syncFollowups);
   }, []);
@@ -44,6 +46,17 @@ export default function LeadsPage() {
   ];
   const list = ws.leads.filter((l) => tab === "all" || (tab === "returning" ? l.returning : l.status === tab));
   const due = ws.leads.filter((l) => l.status === "follow_up").length;
+
+  // One tap: ask this customer for a Google review on WhatsApp.
+  const canAsk = reviewsOn(ws);
+  const digits = (p: string) => p.replace(/\D/g, "").slice(-10);
+  const askedRecently = (phone: string) => (ws.reviewRequests ?? []).some((r) => r.status === "sent" && digits(r.phone) === digits(phone) && withinDays(r.at, 30));
+  async function askReview(id: string, name: string, phone: string) {
+    setAsking(id);
+    const result = await askForReview(name, phone, "manual");
+    setAsking(null);
+    setNote(askMessages[result]);
+  }
 
   function setStatus(id: string, status: LeadStatus) {
     updateWorkspace((w) => {
@@ -149,6 +162,12 @@ export default function LeadsPage() {
         <Segmented label="Filter leads" value={tab} onChange={setTab} options={tabs} />
       </div>
 
+      {note && (
+        <Notice className="mb-4" tone={note.endsWith("✓") ? "ember" : "amber"}>
+          {note}
+        </Notice>
+      )}
+
       {list.length === 0 ? (
         <EmptyState title="No leads here">New enquiries from every channel land here automatically.</EmptyState>
       ) : (
@@ -172,6 +191,17 @@ export default function LeadsPage() {
                     </p>
                   )}
                 </div>
+                {canAsk && l.phone && (
+                  <Btn
+                    size="sm"
+                    variant={askedRecently(l.phone) ? "subtle" : "ghost"}
+                    disabled={asking === l.id || askedRecently(l.phone)}
+                    onClick={() => askReview(l.id, l.name, l.phone!)}
+                    aria-label={`Ask ${l.name} for a Google review`}
+                  >
+                    <Star className="size-3.5" aria-hidden /> {askedRecently(l.phone) ? "Review asked" : "Ask review"}
+                  </Btn>
+                )}
                 <label className="sr-only" htmlFor={`st-${l.id}`}>
                   Status for {l.name}
                 </label>

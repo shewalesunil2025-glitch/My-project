@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { reviewMessage } from "@/lib/reviewMessage";
+import { directReviewLink, reviewMessage } from "@/lib/reviewMessage";
 import { connectionState, evo, evolutionReady, instanceFor, ownership, waDigits } from "./whatsapp";
 
 /**
@@ -31,7 +31,7 @@ export async function requestReview(db: SupabaseClient, ownerId: string, custome
   const ws = row?.data as WorkspaceData | undefined;
   const auto = ws?.automations?.find((a) => a.serviceId === "reviews");
   const trialOver = Boolean(auto?.trialEndsAt && Date.parse(auto.trialEndsAt) <= Date.now());
-  const link = str(auto?.config?.reviewLink);
+  const link = directReviewLink(str(auto?.config?.reviewLink));
   if (!auto || auto.status !== "active" || trialOver || !/^https?:\/\//i.test(link) || !evolutionReady()) return "off";
 
   const wa = ws?.connections?.whatsapp;

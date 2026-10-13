@@ -272,7 +272,7 @@ export const services: ServiceDef[] = [
         type: "text",
         placeholder: "https://g.page/r/...",
         required: true,
-        help: "Google Maps → your business → Share → copy the link. Or Google Business Profile → Ask for reviews → copy the link.",
+        help: "For one-tap reviews: Google Business Profile (search your business name on Google while signed in) → Ask for reviews → copy the link. It looks like g.page/r/…/review. A Place ID (ChIJ…) works too.",
       },
     ],
     configure: [
