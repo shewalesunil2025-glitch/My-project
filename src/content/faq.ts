@@ -5,7 +5,7 @@ export const faqs = [
   },
   {
     q: "What do I get with Digital Marketing?",
-    a: "Social media management for Instagram, Facebook and YouTube, content creation with a monthly calendar, Meta and Google ad campaigns, local SEO and Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report — starting at $299/mo. Ad spend is paid separately to the platforms.",
+    a: "Social media management for Instagram, Facebook and YouTube, content creation with a monthly calendar, Meta and Google ad campaigns, local SEO and Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report — starting at ₹4,999/mo. Ad spend is paid separately to the platforms.",
   },
   {
     q: "Do I have to buy every service?",
@@ -13,7 +13,7 @@ export const faqs = [
   },
   {
     q: "How much does it cost?",
-    a: "Each service has a clear starting price in USD, shown in the Automation Store — for example Email Automation from $29/mo, WhatsApp Automation from $49/mo and a Website from $299 one-time.",
+    a: "Each service has a clear starting price in Indian rupees, shown in the Automation Store — for example Email Automation from ₹499/mo, WhatsApp Automation from ₹699/mo and a Website from ₹2,999 one-time. Pay yearly and get 2 months free.",
   },
   {
     q: "How fast can I go live?",

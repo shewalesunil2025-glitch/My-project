@@ -22,7 +22,7 @@ export const digitalMarketing = {
   href: "#digital-marketing",
   title: "Digital Marketing",
   tagline: "Your complete digital marketing team — run by ibaxai, guided by people.",
-  price: "$299",
+  price: "₹4,999",
   billing: "/mo",
   interest: "Digital Marketing — premium package",
   /** Honest limits shown beside the price. */

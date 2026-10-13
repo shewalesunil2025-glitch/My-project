@@ -141,7 +141,7 @@ export function buildSampleWorkspace(ws: Workspace) {
       important: false,
       messages: [
         { from: "customer", text: "Hi! Do you have gluten-free pizza?", at: hoursAgo(1.1) },
-        { from: "assistant", text: "Hi Sofia! Yes — any of our pizzas can be made on a gluten-free base for $3 extra. Would you like to book a table?", at: hoursAgo(1.09) },
+        { from: "assistant", text: "Hi Sofia! Yes — any of our pizzas can be made on a gluten-free base for ₹50 extra. Would you like to book a table?", at: hoursAgo(1.09) },
         { from: "customer", text: "Yes, Saturday 1 PM for 2 please", at: hoursAgo(1.05) },
         { from: "assistant", text: "Done! Table for 2 on Saturday at 1 PM. See you then 🌅", at: hoursAgo(1.04) },
       ],
@@ -177,7 +177,7 @@ export function buildSampleWorkspace(ws: Workspace) {
       important: true,
       messages: [
         { from: "customer", text: "Could you send a quote for weekly breakfast for 25 staff?", at: hoursAgo(20) },
-        { from: "assistant", text: "Draft reply ready for your approval: quote for 25 breakfasts every Monday, $14 per person.", at: hoursAgo(19.9) },
+        { from: "assistant", text: "Draft reply ready for your approval: quote for 25 breakfasts every Monday, ₹350 per person.", at: hoursAgo(19.9) },
       ],
     },
   ];
@@ -216,7 +216,7 @@ export function buildSampleWorkspace(ws: Workspace) {
     { id: uid(), type: "short", platform: "youtube", title: "Our vegan breakfast plate, explained", body: "Menu showcase Short.", status: "published", publishedAt: daysAgo(2), createdAt: daysAgo(2.5), stats: { views: 1630, likes: 122, comments: 9 } },
     { id: uid(), type: "reel", platform: "instagram", title: "Weekend brunch is back ☀️", body: "Weekend brunch is back! Bottomless coffee, fresh pastries and our famous shakshuka. Book on WhatsApp 👉 link in bio", hashtags: "#austinbrunch #austinfood #brunchtime #sunrisebistro", status: "approval", scheduledAt: hoursAhead(20), createdAt: hoursAgo(2) },
     { id: uid(), type: "post", platform: "instagram", title: "Meet our new truffle pizza", body: "Wild mushroom, truffle cream, fior di latte. Available from today 🍕", hashtags: "#pizza #austineats #newmenu", status: "published", publishedAt: daysAgo(3), createdAt: daysAgo(3.2), stats: { views: 4120, likes: 388, comments: 27 } },
-    { id: uid(), type: "image", platform: "facebook", title: "Catering for your next office event", body: "Feeding a team of 10–60? Our catering menu starts at $14 per person.", status: "draft", createdAt: hoursAgo(30) },
+    { id: uid(), type: "image", platform: "facebook", title: "Catering for your next office event", body: "Feeding a team of 10–60? Our catering menu starts at ₹350 per person.", status: "draft", createdAt: hoursAgo(30) },
   ];
 
   // Metrics — last 60 days

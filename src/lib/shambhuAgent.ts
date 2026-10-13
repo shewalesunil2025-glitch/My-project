@@ -60,7 +60,7 @@ Answer the question directly in your first sentence: no greeting, no introductio
 Founder: ${founder.name}, ${founder.role}.
 IBAX is "Your AI Business Operating System — One AI. One Platform. Your Entire Business." One assistant that answers calls, WhatsApp, email and social media (Instagram, Facebook, YouTube), follows up every lead, handles Google reviews (never fake reviews) and shows every action in one app.
 
-# Services and prices (USD, every service can be bought on its own)
+# Services and prices (Indian rupees, all-inclusive; every service can be bought on its own; yearly = 10 × monthly, 2 months free)
 ${prices}
 
 # Digital Marketing (premium package — highlight it when it fits the visitor's need)

@@ -10,8 +10,11 @@ import { SubHead } from "./Shambhu";
 
 /**
  * Automation Store: every IBAX service can be bought on its own, each with a
- * "Starting at" price in USD. Digital Marketing is the premium package.
+ * "Starting at" price in INR. Digital Marketing is the premium package.
  */
+/** Yearly price for a monthly "₹699": 10 months, so 2 months free. */
+const yearly = (monthly: string) => `₹${(Number(monthly.replace(/\D/g, "")) * 10).toLocaleString("en-IN")}`;
+
 export function AutomationStore() {
   const { openDemo } = useDemo();
   const regular = store.filter((s) => !s.premium);
@@ -47,6 +50,7 @@ export function AutomationStore() {
                     </span>
                     <span className="text-xs whitespace-nowrap text-fg-muted">{s.billing === "monthly" ? "/mo" : "one-time"}</span>
                   </span>
+                  {s.billing === "monthly" && <span className="mt-1 block text-[0.7rem] text-flow-soft">or {yearly(s.price)}/year · 2 months free</span>}
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-flow">
                     Get started <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                   </span>
@@ -80,6 +84,7 @@ export function AutomationStore() {
                 <span className="block font-mono text-[0.58rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
                 <span className="display text-[2.4rem] leading-none">{premium.price}</span>
                 <span className="text-sm text-fg-muted">/mo</span>
+                <span className="mt-1 block text-xs text-flow-soft">or {yearly(premium.price)}/year · 2 months free</span>
               </p>
               <div className="flex flex-col items-start gap-2">
                 <BookDemoButton label="Get started" interest={premium.title} icon className="w-fit" />
@@ -91,7 +96,7 @@ export function AutomationStore() {
           </Reveal>
         )}
 
-        <p className="mt-6 text-center text-sm text-fg-subtle">Prices in USD.</p>
+        <p className="mt-6 text-center text-sm text-fg-subtle">Prices in Indian rupees, all-inclusive. Pay yearly and get 2 months free.</p>
       </div>
     </section>
   );

@@ -16,8 +16,8 @@ export const product = {
   logoTagline: "Intelligent Business Automation Expert",
   description:
     "ibaxai runs your website, AI assistants, WhatsApp, calls, social media, reviews, content and leads from one app — you give the instructions, ibaxai handles the technology.",
-  /** Currency for the placeholder prices in src/content/app/services.ts. */
-  currency: "USD",
+  /** Currency for the prices in src/content/app/services.ts (Indian rupees, all-inclusive). */
+  currency: "INR",
   supportEmail: "ibaxai369@gmail.com",
   /** Support phone and WhatsApp (same number). */
   supportPhone: "+917499414443",
@@ -32,5 +32,5 @@ export const product = {
 } as const;
 
 export function formatPrice(amount: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: product.currency, maximumFractionDigits: 0 }).format(amount);
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency: product.currency, maximumFractionDigits: 0 }).format(amount);
 }

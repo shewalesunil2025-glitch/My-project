@@ -2,7 +2,7 @@ import type { ProviderId } from "@/lib/app/types";
 
 /**
  * Everything sold in the Automation Store, and what each activation wizard asks.
- * Prices are "starting at" USD and match the website's Automation Store
+ * Prices are "starting at" INR (all-inclusive) and match the website's Automation Store
  * (src/content/shambhu.ts). Monthly services can also be paid yearly as 10 months
  * (2 months free); one-time services are paid once.
  */
@@ -28,7 +28,7 @@ export type ServiceDef = {
   icon: string; // lucide icon name, mapped in components/app/icons.tsx
   description: string;
   features: string[];
-  /** USD — per month, or once when `billing` is "one-time". null = custom quote. */
+  /** INR — per month, or once when `billing` is "one-time". null = custom quote. */
   price: number | null;
   billing?: "monthly" | "one-time";
   setupTime: string;
@@ -56,7 +56,7 @@ const prices: FieldDef = {
   key: "prices",
   label: "Prices",
   type: "textarea",
-  placeholder: "Haircut — $25\nFacial — $40",
+  placeholder: "Haircut — ₹200\nFacial — ₹800",
 };
 const approval: FieldDef = {
   key: "approval",
@@ -105,7 +105,7 @@ export const services: ServiceDef[] = [
     description:
       "Build your own website in minutes: pick a template and your business details fill it in — services and prices, hours, location, FAQ, WhatsApp and call buttons and an enquiry form. Change anything, then publish in one click. Every enquiry lands in your Leads.",
     features: ["24 premium 3D templates", "Filled in from your business details", "Services & prices, hours, map, FAQ", "WhatsApp, call & enquiry form", "Enquiries go straight to your Leads", "Publish and update in one click"],
-    price: 299,
+    price: 2999,
     billing: "one-time",
     setupTime: "Minutes — build it yourself and publish in one click",
     connect: [],
@@ -125,7 +125,7 @@ export const services: ServiceDef[] = [
     description:
       "Your assistant picks up every call, answers questions about your business, takes enquiries and appointment requests, and transfers to a person when needed. You get a summary of every call in ibaxai.",
     features: ["Answers incoming calls 24/7", "Business information, prices & hours", "Appointment requests", "Lead capture & follow-up", "Call summaries in ibaxai", "Transfer to a person"],
-    price: 79,
+    price: 1499,
     setupTime: "1–2 working days (number setup)",
     connect: ["phone"],
     info: [
@@ -152,7 +152,7 @@ export const services: ServiceDef[] = [
     description:
       "Answers customer questions, shares product and service details, captures leads, handles appointment and order enquiries and follows up — all on your own WhatsApp number. When a customer needs you, it pauses and alerts you. Conversations appear inside ibaxai.",
     features: ["Instant answers & FAQs", "Product / service information", "Lead capture", "Appointment & order enquiries", "Follow-ups", "Conversations inside ibaxai"],
-    price: 49,
+    price: 699,
     setupTime: "Minutes — link your WhatsApp with a code",
     connect: ["whatsapp"],
     info: [
@@ -179,7 +179,7 @@ export const services: ServiceDef[] = [
     description:
       "ibaxai plans your content, writes captions and hashtags, schedules posts and reels, helps with comments and replies to DMs where Instagram allows it — with your approval or automatically.",
     features: ["Content ideas & captions", "Hashtag suggestions", "Post & reel scheduling", "Comment assistance", "DM replies where supported", "Lead capture & analytics"],
-    price: 39,
+    price: 499,
     setupTime: "Same day",
     connect: ["instagram"],
     info: [{ key: "about", label: "What should your posts show?", type: "textarea", fromBusiness: "services", required: true }],
@@ -194,7 +194,7 @@ export const services: ServiceDef[] = [
     icon: "Facebook",
     description: "Posts and reels for your Facebook Page, scheduled content, comment help and Messenger replies where supported, with lead handling and analytics.",
     features: ["Page posts & reels", "Content scheduling", "Comment assistance", "Messenger replies where supported", "Lead handling", "Analytics"],
-    price: 39,
+    price: 499,
     setupTime: "Same day",
     connect: ["facebook"],
     info: [{ key: "about", label: "What should your posts show?", type: "textarea", fromBusiness: "services", required: true }],
@@ -209,7 +209,7 @@ export const services: ServiceDef[] = [
     description:
       "Tell ibaxai “every day at 7 PM upload one Short about my restaurant.” ibaxai turns your business into ideas, scripts, AI video, voice, thumbnail, title and description, checks quality, schedules and publishes — and shows views, likes and comments in ibaxai.",
     features: ["AI content ideas & scripts", "AI video & voice-over", "Thumbnail, title & description", "Quality check before publishing", "Scheduled publishing", "Views, likes & comments in ibaxai"],
-    price: 39,
+    price: 499,
     setupTime: "Same day — first video within 24 hours",
     connect: ["youtube"],
     info: [
@@ -226,7 +226,7 @@ export const services: ServiceDef[] = [
     icon: "Mail",
     description: "With your permission ibaxai reads your business inbox, sorts enquiries, drafts replies for you to approve, follows up with leads and customers and sends campaigns you authorise.",
     features: ["Reads only the inbox you authorise", "Sorts enquiries", "Drafts replies", "Customer & lead follow-up", "Notifications", "Email campaigns you approve"],
-    price: 29,
+    price: 499,
     setupTime: "Same day",
     connect: ["gmail"],
     info: [{ key: "signature", label: "Email signature", type: "textarea", placeholder: "Team at My Business\n+1 555 0100" }, faq],
@@ -244,7 +244,7 @@ export const services: ServiceDef[] = [
     icon: "Star",
     description: "Monitors your Google reviews, alerts you to new ones, suggests replies, runs review-request campaigns to real customers and tracks your rating. ibaxai never writes fake reviews or manipulates ratings.",
     features: ["New-review alerts", "Suggested replies", "Review requests to real customers", "Rating analytics", "Google Business Profile help"],
-    price: 29,
+    price: 499,
     setupTime: "Same day",
     connect: ["google"],
     info: [{ key: "reviewLink", label: "Your Google review link (if you have it)", type: "text", placeholder: "https://g.page/r/..." }],
@@ -262,7 +262,7 @@ export const services: ServiceDef[] = [
     description:
       "Every new lead from your website or added by you gets a thank-you on your own WhatsApp straight away, then a friendly reminder if they don't reply. It stops as soon as they answer, and every morning ibaxai tells you who to call today.",
     features: ["Instant thank-you on WhatsApp", "Up to 2 polite reminders", "Stops when the lead replies", "Morning “call these today” list", "Status tracking to conversion"],
-    price: 39,
+    price: 499,
     setupTime: "Same day",
     connect: ["whatsapp"],
     info: [{ key: "offer", label: "Any offer for new customers? (optional)", type: "textarea", placeholder: "10% off the first visit" }],
@@ -277,7 +277,7 @@ export const services: ServiceDef[] = [
     description:
       "ibaxai answers your customers' common questions — timings, prices, location, orders, bookings — on your website chat, WhatsApp, Instagram, Facebook and email, and hands anything tricky to you.",
     features: ["Answers on every connected channel", "Your FAQs, prices and policies", "Order and booking status questions", "Hands complaints to a person", "Every conversation visible in ibaxai"],
-    price: 49,
+    price: 599,
     setupTime: "Same day",
     connect: [],
     info: [
@@ -319,7 +319,7 @@ export const services: ServiceDef[] = [
       { title: "Lead follow-up", body: "Every enquiry from your campaigns followed up by IBAX.", icon: "UserCheck" },
       { title: "Monthly report", body: "What went out, what people did and what we'll do next.", icon: "BarChart3" },
     ],
-    price: 299,
+    price: 4999,
     setupTime: "Kick-off call within 2 working days",
     connect: ["google", "instagram", "facebook", "youtube"],
     info: [
@@ -328,7 +328,7 @@ export const services: ServiceDef[] = [
       { key: "competitors", label: "Competitors (optional)", type: "textarea" },
     ],
     configure: [
-      { key: "adBudget", label: "Monthly ad budget (paid separately to ad platforms)", type: "select", options: ["No ads for now", "Up to $200", "$200–$500", "$500–$1,500", "Above $1,500"], default: "No ads for now" },
+      { key: "adBudget", label: "Monthly ad budget (paid separately to ad platforms)", type: "select", options: ["No ads for now", "Up to ₹10,000", "₹10,000–₹25,000", "₹25,000–₹75,000", "Above ₹75,000"], default: "No ads for now" },
       approval,
     ],
     approvalNote: "A marketing specialist reviews your plan with you on a kick-off call before campaigns go live.",
