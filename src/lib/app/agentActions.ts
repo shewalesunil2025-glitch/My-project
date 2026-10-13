@@ -4,6 +4,7 @@ import { activate, missingConnections, runTest, setAutomationStatus } from "./au
 import { cloudAuthHeader } from "./cloud";
 import { beginTrial, trialOver } from "./trial";
 import { appCurrency, money, svcPrice } from "./money";
+import { paymentsAreLive } from "./payment";
 import { audit, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
 import type { Automation, PlanPeriod, ProviderId, Workspace } from "./types";
 
@@ -69,7 +70,7 @@ export function buyService(serviceId: string, requested?: string): string | null
       const sub = a && w.subscriptions.find((x) => x.id === a.subscriptionId);
       if (!a || !sub) return;
       Object.assign(sub, { period, price: amount, currency: appCurrency(), status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
-      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode ? "test" : "paid" });
+      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode && !paymentsAreLive() ? "test" : "paid" });
       const wasOver = trialOver(a);
       delete a.trialEndsAt;
       if (wasOver && a.status === "paused") {
@@ -96,7 +97,7 @@ export function buyService(serviceId: string, requested?: string): string | null
       amount,
       currency: appCurrency(),
       date: nowIso(),
-      status: product.previewMode ? "test" : "paid",
+      status: product.previewMode && !paymentsAreLive() ? "test" : "paid",
     });
     w.automations.push({
       id: automationId,

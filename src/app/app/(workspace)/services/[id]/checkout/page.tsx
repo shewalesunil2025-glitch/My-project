@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { product } from "@/config/product";
 import { annualPrice, isLive, serviceById } from "@/content/app/services";
 import { activateService, buyService } from "@/lib/app/agentActions";
 import { currentWorkspace } from "@/lib/app/store";
+import { collectPayment, paymentsEnabled } from "@/lib/app/payment";
 import type { PlanPeriod } from "@/lib/app/types";
 import { appCurrency, inrNote, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -19,6 +20,11 @@ function Checkout() {
   const router = useRouter();
   const ws = useWorkspace();
   const [paying, setPaying] = useState(false);
+  const [live, setLive] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    void paymentsEnabled().then(setLive);
+  }, []);
   const svc = serviceById(id);
   const period: PlanPeriod = svc?.billing === "one-time" ? "one-time" : params.get("period") === "annual" ? "annual" : "monthly";
 
@@ -35,17 +41,21 @@ function Checkout() {
   if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
   else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
 
-  function pay() {
+  async function pay() {
     setPaying(true);
-    // Preview mode: the payment provider call is simulated. In production this is a
-    // hosted checkout (Stripe / Razorpay) and the subscription is created by its webhook.
-    setTimeout(() => {
-      const automationId = buyService(svc!.id, period);
-      // A trial service that was already on: tell the automation server it's paid now, so it keeps running.
-      const after = currentWorkspace()?.automations.find((a) => a.id === automationId);
-      if (existing && after?.status === "active") void activateService(svc!.id);
-      router.replace(automationId ? `/app/automations/${automationId}?paid=1` : "/app/services");
-    }, 900);
+    setError("");
+    const result = await collectPayment(svc!.id, period);
+    if (result.status === "cancelled") return setPaying(false);
+    if (result.status === "error") {
+      setError(result.message);
+      return setPaying(false);
+    }
+    // Paid (or a test payment in preview mode): create the service and carry on with its setup.
+    const automationId = buyService(svc!.id, period);
+    // A trial service that was already on: tell the automation server it's paid now, so it keeps running.
+    const after = currentWorkspace()?.automations.find((a) => a.id === automationId);
+    if (existing && after?.status === "active") void activateService(svc!.id);
+    router.replace(automationId ? `/app/automations/${automationId}?paid=1` : "/app/services");
   }
 
   return (
@@ -87,7 +97,13 @@ function Checkout() {
         </dl>
       </Card>
 
-      {product.previewMode && (
+      {error && (
+        <Notice tone="amber" className="mt-4">
+          {error}
+        </Notice>
+      )}
+
+      {product.previewMode && !live && (
         <Notice tone="amber" className="mt-4">
           Preview mode — this is a test payment. No card is needed and nothing is charged. When the payment provider is connected, this button opens its secure checkout.
         </Notice>
@@ -96,7 +112,7 @@ function Checkout() {
       <Btn size="lg" className="mt-6 w-full" onClick={pay} disabled={paying}>
         {paying ? (
           <>
-            <Spinner /> Confirming payment…
+            <Spinner /> Opening payment…
           </>
         ) : (
           <>
