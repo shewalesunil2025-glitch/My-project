@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Check, CircleCheck, FlaskConical, Pause, Pencil,
 import { product } from "@/config/product";
 import { providerInfo, serviceById, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { activateService } from "@/lib/app/agentActions";
+import { reviewMessage } from "@/lib/reviewMessage";
 import { contentIdea } from "@/lib/app/assistant";
 import { activate, missingConnections, runTest, setAutomationStatus } from "@/lib/app/automation";
 import { audit, nowIso, updateWorkspace } from "@/lib/app/store";
@@ -227,12 +228,9 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
             )}
             {svc.id === "reviews" && (
               <Card>
-                <p className="mb-3 text-sm text-fg-muted">Example — how a suggested reply looks (this review is an example, not a real one):</p>
-                <div className="rounded-xl border border-white/10 bg-ink-900 p-4 text-sm">
-                  <p className="text-amber-200">★★★★☆</p>
-                  <p className="mt-1">“Great service, a little busy on Saturday.”</p>
-                  <p className="mt-3 text-xs text-fg-subtle">Suggested reply</p>
-                  <p className="mt-1 text-fg-muted">Thank you for visiting {ws.business?.name}! Saturdays are popular — booking ahead helps us have everything ready for you. Hope to see you again soon.</p>
+                <p className="mb-3 text-sm text-fg-muted">The WhatsApp message your customers get (example name):</p>
+                <div className="rounded-xl border border-white/10 bg-ink-900 p-4 text-sm whitespace-pre-line text-fg-muted">
+                  {reviewMessage("Priya", ws.business?.name ?? "", String(values.reviewLink || "https://g.page/r/…"), String(values.message ?? ""))}
                 </div>
                 <Btn className="mt-4" variant={a.tested ? "ghost" : "primary"} onClick={() => (save(i), runTest(a.id))}>
                   {a.tested ? <Check className="size-4" aria-hidden /> : <FlaskConical className="size-4" aria-hidden />} {a.tested ? "Looks good" : "Approve this style"}

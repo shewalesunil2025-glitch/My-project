@@ -259,15 +259,25 @@ export const services: ServiceDef[] = [
     short: "Review requests and reply drafts. Never fake reviews.",
     group: "growth",
     icon: "Star",
-    description: "Monitors your Google reviews, alerts you to new ones, suggests replies, runs review-request campaigns to real customers and tracks your rating. ibaxai never writes fake reviews or manipulates ratings.",
-    features: ["New-review alerts", "Suggested replies", "Review requests to real customers", "Rating analytics", "Google Business Profile help"],
+    description:
+      "More real Google reviews, on autopilot: after a visit or a sale, IBAX thanks the customer on your own WhatsApp and asks for a Google review with your review link — one tap from the app, or automatically when you mark a lead as a customer. ibaxai never writes fake reviews or manipulates ratings.",
+    features: ["Review requests on your WhatsApp", "Your own Google review link", "One tap from the app", "Auto-ask when a lead becomes a customer", "Each customer asked once a month at most", "New-review alerts & reply drafts — coming soon"],
     price: 499,
-    setupTime: "Same day",
-    connect: ["google"],
-    info: [{ key: "reviewLink", label: "Your Google review link (if you have it)", type: "text", placeholder: "https://g.page/r/..." }],
+    setupTime: "Minutes",
+    connect: ["whatsapp"],
+    info: [
+      {
+        key: "reviewLink",
+        label: "Your Google review link",
+        type: "text",
+        placeholder: "https://g.page/r/...",
+        required: true,
+        help: "Google Maps → your business → Share → copy the link. Or Google Business Profile → Ask for reviews → copy the link.",
+      },
+    ],
     configure: [
-      { key: "replies", label: "Replies", type: "select", options: ["Suggest replies, I approve", "Auto-reply to 4–5 star reviews only"], default: "Suggest replies, I approve" },
-      { key: "requests", label: "Ask customers for a review after a visit", type: "toggle", default: true },
+      { key: "requests", label: "Ask automatically when I mark a lead as a customer", type: "toggle", default: true },
+      { key: "message", label: "Your own message (optional — use {name} and {link})", type: "textarea", placeholder: "Namaste {name} 🙏 Thank you for visiting! Please review us: {link}" },
     ],
   },
   {
@@ -373,7 +383,7 @@ export const serviceById = (id: string) => services.find((s) => s.id === id);
  * waitlist instead of payment. Add a service's id here once its automation is
  * built and tested (see docs/ROADMAP.md).
  */
-export const liveServices: readonly string[] = ["website", "whatsapp", "followup", "custom"];
+export const liveServices: readonly string[] = ["website", "whatsapp", "followup", "reviews", "custom"];
 export const isLive = (id: string) => liveServices.includes(id);
 
 /**

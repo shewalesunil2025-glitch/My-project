@@ -57,7 +57,7 @@ export const solutions: Solution[] = [
     id: "reviews",
     title: "Google Review Management",
     headline: "Real reviews from real customers.",
-    summary: "Asks happy customers for a review and drafts replies for you. Never fake reviews.",
+    summary: "Asks every customer for a Google review on your WhatsApp, right after the sale. Never fake reviews.",
     price: "₹499/mo",
   },
   {

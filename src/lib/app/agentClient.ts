@@ -4,6 +4,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { useSyncExternalStore } from "react";
 import { formatPrice, product } from "@/config/product";
 import { isLive, providerInfo, serviceById } from "@/content/app/services";
+import { askForReview, askMessages } from "./reviewRequests";
 import { activateService, automationFor, buyService, joinWaitlist, connectProvider, periodFor, priceFor, saveServiceDetails, servicesSnapshot, setServiceState } from "./agentActions";
 import { detectLang, flowNext, localTurn, type LocalReply } from "./agentLocal";
 import { workspaceContext } from "./assistant";
@@ -182,6 +183,11 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
       });
       out.links.push({ href: "/app/content", label: "Content Centre" });
       return { content: "Draft saved in the Content Centre, waiting for the owner's approval." };
+    }
+    case "ask_review": {
+      const result = await askForReview(String(input.name ?? ""), String(input.phone ?? ""), "manual");
+      if (result !== "sent") out.links.push({ href: "/app/services/reviews", label: "Google Review Management" });
+      return { content: `${askMessages[result]} (result: ${result})`, is_error: result !== "sent" };
     }
     case "check_whatsapp": {
       const conn = ws.connections.whatsapp;

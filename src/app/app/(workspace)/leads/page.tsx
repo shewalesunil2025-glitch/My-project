@@ -4,6 +4,7 @@ import { product } from "@/config/product";
 import { useEffect, useState, type FormEvent } from "react";
 import { MessageCircle, Plus, Sparkles, X } from "lucide-react";
 import { cloudEnabled, cloudFollowupAction } from "@/lib/app/cloud";
+import { askForReview, reviewsOn } from "@/lib/app/reviewRequests";
 import { audit, logActivity, notify, nowIso, syncFollowups, syncSiteLeads, uid, updateWorkspace } from "@/lib/app/store";
 import type { Lead, LeadStatus } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -55,6 +56,9 @@ export default function LeadsPage() {
     const lead = ws?.leads.find((x) => x.id === id);
     // Converted or lost: Lead Follow-up sends no more reminders.
     if (followingUp && lead?.phone && (status === "converted" || status === "lost")) void cloudFollowupAction("stop", { phone: lead.phone });
+    // A new customer: Google Review Management asks them for a review (if the owner turned that on).
+    const autoAsk = ws && reviewsOn(ws) && ws.automations.find((a) => a.serviceId === "reviews")?.config.requests !== false;
+    if (autoAsk && lead?.phone && status === "converted" && lead.status !== "converted") void askForReview(lead.name, lead.phone, "lead");
   }
 
   function update(id: string, fn: (l: Lead) => void) {

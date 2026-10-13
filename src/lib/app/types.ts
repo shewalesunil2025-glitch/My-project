@@ -262,6 +262,8 @@ export type AuditEntry = { at: string; action: string };
 
 export type TeamRole = "owner" | "manager" | "viewer";
 
+export type ReviewRequest = { id: string; name: string; phone: string; at: string; status: "sent" | "failed"; source: "manual" | "lead" };
+
 export type Workspace = {
   id: string;
   ownerId: string;
@@ -286,6 +288,8 @@ export type Workspace = {
   agentFlow?: AgentFlow | null;
   /** Services the owner asked to be told about when they launch. */
   waitlist?: { serviceId: string; at: string }[];
+  /** Google review requests sent on WhatsApp (newest first). */
+  reviewRequests?: ReviewRequest[];
   /** The account's one free trial (3 days of messaging automations and the website builder). */
   trial?: { startedAt: string; endsAt: string } | null;
   metrics: DailyMetric[];
