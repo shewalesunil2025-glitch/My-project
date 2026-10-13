@@ -844,3 +844,17 @@ body {
 @keyframes btn-3d-flow {
   to { background-position: 0 0, 100% 0; }
 }
+
+/* IBAX chat: moving light over the "image is being made" placeholder. */
+.ibax-shimmer {
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.28) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: ibax-shimmer 1.6s linear infinite;
+}
+@keyframes ibax-shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ibax-shimmer { animation: none; }
+}

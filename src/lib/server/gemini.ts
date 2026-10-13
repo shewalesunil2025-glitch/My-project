@@ -297,7 +297,7 @@ export async function geminiLiveToken(): Promise<string | null> {
   const res = await fetch("https://generativelanguage.googleapis.com/v1alpha/auth_tokens", {
     method: "POST",
     headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
-    body: JSON.stringify({ uses: 1, expireTime: new Date(now + 30 * 60_000).toISOString(), newSessionExpireTime: new Date(now + 60_000).toISOString() }),
+    body: JSON.stringify({ uses: 1, expireTime: new Date(now + 30 * 60_000).toISOString(), newSessionExpireTime: new Date(now + 5 * 60_000).toISOString() }),
     signal: AbortSignal.timeout(8_000),
   });
   if (!res.ok) {

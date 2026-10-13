@@ -391,14 +391,33 @@ const imageErrors: Record<string, string> = {
   upstream: "Photo abhi nahi ban paayi. Thodi der baad dobara try kariye.",
 };
 
+/* "Your image is being made" — the chat shows a placeholder card while this is set. */
+let imageSince = 0;
+const imageListeners = new Set<() => void>();
+function setImageSince(v: number) {
+  imageSince = v;
+  imageListeners.forEach((l) => l());
+}
+/** When the image being made was started (0 = none). */
+export function useImagePending() {
+  return useSyncExternalStore(
+    (l) => (imageListeners.add(l), () => void imageListeners.delete(l)),
+    () => imageSince,
+    () => 0,
+  );
+}
+
 /** Makes an image (or edits the last attached photo) on the server. */
 export async function createImage(prompt: string, editLastPhoto = false): Promise<ImageResult> {
   if (!cloudEnabled) return { ok: false, reason: "not_configured", message: imageErrors.not_configured };
+  setImageSince(Date.now());
   const res = await fetch("/api/image", {
     method: "POST",
     headers: { "content-type": "application/json", ...(await cloudAuthHeader()) },
     body: JSON.stringify({ prompt, photo: editLastPhoto && lastPhoto ? lastPhoto : undefined }),
-  }).catch(() => null);
+  })
+    .catch(() => null)
+    .finally(() => setImageSince(0));
   const data = (await res?.json().catch(() => null)) as { ok?: boolean; url?: string | null; image?: string; left?: number; reason?: string } | null;
   const url = data?.url || data?.image;
   if (data?.ok && url) return { ok: true, url, left: data.left ?? 0 };

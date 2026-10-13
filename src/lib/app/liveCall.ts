@@ -80,22 +80,44 @@ type ServerMessage = {
  * Starts the call. `audio` must have been made inside the owner's tap (iPhone rule).
  * Returns null when live calls aren't available, so the app can use normal voice turns.
  */
-export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Promise<LiveCall | null> {
-  let start: { ok?: boolean; token?: string; setup?: { systemInstruction: { parts: { text: string }[] } } & Record<string, unknown> } | null;
-  try {
-    const res = await fetch("/api/live", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ audience: opts.audience ?? "app" }) });
-    start = res.ok ? await res.json() : null;
-  } catch {
-    start = null;
-  }
-  if (!start?.ok || !start.token || !start.setup) return null;
+type LiveStart = { ok?: boolean; token?: string; setup?: { systemInstruction: { parts: { text: string }[] } } & Record<string, unknown> } | null;
 
-  let stream: MediaStream;
-  try {
+const fetchStart = (audience: string): Promise<LiveStart> =>
+  fetch("/api/live", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ audience }) })
+    .then((r) => (r.ok ? (r.json() as Promise<LiveStart>) : null))
+    .catch(() => null);
+
+/* The call's pass, fetched when the chat opens so a call starts at once (a pass works for 5 minutes, once). */
+const passes: Record<string, { at: number; start: Promise<LiveStart> }> = {};
+export function prefetchLive(audience: "app" | "site" = "app") {
+  const have = passes[audience];
+  if (have && Date.now() - have.at < 4 * 60_000) return;
+  passes[audience] = { at: Date.now(), start: fetchStart(audience) };
+}
+function takeStart(audience: string) {
+  const have = passes[audience];
+  delete passes[audience];
+  return have && Date.now() - have.at < 4 * 60_000 ? have.start : fetchStart(audience);
+}
+
+export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Promise<LiveCall | null> {
+  // The pass and the microphone at the same time.
+  const audience = opts.audience ?? "app";
+  const micAsk = navigator.mediaDevices
     // The phone's echo canceller and auto-volume also turn IBAX's voice up and down (it
     // sounded near, then far), so they stay off; IBAX's own voice is told apart below.
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false } });
-  } catch {
+    .getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false } })
+    .catch(() => null);
+  let start = await takeStart(audience);
+  // A pass that was fetched earlier may have expired: get a fresh one.
+  if (!start?.ok) start = await fetchStart(audience);
+  if (!start?.ok || !start.token || !start.setup) {
+    void micAsk.then((s) => s?.getTracks().forEach((t) => t.stop()));
+    return null;
+  }
+
+  const stream = await micAsk;
+  if (!stream) {
     opts.onDrop("mic");
     return { interrupt: () => {}, end: () => {} };
   }
@@ -105,6 +127,9 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   const ws = new WebSocket(`${WS_URL}?access_token=${encodeURIComponent(start.token)}`);
   let ready = false;
   let ended = false;
+  // What the owner says while the call is still connecting is kept and sent once it's ready.
+  let early: Float32Array[] = [];
+  let earlyLength = 0;
   let ownerText = "";
   let ibaxText = "";
   let ownerShown = false;
@@ -188,9 +213,11 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     mute.gain.value = 0;
     source.connect(tap).connect(mute).connect(audio.destination);
     tap.port.onmessage = (e: MessageEvent<Float32Array>) => {
-      if (!ready || ended) {
-        pending = [];
-        pendingLength = 0;
+      if (ended) return;
+      if (!ready) {
+        early.push(e.data);
+        earlyLength += e.data.length;
+        while (earlyLength > audio.sampleRate * 8) earlyLength -= early.shift()!.length;
         return;
       }
       if (state === "speaking") {
@@ -306,6 +333,15 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     if (msg.setupComplete) {
       ready = true;
       setState("listening");
+      // Send what the owner already said while connecting, in one-second pieces.
+      const second = audio.sampleRate;
+      while (early.length) {
+        const piece: Float32Array[] = [];
+        let n = 0;
+        while (early.length && n < second) n += (piece.push(early.shift()!), piece[piece.length - 1].length);
+        ws.send(JSON.stringify({ realtimeInput: { audio: { data: toBase64(toPcm16(piece, audio.sampleRate)), mimeType: `audio/pcm;rate=${IN_RATE}` } } }));
+      }
+      earlyLength = 0;
       return;
     }
     if (msg.goAway) return end("limit");
