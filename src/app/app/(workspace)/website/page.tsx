@@ -12,16 +12,14 @@ import type { SiteSection, WebsiteProject } from "@/lib/app/types";
 import { accents, allSections, buildSite, premiumTemplate, slugify, templates, validSlug, withDefaults } from "@/lib/sites/site";
 import { useWorkspace } from "@/components/app/AppShell";
 import { SiteView } from "@/components/sites/SiteView";
+import { themeFor } from "@/lib/sites/themes";
 import { Btn, BtnLink, Card, Field, Input, Notice, PageHeader, Pill, Spinner, TextArea } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
 
-/** Swatches for the template picker: page background and hero look. */
-const looks: Record<string, string> = {
-  aurora: "radial-gradient(circle at 20% 20%, var(--a), transparent 60%), radial-gradient(circle at 80% 40%, #22d3ee88, transparent 55%), #06070a",
-  prism: "linear-gradient(160deg, #fff, #e9ebe4)",
-  glass: "radial-gradient(circle at 70% 30%, var(--a) 0 18%, transparent 19%), radial-gradient(ellipse at 20% 0%, var(--a), transparent 60%), #080b12",
-  luxe: "linear-gradient(180deg, #fbf9f4, #f1ede3)",
-  neon: "repeating-linear-gradient(90deg, var(--a) 0 1px, transparent 1px 14px), linear-gradient(180deg, #000 45%, #111)",
+/** Swatch for the template picker: the template's background with its two hero colours. */
+const swatch = (id: string, accent: string) => {
+  const t = themeFor(id);
+  return `radial-gradient(circle at 72% 38%, ${accent} 0 14%, transparent 42%), radial-gradient(circle at 28% 78%, ${t.tint}aa 0 8%, transparent 40%), ${t.bg}`;
 };
 
 export default function WebsitePage() {
@@ -156,7 +154,7 @@ export default function WebsitePage() {
                     premiumTemplate(site.template) === t.id ? "border-flow ring-2 ring-flow/40" : "border-white/10 hover:border-white/25",
                   )}
                 >
-                  <span className="block h-14" style={{ background: looks[t.id], ["--a" as string]: site.accent }} />
+                  <span className="block h-14" style={{ background: swatch(t.id, site.accent) }} />
                   <span className="block px-2.5 py-2">
                     <span className="block text-xs font-semibold">{t.label}</span>
                     <span className="block truncate text-[0.65rem] text-fg-subtle">{t.note}</span>

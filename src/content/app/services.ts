@@ -104,7 +104,7 @@ export const services: ServiceDef[] = [
     icon: "Globe",
     description:
       "Build your own website in minutes: pick a template and your business details fill it in — services and prices, hours, location, FAQ, WhatsApp and call buttons and an enquiry form. Change anything, then publish in one click. Every enquiry lands in your Leads.",
-    features: ["4 mobile-ready templates", "Filled in from your business details", "Services & prices, hours, map, FAQ", "WhatsApp, call & enquiry form", "Enquiries go straight to your Leads", "Publish and update in one click"],
+    features: ["24 premium 3D templates", "Filled in from your business details", "Services & prices, hours, map, FAQ", "WhatsApp, call & enquiry form", "Enquiries go straight to your Leads", "Publish and update in one click"],
     price: 299,
     billing: "one-time",
     setupTime: "Minutes — build it yourself and publish in one click",
