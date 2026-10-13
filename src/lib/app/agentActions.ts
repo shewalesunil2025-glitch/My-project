@@ -1,7 +1,8 @@
 import { formatPrice, product } from "@/config/product";
-import { annualPrice, isLive, providerInfo, serviceById, services, type FieldDef, type ServiceDef } from "@/content/app/services";
+import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { activate, missingConnections, runTest, setAutomationStatus } from "./automation";
 import { cloudAuthHeader } from "./cloud";
+import { beginTrial, trialOver } from "./trial";
 import { audit, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
 import type { Automation, PlanPeriod, ProviderId, Workspace } from "./types";
 
@@ -51,13 +52,35 @@ export function buyService(serviceId: string, requested?: string): string | null
   const ws = currentWorkspace();
   if (!svc || svc.price === null || !ws || !isLive(svc.id)) return null;
   const existing = automationFor(ws, svc.id);
-  if (existing) return existing.id;
+  if (existing && !existing.trialEndsAt) return existing.id;
 
   const period = periodFor(svc, requested);
   const amount = priceFor(svc, period);
   const renews = new Date();
   if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
   else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
+
+  // Paying for a service that ran on the free trial: keep its setup, just make it paid.
+  if (existing) {
+    updateWorkspace((w) => {
+      const a = automationFor(w, svc.id);
+      const sub = a && w.subscriptions.find((x) => x.id === a.subscriptionId);
+      if (!a || !sub) return;
+      Object.assign(sub, { period, price: amount, status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
+      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, date: nowIso(), status: product.previewMode ? "test" : "paid" });
+      const wasOver = trialOver(a);
+      delete a.trialEndsAt;
+      if (wasOver && a.status === "paused") {
+        a.status = a.activatedAt ? "active" : "setup";
+        a.note = undefined;
+      }
+      a.logs.unshift({ at: nowIso(), level: "success", message: "Payment confirmed — free trial converted to a paid plan" });
+      logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc.name}`, detail: `${formatPrice(amount)} · ${period}`, href: "/app/billing" });
+      notify(w, { kind: "payment", title: "Payment confirmed", detail: `${svc.name} — ${formatPrice(amount)}. It keeps running after your trial.`, href: `/app/automations/${a.id}` });
+      audit(w, `Purchased ${svc.name} (${period}) after the free trial`);
+    });
+    return existing.id;
+  }
   const automationId = uid();
 
   updateWorkspace((w) => {
@@ -86,6 +109,41 @@ export function buyService(serviceId: string, requested?: string): string | null
     logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc.name}`, detail: `${formatPrice(amount)} · ${period}`, href: "/app/billing" });
     notify(w, { kind: "payment", title: "Payment confirmed", detail: `${svc.name} — ${formatPrice(amount)}. Let's activate it.`, href: `/app/automations/${automationId}` });
     audit(w, `Purchased ${svc.name} (${period})`);
+  });
+  return automationId;
+}
+
+/**
+ * Starts a messaging service on the free trial: no payment, it runs until the trial ends.
+ * Starts the account's trial if needed. Null when the service isn't in the trial or the
+ * trial is used up.
+ */
+export function startTrialService(serviceId: string): string | null {
+  const svc = serviceById(serviceId);
+  const ws = currentWorkspace();
+  if (!svc || svc.price === null || !ws || !isLive(svc.id) || !inTrial(svc.id)) return null;
+  const existing = automationFor(ws, svc.id);
+  if (existing) return existing.id;
+  if (!beginTrial()) return null;
+  const endsAt = currentWorkspace()!.trial!.endsAt;
+  const automationId = uid();
+  updateWorkspace((w) => {
+    const subId = uid();
+    w.subscriptions.push({ id: subId, serviceId: svc.id, period: "monthly", price: svc.price!, status: "trial", startedAt: nowIso(), renewsAt: endsAt });
+    w.automations.push({
+      id: automationId,
+      serviceId: svc.id,
+      subscriptionId: subId,
+      status: "setup",
+      config: prefill(w, svc),
+      setupStep: 0,
+      tested: false,
+      createdAt: nowIso(),
+      trialEndsAt: endsAt,
+      logs: [{ at: nowIso(), level: "info", message: "Free trial started — waiting for setup" }],
+    });
+    logActivity(w, { kind: "automation", title: `${svc.name} free trial started`, href: `/app/automations/${automationId}` });
+    audit(w, `Started ${svc.name} on the free trial`);
   });
   return automationId;
 }
@@ -146,7 +204,7 @@ export async function activateService(serviceId: string): Promise<ActivationResu
   if (!svc) return { ok: false, reason: "unknown_service", missing: [] };
   const ws = currentWorkspace();
   const a = ws && automationFor(ws, svc.id);
-  if (!ws || !a) return { ok: false, reason: "not_paid", missing: [] };
+  if (!ws || !a || trialOver(a)) return { ok: false, reason: "not_paid", missing: [] };
   const details = missingDetails(svc, a);
   if (details.length) return { ok: false, reason: "missing_details", missing: details.map((f) => f.key) };
   const accounts = missingConnections(ws, svc);
@@ -170,6 +228,8 @@ export async function activateService(serviceId: string): Promise<ActivationResu
         business: ws.business ? { ...ws.business, logo: undefined } : null,
         config: after.config,
         accounts: Object.fromEntries(svc.connect.map((p) => [p, ws.connections[p]?.account ?? ""])),
+        // On the free trial the automation server stops at this time unless the service is paid.
+        trialEndsAt: after.trialEndsAt ?? null,
       }),
     });
     const data = (await res.json().catch(() => null)) as { mode?: "preview" | "sent" } | null;
@@ -208,7 +268,7 @@ export function joinWaitlist(serviceId: string) {
 export function setServiceState(serviceId: string, state: "pause" | "resume") {
   const ws = currentWorkspace();
   const a = ws && automationFor(ws, serviceId);
-  if (!a) return false;
+  if (!a || (state === "resume" && trialOver(a))) return false;
   setAutomationStatus(a.id, state === "pause" ? "paused" : "active", state === "pause" ? "Paused" : "Resumed");
   return true;
 }

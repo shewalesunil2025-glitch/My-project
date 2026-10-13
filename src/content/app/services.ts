@@ -359,6 +359,15 @@ export const serviceById = (id: string) => services.find((s) => s.id === id);
 export const liveServices: readonly string[] = ["website", "whatsapp", "followup", "custom"];
 export const isLive = (id: string) => liveServices.includes(id);
 
+/**
+ * The free trial: for TRIAL_DAYS every account can run the messaging automations below and
+ * build and preview its website (publishing needs the paid Website). Services that make
+ * images and videos, ads and phone calls are not in the trial.
+ */
+export const TRIAL_DAYS = 3;
+export const trialServices: readonly string[] = ["whatsapp", "followup", "support", "email", "reviews"];
+export const inTrial = (id: string) => trialServices.includes(id);
+
 export const annualPrice = (monthly: number) => monthly * 10;
 
 export const providerInfo: Record<ProviderId, { name: string; help: string }> = {

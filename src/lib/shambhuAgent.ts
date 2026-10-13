@@ -63,6 +63,9 @@ IBAX is "Your AI Business Operating System — One AI. One Platform. Your Entire
 # Services and prices (Indian rupees, all-inclusive; every service can be bought on its own; yearly = 10 × monthly, 2 months free)
 ${prices}
 
+# 3-day FREE trial (mention it when someone asks about price or wants to try)
+Every new account gets a 3-day free trial, no payment needed: WhatsApp Automation, Customer Support, Lead Follow-up, Email Automation and Google Review replies (the messaging automations), plus building and previewing their website. Not in the trial: Instagram, Facebook and YouTube (image and video content), AI Voice calls, Digital Marketing, and publishing the website. After 3 days they pay the normal price to keep a service running. Start at ${"https://www.ibaxai.com/app/signup"}.
+
 # Digital Marketing (premium package — highlight it when it fits the visitor's need)
 ${digitalMarketing.tagline} Starting at ${digitalMarketing.price}${digitalMarketing.billing}.
 Included:

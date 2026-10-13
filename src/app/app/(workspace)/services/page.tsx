@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { formatPrice, product } from "@/config/product";
-import { isLive, services, type ServiceDef } from "@/content/app/services";
+import { inTrial, isLive, services, TRIAL_DAYS, type ServiceDef } from "@/content/app/services";
 import { onWaitlist } from "@/lib/app/agentActions";
 import { useWorkspace } from "@/components/app/AppShell";
+import { TrialBanner } from "@/components/app/TrialBanner";
+import { trialState } from "@/lib/app/trial";
 import { automationStatus } from "@/components/app/status";
 import { Icon, PageHeader, Pill, Segmented } from "@/components/app/ui";
 
@@ -25,11 +27,14 @@ export default function ServicesPage() {
 
   const owned = (id: string) => ws.automations.find((a) => a.serviceId === id);
   const premium = services.find((s) => s.group === "premium")!;
+  const trialOpen = !ws.sample && trialState(ws).phase !== "over";
   const list = services.filter((s) => s.group !== "premium" && (group === "all" || s.group === group));
 
   return (
     <div>
       <PageHeader eyebrow="Automation Store" title="Choose your automation" subtitle={`Buy any service on its own, or let ${product.name} run everything with Digital Marketing.`} />
+
+      {!ws.sample && <TrialBanner ws={ws} className="mb-8" />}
 
       {/* Premium package */}
       <Link
@@ -91,9 +96,13 @@ export default function ServicesPage() {
                     <Icon name={s.icon} className="size-5" />
                   </span>
                   {a ? (
-                    <Pill tone={automationStatus[a.status].tone}>{automationStatus[a.status].label}</Pill>
+                    <Pill tone={a.trialEndsAt && a.status !== "paused" ? "green" : automationStatus[a.status].tone}>
+                      {a.trialEndsAt && a.status !== "paused" ? "Free trial" : automationStatus[a.status].label}
+                    </Pill>
+                  ) : !isLive(s.id) ? (
+                    <Pill tone="amber">Coming soon</Pill>
                   ) : (
-                    !isLive(s.id) && <Pill tone="amber">Coming soon</Pill>
+                    trialOpen && inTrial(s.id) && <Pill tone="green">🎁 {TRIAL_DAYS} days FREE</Pill>
                   )}
                 </div>
                 <p className="mt-5 text-lg font-semibold tracking-tight">{s.name}</p>
@@ -110,7 +119,7 @@ export default function ServicesPage() {
                   </>
                 )}
                 <span className="mt-3 text-sm font-semibold text-flow">
-                  {a ? "Manage →" : !isLive(s.id) ? (onWaitlist(ws, s.id) ? "On the waitlist ✓" : "Join the waitlist →") : s.price === null ? "Request a quote →" : "Get started →"}
+                  {a ? "Manage →" : !isLive(s.id) ? (onWaitlist(ws, s.id) ? "On the waitlist ✓" : "Join the waitlist →") : s.price === null ? "Request a quote →" : trialOpen && inTrial(s.id) ? "Start free trial →" : "Get started →"}
                 </span>
               </Link>
             </li>

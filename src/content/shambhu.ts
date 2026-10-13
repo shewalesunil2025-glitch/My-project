@@ -55,20 +55,22 @@ export type StoreItem = {
   price: string;
   billing: "monthly" | "one-time";
   premium?: boolean;
+  /** Free for the first 3 days (messaging automations only). */
+  trial?: boolean;
 };
 
 /** The Automation Store: every service can be bought on its own. */
 export const store: StoreItem[] = [
   { title: "Website", body: "A fast, modern website with ibaxai built in.", icon: Globe, price: "₹2,999", billing: "one-time" },
   { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "₹1,499", billing: "monthly" },
-  { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹699", billing: "monthly" },
-  { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹599", billing: "monthly" },
-  { title: "Lead Follow-up", body: "Every enquiry followed up on time.", icon: UserRoundCheck, price: "₹499", billing: "monthly" },
+  { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹699", billing: "monthly", trial: true },
+  { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹599", billing: "monthly", trial: true },
+  { title: "Lead Follow-up", body: "Every enquiry followed up on time.", icon: UserRoundCheck, price: "₹499", billing: "monthly", trial: true },
   { title: "Instagram Automation", body: "DMs, comments and post planning.", icon: Camera, price: "₹499", billing: "monthly" },
   { title: "Facebook Automation", body: "Page messages, comments and posts.", icon: ThumbsUp, price: "₹499", billing: "monthly" },
   { title: "YouTube Automation", body: "Video planning and comment replies.", icon: Clapperboard, price: "₹499", billing: "monthly" },
-  { title: "Email Automation", body: "Inbox sorting, drafts and follow-ups.", icon: Mail, price: "₹499", billing: "monthly" },
-  { title: "Google Review Management", body: "Review requests and reply drafts. Never fake reviews.", icon: Star, price: "₹499", billing: "monthly" },
+  { title: "Email Automation", body: "Inbox sorting, drafts and follow-ups.", icon: Mail, price: "₹499", billing: "monthly", trial: true },
+  { title: "Google Review Management", body: "Review requests and reply drafts. Never fake reviews.", icon: Star, price: "₹499", billing: "monthly", trial: true },
   {
     title: "Digital Marketing",
     body: "The premium package: content, social media, campaigns and reporting, run together.",

@@ -24,7 +24,7 @@ export type SupportSetup = {
 
 type WorkspaceData = {
   business?: { name?: string; phone?: string; description?: string; hours?: string } | null;
-  automations?: { serviceId: string; status: string; config?: Record<string, unknown> }[];
+  automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string }[];
   connections?: { whatsapp?: { account?: string; status?: string } };
 };
 
@@ -35,7 +35,7 @@ export async function supportFor(db: SupabaseClient, ownerId: string): Promise<S
   const { data: row } = await db.from("workspaces").select("data").eq("owner_id", ownerId).maybeSingle();
   const ws = row?.data as WorkspaceData | undefined;
   if (!ws) return null;
-  const auto = ws.automations?.find((a) => a.serviceId === "support" && a.status === "active");
+  const auto = ws.automations?.find((a) => a.serviceId === "support" && a.status === "active" && !(a.trialEndsAt && Date.parse(a.trialEndsAt) <= Date.now()));
   const c = auto?.config ?? {};
   const wa = ws?.connections?.whatsapp;
   const digits = wa?.status === "connected" ? waDigits(String(wa.account ?? "")) : null;

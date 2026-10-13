@@ -6,7 +6,8 @@ import { Suspense, useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { formatPrice, product } from "@/config/product";
 import { annualPrice, isLive, serviceById } from "@/content/app/services";
-import { buyService } from "@/lib/app/agentActions";
+import { activateService, buyService } from "@/lib/app/agentActions";
+import { currentWorkspace } from "@/lib/app/store";
 import type { PlanPeriod } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
 import { Btn, BtnLink, Card, EmptyState, Icon, Notice, Spinner } from "@/components/app/ui";
@@ -24,7 +25,7 @@ function Checkout() {
   if (!svc || svc.price === null) return <EmptyState title="This service can't be bought online" action={<BtnLink href="/app/services">Back to services</BtnLink>} />;
   if (!isLive(svc.id)) return <EmptyState title={`${svc.name} is coming soon`} action={<BtnLink href={`/app/services/${svc.id}`}>Join the waitlist</BtnLink>} />;
   const existing = ws.automations.find((a) => a.serviceId === svc.id);
-  if (existing) return <EmptyState title={`You already have ${svc.name}`} action={<BtnLink href={`/app/automations/${existing.id}`}>Manage it</BtnLink>} />;
+  if (existing && !existing.trialEndsAt) return <EmptyState title={`You already have ${svc.name}`} action={<BtnLink href={`/app/automations/${existing.id}`}>Manage it</BtnLink>} />;
 
   const amount = period === "annual" ? annualPrice(svc.price) : svc.price;
   const renews = new Date();
@@ -37,6 +38,9 @@ function Checkout() {
     // hosted checkout (Stripe / Razorpay) and the subscription is created by its webhook.
     setTimeout(() => {
       const automationId = buyService(svc!.id, period);
+      // A trial service that was already on: tell the automation server it's paid now, so it keeps running.
+      const after = currentWorkspace()?.automations.find((a) => a.id === automationId);
+      if (existing && after?.status === "active") void activateService(svc!.id);
       router.replace(automationId ? `/app/automations/${automationId}?paid=1` : "/app/services");
     }, 900);
   }

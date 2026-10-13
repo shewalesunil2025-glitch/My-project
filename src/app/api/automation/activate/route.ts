@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const raw = await request.text();
   if (raw.length > MAX_BODY) return NextResponse.json({ ok: false, reason: "too_large" }, { status: 413 });
 
-  let body: { workspaceId?: unknown; serviceId?: unknown; business?: unknown; config?: unknown; accounts?: unknown };
+  let body: { workspaceId?: unknown; serviceId?: unknown; business?: unknown; config?: unknown; accounts?: unknown; trialEndsAt?: unknown };
   try {
     body = JSON.parse(raw);
   } catch {
@@ -52,6 +52,8 @@ export async function POST(request: Request) {
         business: body.business && typeof body.business === "object" ? { ...(body.business as Record<string, unknown>), logo: undefined } : null,
         config: body.config ?? {},
         accounts: body.accounts ?? {},
+        // Free trial: the service stops replying after this time unless it's paid ("" = paid).
+        trialEndsAt: typeof body.trialEndsAt === "string" && !Number.isNaN(Date.parse(body.trialEndsAt)) ? new Date(body.trialEndsAt).toISOString() : "",
       }),
       signal: AbortSignal.timeout(10_000),
     });

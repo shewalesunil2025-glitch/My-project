@@ -13,6 +13,7 @@ import { Footer } from "@/components/footer/Footer";
 import { Shambhu } from "@/components/shambhu/Shambhu";
 import { AutomationStore } from "@/components/shambhu/AutomationStore";
 import { DigitalMarketing } from "@/components/marketing/DigitalMarketing";
+import { FreeTrial } from "@/components/marketing/FreeTrial";
 import { ShambhuAgent } from "@/components/shambhu/ShambhuAgent";
 import { ScrollPanel } from "@/components/effects/ScrollPanel";
 import { SmoothScroll } from "@/components/effects/SmoothScroll";
@@ -54,6 +55,7 @@ export default function HomePage() {
         <Navbar />
         <main id="main">
           <Hero />
+          <FreeTrial />
           <ConnectSection />
           <Solutions />
           <ScrollPanel>

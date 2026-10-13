@@ -27,6 +27,7 @@ import {
 import { product } from "@/config/product";
 import { cn } from "@/lib/cn";
 import { logOut, useSession } from "@/lib/app/store";
+import { expireTrials } from "@/lib/app/trial";
 import type { Workspace } from "@/lib/app/types";
 import { BrandLogo, BrandMark, FullScreenLoader, LumiMark } from "./ui";
 import { IbaxLauncher } from "./IbaxLauncher";
@@ -65,6 +66,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (!user) router.replace("/app/login");
     else if (!workspace?.business || !workspace.assistant) router.replace("/app/setup");
   }, [ready, user, workspace, router]);
+
+  // The free trial ends on time even while the app stays open.
+  useEffect(() => {
+    if (!workspace) return;
+    expireTrials(workspace);
+    const timer = window.setInterval(() => expireTrials(workspace), 60_000);
+    return () => window.clearInterval(timer);
+  }, [workspace]);
 
   if (!ready || !user || !workspace?.business || !workspace.assistant) return <FullScreenLoader />;
 
