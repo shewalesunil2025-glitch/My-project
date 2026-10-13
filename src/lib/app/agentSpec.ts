@@ -190,7 +190,7 @@ export const agentTools: Anthropic.Beta.BetaTool[] = [
   {
     name: "create_image",
     description:
-      "Makes one AI image for the owner's business — an offer poster, social media post, banner, product photo or logo idea — or edits the photo the owner attached last (change background, make it brighter, add text). Limited per day (3 on the free trial, 10 with a paid service). Write a detailed English prompt: subject, style, colours, any text to show (keep text short), format (square post, 9:16 story, wide banner).",
+      "Makes one AI image for the owner's business — an offer poster, social media post, banner, product photo or logo idea — or edits the photo the owner attached last (change background, make it brighter, add text). Free for every customer, up to 20 a day. Any style: realistic, 3D cartoon, anime, watercolour, poster. To turn the owner's attached photo into a cartoon or another style, set edit_last_photo. Write a detailed English prompt: subject, style, colours, any text to show (keep text short), format (square post, 9:16 story, wide banner).",
     strict: true,
     input_schema: {
       type: "object",

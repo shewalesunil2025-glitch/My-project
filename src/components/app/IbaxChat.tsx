@@ -937,7 +937,7 @@ export function IbaxChat({
       {!inCall && file && <AttachmentChip file={file} onRemove={() => setFile(null)} />}
       {!inCall && imageMode && (
         <p className="mx-3 mb-1 rounded-xl border border-flow/30 bg-flow/[0.08] px-3 py-2 text-xs text-flow-soft">
-          🎨 Create image: describe the poster, post or photo you want{file?.kind === "image" ? " — or how to change the attached photo" : ""}. Free trial 3 / day, paid plans 10 / day.
+          🎨 Create image: describe the poster, post or photo you want{file?.kind === "image" ? " — or how to change the attached photo" : ""}. Free — up to 20 a day. Any style: 3D cartoon, anime, realistic, poster.
         </p>
       )}
       {inCall ? (
