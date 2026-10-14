@@ -19,7 +19,7 @@ export const solutions: Solution[] = [
     headline: "More of the right customers finding you.",
     summary: "Social media, content, ads, local SEO and a monthly report — one package.",
     price: "₹9,999/mo",
-    usd: "$119/mo",
+    usd: "$299/mo",
   },
   {
     id: "website",
@@ -27,7 +27,7 @@ export const solutions: Solution[] = [
     headline: "A website that works while you sleep.",
     summary: "A fast, modern website that captures enquiries and hands them straight to ibaxai.",
     price: "₹2,999",
-    usd: "$39",
+    usd: "$299",
   },
   {
     id: "whatsapp",
@@ -35,7 +35,7 @@ export const solutions: Solution[] = [
     headline: "Every WhatsApp message answered.",
     summary: "Instant replies, details and follow-ups on WhatsApp Business.",
     price: "₹699/mo",
-    usd: "$9/mo",
+    usd: "$49/mo",
   },
   {
     id: "voice",
@@ -43,7 +43,7 @@ export const solutions: Solution[] = [
     headline: "Every call answered. Even at 2 a.m.",
     summary: "Answers calls in a natural voice, takes enquiries and booking requests.",
     price: "₹1,499/mo",
-    usd: "$19/mo",
+    usd: "$79/mo",
   },
   {
     id: "support",
@@ -51,7 +51,7 @@ export const solutions: Solution[] = [
     headline: "Answers from your business, not a script.",
     summary: "Common questions answered on every channel. Tricky ones go to your team.",
     price: "₹599/mo",
-    usd: "$7/mo",
+    usd: "$49/mo",
   },
   {
     id: "leads",
@@ -59,7 +59,7 @@ export const solutions: Solution[] = [
     headline: "No lead goes cold again.",
     summary: "Every enquiry followed up on time, until it becomes a customer.",
     price: "₹499/mo",
-    usd: "$6/mo",
+    usd: "$39/mo",
   },
   {
     id: "reviews",
@@ -67,7 +67,7 @@ export const solutions: Solution[] = [
     headline: "Real reviews from real customers.",
     summary: "Asks every customer for a Google review on your WhatsApp, right after the sale. Never fake reviews.",
     price: "₹499/mo",
-    usd: "$6/mo",
+    usd: "$29/mo",
   },
   {
     id: "social",
@@ -75,7 +75,7 @@ export const solutions: Solution[] = [
     headline: "Your social media, on autopilot.",
     summary: "Replies to DMs and comments, and plans posts in your brand voice.",
     price: "from ₹1,999/mo",
-    usd: "from $24/mo",
+    usd: "from $39/mo",
   },
   {
     id: "email",
@@ -83,6 +83,6 @@ export const solutions: Solution[] = [
     headline: "An inbox that sorts itself.",
     summary: "Sorts Gmail, drafts replies and sends the follow-ups you approve.",
     price: "₹499/mo",
-    usd: "$6/mo",
+    usd: "$29/mo",
   },
 ];

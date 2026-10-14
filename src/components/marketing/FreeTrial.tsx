@@ -25,7 +25,7 @@ export function FreeTrial() {
                   Try it before you pay.
                 </h2>
                 <p className="mt-5 max-w-lg text-fg-muted md:text-lg">
-                  Switch on every messaging automation free for 3 days — on your own WhatsApp, with your own customers — and build your website. Love it? Continue from just <Money inr="₹499" usd="$6" />/month.
+                  Switch on every messaging automation free for 3 days — on your own WhatsApp, with your own customers — and build your website. Love it? Continue from just <Money inr="₹499" usd="$29" />/month.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Link
