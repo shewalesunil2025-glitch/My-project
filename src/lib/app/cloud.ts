@@ -154,6 +154,16 @@ export async function cloudSiteLeads(): Promise<SiteLeadRow[]> {
   return error || !data ? [] : (data as SiteLeadRow[]);
 }
 
+/* ── Paid plans (subscriptions table, written by the server after each payment, Autopay included) ── */
+
+export type PaidPlanRow = { service_id: string; period: string; renews_at: string | null };
+
+export async function cloudPaidPlans(): Promise<PaidPlanRow[]> {
+  if (!cloudEnabled) return [];
+  const { data, error } = await sb().from("subscriptions").select("service_id, period, renews_at").eq("status", "active").neq("period", "one-time");
+  return error || !data ? [] : (data as PaidPlanRow[]);
+}
+
 /* ── Lead Follow-up (followups table, written by the server) ── */
 
 export type FollowupRow = { lead_ref: string; phone: string; state: "waiting" | "replied" | "done" | "stopped" | "failed"; steps_sent: number; replied_at: string | null };

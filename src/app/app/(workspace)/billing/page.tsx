@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { FileText, X } from "lucide-react";
+import { FileText, RefreshCw, X } from "lucide-react";
 import { product } from "@/config/product";
 import { annualPrice, priceIn, serviceById } from "@/content/app/services";
-import { paymentsAreLive } from "@/lib/app/payment";
+import { paymentsAreLive, stopAutopay } from "@/lib/app/payment";
+import { setAutopay } from "@/lib/app/agentActions";
 import { audit, logActivity, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { Invoice } from "@/lib/app/types";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
@@ -17,6 +18,8 @@ export default function BillingPage() {
   const ws = useWorkspace();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
+  const [autopayBusy, setAutopayBusy] = useState<string | null>(null);
+  const [autopayError, setAutopayError] = useState("");
   if (!ws?.business) return null;
 
   const active = ws.subscriptions.filter((s) => s.status === "active");
@@ -39,7 +42,19 @@ export default function BillingPage() {
     });
   }
 
-  function cancel(id: string) {
+  async function autopayOff(id: string, autopayId: string) {
+    setAutopayBusy(id);
+    setAutopayError("");
+    const ok = await stopAutopay(autopayId);
+    setAutopayBusy(null);
+    if (ok) setAutopay(id, null);
+    else setAutopayError("Autopay band nahi ho paya. Thodi der baad dobara try kariye.");
+    return ok;
+  }
+
+  async function cancel(id: string) {
+    const autopayId = ws?.subscriptions.find((x) => x.id === id)?.autopayId;
+    if (autopayId && !(await autopayOff(id, autopayId))) return;
     updateWorkspace((w) => {
       const s = w.subscriptions.find((x) => x.id === id);
       if (!s) return;
@@ -80,6 +95,11 @@ export default function BillingPage() {
 
       <section className="mb-8">
         <SectionTitle>Subscriptions</SectionTitle>
+        {autopayError && (
+          <Notice tone="amber" className="mb-3">
+            {autopayError}
+          </Notice>
+        )}
         {ws.subscriptions.length === 0 ? (
           <EmptyState title="No subscriptions yet" action={<BtnLink href="/app/services">Browse services</BtnLink>} />
         ) : (
@@ -95,7 +115,7 @@ export default function BillingPage() {
                         {svc.name} {s.serviceId === "digital-marketing" && <Pill tone="ember">Package</Pill>}
                       </p>
                       <p className="text-xs text-fg-subtle">
-                        {planEnded ? `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ended ${fmtDate(s.renewsAt)}` : s.status === "trial" || s.status === "expired" ? `Free trial · ${s.status === "trial" ? "ends" : "ended"} ${fmtDate(s.renewsAt)}` : s.period === "one-time" ? `${money(s.price, s.currency ?? "INR")} · paid once on ${fmtDate(s.startedAt)}` : `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
+                        {planEnded ? `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ended ${fmtDate(s.renewsAt)}` : s.status === "trial" || s.status === "expired" ? `Free trial · ${s.status === "trial" ? "ends" : "ended"} ${fmtDate(s.renewsAt)}` : s.period === "one-time" ? `${money(s.price, s.currency ?? "INR")} · paid once on ${fmtDate(s.startedAt)}` : `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `${s.autopayId ? "Autopay renews" : "renews"} ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
                       </p>
                     </div>
                     {planEnded ? (
@@ -103,7 +123,14 @@ export default function BillingPage() {
                     ) : s.status === "trial" || s.status === "expired" ? (
                       <Pill tone={s.status === "trial" ? "green" : "amber"}>{s.status === "trial" ? "Free trial" : "Trial ended"}</Pill>
                     ) : (
-                      <Pill tone={s.status === "active" ? "green" : "gray"}>{s.period === "one-time" ? "Paid" : s.status === "active" ? "Active" : "Cancelled"}</Pill>
+                      <>
+                        {s.autopayId && s.status === "active" && (
+                          <Pill tone="green">
+                            <RefreshCw className="size-3" aria-hidden /> Autopay on
+                          </Pill>
+                        )}
+                        <Pill tone={s.status === "active" ? "green" : "gray"}>{s.period === "one-time" ? "Paid" : s.status === "active" ? "Active" : "Cancelled"}</Pill>
+                      </>
                     )}
                   </div>
                   {planEnded && (
@@ -124,12 +151,23 @@ export default function BillingPage() {
                   )}
                   {s.status === "active" && s.period !== "one-time" && (
                     <div className="mt-3 flex flex-wrap gap-2 border-t border-white/[0.06] pt-3">
-                      <BtnLink size="sm" href={renewHref(s)}>
-                        Renew now
-                      </BtnLink>
-                      <Btn size="sm" variant="ghost" onClick={() => switchPeriod(s.id)}>
-                        {s.period === "monthly" ? "Upgrade to annual (2 months free)" : "Switch to monthly"}
-                      </Btn>
+                      {s.autopayId ? (
+                        <Btn size="sm" variant="ghost" disabled={autopayBusy === s.id} onClick={() => void autopayOff(s.id, s.autopayId!)}>
+                          {autopayBusy === s.id ? "Turning off…" : "Turn off Autopay"}
+                        </Btn>
+                      ) : (
+                        <>
+                          <BtnLink size="sm" href={renewHref(s)}>
+                            Renew now
+                          </BtnLink>
+                          <BtnLink size="sm" variant="ghost" href={renewHref(s)}>
+                            <RefreshCw className="size-3.5" aria-hidden /> Turn on Autopay
+                          </BtnLink>
+                          <Btn size="sm" variant="ghost" onClick={() => switchPeriod(s.id)}>
+                            {s.period === "monthly" ? "Upgrade to annual (2 months free)" : "Switch to monthly"}
+                          </Btn>
+                        </>
+                      )}
                       {s.serviceId !== "digital-marketing" && (
                         <BtnLink size="sm" variant="ghost" href="/app/services/digital-marketing">
                           Upgrade to Digital Marketing
@@ -137,7 +175,7 @@ export default function BillingPage() {
                       )}
                       {confirmCancel === s.id ? (
                         <>
-                          <Btn size="sm" variant="danger" onClick={() => cancel(s.id)}>
+                          <Btn size="sm" variant="danger" disabled={autopayBusy === s.id} onClick={() => void cancel(s.id)}>
                             Yes, cancel {svc.name}
                           </Btn>
                           <Btn size="sm" variant="subtle" onClick={() => setConfirmCancel(null)}>

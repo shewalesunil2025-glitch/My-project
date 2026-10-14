@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serviceById } from "@/content/app/services";
+import { sendActivation } from "@/lib/server/billing";
 import { evolutionReady, instanceFor, ownership, userFromRequest, waDigits } from "@/lib/server/whatsapp";
 
 /**
@@ -37,33 +38,14 @@ export async function POST(request: Request) {
     }
   }
 
-  const url = process.env.N8N_ACTIVATE_WEBHOOK_URL;
-  if (!url) return NextResponse.json({ ok: true, mode: "preview" });
-
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-ibax-secret": process.env.N8N_WEBHOOK_SECRET ?? "" },
-      body: JSON.stringify({
-        event: "service.activated",
-        at: new Date().toISOString(),
-        workspaceId: body.workspaceId,
-        serviceId: svc.id,
-        business: body.business && typeof body.business === "object" ? { ...(body.business as Record<string, unknown>), logo: undefined } : null,
-        config: body.config ?? {},
-        accounts: body.accounts ?? {},
-        // Free trial: the service stops replying after this time unless it's paid ("" = paid).
-        trialEndsAt: typeof body.trialEndsAt === "string" && !Number.isNaN(Date.parse(body.trialEndsAt)) ? new Date(body.trialEndsAt).toISOString() : "",
-      }),
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (!res.ok) {
-      console.error(`[activate] automation server answered ${res.status}`);
-      return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });
-    }
-    return NextResponse.json({ ok: true, mode: "sent" });
-  } catch (error) {
-    console.error("[activate] automation server unreachable", error);
-    return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });
-  }
+  const mode = await sendActivation({
+    workspaceId: body.workspaceId,
+    serviceId: svc.id,
+    business: body.business,
+    config: body.config,
+    accounts: body.accounts,
+    trialEndsAt: body.trialEndsAt,
+  });
+  if (mode === "failed") return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });
+  return NextResponse.json({ ok: true, mode });
 }

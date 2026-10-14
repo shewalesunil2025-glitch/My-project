@@ -50,7 +50,7 @@ function prefill(ws: Workspace, svc: ServiceDef): Automation["config"] {
  * Preview mode: the payment is simulated. In production this is the payment
  * provider's webhook (Stripe / Razorpay), never the browser.
  */
-export function buyService(serviceId: string, requested?: string): string | null {
+export function buyService(serviceId: string, requested?: string, paid?: { paymentRef?: string; autopayId?: string }): string | null {
   const svc = serviceById(serviceId);
   const ws = currentWorkspace();
   if (!svc || svc.price === null || !ws || !isLive(svc.id)) return null;
@@ -72,7 +72,8 @@ export function buyService(serviceId: string, requested?: string): string | null
       if (period === "monthly") end.setMonth(end.getMonth() + 1);
       else end.setFullYear(end.getFullYear() + 1);
       Object.assign(sub, { period, price: amount, currency: appCurrency(), status: "active", renewsAt: end.toISOString() });
-      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode && !paymentsAreLive() ? "test" : "paid" });
+      if (paid?.autopayId) sub.autopayId = paid.autopayId;
+      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode && !paymentsAreLive() ? "test" : "paid", paymentRef: paid?.paymentRef });
       const wasOver = trialOver(a);
       a.paidUntil = paidUntilFor(sub.renewsAt);
       if (wasOver && a.status === "paused") {
@@ -93,8 +94,8 @@ export function buyService(serviceId: string, requested?: string): string | null
       const a = automationFor(w, svc.id);
       const sub = a && w.subscriptions.find((x) => x.id === a.subscriptionId);
       if (!a || !sub) return;
-      Object.assign(sub, { period, price: amount, currency: appCurrency(), status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
-      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode && !paymentsAreLive() ? "test" : "paid" });
+      Object.assign(sub, { period, price: amount, currency: appCurrency(), status: "active", startedAt: nowIso(), renewsAt: renews.toISOString(), ...(paid?.autopayId ? { autopayId: paid.autopayId } : {}) });
+      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode && !paymentsAreLive() ? "test" : "paid", paymentRef: paid?.paymentRef });
       const wasOver = trialOver(a);
       delete a.trialEndsAt;
       if (period !== "one-time") a.paidUntil = paidUntilFor(renews.toISOString());
@@ -113,7 +114,7 @@ export function buyService(serviceId: string, requested?: string): string | null
 
   updateWorkspace((w) => {
     const subId = uid();
-    w.subscriptions.push({ id: subId, serviceId: svc.id, period, price: amount, currency: appCurrency(), status: "active", startedAt: nowIso(), renewsAt: renews.toISOString() });
+    w.subscriptions.push({ id: subId, serviceId: svc.id, period, price: amount, currency: appCurrency(), status: "active", startedAt: nowIso(), renewsAt: renews.toISOString(), ...(paid?.autopayId ? { autopayId: paid.autopayId } : {}) });
     w.invoices.unshift({
       id: uid(),
       number: `LUMI-${1000 + w.invoices.length + 1}`,
@@ -123,6 +124,7 @@ export function buyService(serviceId: string, requested?: string): string | null
       currency: appCurrency(),
       date: nowIso(),
       status: product.previewMode && !paymentsAreLive() ? "test" : "paid",
+      paymentRef: paid?.paymentRef,
     });
     w.automations.push({
       id: automationId,
@@ -141,6 +143,19 @@ export function buyService(serviceId: string, requested?: string): string | null
     audit(w, `Purchased ${svc.name} (${period})`);
   });
   return automationId;
+}
+
+/** Autopay switched on (Razorpay subscription id) or off (null) for a paid plan. */
+export function setAutopay(subscriptionId: string, autopayId: string | null) {
+  updateWorkspace((w) => {
+    const s = w.subscriptions.find((x) => x.id === subscriptionId);
+    if (!s) return;
+    const name = serviceById(s.serviceId)?.name;
+    if (autopayId) s.autopayId = autopayId;
+    else delete s.autopayId;
+    logActivity(w, { kind: "payment", title: `Autopay ${autopayId ? "on" : "off"} — ${name}`, href: "/app/billing" });
+    audit(w, `Autopay ${autopayId ? "switched on" : "switched off"} for ${name}`);
+  });
 }
 
 /**

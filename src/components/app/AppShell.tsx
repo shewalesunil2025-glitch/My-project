@@ -28,6 +28,7 @@ import { product } from "@/config/product";
 import { cn } from "@/lib/cn";
 import { logOut, useSession } from "@/lib/app/store";
 import { expireTrials } from "@/lib/app/trial";
+import { syncPaidPlans } from "@/lib/app/renewal";
 import type { Workspace } from "@/lib/app/types";
 import { BrandLogo, BrandMark, FullScreenLoader, LumiMark } from "./ui";
 import { IbaxLauncher } from "./IbaxLauncher";
@@ -66,6 +67,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (!user) router.replace("/app/login");
     else if (!workspace?.business || !workspace.assistant) router.replace("/app/setup");
   }, [ready, user, workspace, router]);
+
+  // Autopay renewals recorded by the server while the app was closed.
+  const signedIn = Boolean(user && workspace && !workspace.sample);
+  useEffect(() => {
+    if (!signedIn) return;
+    const sync = () => void syncPaidPlans().catch(() => {});
+    sync();
+    window.addEventListener("focus", sync);
+    return () => window.removeEventListener("focus", sync);
+  }, [signedIn]);
 
   // The free trial ends on time even while the app stays open.
   useEffect(() => {
