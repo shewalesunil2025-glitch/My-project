@@ -8,7 +8,7 @@ import { chargeInInr, product } from "@/config/product";
 import { annualPrice, isLive, serviceById } from "@/content/app/services";
 import { activateService, buyService, setAutopay } from "@/lib/app/agentActions";
 import { currentWorkspace } from "@/lib/app/store";
-import { AUTOPAY_MAX_INR, collectPayment, paymentsEnabled, startAutopay } from "@/lib/app/payment";
+import { AUTOPAY_MAX_INR, autopayAvailable, collectPayment, paymentsEnabled, startAutopay } from "@/lib/app/payment";
 import type { PlanPeriod } from "@/lib/app/types";
 import { appCurrency, inrNote, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -23,8 +23,12 @@ function Checkout() {
   const [live, setLive] = useState(false);
   const [error, setError] = useState("");
   const [autopay, setAutopayOn] = useState(true);
+  const [autopayReady, setAutopayReady] = useState(false);
   useEffect(() => {
-    void paymentsEnabled().then(setLive);
+    void paymentsEnabled().then((on) => {
+      setLive(on);
+      setAutopayReady(autopayAvailable());
+    });
   }, []);
   const svc = serviceById(id);
   const period: PlanPeriod = svc?.billing === "one-time" ? "one-time" : params.get("period") === "annual" ? "annual" : "monthly";
@@ -47,7 +51,7 @@ function Checkout() {
   if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
   else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
 
-  const canAutopay = period !== "one-time" && chargeInInr(amount, cur) <= AUTOPAY_MAX_INR && !sub?.autopayId;
+  const canAutopay = autopayReady && period !== "one-time" && chargeInInr(amount, cur) <= AUTOPAY_MAX_INR && !sub?.autopayId;
   const useAutopay = canAutopay && autopay;
   const mandateOnly = useAutopay && laterStart;
 

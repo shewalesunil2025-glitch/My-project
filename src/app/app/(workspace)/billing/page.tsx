@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileText, RefreshCw, X } from "lucide-react";
 import { product } from "@/config/product";
 import { annualPrice, priceIn, serviceById } from "@/content/app/services";
-import { paymentsAreLive, stopAutopay } from "@/lib/app/payment";
+import { autopayAvailable, paymentsAreLive, paymentsEnabled, stopAutopay } from "@/lib/app/payment";
 import { setAutopay } from "@/lib/app/agentActions";
 import { audit, logActivity, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { Invoice } from "@/lib/app/types";
@@ -20,6 +20,10 @@ export default function BillingPage() {
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
   const [autopayBusy, setAutopayBusy] = useState<string | null>(null);
   const [autopayError, setAutopayError] = useState("");
+  const [autopayReady, setAutopayReady] = useState(false);
+  useEffect(() => {
+    void paymentsEnabled().then(() => setAutopayReady(autopayAvailable()));
+  }, []);
   if (!ws?.business) return null;
 
   const active = ws.subscriptions.filter((s) => s.status === "active");
@@ -160,9 +164,11 @@ export default function BillingPage() {
                           <BtnLink size="sm" href={renewHref(s)}>
                             Renew now
                           </BtnLink>
-                          <BtnLink size="sm" variant="ghost" href={renewHref(s)}>
-                            <RefreshCw className="size-3.5" aria-hidden /> Turn on Autopay
-                          </BtnLink>
+                          {autopayReady && (
+                            <BtnLink size="sm" variant="ghost" href={renewHref(s)}>
+                              <RefreshCw className="size-3.5" aria-hidden /> Turn on Autopay
+                            </BtnLink>
+                          )}
                           <Btn size="sm" variant="ghost" onClick={() => switchPeriod(s.id)}>
                             {s.period === "monthly" ? "Upgrade to annual (2 months free)" : "Switch to monthly"}
                           </Btn>

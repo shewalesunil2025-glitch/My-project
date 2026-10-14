@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { annualPrice, isLive, priceIn, serviceById } from "@/content/app/services";
 import { chargeInInr, currencyForCountry } from "@/config/product";
 import { adminDb } from "@/lib/server/followup";
-import { createOrder, razorpayKeyId, razorpayReady, razorpayTestMode } from "@/lib/server/razorpay";
+import { createOrder, razorpayKeyId, razorpayReady, razorpayTestMode, webhookReady } from "@/lib/server/razorpay";
 import { userFromRequest } from "@/lib/server/whatsapp";
 
 /**
@@ -11,7 +11,8 @@ import { userFromRequest } from "@/lib/server/whatsapp";
  */
 
 export function GET() {
-  return NextResponse.json({ enabled: razorpayReady(), test: razorpayTestMode() });
+  // Autopay is offered only once the webhook is set up, or monthly charges would not extend plans.
+  return NextResponse.json({ enabled: razorpayReady(), test: razorpayTestMode(), autopay: razorpayReady() && webhookReady() });
 }
 
 export async function POST(request: Request) {

@@ -19,13 +19,19 @@ declare global {
 
 let enabled: Promise<boolean> | null = null;
 let known = false;
+let autopayOn = false;
+/** True once we know Autopay can be offered (Razorpay webhook set up). Call after paymentsEnabled(). */
+export const autopayAvailable = () => autopayOn;
 /** True once we know real payments are on (so invoices say "paid", not "test"). */
 export const paymentsAreLive = () => known;
 /** Are real payments switched on? Asked once per visit. */
 export function paymentsEnabled() {
   enabled ??= fetch("/api/pay/order")
-    .then((r) => r.json() as Promise<{ enabled?: boolean }>)
-    .then((d) => (known = Boolean(d.enabled)))
+    .then((r) => r.json() as Promise<{ enabled?: boolean; autopay?: boolean }>)
+    .then((d) => {
+      autopayOn = Boolean(d.autopay);
+      return (known = Boolean(d.enabled));
+    })
     .catch(() => false);
   return enabled;
 }
