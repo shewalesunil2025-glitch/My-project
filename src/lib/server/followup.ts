@@ -34,7 +34,7 @@ export type FollowupSetup = { active: boolean; instance: string; business: strin
 
 type WorkspaceData = {
   business?: { name?: string; phone?: string } | null;
-  automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string }[];
+  automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string; paidUntil?: string }[];
   connections?: { whatsapp?: { account?: string; status?: string } };
 };
 
@@ -49,7 +49,7 @@ export async function setupFor(db: SupabaseClient, ownerId: string): Promise<Fol
   const config = auto.config ?? {};
   return {
     // A free-trial service stops when the trial ends, even if the owner hasn't opened the app since.
-    active: auto.status === "active" && !(auto.trialEndsAt && Date.parse(auto.trialEndsAt) <= Date.now()),
+    active: auto.status === "active" && ![auto.trialEndsAt, auto.paidUntil].some((t) => t && Date.parse(t) <= Date.now()),
     instance: instanceFor(digits),
     business: String(ws?.business?.name ?? "").trim() || "our team",
     offer: typeof config.offer === "string" ? config.offer.trim() : "",

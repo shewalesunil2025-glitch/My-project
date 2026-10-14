@@ -9,6 +9,7 @@ import { paymentsAreLive } from "@/lib/app/payment";
 import { audit, logActivity, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { Invoice } from "@/lib/app/types";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
+import { renewHref, wasPaid } from "@/lib/app/renewal";
 import { useWorkspace } from "@/components/app/AppShell";
 import { Btn, BtnLink, Card, EmptyState, Notice, PageHeader, Pill, SectionTitle, Stat, fmtDate } from "@/components/app/ui";
 
@@ -85,6 +86,7 @@ export default function BillingPage() {
           <ul className="space-y-3">
             {ws.subscriptions.map((s) => {
               const svc = serviceById(s.serviceId)!;
+              const planEnded = s.status === "expired" && wasPaid(ws, s);
               return (
                 <li key={s.id} className="glass rounded-2xl p-4">
                   <div className="flex flex-wrap items-center gap-3">
@@ -93,16 +95,26 @@ export default function BillingPage() {
                         {svc.name} {s.serviceId === "digital-marketing" && <Pill tone="ember">Package</Pill>}
                       </p>
                       <p className="text-xs text-fg-subtle">
-                        {s.status === "trial" || s.status === "expired" ? `Free trial · ${s.status === "trial" ? "ends" : "ended"} ${fmtDate(s.renewsAt)}` : s.period === "one-time" ? `${money(s.price, s.currency ?? "INR")} · paid once on ${fmtDate(s.startedAt)}` : `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
+                        {planEnded ? `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ended ${fmtDate(s.renewsAt)}` : s.status === "trial" || s.status === "expired" ? `Free trial · ${s.status === "trial" ? "ends" : "ended"} ${fmtDate(s.renewsAt)}` : s.period === "one-time" ? `${money(s.price, s.currency ?? "INR")} · paid once on ${fmtDate(s.startedAt)}` : `${money(s.price, s.currency ?? "INR")} / ${s.period === "monthly" ? "month" : "year"} · ${s.status === "active" ? `renews ${fmtDate(s.renewsAt)}` : `ends ${fmtDate(s.renewsAt)}`}`}
                       </p>
                     </div>
-                    {s.status === "trial" || s.status === "expired" ? (
+                    {planEnded ? (
+                      <Pill tone="amber">Plan ended</Pill>
+                    ) : s.status === "trial" || s.status === "expired" ? (
                       <Pill tone={s.status === "trial" ? "green" : "amber"}>{s.status === "trial" ? "Free trial" : "Trial ended"}</Pill>
                     ) : (
                       <Pill tone={s.status === "active" ? "green" : "gray"}>{s.period === "one-time" ? "Paid" : s.status === "active" ? "Active" : "Cancelled"}</Pill>
                     )}
                   </div>
-                  {(s.status === "trial" || s.status === "expired") && (
+                  {planEnded && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3">
+                      <BtnLink size="sm" href={renewHref(s)}>
+                        Renew {svc.name}
+                      </BtnLink>
+                      <span className="text-xs text-fg-subtle">Paused — renew to switch it back on. Your settings are kept.</span>
+                    </div>
+                  )}
+                  {!planEnded && (s.status === "trial" || s.status === "expired") && (
                     <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3">
                       <BtnLink size="sm" href={`/app/services/${s.serviceId}`}>
                         Pay & keep {svc.name}
@@ -112,6 +124,9 @@ export default function BillingPage() {
                   )}
                   {s.status === "active" && s.period !== "one-time" && (
                     <div className="mt-3 flex flex-wrap gap-2 border-t border-white/[0.06] pt-3">
+                      <BtnLink size="sm" href={renewHref(s)}>
+                        Renew now
+                      </BtnLink>
                       <Btn size="sm" variant="ghost" onClick={() => switchPeriod(s.id)}>
                         {s.period === "monthly" ? "Upgrade to annual (2 months free)" : "Switch to monthly"}
                       </Btn>

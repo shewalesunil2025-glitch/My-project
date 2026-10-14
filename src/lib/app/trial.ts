@@ -24,8 +24,13 @@ export function timeLeft(ms: number) {
   return `${Math.max(1, Math.ceil(ms / 60_000))} minutes left`;
 }
 
-/** True when this automation ran on the trial and the trial has ended without payment. */
-export const trialOver = (a: Pick<Automation, "trialEndsAt">, now = Date.now()) => Boolean(a.trialEndsAt && Date.parse(a.trialEndsAt) <= now);
+/** Days a paid plan keeps running after its end date, while the renewal reminders go out. */
+export const GRACE_DAYS = 3;
+export const paidUntilFor = (renewsAt: string) => new Date(Date.parse(renewsAt) + GRACE_DAYS * 86_400_000).toISOString();
+
+/** True when this automation's free trial ended unpaid, or its paid plan ended without renewal. */
+export const trialOver = (a: Pick<Automation, "trialEndsAt" | "paidUntil">, now = Date.now()) =>
+  Boolean((a.trialEndsAt && Date.parse(a.trialEndsAt) <= now) || (a.paidUntil && Date.parse(a.paidUntil) <= now));
 
 /** Starts the account's free trial (once). Returns false when it was already used up. */
 export function beginTrial(): boolean {
@@ -60,9 +65,18 @@ export function expireTrials(ws: Workspace) {
     for (const a of w.automations) {
       if (!trialOver(a) || a.status === "paused") continue;
       a.status = "paused";
-      a.note = "Your free trial has ended. Pay to switch it back on.";
-      a.logs.unshift({ at: nowIso(), level: "warning", message: "Free trial ended — paused until paid" });
-      paused++;
+      if (a.trialEndsAt) {
+        a.note = "Your free trial has ended. Pay to switch it back on.";
+        a.logs.unshift({ at: nowIso(), level: "warning", message: "Free trial ended — paused until paid" });
+        paused++;
+      } else {
+        // A paid plan that wasn't renewed.
+        a.note = "Your plan has ended. Renew to switch it back on — your settings are kept.";
+        a.logs.unshift({ at: nowIso(), level: "warning", message: "Plan ended — paused until renewed" });
+        const sub = w.subscriptions.find((s) => s.id === a.subscriptionId);
+        if (sub && sub.status === "active") sub.status = "expired";
+        notify(w, { kind: "expiry", title: "A plan has ended", detail: "Renew it from Billing to switch it back on.", href: "/app/billing" });
+      }
     }
     if (paused) {
       notify(w, { kind: "expiry", title: "Your free trial has ended", detail: "Your trial automations are paused. Pay for any service to switch it back on.", href: "/app/billing" });

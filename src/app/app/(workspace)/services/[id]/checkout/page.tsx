@@ -32,12 +32,15 @@ function Checkout() {
   if (!svc || svc.price === null) return <EmptyState title="This service can't be bought online" action={<BtnLink href="/app/services">Back to services</BtnLink>} />;
   if (!isLive(svc.id)) return <EmptyState title={`${svc.name} is coming soon`} action={<BtnLink href={`/app/services/${svc.id}`}>Join the waitlist</BtnLink>} />;
   const existing = ws.automations.find((a) => a.serviceId === svc.id);
-  if (existing && !existing.trialEndsAt) return <EmptyState title={`You already have ${svc.name}`} action={<BtnLink href={`/app/automations/${existing.id}`}>Manage it</BtnLink>} />;
+  if (existing && !existing.trialEndsAt && svc.billing === "one-time") return <EmptyState title={`You already have ${svc.name}`} action={<BtnLink href={`/app/automations/${existing.id}`}>Manage it</BtnLink>} />;
 
   const cur = appCurrency(ws);
   const base = svcPrice(svc, ws) ?? svc.price;
   const amount = period === "annual" ? annualPrice(base) : base;
+  const sub = existing && !existing.trialEndsAt ? ws.subscriptions.find((x) => x.id === existing.subscriptionId) : undefined;
+  // Renewing: the new period starts from the current end date, so paying early loses nothing.
   const renews = new Date();
+  if (sub && Date.parse(sub.renewsAt) > renews.getTime()) renews.setTime(Date.parse(sub.renewsAt));
   if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
   else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
 
@@ -63,7 +66,7 @@ function Checkout() {
       <Link href={`/app/services/${svc.id}`} className="mb-5 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" aria-hidden /> Back
       </Link>
-      <h1 className="display text-2xl sm:text-3xl">Payment</h1>
+      <h1 className="display text-2xl sm:text-3xl">{sub ? `Renew ${svc.name}` : "Payment"}</h1>
 
       <Card className="mt-6 space-y-4">
         <div className="flex items-center gap-3">
@@ -85,7 +88,7 @@ function Checkout() {
           </div>
           {period !== "one-time" && (
             <div className="flex justify-between">
-              <dt className="text-fg-muted">Renews on</dt>
+              <dt className="text-fg-muted">{sub ? "Runs until" : "Renews on"}</dt>
               <dd>{renews.toLocaleDateString([], { year: "numeric", month: "long", day: "numeric" })}</dd>
             </div>
           )}
