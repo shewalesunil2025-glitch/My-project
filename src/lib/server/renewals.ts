@@ -42,7 +42,9 @@ export async function sendRenewalReminders(db: SupabaseClient) {
     const left = daysUntil(s.renews_at, now);
     if (left !== 3 && left !== 0) continue;
     const { data: row } = await db.from("workspaces").select("data").eq("owner_id", s.owner_id).maybeSingle();
-    const ws = row?.data as { business?: { ownerName?: string; phone?: string } | null } | undefined;
+    const ws = row?.data as { business?: { ownerName?: string; phone?: string } | null; subscriptions?: { serviceId: string; autopayId?: string }[] } | undefined;
+    // Autopay renews it; Razorpay sends its own notice before charging.
+    if (ws?.subscriptions?.some((x) => x.serviceId === s.service_id && x.autopayId)) continue;
     const to = waDigits(String(ws?.business?.phone ?? ""));
     const svc = serviceById(s.service_id);
     if (!to || !svc) continue;

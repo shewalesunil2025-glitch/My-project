@@ -53,6 +53,8 @@ export type Subscription = {
   renewsAt: string;
   /** Currency of `price` (default INR). */
   currency?: "INR" | "USD";
+  /** Razorpay subscription id while Autopay (UPI AutoPay / card) renews this plan. */
+  autopayId?: string;
 };
 
 export type Invoice = {
@@ -63,6 +65,8 @@ export type Invoice = {
   amount: number;
   date: string;
   status: "paid" | "test";
+  /** Razorpay payment id, so the same payment is never billed twice. */
+  paymentRef?: string;
   /** Currency of `amount` (default INR); payment is always taken in rupees. */
   currency?: "INR" | "USD";
 };
