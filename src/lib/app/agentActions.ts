@@ -2,7 +2,7 @@ import { product } from "@/config/product";
 import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, type FieldDef, type ServiceDef } from "@/content/app/services";
 import { activate, missingConnections, runTest, setAutomationStatus } from "./automation";
 import { cloudAuthHeader } from "./cloud";
-import { beginTrial, trialOver } from "./trial";
+import { beginTrial, paidUntilFor, trialOver } from "./trial";
 import { appCurrency, money, svcPrice } from "./money";
 import { paymentsAreLive } from "./payment";
 import { audit, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
@@ -55,13 +55,37 @@ export function buyService(serviceId: string, requested?: string): string | null
   const ws = currentWorkspace();
   if (!svc || svc.price === null || !ws || !isLive(svc.id)) return null;
   const existing = automationFor(ws, svc.id);
-  if (existing && !existing.trialEndsAt) return existing.id;
-
   const period = periodFor(svc, requested);
+  if (existing && !existing.trialEndsAt && period === "one-time") return existing.id;
   const amount = priceFor(svc, period);
   const renews = new Date();
   if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
   else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
+
+  // Renewing a paid plan: a month (or a year) more from the current end date, so paying early loses nothing.
+  if (existing && !existing.trialEndsAt) {
+    updateWorkspace((w) => {
+      const a = automationFor(w, svc.id);
+      const sub = a && w.subscriptions.find((x) => x.id === a.subscriptionId);
+      if (!a || !sub) return;
+      const end = new Date(Math.max(Date.parse(sub.renewsAt) || 0, Date.now()));
+      if (period === "monthly") end.setMonth(end.getMonth() + 1);
+      else end.setFullYear(end.getFullYear() + 1);
+      Object.assign(sub, { period, price: amount, currency: appCurrency(), status: "active", renewsAt: end.toISOString() });
+      w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode && !paymentsAreLive() ? "test" : "paid" });
+      const wasOver = trialOver(a);
+      a.paidUntil = paidUntilFor(sub.renewsAt);
+      if (wasOver && a.status === "paused") {
+        a.status = a.activatedAt ? "active" : "setup";
+        a.note = undefined;
+      }
+      a.logs.unshift({ at: nowIso(), level: "success", message: `Renewed until ${new Date(sub.renewsAt).toLocaleDateString()}` });
+      logActivity(w, { kind: "payment", title: `${svc.name} renewed`, detail: `${money(amount)} · ${period}`, href: "/app/billing" });
+      notify(w, { kind: "payment", title: "Plan renewed", detail: `${svc.name} — ${money(amount)}. Thank you!`, href: "/app/billing" });
+      audit(w, `Renewed ${svc.name} (${period})`);
+    });
+    return existing.id;
+  }
 
   // Paying for a service that ran on the free trial: keep its setup, just make it paid.
   if (existing) {
@@ -73,6 +97,7 @@ export function buyService(serviceId: string, requested?: string): string | null
       w.invoices.unshift({ id: uid(), number: `LUMI-${1000 + w.invoices.length + 1}`, serviceId: svc.id, period, amount, currency: appCurrency(), date: nowIso(), status: product.previewMode && !paymentsAreLive() ? "test" : "paid" });
       const wasOver = trialOver(a);
       delete a.trialEndsAt;
+      if (period !== "one-time") a.paidUntil = paidUntilFor(renews.toISOString());
       if (wasOver && a.status === "paused") {
         a.status = a.activatedAt ? "active" : "setup";
         a.note = undefined;
@@ -108,6 +133,7 @@ export function buyService(serviceId: string, requested?: string): string | null
       setupStep: 0,
       tested: false,
       createdAt: nowIso(),
+      paidUntil: period === "one-time" ? undefined : paidUntilFor(renews.toISOString()),
       logs: [{ at: nowIso(), level: "info", message: "Payment confirmed — waiting for setup" }],
     });
     logActivity(w, { kind: "payment", title: `Payment confirmed — ${svc.name}`, detail: `${money(amount)} · ${period}`, href: "/app/billing" });
@@ -233,7 +259,7 @@ export async function activateService(serviceId: string): Promise<ActivationResu
         config: after.config,
         accounts: Object.fromEntries(svc.connect.map((p) => [p, ws.connections[p]?.account ?? ""])),
         // On the free trial the automation server stops at this time unless the service is paid.
-        trialEndsAt: after.trialEndsAt ?? null,
+        trialEndsAt: after.trialEndsAt ?? after.paidUntil ?? null,
       }),
     });
     const data = (await res.json().catch(() => null)) as { mode?: "preview" | "sent" } | null;

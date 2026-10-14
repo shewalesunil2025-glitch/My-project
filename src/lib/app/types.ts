@@ -87,6 +87,8 @@ export type Automation = {
   note?: string;
   /** Set while the service runs on the free trial: it stops at this time unless paid. */
   trialEndsAt?: string;
+  /** Paid monthly or yearly plans: the service stops after this time (end date + grace days) unless renewed. */
+  paidUntil?: string;
   logs: LogEntry[];
 };
 

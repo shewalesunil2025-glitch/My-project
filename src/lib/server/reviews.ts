@@ -14,7 +14,7 @@ const ONCE_PER_MS = 30 * 86_400_000;
 
 type WorkspaceData = {
   business?: { name?: string } | null;
-  automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string }[];
+  automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string; paidUntil?: string }[];
   connections?: { whatsapp?: { account?: string; status?: string } };
   reviewRequests?: { phone: string; at: string; status?: string }[];
 };
@@ -30,7 +30,7 @@ export async function requestReview(db: SupabaseClient, ownerId: string, custome
   const { data: row } = await db.from("workspaces").select("data").eq("owner_id", ownerId).maybeSingle();
   const ws = row?.data as WorkspaceData | undefined;
   const auto = ws?.automations?.find((a) => a.serviceId === "reviews");
-  const trialOver = Boolean(auto?.trialEndsAt && Date.parse(auto.trialEndsAt) <= Date.now());
+  const trialOver = [auto?.trialEndsAt, auto?.paidUntil].some((t) => t && Date.parse(t) <= Date.now());
   const link = directReviewLink(str(auto?.config?.reviewLink));
   if (!auto || auto.status !== "active" || trialOver || !/^https?:\/\//i.test(link) || !evolutionReady()) return "off";
 

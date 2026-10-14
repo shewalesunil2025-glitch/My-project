@@ -29,24 +29,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, reason: "mismatch" }, { status: 400 });
     }
     const period = notes.period === "annual" || notes.period === "one-time" ? notes.period : "monthly";
-    const renews = new Date();
+    // Recorded once per payment, even if the browser confirms twice.
+    const { data: seen } = await db.from("subscriptions").select("renews_at").eq("payment_ref", paymentId).maybeSingle();
+    if (seen) return NextResponse.json({ ok: true, serviceId: notes.service, period, paymentId, renewsAt: seen.renews_at });
+
+    // A renewal adds a month (or a year) after the current end date, so paying early loses nothing.
+    const { data: current } = await db
+      .from("subscriptions")
+      .select("id, renews_at")
+      .eq("owner_id", user.id)
+      .eq("service_id", notes.service)
+      .eq("status", "active")
+      .order("renews_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const from = current?.renews_at && Date.parse(current.renews_at) > Date.now() ? new Date(current.renews_at) : new Date();
+    const renews = new Date(from);
     if (period === "monthly") renews.setMonth(renews.getMonth() + 1);
     else if (period === "annual") renews.setFullYear(renews.getFullYear() + 1);
-    // Recorded once per payment, even if the browser confirms twice.
-    const { data: seen } = await db.from("subscriptions").select("id").eq("payment_ref", paymentId).maybeSingle();
-    if (!seen) {
-      const { error } = await db.from("subscriptions").insert({
-        owner_id: user.id,
-        service_id: notes.service,
-        period,
-        price: order.amount / 100,
-        status: "active",
-        renews_at: period === "one-time" ? null : renews.toISOString(),
-        payment_ref: paymentId,
-      });
-      if (error) console.error("[pay] could not record subscription", error.message);
-    }
-    return NextResponse.json({ ok: true, serviceId: notes.service, period, paymentId });
+    const row = { period, price: order.amount / 100, status: "active", renews_at: period === "one-time" ? null : renews.toISOString(), payment_ref: paymentId };
+    const { error } =
+      current && period !== "one-time"
+        ? await db.from("subscriptions").update(row).eq("id", current.id)
+        : await db.from("subscriptions").insert({ owner_id: user.id, service_id: notes.service, ...row });
+    if (error) console.error("[pay] could not record subscription", error.message);
+    return NextResponse.json({ ok: true, serviceId: notes.service, period, paymentId, renewsAt: row.renews_at });
   } catch (error) {
     console.error("[pay] verify failed", error instanceof Error ? error.message : error);
     return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });
