@@ -10,8 +10,7 @@ type Manifest = Record<string, Partial<Record<DemoMode, { duration: number; lang
 const LANG_KEY = "ibaxai-demo-lang";
 
 /**
- * A service's demo video (MP4) with IBAX's narration in the chosen language. The picture is
- * the same in every language; the voice is a separate track kept in step with it.
+ * A service's demo video: one MP4 per language, with IBAX's narration inside.
  * Below the video there are only three choices: Just say it, Manually, Language.
  */
 export function DemoVideo({ svc }: { svc: ServiceDef }) {
@@ -23,8 +22,8 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
   const [progress, setProgress] = useState(0);
   const [time, setTime] = useState(0);
   const video = useRef<HTMLVideoElement>(null);
-  const audio = useRef<HTMLAudioElement>(null);
   const resume = useRef(false);
+  const startAt = useRef(0);
 
   useEffect(() => {
     let saved: string | null = null;
@@ -48,59 +47,43 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
   const voice = info && !info.langs.includes(lang) ? "en" : lang;
   const base = `/demo`;
 
-  // Keep the voice in step with the picture.
+  // The voice is inside each language's MP4, so there's nothing to keep in step.
   useEffect(() => {
     const v = video.current;
-    const a = audio.current;
-    if (!v || !a) return;
-    const sync = () => {
-      if (Math.abs(a.currentTime - v.currentTime) > 0.25) a.currentTime = v.currentTime;
-    };
+    if (!v) return;
     const onPlay = () => {
-      a.currentTime = v.currentTime;
-      void a.play().catch(() => {});
       setPlaying(true);
       setEnded(false);
     };
-    const onPause = () => {
-      a.pause();
-      setPlaying(false);
-    };
+    const onPause = () => setPlaying(false);
     const onTime = () => {
       setTime(v.currentTime);
       setProgress(v.duration ? v.currentTime / v.duration : 0);
-      if (!v.paused) sync();
     };
     const onEnd = () => {
-      a.pause();
       setPlaying(false);
       setEnded(true);
     };
-    const onSeek = () => (a.currentTime = v.currentTime);
-    const onWait = () => a.pause();
-    const onResume = () => !v.paused && void a.play().catch(() => {});
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
     v.addEventListener("timeupdate", onTime);
     v.addEventListener("ended", onEnd);
-    v.addEventListener("seeked", onSeek);
-    v.addEventListener("waiting", onWait);
-    v.addEventListener("playing", onResume);
     return () => {
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("timeupdate", onTime);
       v.removeEventListener("ended", onEnd);
-      v.removeEventListener("seeked", onSeek);
-      v.removeEventListener("waiting", onWait);
-      v.removeEventListener("playing", onResume);
     };
   }, [mode, voice]);
 
-  // After switching video or language, carry on playing if it was playing.
+  // After switching video or language, carry on (from the same moment for a new language).
   useEffect(() => {
     const v = video.current;
-    if (!v || !resume.current) return;
+    if (!v) return;
+    const at = startAt.current;
+    startAt.current = 0;
+    if (at) v.currentTime = at;
+    if (!resume.current) return;
     resume.current = false;
     void v.play().catch(() => {});
   }, [mode, voice]);
@@ -130,17 +113,13 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
   function chooseLang(code: DemoLang) {
     const v = video.current;
     resume.current = Boolean(v && !v.paused);
-    const at = v?.currentTime ?? 0;
+    startAt.current = v?.currentTime ?? 0;
     setLang(code);
     try {
       localStorage.setItem(LANG_KEY, code);
     } catch {
       /* private mode */
     }
-    // The new voice starts where the picture is.
-    requestAnimationFrame(() => {
-      if (audio.current) audio.current.currentTime = at;
-    });
   }
 
   const has = (m: DemoMode) => !manifest || Boolean(manifest[svc.id]?.[m]);
@@ -152,17 +131,15 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
     <div className="mx-auto w-full max-w-[26rem]">
       <div className="relative overflow-hidden rounded-[1.75rem] border border-flow/25 bg-ink-950 shadow-[0_40px_120px_-40px_rgb(102_211_76/0.55)]">
         <video
-          key={mode}
+          key={`${mode}-${voice}`}
           ref={video}
-          src={`${base}/video/${svc.id}-${mode}.mp4`}
+          src={`${base}/video/${svc.id}-${mode}-${voice}.mp4`}
           poster={`${base}/poster/${svc.id}-${mode}.jpg`}
           playsInline
-          muted
           preload="auto"
           onClick={toggle}
           className="block aspect-[9/16] w-full cursor-pointer bg-ink-950 object-cover"
         />
-        <audio key={`${mode}-${voice}`} ref={audio} src={`${base}/audio/${svc.id}-${mode}-${voice}.m4a`} preload="auto" />
 
         {/* The tagline in the chosen language, as the video opens. */}
         {voice !== "en" && playing && time < 3.4 && (
