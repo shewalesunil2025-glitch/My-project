@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Play, Sparkles } from "lucide-react";
 import { product } from "@/config/product";
 import { inTrial, isLive, services } from "@/content/app/services";
-import { BrandLogo, BtnLink, Icon } from "@/components/app/ui";
+import { BrandLogo, BtnLink } from "@/components/app/ui";
 
 export const metadata = { title: `Demo videos — ${product.name}`, description: `Watch how every ${product.name} service works, and how to switch it on by just talking to IBAX.` };
 
@@ -24,7 +24,7 @@ export default function DemoLibraryPage() {
         <p className="eyebrow mt-6">Demo videos</p>
         <h1 className="display mt-2 text-3xl sm:text-5xl">See how it works.</h1>
         <p className="mt-3 max-w-2xl text-fg-muted">
-          One short video for every service: what it does, and how to switch it on — by just talking to {product.assistantName}, or yourself, step by step.
+          One short video for every service, in English, Hindi and Marathi: how to switch it on by just talking to {product.assistantName}, or yourself, step by step.
         </p>
 
         <Link
@@ -44,11 +44,14 @@ export default function DemoLibraryPage() {
         <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {demos.map((s) => (
             <li key={s.id}>
-              <Link href={`/app/demo/${s.id}`} className="glass flex h-full gap-3.5 rounded-2xl p-4">
-                <span className="relative grid size-12 shrink-0 place-items-center rounded-xl bg-flow/12 text-flow-soft">
-                  <Icon name={s.icon} className="size-6" />
-                  <span className="absolute -right-1.5 -bottom-1.5 grid size-6 place-items-center rounded-full bg-flow text-ink-950">
-                    <Play className="size-3 fill-current" aria-hidden />
+              <Link href={`/app/demo/${s.id}`} className="glass flex h-full gap-3.5 rounded-2xl p-3">
+                <span className="relative block aspect-[9/16] w-16 shrink-0 overflow-hidden rounded-xl bg-flow/12">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/demo/poster/${s.id}-talk.jpg`} alt="" loading="lazy" className="size-full object-cover" />
+                  <span className="absolute inset-0 grid place-items-center bg-black/25">
+                    <span className="grid size-7 place-items-center rounded-full bg-flow text-ink-950">
+                      <Play className="ml-0.5 size-3.5 fill-current" aria-hidden />
+                    </span>
                   </span>
                 </span>
                 <span className="min-w-0">
@@ -58,7 +61,7 @@ export default function DemoLibraryPage() {
                     {inTrial(s.id) && isLive(s.id) && <span className="rounded-full bg-flow/15 px-2 py-0.5 font-semibold text-flow">Free trial</span>}
                     {!isLive(s.id) && <span className="rounded-full bg-white/10 px-2 py-0.5 text-fg-muted">Coming soon</span>}
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-2 py-0.5 text-fg-muted">
-                      <Sparkles className="size-3" aria-hidden /> Talk-to-activate shown
+                      <Sparkles className="size-3" aria-hidden /> English · हिंदी · मराठी
                     </span>
                   </span>
                 </span>
