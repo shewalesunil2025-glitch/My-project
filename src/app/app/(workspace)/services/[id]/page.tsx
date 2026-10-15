@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { PlanPeriod } from "@/lib/app/types";
-import { ArrowLeft, Check, Clock, Gift, Info, Link2 } from "lucide-react";
+import { ArrowLeft, Check, CirclePlay, Clock, Gift, Info, Link2 } from "lucide-react";
 import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, TRIAL_DAYS } from "@/content/app/services";
 import { joinWaitlist, onWaitlist, startTrialService } from "@/lib/app/agentActions";
 import { timeLeft, trialOver, trialState } from "@/lib/app/trial";
@@ -105,6 +105,9 @@ export default function ServiceDetailPage() {
             <div>
               <h1 className="display text-2xl sm:text-3xl">{svc.name}</h1>
               <p className="mt-1 text-sm text-fg-muted">{svc.short}</p>
+              <Link href={`/app/demo/${svc.id}`} className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-flow/15 px-3 py-1 text-xs font-semibold text-flow ring-1 ring-flow/30 hover:bg-flow/25">
+                <CirclePlay className="size-3.5" aria-hidden /> Watch demo video
+              </Link>
             </div>
           </div>
           <p className="leading-relaxed text-fg-muted">{svc.description}</p>
