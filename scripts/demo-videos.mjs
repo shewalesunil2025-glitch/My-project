@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
  * Makes the demo videos shown at /app/demo/<service>: for every service, a "talk" video
- * (just tell IBAX) and a "manual" video (do it yourself), as silent MP4s plus one narration
- * track per language in IBAX's natural (Gemini) voice. The player plays the MP4 with the
- * chosen language's track.
+ * (just tell IBAX) and a "manual" video (do it yourself), one MP4 per language with the
+ * narration inside, in IBAX's natural (Gemini) voice.
  *
  *   npm run build && npx next start -p 3123      # the frames are drawn by /render/demo/<id>
  *   node scripts/demo-videos.mjs [--only whatsapp] [--mode talk] [--langs en,hi]
@@ -33,7 +32,7 @@ const PW = arg("playwright", process.env.PLAYWRIGHT_MODULE ?? "playwright");
 /** Also write ready-to-share MP4s with the voice inside (one per language), for review. */
 const PREVIEW = arg("preview", "");
 
-for (const d of [OUT, `${OUT}/video`, `${OUT}/audio`, `${OUT}/poster`, CACHE]) mkdirSync(d, { recursive: true });
+for (const d of [OUT, `${OUT}/video`, `${OUT}/poster`, CACHE]) mkdirSync(d, { recursive: true });
 const { chromium } = await import(PW);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -116,7 +115,7 @@ for (const id of ids) {
     const D = durations.map((d) => d.toFixed(2));
 
     // Picture → MP4 (silent).
-    const mp4 = join(OUT, "video", `${id}-${mode}.mp4`);
+    const mp4 = join(CACHE, `${id}-${mode}.mp4`); // silent; each language gets its own copy with the voice inside
     await load(id, mode, D);
     const ff = spawn("ffmpeg", ["-y", "-v", "error", "-f", "image2pipe", "-framerate", String(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "27", "-pix_fmt", "yuv420p", "-movflags", "+faststart", mp4], { stdio: ["pipe", "inherit", "inherit"] });
     const frames = Math.ceil(video * FPS);
@@ -144,8 +143,10 @@ for (const id of ids) {
       }
       const dur = probe(wav);
       const fit = Math.min(1.3, Math.max(0.88, dur / (video - 0.8)));
-      const m4a = join(OUT, "audio", `${id}-${mode}-${lang}.m4a`);
+      const m4a = join(CACHE, `${id}-${mode}-${lang}.m4a`);
       execFileSync("ffmpeg", ["-y", "-v", "error", "-i", wav, "-af", `adelay=300|300,atempo=${fit.toFixed(3)},loudnorm=I=-16:TP=-1.5,aresample=44100,apad`, "-t", video.toFixed(2), "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "40k", m4a]);
+      // One MP4 per language with the voice inside: plays smoothly everywhere, nothing to sync.
+      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "64k", "-ac", "1", "-ar", "44100", "-shortest", "-movflags", "+faststart", join(OUT, "video", `${id}-${mode}-${lang}.mp4`)]);
       if (PREVIEW) {
         mkdirSync(PREVIEW, { recursive: true });
         execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-c:v", "copy", "-ac", "2", "-ar", "44100", "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", join(PREVIEW, `${id}-${mode}-${lang}.mp4`)]);
