@@ -145,10 +145,10 @@ for (const id of ids) {
       const dur = probe(wav);
       const fit = Math.min(1.3, Math.max(0.88, dur / (video - 0.8)));
       const m4a = join(OUT, "audio", `${id}-${mode}-${lang}.m4a`);
-      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", wav, "-af", `adelay=300|300,atempo=${fit.toFixed(3)},apad`, "-t", video.toFixed(2), "-ac", "1", "-c:a", "aac", "-b:a", "40k", m4a]);
+      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", wav, "-af", `adelay=300|300,atempo=${fit.toFixed(3)},loudnorm=I=-16:TP=-1.5,aresample=44100,apad`, "-t", video.toFixed(2), "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "40k", m4a]);
       if (PREVIEW) {
         mkdirSync(PREVIEW, { recursive: true });
-        execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-c:v", "copy", "-c:a", "aac", "-b:a", "96k", "-shortest", "-movflags", "+faststart", join(PREVIEW, `${id}-${mode}-${lang}.mp4`)]);
+        execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-c:v", "copy", "-ac", "2", "-ar", "44100", "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", join(PREVIEW, `${id}-${mode}-${lang}.mp4`)]);
       }
       made.push(lang);
       console.log(`  ✓ ${lang} (${dur.toFixed(1)}s → ×${fit.toFixed(2)})`);
