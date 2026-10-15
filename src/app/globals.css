@@ -314,9 +314,31 @@ body {
   initial-value: 0deg;
   inherits: false;
 }
-/* A light that travels around the card border (after 21st.dev "Border Beam"). */
+/* Cards in the app: a calm, steady green border when hovered or tapped — no moving light. */
 .glass::before,
-[data-spotlight]::before,
+[data-spotlight]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: rgb(102 211 76 / 0.75);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.glass:hover::before,
+.glass:active::before,
+.glass:focus-visible::before,
+[data-spotlight]:hover::before,
+[data-spotlight]:active::before,
+[data-spotlight]:focus-visible::before {
+  opacity: 1;
+}
+/* A light that travels around a showcase card on the website (after 21st.dev "Border Beam"). */
 .beam::before {
   content: "";
   position: absolute;
@@ -328,15 +350,7 @@ body {
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.5s;
-  animation: beam-spin 3.2s linear infinite paused;
-}
-.glass:hover::before,
-[data-spotlight]:hover::before,
-.beam::before {
-  opacity: 1;
-  animation-play-state: running;
+  animation: beam-spin 3.2s linear infinite;
 }
 .beam { position: relative; }
 
