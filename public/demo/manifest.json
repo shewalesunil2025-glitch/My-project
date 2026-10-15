@@ -1,0 +1,36 @@
+{
+  "website": {
+    "talk": {
+      "duration": 28.08,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 25.8,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "voice": {
+    "talk": {
+      "duration": 35.13,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 29.42,
+      "langs": [
+        "en"
+      ]
+    }
+  }
+}

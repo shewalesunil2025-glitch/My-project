@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { serviceById } from "@/content/app/services";
-import { DemoPlayer } from "@/components/demo/DemoPlayer";
+import { DemoVideo } from "@/components/demo/DemoVideo";
 import { BrandLogo, BtnLink, EmptyState } from "@/components/app/ui";
 
 export default function ServiceDemoPage() {
@@ -12,20 +12,15 @@ export default function ServiceDemoPage() {
   const svc = serviceById(id);
   return (
     <div className="min-h-dvh">
-      <header className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/app" className="flex items-center gap-2">
-          <BrandLogo tagline />
+      <header className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
+        <Link href="/app/demo" aria-label="All demo videos" className="grid size-10 place-items-center rounded-full border border-white/10">
+          <ArrowLeft className="size-4" aria-hidden />
         </Link>
-        <BtnLink href="/app/signup" size="sm">
-          Create Account
-        </BtnLink>
+        <Link href="/app">
+          <BrandLogo />
+        </Link>
       </header>
-      <main className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <Link href="/app/demo" className="mb-4 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg">
-          <ArrowLeft className="size-4" aria-hidden /> All demo videos
-        </Link>
-        {svc && svc.id !== "custom" ? <DemoPlayer key={svc.id} svc={svc} /> : <EmptyState title="Demo not found" action={<BtnLink href="/app/demo">All demos</BtnLink>} />}
-      </main>
+      <main className="px-4 pb-10">{svc && svc.id !== "custom" ? <DemoVideo key={svc.id} svc={svc} /> : <EmptyState title="Demo not found" action={<BtnLink href="/app/demo">All demos</BtnLink>} />}</main>
     </div>
   );
 }
