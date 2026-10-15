@@ -1,0 +1,20 @@
+{
+  "website": {
+    "talk": {
+      "duration": 28.08,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 25.8,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  }
+}
