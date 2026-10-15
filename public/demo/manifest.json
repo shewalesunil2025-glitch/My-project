@@ -16,5 +16,21 @@
         "mr"
       ]
     }
+  },
+  "voice": {
+    "talk": {
+      "duration": 35.13,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 29.42,
+      "langs": [
+        "en"
+      ]
+    }
   }
 }

@@ -143,6 +143,11 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
     });
   }
 
+  const has = (m: DemoMode) => !manifest || Boolean(manifest[svc.id]?.[m]);
+  if (manifest && !manifest[svc.id]) {
+    return <p className="mx-auto mt-10 max-w-sm rounded-2xl border border-white/10 p-6 text-center text-sm text-fg-muted">This demo video is coming soon.</p>;
+  }
+
   return (
     <div className="mx-auto w-full max-w-[26rem]">
       <div className="relative overflow-hidden rounded-[1.75rem] border border-flow/25 bg-ink-950 shadow-[0_40px_120px_-40px_rgb(102_211_76/0.55)]">
@@ -195,8 +200,9 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
         <button
           type="button"
           onClick={() => pick("talk")}
+          disabled={!has("talk")}
           aria-pressed={mode === "talk"}
-          className={cn("flex min-h-14 items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-semibold transition-colors", mode === "talk" ? "border-flow bg-flow text-ink-950" : "border-white/12 text-fg hover:border-flow/50")}
+          className={cn("flex min-h-14 items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-semibold transition-colors disabled:opacity-40", mode === "talk" ? "border-flow bg-flow text-ink-950" : "border-white/12 text-fg hover:border-flow/50")}
         >
           <Sparkles className="size-4 shrink-0" aria-hidden />
           <span className="leading-tight">Just say it. IBAX does it.</span>
@@ -204,8 +210,9 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
         <button
           type="button"
           onClick={() => pick("manual")}
+          disabled={!has("manual")}
           aria-pressed={mode === "manual"}
-          className={cn("flex min-h-14 items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-semibold transition-colors", mode === "manual" ? "border-flow bg-flow text-ink-950" : "border-white/12 text-fg hover:border-flow/50")}
+          className={cn("flex min-h-14 items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-semibold transition-colors disabled:opacity-40", mode === "manual" ? "border-flow bg-flow text-ink-950" : "border-white/12 text-fg hover:border-flow/50")}
         >
           <Hand className="size-4 shrink-0" aria-hidden />
           Manually
