@@ -854,7 +854,9 @@ export function IbaxChat({
                     <Link
                       key={l.href + l.label}
                       href={l.href}
-                      className="inline-flex h-8 items-center rounded-full bg-white/10 px-3 text-xs font-semibold text-fg hover:bg-white/15"
+                      // Always close the chat panel, so the page shows even when it's the one already open behind it.
+                      onClick={() => onClose?.()}
+                      className="inline-flex h-10 items-center rounded-full bg-flow/15 px-4 text-sm font-semibold text-flow ring-1 ring-flow/30 hover:bg-flow/25"
                     >
                       {l.label} →
                     </Link>
