@@ -120,6 +120,11 @@ export function IbaxLauncher({ ws }: { ws: Workspace }) {
           <motion.section
             id="ibax-sheet"
             role="dialog"
+            // Any in-app link inside the chat (buttons, "Manage it") closes the panel so its page is visible.
+            onClickCapture={(e) => {
+              const a = (e.target as HTMLElement).closest("a");
+              if (a?.getAttribute("href")?.startsWith("/")) setOpen(false);
+            }}
             aria-label={`${product.assistantName} assistant`}
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
