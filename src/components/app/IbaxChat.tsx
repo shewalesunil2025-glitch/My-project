@@ -276,7 +276,7 @@ function ConnectCard({
             inputMode={whatsapp ? "tel" : undefined}
             placeholder={
               whatsapp
-                ? "WhatsApp Business number, e.g. +91 98765 43210"
+                ? "WhatsApp Business number with country code"
                 : "Account name or email"
             }
             className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm placeholder:text-fg-subtle focus:border-flow/50 focus:outline-none"

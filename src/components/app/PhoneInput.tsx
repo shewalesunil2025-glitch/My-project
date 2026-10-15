@@ -75,7 +75,6 @@ export function PhoneInput({
             setLocal(n);
             onChange?.(full(country, n));
           }}
-          placeholder={country.iso === "IN" ? "98765 43210" : "Mobile number"}
           className="h-11 min-w-0 flex-1 bg-transparent px-2 text-[16px] text-fg placeholder:text-fg-subtle focus:outline-none sm:text-sm"
         />
       </div>

@@ -121,7 +121,7 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
         onChange={(e) => setNumber(e.target.value)}
         inputMode="tel"
         autoComplete="tel"
-        placeholder="WhatsApp number, e.g. +91 98765 43210"
+        placeholder="WhatsApp number with country code"
         className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm placeholder:text-fg-subtle focus:border-flow/50 focus:outline-none"
       />
       {error && <Notice tone="amber">{error}</Notice>}

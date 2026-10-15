@@ -41,7 +41,7 @@ function AskForReview({ ws }: { ws: Workspace }) {
             <Input id="rv-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Priya" maxLength={80} />
           </Field>
           <Field label="WhatsApp number" htmlFor="rv-phone">
-            <Input id="rv-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="98765 43210" inputMode="tel" maxLength={20} />
+            <Input id="rv-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Customer's mobile number" inputMode="tel" maxLength={20} />
           </Field>
         </div>
         {msg && (
