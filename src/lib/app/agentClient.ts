@@ -3,7 +3,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { useSyncExternalStore } from "react";
 import { product } from "@/config/product";
-import { isLive, providerInfo, serviceById } from "@/content/app/services";
+import { businessCategories, isLive, providerInfo, serviceById } from "@/content/app/services";
 import { askForReview, askMessages } from "./reviewRequests";
 import { money } from "./money";
 import { collectPayment } from "./payment";
@@ -13,8 +13,8 @@ import { activateService, automationFor, buyService, joinWaitlist, connectProvid
 import { detectLang, flowNext, localTurn, type LocalReply } from "./agentLocal";
 import { workspaceContext } from "./assistant";
 import { whatsAppStatus } from "./whatsappLink";
-import { currentWorkspace, logActivity, nowIso, uid, updateWorkspace } from "./store";
-import type { AgentCard, ChatMessage, ProviderId, Workspace } from "./types";
+import { audit, currentWorkspace, logActivity, nowIso, uid, updateWorkspace } from "./store";
+import type { AgentCard, Business, ChatMessage, ProviderId, Workspace } from "./types";
 
 /**
  * Runs IBAX conversations. With the AI model configured, every owner message goes to
@@ -118,6 +118,12 @@ function postAssistant(reply: LocalReply & { image?: string }) {
   });
 }
 
+/** The automation server keeps a copy of the business details: send the new ones to every service that's on. */
+function refreshActiveServices() {
+  const ws = currentWorkspace();
+  for (const a of ws?.automations ?? []) if (a.status === "active") void activateService(a.serviceId).catch(() => {});
+}
+
 /** Carries out one action IBAX asked for. Returns the result IBAX sees. */
 async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pick<LocalReply, "cards" | "links">> & { image?: string }): Promise<{ content: string; is_error?: boolean }> {
   const input = (block.input ?? {}) as Record<string, unknown>;
@@ -214,6 +220,51 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
       return {
         content: `WhatsApp ${conn.account} is NOT linked right now (state: ${state}). WhatsApp logs out linked devices when the phone is offline for about 14 days, when the owner removes it under Linked devices, or after a WhatsApp update. Fix: open the WhatsApp service page and link again with the code (Linked devices → Link a device → Link with phone number instead). A "Link WhatsApp again" button was added.`,
       };
+    }
+    case "update_business_profile": {
+      if (!ws.business) return { content: "The business profile isn't set up yet — ask the owner to finish setup first.", is_error: true };
+      const map: Record<string, keyof Business> = {
+        name: "name",
+        category: "category",
+        owner_name: "ownerName",
+        phone: "phone",
+        email: "email",
+        address: "address",
+        city: "city",
+        hours: "hours",
+        description: "description",
+        services: "services",
+        target_customers: "targetCustomers",
+        website_url: "websiteUrl",
+        social_links: "socialLinks",
+      };
+      const changes = Object.entries(map)
+        .map(([k, field]) => [field, typeof input[k] === "string" ? (input[k] as string).trim().slice(0, 600) : ""] as const)
+        .filter(([, v]) => v);
+      const cat = changes.find(([f]) => f === "category");
+      if (cat && !businessCategories.some((c) => c.toLowerCase() === cat[1].toLowerCase())) return { content: `Unknown business type "${cat[1]}". Pick one of: ${businessCategories.join(", ")}.`, is_error: true };
+      if (!changes.length) return { content: "Nothing to change — every field was empty.", is_error: true };
+      updateWorkspace((w) => {
+        if (!w.business) return;
+        for (const [field, v] of changes) (w.business as Record<string, unknown>)[field] = field === "category" ? businessCategories.find((c) => c.toLowerCase() === v.toLowerCase()) : v;
+        audit(w, `IBAX updated the business profile: ${changes.map(([f]) => f).join(", ")}`);
+      });
+      refreshActiveServices();
+      const now = currentWorkspace()!.business!;
+      return { content: `Saved. Business profile now: ${changes.map(([f]) => `${f} = ${now[f]}`).join("; ")}. Active services get the new details automatically.` };
+    }
+    case "update_assistant_profile": {
+      if (!ws.assistant) return { content: "The assistant profile isn't set up yet — ask the owner to finish setup first.", is_error: true };
+      const fields = ["name", "language", "tone", "personality", "welcome"] as const;
+      const changes = fields.map((f) => [f, typeof input[f] === "string" ? (input[f] as string).trim().slice(0, 600) : ""] as const).filter(([, v]) => v);
+      if (!changes.length) return { content: "Nothing to change — every field was empty.", is_error: true };
+      updateWorkspace((w) => {
+        if (!w.assistant) return;
+        for (const [f, v] of changes) w.assistant[f] = v;
+        audit(w, `IBAX updated the assistant profile: ${changes.map(([f]) => f).join(", ")}`);
+      });
+      refreshActiveServices();
+      return { content: `Saved. Assistant profile: ${changes.map(([f, v]) => `${f} = ${v}`).join("; ")}.` };
     }
     case "show_link": {
       if (typeof input.page !== "string" || !input.page.startsWith("/app")) return { content: "Unknown page.", is_error: true };

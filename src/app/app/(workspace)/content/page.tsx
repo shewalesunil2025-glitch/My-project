@@ -107,7 +107,7 @@ export default function ContentPage() {
               <X className="size-4" aria-hidden />
             </button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Type" htmlFor="c-type">
               <Select id="c-type" value={editing.type} onChange={(e) => setEditing({ ...editing, type: e.target.value as ContentType })}>
                 {(Object.keys(typeEmoji) as ContentType[]).map((t) => (

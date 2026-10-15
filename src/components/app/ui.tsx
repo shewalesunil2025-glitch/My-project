@@ -213,11 +213,11 @@ export function EmptyState({ icon, title, children, action }: { icon?: ReactNode
 
 /* ── Forms ── */
 const inputCls =
-  "w-full rounded-xl border border-white/10 bg-ink-900 px-3.5 py-2.5 text-sm text-fg placeholder:text-fg-subtle/80 transition-colors focus:border-flow/60 focus:outline-none focus-visible:outline-none";
+  "w-full min-w-0 rounded-xl border border-white/10 bg-ink-900 px-3.5 py-2.5 text-sm text-fg placeholder:text-fg-subtle/80 transition-colors focus:border-flow/60 focus:outline-none focus-visible:outline-none";
 
 export function Field({ label, help, children, htmlFor, required }: { label: string; help?: ReactNode; children: ReactNode; htmlFor?: string; required?: boolean }) {
   return (
-    <div className="space-y-1.5">
+    <div className="min-w-0 space-y-1.5">
       <label htmlFor={htmlFor} className="block text-[0.8rem] font-medium text-fg">
         {label}
         {required && <span className="text-flow-soft"> *</span>}

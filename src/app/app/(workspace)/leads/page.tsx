@@ -129,7 +129,7 @@ export default function LeadsPage() {
                 <X className="size-4" aria-hidden />
               </button>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Name" htmlFor="l-name" required>
                 <Input id="l-name" name="name" required />
               </Field>

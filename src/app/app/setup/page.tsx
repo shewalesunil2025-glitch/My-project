@@ -131,7 +131,7 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
               <Field label="Business name" htmlFor="b-name" required>
                 <Input id="b-name" value={biz.name} onChange={set("name")} required />
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Owner name" htmlFor="b-owner">
                   <Input id="b-owner" value={biz.ownerName} onChange={set("ownerName")} />
                 </Field>
@@ -145,7 +145,7 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
               <Field label="Address" htmlFor="b-address">
                 <Input id="b-address" value={biz.address} onChange={set("address")} autoComplete="street-address" />
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="City" htmlFor="b-city" required>
                   <Input id="b-city" value={biz.city} onChange={set("city")} />
                 </Field>

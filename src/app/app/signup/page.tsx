@@ -66,7 +66,7 @@ export default function SignUpPage() {
         <Field label="Mobile number" htmlFor="phone" required help="Pick your country — prices show in ₹ for India and in $ for other countries.">
           <PhoneInput id="phone" name="phone" required />
         </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Password" htmlFor="password" required help="At least 8 characters">
             <Input id="password" name="password" type="password" autoComplete="new-password" minLength={8} required />
           </Field>

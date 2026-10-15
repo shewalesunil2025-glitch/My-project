@@ -107,7 +107,7 @@ export default function SettingsPage() {
       )}
 
       <Section id="business" title="Business settings">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Business name" htmlFor="s-name">
             <Input id="s-name" value={biz.name} onChange={setB("name")} />
           </Field>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
       </Section>
 
       <Section id="assistant" title={`${product.assistantName} settings`} subtitle={`How ${product.assistantName} talks — language, tone and personality.`}>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Language" htmlFor="s-alang">
             <Input id="s-alang" value={asst.language} onChange={setA("language")} />
           </Field>
