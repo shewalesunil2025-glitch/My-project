@@ -100,10 +100,10 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
       // Atmosphere / rim glow, breathing slowly
       const breathe = 0.85 + Math.sin(t * 0.9) * 0.15;
       const halo = ctx.createRadialGradient(cx, cy, r * 0.86, cx, cy, r * 1.25);
-      halo.addColorStop(0, "rgba(125,255,58,0)");
-      halo.addColorStop(0.22, `rgba(160,255,100,${(0.6 * breathe).toFixed(3)})`);
-      halo.addColorStop(0.5, `rgba(90,210,40,${(0.2 * breathe).toFixed(3)})`);
-      halo.addColorStop(1, "rgba(125,255,58,0)");
+      halo.addColorStop(0, "rgba(37,211,102,0)");
+      halo.addColorStop(0.22, `rgba(111,227,160,${(0.6 * breathe).toFixed(3)})`);
+      halo.addColorStop(0.5, `rgba(33,192,99,${(0.2 * breathe).toFixed(3)})`);
+      halo.addColorStop(1, "rgba(37,211,102,0)");
       ctx.fillStyle = halo;
       ctx.beginPath();
       ctx.arc(cx, cy, r * 1.22, 0, Math.PI * 2);
@@ -113,12 +113,12 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
       const body = ctx.createRadialGradient(cx, cy - r * 0.3, r * 0.1, cx, cy, r);
       body.addColorStop(0, "#0e1a0f");
       body.addColorStop(0.8, "#060d07");
-      body.addColorStop(1, "#123a10");
+      body.addColorStop(1, "#0d3a22");
       ctx.fillStyle = body;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = "rgba(170,255,120,0.6)";
+      ctx.strokeStyle = "rgba(120,230,165,0.6)";
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
@@ -128,10 +128,10 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
         if (p[2] > 0) return;
         const depth = Math.min(1, -p[2] / r);
         if (land[i]) {
-          ctx.fillStyle = `rgba(190,255,150,${(0.25 + depth * 0.7).toFixed(3)})`;
+          ctx.fillStyle = `rgba(185,240,205,${(0.25 + depth * 0.7).toFixed(3)})`;
           ctx.fillRect(cx + p[0] - 1.1, cy + p[1] - 1.1, 2.2, 2.2);
         } else {
-          ctx.fillStyle = `rgba(130,210,115,${(0.14 + depth * 0.3).toFixed(3)})`;
+          ctx.fillStyle = `rgba(110,200,145,${(0.14 + depth * 0.3).toFixed(3)})`;
           ctx.fillRect(cx + p[0] - 0.7, cy + p[1] - 0.7, 1.4, 1.4);
         }
       });
@@ -163,14 +163,14 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
           if (s2 === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         }
-        ctx.strokeStyle = `rgba(160,255,100,${((lit ? 0.9 : 0.5) * fade).toFixed(3)})`;
+        ctx.strokeStyle = `rgba(111,227,160,${((lit ? 0.9 : 0.5) * fade).toFixed(3)})`;
         ctx.lineWidth = lit ? 2 : 1.3;
         ctx.stroke();
         // Spark racing ahead of the line
         const [sx, sy] = at(grow);
         const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 7);
-        g.addColorStop(0, `rgba(240,255,225,${fade.toFixed(3)})`);
-        g.addColorStop(1, "rgba(125,255,58,0)");
+        g.addColorStop(0, `rgba(230,250,238,${fade.toFixed(3)})`);
+        g.addColorStop(1, "rgba(37,211,102,0)");
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(sx, sy, 7, 0, Math.PI * 2);
@@ -188,18 +188,18 @@ export function DottedGlobe({ markers, links, className, radiusRatio = 0.42, cen
         // Expanding ping rings
         for (let k = 0; k < 2; k++) {
           const ph = (t * 0.8 + i * 0.3 + k * 0.5) % 1;
-          ctx.strokeStyle = `rgba(160,255,100,${((1 - ph) * (on ? 0.9 : 0.5)).toFixed(3)})`;
+          ctx.strokeStyle = `rgba(111,227,160,${((1 - ph) * (on ? 0.9 : 0.5)).toFixed(3)})`;
           ctx.lineWidth = on ? 1.6 : 1;
           ctx.beginPath();
           ctx.arc(x, y, 4 + ph * (on ? 22 : 14), 0, Math.PI * 2);
           ctx.stroke();
         }
-        ctx.fillStyle = on ? "#eaffd9" : "#7dff3a";
+        ctx.fillStyle = on ? "#d9f7e6" : "#25d366";
         ctx.beginPath();
         ctx.arc(x, y, on ? 4.5 : 3.2, 0, Math.PI * 2);
         ctx.fill();
         ctx.font = on ? "600 14px ui-sans-serif, system-ui, sans-serif" : "600 12px ui-sans-serif, system-ui, sans-serif";
-        ctx.fillStyle = on ? "#eaffd9" : "rgba(255,255,255,0.9)";
+        ctx.fillStyle = on ? "#d9f7e6" : "rgba(255,255,255,0.9)";
         ctx.fillText(m.label, x + 10, y + 4);
       });
     };

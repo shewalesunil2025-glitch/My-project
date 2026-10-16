@@ -15,7 +15,7 @@ const base =
 const variants: Record<Variant, string> = {
   /** White pill with a lime "switch" knob — the main call to action. */
   primary:
-    "btn-shine knob bg-white text-ink-950 shadow-[0_10px_30px_-12px_rgb(125_255_58/0.6)] hover:shadow-[0_14px_40px_-8px_rgb(125_255_58/0.7)]",
+    "btn-shine knob bg-white text-ink-950 shadow-[0_10px_30px_-12px_rgb(37_211_102/0.6)] hover:shadow-[0_14px_40px_-8px_rgb(37_211_102/0.7)]",
   /** Transparent on dark. */
   ghost: "border border-white/12 bg-white/[0.04] text-fg hover:border-white/25 hover:bg-white/[0.08]",
   /** White pill on dark (used in the floating nav and final CTA). */

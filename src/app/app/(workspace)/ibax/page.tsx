@@ -31,7 +31,7 @@ export default function IbaxHubPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[1.8rem] border border-flow/25 p-6 text-center shadow-[0_40px_100px_-40px_rgb(102_211_76/0.55)] [background:radial-gradient(ellipse_at_50%_-10%,rgb(102_211_76/0.32),transparent_60%),linear-gradient(180deg,rgb(255_255_255/0.05),rgb(255_255_255/0.01)),var(--color-ink-900)] sm:p-8">
+      <section className="relative overflow-hidden rounded-[1.8rem] border border-flow/25 p-6 text-center shadow-[0_40px_100px_-40px_rgb(37_211_102/0.55)] [background:radial-gradient(ellipse_at_50%_-10%,rgb(37_211_102/0.32),transparent_60%),linear-gradient(180deg,rgb(255_255_255/0.05),rgb(255_255_255/0.01)),var(--color-ink-900)] sm:p-8">
         <div aria-hidden className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-flow/70 to-transparent" />
         <LumiMark className="mx-auto size-16 animate-float" />
         <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{product.assistantName}</h1>

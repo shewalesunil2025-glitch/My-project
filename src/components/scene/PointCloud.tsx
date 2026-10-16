@@ -163,7 +163,7 @@ function lobes(n: number): Vec {
   return out;
 }
 
-const PALETTE = ["#0b2a0d", "#154f17", "#23801f", "#3cb81c", "#6cf02e", "#9dff5e", "#d8ffbe"];
+const PALETTE = ["#06281a", "#0b4a2c", "#128c4a", "#1daa55", "#25d366", "#6fe3a0", "#d9f7e6"];
 
 /**
  * Particle forms from the reference: a brain made of green dots in the hero, a DNA

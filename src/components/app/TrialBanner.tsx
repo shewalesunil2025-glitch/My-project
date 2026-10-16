@@ -23,13 +23,13 @@ export function TrialBanner({ ws, className }: { ws: Workspace; className?: stri
       aria-label="Free trial"
       className={cn(
         "relative overflow-hidden rounded-3xl border p-5 sm:p-7",
-        t.phase === "over" ? "border-amber-400/30 bg-[linear-gradient(135deg,rgb(251_191_36/0.16),rgb(251_191_36/0.03)_60%)]" : "border-flow/40 bg-[linear-gradient(135deg,rgb(102_211_76/0.26),rgb(56_189_248/0.10)_55%,rgb(102_211_76/0.04))]",
+        t.phase === "over" ? "border-amber-400/30 bg-[linear-gradient(135deg,rgb(251_191_36/0.16),rgb(251_191_36/0.03)_60%)]" : "border-flow/40 bg-[linear-gradient(135deg,rgb(37_211_102/0.26),rgb(56_189_248/0.10)_55%,rgb(37_211_102/0.04))]",
         className,
       )}
     >
       <div aria-hidden className="absolute -top-24 -right-16 size-72 rounded-full bg-flow/25 blur-3xl" />
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
-        <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-flow text-ink-950 shadow-[0_12px_40px_-10px_rgb(102_211_76/0.9)]">
+        <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-flow text-ink-950 shadow-[0_12px_40px_-10px_rgb(37_211_102/0.9)]">
           {t.phase === "on" ? <Timer className="size-7" aria-hidden /> : <Gift className="size-7" aria-hidden />}
         </span>
         <div className="min-w-0 flex-1">

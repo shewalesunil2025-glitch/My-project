@@ -30,7 +30,7 @@ export function AutomationStore() {
 
   return (
     <section id="store" aria-label="Automation Store" className="relative py-24 md:py-32">
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(125_255_58/0.08),transparent_70%)]" />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(40%_60%_at_50%_0%,rgb(37_211_102/0.08),transparent_70%)]" />
       <div className="container-x relative">
         <SubHead label="Automation Store" title="Pick only what you need." />
         <Reveal delay={0.1}>
@@ -55,7 +55,7 @@ export function AutomationStore() {
                 className="glass group relative flex h-full w-full flex-col rounded-2xl p-4 text-left transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-flow/40 md:p-5"
               >
                 {s.trial && (
-                  <span className="absolute top-3 right-3 rounded-full bg-flow px-2 py-0.5 text-[0.62rem] font-bold tracking-wide text-ink-950 uppercase shadow-[0_6px_18px_-6px_rgb(125_255_58/0.9)]">
+                  <span className="absolute top-3 right-3 rounded-full bg-flow px-2 py-0.5 text-[0.62rem] font-bold tracking-wide text-ink-950 uppercase shadow-[0_6px_18px_-6px_rgb(37_211_102/0.9)]">
                     3 days free
                   </span>
                 )}
@@ -123,7 +123,7 @@ export function AutomationStore() {
             <article
               className={cn(
                 "beam relative grid items-center gap-6 overflow-hidden rounded-[1.5rem] border border-flow/40 p-6 md:grid-cols-[1fr_auto_auto] md:p-8",
-                "[background:linear-gradient(120deg,rgb(125_255_58/0.14),rgb(125_255_58/0.02)_55%),var(--color-ink-850)]",
+                "[background:linear-gradient(120deg,rgb(37_211_102/0.14),rgb(37_211_102/0.02)_55%),var(--color-ink-850)]",
               )}
             >
               <div className="flex items-start gap-4">

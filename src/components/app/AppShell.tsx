@@ -101,7 +101,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh lg:pl-64">
-      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(ellipse_at_50%_-20%,rgb(102_211_76/0.14),transparent_70%)]" />
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(ellipse_at_50%_-20%,rgb(37_211_102/0.14),transparent_70%)]" />
       <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-ink-950">
         Skip to content
       </a>
@@ -215,13 +215,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <motion.span
                       layoutId="nav-edge"
                       aria-hidden
-                      className="absolute -top-[0.4rem] left-1/2 h-[3px] w-9 -translate-x-1/2 rounded-full bg-flow shadow-[0_0_14px_2px_rgb(102_211_76/0.75)]"
+                      className="absolute -top-[0.4rem] left-1/2 h-[3px] w-9 -translate-x-1/2 rounded-full bg-flow shadow-[0_0_14px_2px_rgb(37_211_102/0.75)]"
                       transition={{ type: "spring", stiffness: 420, damping: 36 }}
                     />
                     <motion.span
                       layoutId="nav-pill"
                       aria-hidden
-                      className="absolute inset-0 rounded-[1.15rem] bg-[linear-gradient(180deg,rgb(102_211_76/0.22),rgb(102_211_76/0.06))] ring-1 ring-flow/35 shadow-[0_8px_24px_-10px_rgb(102_211_76/0.7)]"
+                      className="absolute inset-0 rounded-[1.15rem] bg-[linear-gradient(180deg,rgb(37_211_102/0.22),rgb(37_211_102/0.06))] ring-1 ring-flow/35 shadow-[0_8px_24px_-10px_rgb(37_211_102/0.7)]"
                       transition={{ type: "spring", stiffness: 420, damping: 36 }}
                     />
                   </>

@@ -24,7 +24,7 @@ function Kpi({ label, value, hint, href, icon: I, trend, metric }: { label: stri
   return (
     <Link
       href={href}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(160deg,rgb(255_255_255/0.06),rgb(255_255_255/0.015))] p-4 transition-all hover:-translate-y-0.5 hover:border-flow/30 hover:shadow-[0_18px_40px_-24px_rgb(102_211_76/0.6)]"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(160deg,rgb(255_255_255/0.06),rgb(255_255_255/0.015))] p-4 transition-all hover:-translate-y-0.5 hover:border-flow/30 hover:shadow-[0_18px_40px_-24px_rgb(37_211_102/0.6)]"
     >
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-medium text-fg-muted">{label}</p>
@@ -79,7 +79,7 @@ function Dashboard() {
     <div className="space-y-8">
       {!ws.sample && <RenewalBanner ws={ws} className="mb-4" />}
       {!ws.sample && <TrialBanner ws={ws} />}
-      <section className="relative overflow-hidden rounded-[1.75rem] border border-flow/20 bg-[radial-gradient(120%_90%_at_100%_0%,rgb(102_211_76/0.22),transparent_55%),linear-gradient(160deg,#0e2414,#06100a_60%,#040905)] p-5 shadow-[0_30px_80px_-40px_rgb(102_211_76/0.55)] sm:p-7">
+      <section className="relative overflow-hidden rounded-[1.75rem] border border-flow/20 bg-[radial-gradient(120%_90%_at_100%_0%,rgb(37_211_102/0.22),transparent_55%),linear-gradient(160deg,#0e2414,#06100a_60%,#040905)] p-5 shadow-[0_30px_80px_-40px_rgb(37_211_102/0.55)] sm:p-7">
         <div aria-hidden className="grid-backdrop pointer-events-none absolute inset-0 opacity-40" />
         <div aria-hidden className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-flow/20 blur-3xl" />
         <div className="relative">
@@ -300,7 +300,7 @@ function Dashboard() {
                       <li key={a.id} className="flex items-center gap-3 rounded-xl p-2.5">
                         <span className="relative grid size-9 place-items-center rounded-xl bg-flow/12 text-flow-soft ring-1 ring-flow/20">
                           <Icon name={svc.icon} className="size-4" />
-                          {a.status === "active" && <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full border-2 border-ink-900 bg-flow shadow-[0_0_8px_rgb(102_211_76/0.9)]" />}
+                          {a.status === "active" && <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full border-2 border-ink-900 bg-flow shadow-[0_0_8px_rgb(37_211_102/0.9)]" />}
                         </span>
                         <span className="min-w-0 flex-1 truncate text-sm">{svc.name}</span>
                         <Pill tone={st.tone}>{st.label}</Pill>

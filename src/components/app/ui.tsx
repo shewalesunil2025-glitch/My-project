@@ -33,7 +33,7 @@ import { product } from "@/config/product";
 
 /* ── Brand: the ibaxai symbol and wordmark, the same as the website ── */
 export function BrandMark({ className }: { className?: string }) {
-  return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_16px_rgb(98_207_74/0.5)]", className)} />;
+  return <LogoMark className={cn("size-9 shrink-0 drop-shadow-[0_0_16px_rgb(33_192_99/0.5)]", className)} />;
 }
 
 /** Symbol + "ibaxai" wordmark, with the "Intelligent Business Automation Expert" line under it when `tagline` is set. */
@@ -69,7 +69,7 @@ export function BrandLogo({
 export function LumiMark({ className, glow = true }: { className?: string; glow?: boolean }) {
   return (
     <span aria-hidden className={cn("inline-block size-9 shrink-0", className)}>
-      <LogoMark className={cn("size-full", glow && "drop-shadow-[0_0_14px_rgb(102_211_76/0.55)]")} />
+      <LogoMark className={cn("size-full", glow && "drop-shadow-[0_0_14px_rgb(37_211_102/0.55)]")} />
     </span>
   );
 }

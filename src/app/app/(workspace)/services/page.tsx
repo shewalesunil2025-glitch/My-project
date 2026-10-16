@@ -41,7 +41,7 @@ export default function ServicesPage() {
       {/* Premium package */}
       <Link
         href={`/app/services/${premium.id}`}
-        className="group relative mb-8 block overflow-hidden rounded-3xl border border-flow/30 bg-[linear-gradient(135deg,rgb(102_211_76/0.18),rgb(102_211_76/0.03)_60%)] p-6 sm:p-8"
+        className="group relative mb-8 block overflow-hidden rounded-3xl border border-flow/30 bg-[linear-gradient(135deg,rgb(37_211_102/0.18),rgb(37_211_102/0.03)_60%)] p-6 sm:p-8"
       >
         <div aria-hidden className="absolute -top-20 -right-16 size-64 rounded-full bg-flow/20 blur-3xl" />
         <div className="relative grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-center">
@@ -91,7 +91,7 @@ export default function ServicesPage() {
             <li key={s.id}>
               <Link
                 href={`/app/services/${s.id}`}
-                className="group flex h-full flex-col rounded-2xl border border-white/[0.07] bg-[linear-gradient(160deg,rgb(255_255_255/0.05),rgb(255_255_255/0.01))] p-5 transition-all hover:-translate-y-0.5 hover:border-flow/35 hover:shadow-[0_24px_50px_-30px_rgb(102_211_76/0.7)]"
+                className="group flex h-full flex-col rounded-2xl border border-white/[0.07] bg-[linear-gradient(160deg,rgb(255_255_255/0.05),rgb(255_255_255/0.01))] p-5 transition-all hover:-translate-y-0.5 hover:border-flow/35 hover:shadow-[0_24px_50px_-30px_rgb(37_211_102/0.7)]"
               >
                 <div className="flex items-start justify-between gap-3">
                   <span className="grid size-11 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow">
