@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Star } from "lucide-react";
+import { Check, Copy, MessageSquareReply, Send, Star } from "lucide-react";
 import { product } from "@/config/product";
 import { audit, updateWorkspace } from "@/lib/app/store";
 import { askForReview, askMessages, reviewsOn } from "@/lib/app/reviewRequests";
 import type { Review, Workspace } from "@/lib/app/types";
+import { cloudAuthHeader } from "@/lib/app/cloud";
 import { useWorkspace } from "@/components/app/AppShell";
 import { Btn, BtnLink, Card, EmptyState, Field, Input, Notice, PageHeader, Pill, SectionTitle, Spinner, Stat, TextArea, relTime, withinDays } from "@/components/app/ui";
 
@@ -71,6 +72,89 @@ function AskForReview({ ws }: { ws: Workspace }) {
         )}
       </Card>
     </section>
+  );
+}
+
+/** Paste a Google review, get a reply IBAX has written for it (copy it into Google). */
+function ReplyHelper({ ws }: { ws: Workspace }) {
+  const [text, setText] = useState("");
+  const [author, setAuthor] = useState("");
+  const [rating, setRating] = useState(5);
+  const [reply, setReply] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  async function write() {
+    setBusy(true);
+    setError("");
+    setReply("");
+    setCopied(false);
+    const res = await fetch("/api/reviews/reply", {
+      method: "POST",
+      headers: { "content-type": "application/json", ...(await cloudAuthHeader()) },
+      body: JSON.stringify({ review: text, rating, author, business: ws.business?.name }),
+    }).catch(() => null);
+    const data = (await res?.json().catch(() => null)) as { ok?: boolean; reply?: string; reason?: string } | null;
+    setBusy(false);
+    if (data?.ok && data.reply) setReply(data.reply);
+    else setError(data?.reason === "limit" ? "Thodi der baad dobara try kariye (ek ghante me 30 replies tak)." : "Reply nahi ban paya. Thodi der baad dobara try kariye.");
+  }
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(reply);
+      setCopied(true);
+    } catch {
+      setError("Copy nahi hua — reply ko dabakar rakhkar copy kariye.");
+    }
+  }
+
+  return (
+    <Card className="mb-8">
+      <h2 className="flex items-center gap-2 font-semibold">
+        <MessageSquareReply className="size-4 text-flow" aria-hidden /> Reply to a Google review
+      </h2>
+      <p className="mt-1 text-sm text-fg-muted">Copy a review from Google, paste it here, and IBAX writes the reply — in the customer&apos;s language. Then copy it back into Google.</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+        <Field label="Customer name (optional)" htmlFor="rr-author">
+          <Input id="rr-author" value={author} onChange={(e) => setAuthor(e.target.value)} maxLength={60} />
+        </Field>
+        <Field label="Stars" htmlFor="rr-stars">
+          <div id="rr-stars" role="radiogroup" aria-label="Stars" className="flex h-[2.6rem] items-center gap-1">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={`${n} star${n > 1 ? "s" : ""}`} onClick={() => setRating(n)} className="grid size-9 place-items-center rounded-lg text-amber-300 hover:bg-white/10">
+                <Star className="size-5" fill={n <= rating ? "currentColor" : "none"} aria-hidden />
+              </button>
+            ))}
+          </div>
+        </Field>
+      </div>
+      <div className="mt-3">
+        <Field label="The review" htmlFor="rr-text">
+          <TextArea id="rr-text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Paste the review here…" maxLength={1500} className="min-h-24" />
+        </Field>
+      </div>
+      <Btn className="mt-4 w-full sm:w-auto" onClick={write} disabled={busy || (!text.trim() && rating < 4)}>
+        {busy ? <Spinner /> : <MessageSquareReply className="size-4" aria-hidden />} Write reply
+      </Btn>
+      {error && (
+        <Notice tone="amber" className="mt-3">
+          {error}
+        </Notice>
+      )}
+      {reply && (
+        <div className="mt-4 space-y-2">
+          <label htmlFor="rr-reply" className="text-xs text-fg-subtle">
+            Your reply — edit if you like, then copy it into Google
+          </label>
+          <TextArea id="rr-reply" value={reply} onChange={(e) => setReply(e.target.value)} className="min-h-24" />
+          <Btn size="sm" onClick={copy}>
+            {copied ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />} {copied ? "Copied" : "Copy reply"}
+          </Btn>
+        </div>
+      )}
+    </Card>
   );
 }
 
@@ -153,12 +237,13 @@ export default function ReviewsPage() {
           <BtnLink href="/app/services/reviews">{active ? "Finish setup" : "Get Google Review Management"}</BtnLink>
         </Card>
       )}
+      {reviewsOn(ws) && <ReplyHelper ws={ws} />}
       <Notice tone="blue" className="mb-6">
         {product.name} only works with genuine reviews from real customers. It never writes fake reviews or manipulates ratings.
       </Notice>
       {ws.reviews.length === 0 ? (
         <EmptyState title="New-review alerts are coming soon">
-          Soon IBAX will also show your Google reviews here and draft replies — once Google approves our connection.
+          Soon IBAX will also show your new Google reviews here automatically — once Google approves our connection. Until then, paste any review above and IBAX writes the reply.
         </EmptyState>
       ) : (
         <>
