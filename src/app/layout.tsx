@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Inter_Tight, Playfair_Display, Poppins } from "next/
 import { GeistMono } from "geist/font/mono";
 import { MotionConfig } from "framer-motion";
 import { siteConfig } from "@/config/site";
+import { CountryDialog } from "@/components/cta/Money";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <MotionConfig reducedMotion="never">
           {children}
+          <CountryDialog />
         </MotionConfig>
       </body>
     </html>
