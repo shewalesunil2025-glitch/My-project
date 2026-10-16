@@ -272,7 +272,7 @@ export const services: ServiceDef[] = [
     icon: "Star",
     description:
       "More real Google reviews, on autopilot: after a visit or a sale, IBAX thanks the customer on your own WhatsApp and asks for a Google review with your review link — one tap from the app, or automatically when you mark a lead as a customer. ibaxai never writes fake reviews or manipulates ratings.",
-    features: ["Review requests on your WhatsApp", "Your own Google review link", "One tap from the app", "Auto-ask when a lead becomes a customer", "Each customer asked once a month at most", "New-review alerts & reply drafts — coming soon"],
+    features: ["Review requests on your WhatsApp", "Your own Google review link", "One tap from the app", "Auto-ask when a lead becomes a customer", "Each customer asked once a month at most", "Reply to any Google review: paste it, IBAX writes the reply", "New-review alerts — coming soon"],
     price: 499,
     usd: 29,
     setupTime: "Minutes",
