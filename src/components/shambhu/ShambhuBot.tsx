@@ -5,10 +5,10 @@ import { cn } from "@/lib/cn";
 
 export type BotMood = "idle" | "listening" | "thinking" | "speaking";
 
-/** IBAX greens for the rim of light, the glass core and the inner glow. */
-const RIM = ["#d6ff7a", "#8ff05e", "#4fd84a", "#2ec27e", "#2fe0b0", "#1fb7a6", "#0e8f6a", "#7ae86a", "#f0ff9e", "#d6ff7a"];
+/** Soft WhatsApp-style greens for the rim of light, the glass core and the inner glow. */
+const RIM = ["#9fe3bd", "#6fd89c", "#25d366", "#1daa55", "#25c062", "#128c4a", "#0f7a45", "#4fcf88", "#a6e6c3", "#9fe3bd"];
 const CORE = ["#0f4a3a", "#0a2f25", "#03120d"];
-const WISP = ["#9be35a", "#5ff0b0"];
+const WISP = ["#25d366", "#6fd89c"];
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
@@ -108,7 +108,7 @@ export function ShambhuBot({ mood = "idle", className, bleed = 0.92 }: { mood?: 
 
       // Outer glow
       const halo = ctx.createRadialGradient(hx, hy, R * 0.6, hx, hy, R * 1.28);
-      halo.addColorStop(0, "rgba(110,217,78,0.24)");
+      halo.addColorStop(0, "rgba(37,211,102,0.14)");
       halo.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = halo;
       ctx.beginPath(); ctx.arc(hx, hy, R * 1.28, 0, 6.2832); ctx.fill();
@@ -127,12 +127,12 @@ export function ShambhuBot({ mood = "idle", className, bleed = 0.92 }: { mood?: 
       ctx.beginPath(); ctx.arc(hx, hy, Rc, 0, 6.2832); ctx.clip();
       const gx = hx + look.x * R * 0.25, gy = hy + look.y * R * 0.2;
       const heart = ctx.createRadialGradient(gx, gy, 0, gx, gy, Rc * 0.7);
-      heart.addColorStop(0, "rgba(110,217,78,0.45)"); heart.addColorStop(1, "rgba(0,0,0,0)");
+      heart.addColorStop(0, "rgba(37,211,102,0.3)"); heart.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = heart; ctx.fillRect(hx - Rc, hy - Rc, Rc * 2, Rc * 2);
       ctx.globalCompositeOperation = "lighter";
       for (let w = 0; w < 3; w++) {
         const ang = t * (0.35 + w * 0.17) + w * 2.1;
-        ctx.globalAlpha = 0.015 + 0.15 * k;
+        ctx.globalAlpha = 0.01 + 0.1 * k;
         ctx.strokeStyle = WISP[w % 2];
         ctx.lineWidth = Rc * (0.18 + 0.1 * w);
         ctx.beginPath();
@@ -140,7 +140,7 @@ export function ShambhuBot({ mood = "idle", className, bleed = 0.92 }: { mood?: 
         ctx.stroke();
       }
       ctx.globalAlpha = 0.08 + 0.06 * Math.sin(t * 0.7);
-      ctx.strokeStyle = "#bfffe8"; ctx.lineWidth = Rc * 0.05;
+      ctx.strokeStyle = "#c5f2d6"; ctx.lineWidth = Rc * 0.05;
       const sy = Math.sin(t * 0.5) * Rc * 0.3;
       ctx.beginPath(); ctx.moveTo(hx - Rc * 0.9, hy + Rc * 0.1 + sy); ctx.lineTo(hx + Rc * 0.9, hy + Rc * 0.65 + sy); ctx.stroke();
       ctx.restore();
@@ -168,12 +168,13 @@ export function ShambhuBot({ mood = "idle", className, bleed = 0.92 }: { mood?: 
         ctx.closePath();
         ctx.strokeStyle = grad ?? RIM[r % RIM.length];
         const lw = R * rb.w * (0.8 + 0.5 * k), a = rb.alpha * (r < 2 ? 1 : 0.35 + 0.65 * k);
-        ctx.globalAlpha = a * 0.06; ctx.lineWidth = lw * 3.6; ctx.stroke();
-        ctx.globalAlpha = a * 0.12; ctx.lineWidth = lw * 2.4; ctx.stroke();
-        ctx.globalAlpha = a * 0.22; ctx.lineWidth = lw * 1.4; ctx.stroke();
-        ctx.globalAlpha = a * 0.3; ctx.lineWidth = lw * 0.75; ctx.stroke();
+        // Soft layers, kept gentle so the orb glows without glaring.
+        ctx.globalAlpha = a * 0.04; ctx.lineWidth = lw * 3.6; ctx.stroke();
+        ctx.globalAlpha = a * 0.08; ctx.lineWidth = lw * 2.4; ctx.stroke();
+        ctx.globalAlpha = a * 0.15; ctx.lineWidth = lw * 1.4; ctx.stroke();
+        ctx.globalAlpha = a * 0.21; ctx.lineWidth = lw * 0.75; ctx.stroke();
       });
-      ctx.globalAlpha = 0.5; ctx.lineWidth = R * 0.018; ctx.strokeStyle = grad ?? "#fff";
+      ctx.globalAlpha = 0.32; ctx.lineWidth = R * 0.018; ctx.strokeStyle = grad ?? "#fff";
       ctx.beginPath(); ctx.arc(hx, hy, Rc * 1.01, 0, 6.2832); ctx.stroke();
       ctx.restore();
       ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
@@ -184,7 +185,7 @@ export function ShambhuBot({ mood = "idle", className, bleed = 0.92 }: { mood?: 
       ctx.save();
       ctx.translate(hx + look.x * R * 0.36, hy + look.y * R * 0.32 - R * 0.02);
       ctx.rotate(turn * look.y * 0.5 + turn * 0.08);
-      ctx.shadowColor = "rgba(255,255,255,0.95)"; ctx.shadowBlur = R * 0.09;
+      ctx.shadowColor = "rgba(255,255,255,0.6)"; ctx.shadowBlur = R * 0.07;
       ctx.fillStyle = "#fff"; ctx.strokeStyle = "#fff"; ctx.lineCap = "round";
       for (const e of [-1, 1]) {
         if (m === "speaking") {
