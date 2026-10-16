@@ -83,7 +83,7 @@ export function OneSystem() {
         <motion.div
           aria-hidden
           style={{ opacity: glow }}
-          className="absolute bottom-0 left-1/2 h-[70%] w-[80%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(125_255_58/0.22),transparent)] blur-2xl"
+          className="absolute bottom-0 left-1/2 h-[70%] w-[80%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(37_211_102/0.22),transparent)] blur-2xl"
         />
         <motion.div style={{ y: globeY, scale: globeScale }} className="absolute inset-0 origin-bottom">
           <DottedGlobe markers={markers} links={links} radiusRatio={0.34} centerY={0.9} active={active} className="max-md:hidden" />
@@ -112,7 +112,7 @@ export function OneSystem() {
               <div
                 className={cn(
                   "glass flex h-full flex-col gap-3 rounded-2xl p-4",
-                  active === i && "border-flow/50 shadow-[0_0_40px_-10px_rgb(125_255_58/0.6)]",
+                  active === i && "border-flow/50 shadow-[0_0_40px_-10px_rgb(37_211_102/0.6)]",
                 )}
               >
                 <motion.span

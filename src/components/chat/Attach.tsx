@@ -146,7 +146,7 @@ export function ImageInProgress({ since }: { since: number }) {
   return (
     <div className="flex justify-start" role="status" aria-live="polite">
       <div className="w-full max-w-[85%] rounded-2xl rounded-bl-sm border border-white/[0.06] bg-white/[0.05] p-2.5">
-        <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-[linear-gradient(135deg,rgb(102_211_76/0.25),rgb(56_189_248/0.2),rgb(232_121_249/0.25))]">
+        <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-[linear-gradient(135deg,rgb(37_211_102/0.25),rgb(56_189_248/0.2),rgb(232_121_249/0.25))]">
           <div aria-hidden className="absolute inset-0 animate-pulse bg-[radial-gradient(60%_60%_at_30%_30%,rgb(255_255_255/0.25),transparent_70%)]" />
           <div aria-hidden className="ibax-shimmer absolute inset-0" />
           <div className="absolute inset-0 grid place-items-center">

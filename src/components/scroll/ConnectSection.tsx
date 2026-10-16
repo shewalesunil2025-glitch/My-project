@@ -68,10 +68,10 @@ function PillarStatement() {
 function LightPillar() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-y-0 left-[58%] w-0 max-md:left-[80%]">
-      <div className="absolute inset-y-0 left-0 w-[14rem] -translate-x-1/2 animate-pillar bg-[radial-gradient(50%_100%_at_50%_50%,rgb(125_255_58/0.35),transparent_70%)] blur-2xl" />
-      <div className="absolute inset-y-0 left-0 w-10 -translate-x-1/2 bg-[linear-gradient(to_bottom,rgb(125_255_58/0),rgb(160_255_100/0.8)_45%,rgb(200_255_150/0.95)_80%,rgb(125_255_58/0.3))] blur-md" />
-      <div className="absolute inset-y-0 left-0 w-[3px] -translate-x-1/2 bg-[linear-gradient(to_bottom,transparent,#eaffd9_50%,#b6ff8a)]" />
-      <div className="absolute bottom-[4%] left-0 h-24 w-[36rem] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(200_255_150/0.9),rgb(125_255_58/0.35)_45%,transparent)] blur-lg" />
+      <div className="absolute inset-y-0 left-0 w-[14rem] -translate-x-1/2 animate-pillar bg-[radial-gradient(50%_100%_at_50%_50%,rgb(37_211_102/0.35),transparent_70%)] blur-2xl" />
+      <div className="absolute inset-y-0 left-0 w-10 -translate-x-1/2 bg-[linear-gradient(to_bottom,rgb(37_211_102/0),rgb(160_255_100/0.8)_45%,rgb(197_242_214/0.95)_80%,rgb(37_211_102/0.3))] blur-md" />
+      <div className="absolute inset-y-0 left-0 w-[3px] -translate-x-1/2 bg-[linear-gradient(to_bottom,transparent,#d9f7e6_50%,#6fe3a0)]" />
+      <div className="absolute bottom-[4%] left-0 h-24 w-[36rem] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(197_242_214/0.9),rgb(37_211_102/0.35)_45%,transparent)] blur-lg" />
     </div>
   );
 }
@@ -92,8 +92,8 @@ function ScanCard() {
         className="relative overflow-hidden border border-white/10 bg-ink-900"
       >
         {/* Light leaking in from the top and bottom edges */}
-        <div aria-hidden className="absolute top-0 left-1/2 h-40 w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(200_255_150/0.7),rgb(125_255_58/0.25)_50%,transparent)] blur-xl" />
-        <div aria-hidden className="absolute bottom-0 left-1/2 h-40 w-[60%] -translate-x-1/2 translate-y-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(200_255_150/0.7),rgb(125_255_58/0.25)_50%,transparent)] blur-xl" />
+        <div aria-hidden className="absolute top-0 left-1/2 h-40 w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(197_242_214/0.7),rgb(37_211_102/0.25)_50%,transparent)] blur-xl" />
+        <div aria-hidden className="absolute bottom-0 left-1/2 h-40 w-[60%] -translate-x-1/2 translate-y-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(197_242_214/0.7),rgb(37_211_102/0.25)_50%,transparent)] blur-xl" />
 
         <div className="relative grid min-h-[34rem] items-center gap-8 p-6 md:grid-cols-12 md:p-12">
           <div className="order-2 md:order-1 md:col-span-4">
@@ -145,7 +145,7 @@ function ScanCard() {
 /** The scanned print: ibaxai's fingerprint, held still inside the card. */
 function ScanImage() {
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-[1.6rem] border border-flow/20 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.9),0_0_60px_-25px_rgb(125_255_58/0.6)]">
+    <div className="absolute inset-0 overflow-hidden rounded-[1.6rem] border border-flow/20 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.9),0_0_60px_-25px_rgb(37_211_102/0.6)]">
       <FingerprintScan className="absolute -inset-[4%] size-[108%]" />
       {/* Edge fade into the card */}
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgb(7_13_7/0.85))]" />
@@ -163,7 +163,7 @@ function ScanBrackets() {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: "-20%" }}
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-      className="pointer-events-none absolute top-[12%] left-1/2 h-[74%] w-[78%] -translate-x-1/2 drop-shadow-[0_0_8px_rgb(125_255_58/0.9)]"
+      className="pointer-events-none absolute top-[12%] left-1/2 h-[74%] w-[78%] -translate-x-1/2 drop-shadow-[0_0_8px_rgb(37_211_102/0.9)]"
     >
       <span className={`${corner} top-0 left-0 rounded-tl-2xl border-t-[3px] border-l-[3px]`} />
       <span className={`${corner} top-0 right-0 rounded-tr-2xl border-t-[3px] border-r-[3px]`} />

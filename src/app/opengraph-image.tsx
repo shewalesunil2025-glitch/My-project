@@ -24,7 +24,7 @@ export default function OpengraphImage() {
         <div style={{ fontSize: 26, letterSpacing: 8, color: "#a3aba6" }}>{siteConfig.wordmark}</div>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 96, fontWeight: 700, letterSpacing: -4, lineHeight: 0.95 }}>
           <span>THE BUSINESS THAT</span>
-          <span style={{ color: "#7dff3a" }}>NEVER SLEEPS.</span>
+          <span style={{ color: "#25d366" }}>NEVER SLEEPS.</span>
         </div>
         <div style={{ fontSize: 28, color: "#a3aba6" }}>{siteConfig.tagline}</div>
       </div>

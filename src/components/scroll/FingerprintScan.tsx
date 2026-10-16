@@ -52,8 +52,8 @@ export function FingerprintScan({ className }: { className?: string }) {
           <stop offset="100%" stopColor="#020502" />
         </radialGradient>
         <linearGradient id={id("ink")} x1="0" y1="0" x2="0.3" y2="1">
-          <stop offset="0%" stopColor="#d4ffb8" />
-          <stop offset="45%" stopColor="#7dff3a" />
+          <stop offset="0%" stopColor="#c5f2d6" />
+          <stop offset="45%" stopColor="#25d366" />
           <stop offset="100%" stopColor="#2fe0b4" />
         </linearGradient>
         {/* Ridges fade out toward the finger's edge */}
@@ -95,7 +95,7 @@ export function FingerprintScan({ className }: { className?: string }) {
           <path
             d="M20 0H0V20"
             fill="none"
-            stroke="#7dff3a"
+            stroke="#25d366"
             strokeOpacity="0.07"
             strokeWidth="1"
           />
@@ -106,7 +106,7 @@ export function FingerprintScan({ className }: { className?: string }) {
       <rect width="300" height="400" fill={url("grid")} />
 
       {/* HUD ring with ticks around the print */}
-      <g stroke="#7dff3a">
+      <g stroke="#25d366">
         {TICKS.map((t, i) => (
           <line
             key={i}
@@ -142,7 +142,7 @@ export function FingerprintScan({ className }: { className?: string }) {
         </g>
 
         {/* Crosshair on the core */}
-        <g stroke="#d4ffb8" strokeWidth="1" opacity="0.8">
+        <g stroke="#c5f2d6" strokeWidth="1" opacity="0.8">
           <line x1="160" y1="140" x2="160" y2="156" />
           <line x1="160" y1="184" x2="160" y2="200" />
           <line x1="130" y1="170" x2="146" y2="170" />
@@ -166,7 +166,7 @@ export function FingerprintScan({ className }: { className?: string }) {
                     cy={m.y}
                     r="7"
                     fill="none"
-                    stroke="#d4ffb8"
+                    stroke="#c5f2d6"
                     strokeWidth="1.4"
                   />
                 ) : (
@@ -176,22 +176,22 @@ export function FingerprintScan({ className }: { className?: string }) {
                     width="9"
                     height="9"
                     fill="none"
-                    stroke="#d4ffb8"
+                    stroke="#c5f2d6"
                     strokeWidth="1.3"
                   />
                 )}
-                <circle cx={m.x} cy={m.y} r="1.6" fill="#d4ffb8" />
+                <circle cx={m.x} cy={m.y} r="1.6" fill="#c5f2d6" />
                 <polyline
                   points={`${m.x + 6 * dir},${m.y - 4} ${lx},${m.y - 14} ${lx + 26 * dir},${m.y - 14}`}
                   fill="none"
-                  stroke="#7dff3a"
+                  stroke="#25d366"
                   strokeOpacity="0.7"
                   strokeWidth="0.8"
                 />
                 <text
                   x={lx + 2 * dir}
                   y={m.y - 17}
-                  fill="#b6ff8a"
+                  fill="#6fe3a0"
                   textAnchor={dir === 1 ? "start" : "end"}
                 >
                   {m.label}
@@ -208,7 +208,7 @@ export function FingerprintScan({ className }: { className?: string }) {
           width="260"
           height="2.5"
           rx="1.25"
-          fill="#eaffd9"
+          fill="#d9f7e6"
           filter={url("glow")}
         >
           <animate
@@ -228,7 +228,7 @@ export function FingerprintScan({ className }: { className?: string }) {
         fontFamily="ui-monospace, monospace"
         fontSize="8"
         letterSpacing="2"
-        fill="#7dff3a"
+        fill="#25d366"
         opacity="0.85"
       >
         BIOMETRIC ID · SCANNING

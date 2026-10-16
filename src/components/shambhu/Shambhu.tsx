@@ -31,7 +31,7 @@ export function Shambhu() {
     <section id="ibax-ai" aria-labelledby="shambhu-title" className="relative overflow-hidden py-24 md:py-36">
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 h-[40rem] bg-[radial-gradient(45%_55%_at_50%_0%,rgb(125_255_58/0.12),transparent_70%)]"
+        className="absolute inset-x-0 top-0 h-[40rem] bg-[radial-gradient(45%_55%_at_50%_0%,rgb(37_211_102/0.12),transparent_70%)]"
       />
       <div className="container-x relative">
         <Intro />
@@ -155,7 +155,7 @@ function AppPreview() {
       {/* Desktop dashboard */}
       <motion.div
         style={{ rotateX: tilt, y: lift }}
-        className="beam relative origin-bottom overflow-hidden rounded-[1.5rem] border border-white/10 [background:linear-gradient(180deg,rgb(125_255_58/0.07),transparent_30%),var(--color-ink-900)] shadow-[0_60px_120px_-40px_rgb(125_255_58/0.35)]"
+        className="beam relative origin-bottom overflow-hidden rounded-[1.5rem] border border-white/10 [background:linear-gradient(180deg,rgb(37_211_102/0.07),transparent_30%),var(--color-ink-900)] shadow-[0_60px_120px_-40px_rgb(37_211_102/0.35)]"
       >
         <div className="flex items-center gap-2 border-b border-white/[0.07] px-4 py-3">
           <span className="size-2.5 rounded-full bg-white/15" />
@@ -185,7 +185,7 @@ function AppPreview() {
 
           <div className="min-w-0 p-4 md:p-6">
             {/* Ask IBAX */}
-            <div className="flex items-center gap-3 rounded-2xl border border-flow/25 bg-ink-950/70 px-4 py-3 shadow-[inset_0_0_30px_-12px_rgb(125_255_58/0.5)]">
+            <div className="flex items-center gap-3 rounded-2xl border border-flow/25 bg-ink-950/70 px-4 py-3 shadow-[inset_0_0_30px_-12px_rgb(37_211_102/0.5)]">
               <Search className="size-4 shrink-0 text-flow" aria-hidden />
               <p className="min-w-0 flex-1 truncate text-sm text-fg/90" aria-label="Ask IBAX anything">
                 {typed}
@@ -268,8 +268,8 @@ function AppPreview() {
         style={{ y: phoneY }}
         className="relative z-10 mx-auto mt-8 w-[17rem] sm:absolute sm:right-[-1rem] sm:bottom-[-4rem] sm:mt-0 lg:right-[-5rem] lg:bottom-[-6rem]"
       >
-        <div className="rounded-[2.2rem] border border-white/15 bg-ink-950 p-2 shadow-[0_40px_80px_-20px_rgb(0_0_0/0.9),0_0_60px_-20px_rgb(125_255_58/0.5)]">
-          <div className="overflow-hidden rounded-[1.8rem] border border-white/[0.06] [background:linear-gradient(180deg,rgb(125_255_58/0.1),transparent_40%),var(--color-ink-900)]">
+        <div className="rounded-[2.2rem] border border-white/15 bg-ink-950 p-2 shadow-[0_40px_80px_-20px_rgb(0_0_0/0.9),0_0_60px_-20px_rgb(37_211_102/0.5)]">
+          <div className="overflow-hidden rounded-[1.8rem] border border-white/[0.06] [background:linear-gradient(180deg,rgb(37_211_102/0.1),transparent_40%),var(--color-ink-900)]">
             <div className="flex items-center gap-2.5 px-4 pt-5">
               <ShambhuBot bleed={1} className="size-11 shrink-0" />
               <span>
@@ -326,11 +326,11 @@ function Journey() {
         <div aria-hidden className="absolute top-2 bottom-2 left-[1.1rem] w-px bg-white/10 md:top-[1.1rem] md:right-[10%] md:bottom-auto md:left-[10%] md:h-px md:w-auto">
           <motion.div
             style={{ scaleY: fill }}
-            className="absolute inset-0 origin-top bg-flow shadow-[0_0_12px_rgb(125_255_58/0.8)] md:hidden"
+            className="absolute inset-0 origin-top bg-flow shadow-[0_0_12px_rgb(37_211_102/0.8)] md:hidden"
           />
           <motion.div
             style={{ scaleX: fill }}
-            className="absolute inset-0 origin-left bg-flow shadow-[0_0_12px_rgb(125_255_58/0.8)] max-md:hidden"
+            className="absolute inset-0 origin-left bg-flow shadow-[0_0_12px_rgb(37_211_102/0.8)] max-md:hidden"
           />
         </div>
         <ol ref={ref} className="grid gap-6 md:grid-cols-5 md:gap-4">
@@ -343,7 +343,7 @@ function Journey() {
               transition={{ duration: 0.8, delay: i * 0.08, ease }}
               className="relative pl-12 md:pl-0 md:text-center"
             >
-              <span className="absolute top-0 left-0 grid size-9 place-items-center rounded-full border border-flow/40 bg-ink-950 font-mono text-[0.7rem] text-flow shadow-[0_0_20px_-4px_rgb(125_255_58/0.8)] md:relative md:mx-auto">
+              <span className="absolute top-0 left-0 grid size-9 place-items-center rounded-full border border-flow/40 bg-ink-950 font-mono text-[0.7rem] text-flow shadow-[0_0_20px_-4px_rgb(37_211_102/0.8)] md:relative md:mx-auto">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <h4 className="text-base font-semibold md:mt-4">{step.title}</h4>

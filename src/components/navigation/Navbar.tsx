@@ -80,7 +80,7 @@ export function Navbar() {
                   )}
                   <span className={cn("relative flex items-center gap-1.5", item.href === "#digital-marketing" && "text-flow")}>
                     {item.href === "#digital-marketing" && (
-                      <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-flow shadow-[0_0_8px_#7dff3a]" />
+                      <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-flow shadow-[0_0_8px_#25d366]" />
                     )}
                     {item.label}
                   </span>

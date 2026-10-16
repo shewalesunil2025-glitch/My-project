@@ -43,13 +43,13 @@ export function Hero() {
       <div className="sticky top-0 h-svh overflow-hidden">
         {/* Spotlight from above */}
         <motion.div aria-hidden style={{ opacity: spot }} className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-[30vh] left-1/2 h-[95vh] w-[70vw] -translate-x-1/2 bg-[radial-gradient(50%_55%_at_50%_30%,rgb(125_255_58/0.32),rgb(40_140_30/0.14)_45%,transparent_75%)] blur-2xl" />
+          <div className="absolute -top-[30vh] left-1/2 h-[95vh] w-[70vw] -translate-x-1/2 bg-[radial-gradient(50%_55%_at_50%_30%,rgb(37_211_102/0.32),rgb(18_140_74/0.14)_45%,transparent_75%)] blur-2xl" />
           <div className="absolute inset-x-0 top-0 h-[70vh] bg-[linear-gradient(to_bottom,rgb(30_110_30/0.35),transparent)]" />
         </motion.div>
 
         {/* Nebula the brain dissolves into */}
         <motion.div aria-hidden style={{ opacity: nebula }} className="pointer-events-none absolute inset-0">
-          <div className="absolute top-[8%] left-[18%] h-[40vh] w-[46vw] animate-aurora rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.28),transparent_65%)] blur-3xl" />
+          <div className="absolute top-[8%] left-[18%] h-[40vh] w-[46vw] animate-aurora rounded-full bg-[radial-gradient(circle,rgb(37_211_102/0.28),transparent_65%)] blur-3xl" />
           <div className="absolute top-[30%] right-[8%] h-[36vh] w-[34vw] animate-aurora rounded-full bg-[radial-gradient(circle,rgb(60_200_60/0.22),transparent_65%)] blur-3xl [animation-delay:-8s]" />
           <div className="stars absolute inset-0" />
         </motion.div>

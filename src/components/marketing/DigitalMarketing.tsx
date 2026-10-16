@@ -35,7 +35,7 @@ export function DigitalMarketing() {
     <section
       id={digitalMarketing.id}
       aria-labelledby="dm-title"
-      className="relative mx-2 overflow-hidden rounded-[2rem] border border-flow/25 py-20 md:mx-4 md:rounded-[3rem] md:py-28 [background:radial-gradient(60%_50%_at_80%_0%,rgb(125_255_58/0.16),transparent_70%),radial-gradient(50%_40%_at_0%_100%,rgb(125_255_58/0.1),transparent_70%),var(--color-ink-900)]"
+      className="relative mx-2 overflow-hidden rounded-[2rem] border border-flow/25 py-20 md:mx-4 md:rounded-[3rem] md:py-28 [background:radial-gradient(60%_50%_at_80%_0%,rgb(37_211_102/0.16),transparent_70%),radial-gradient(50%_40%_at_0%_100%,rgb(37_211_102/0.1),transparent_70%),var(--color-ink-900)]"
     >
       <div className="container-x relative">
         {/* Intro + price, with the channel orbit */}
@@ -138,10 +138,10 @@ function ChannelOrbit() {
   const reduce = useReducedMotion();
   return (
     <Reveal delay={0.1} className="relative mx-auto aspect-square w-full max-w-[26rem]">
-      <div aria-hidden className="absolute inset-[18%] rounded-full bg-[radial-gradient(closest-side,rgb(125_255_58/0.35),transparent)] blur-2xl" />
+      <div aria-hidden className="absolute inset-[18%] rounded-full bg-[radial-gradient(closest-side,rgb(37_211_102/0.35),transparent)] blur-2xl" />
       <div aria-hidden className="absolute inset-[17%] rounded-full border border-dashed sm:inset-[13%] border-flow/25" />
       <div aria-hidden className="absolute inset-[24%] rounded-full border border-flow/15" />
-      <div className="absolute inset-[34%] grid place-items-center rounded-full bg-flow text-ink-950 shadow-[0_0_80px_-10px_rgb(125_255_58/0.9)]">
+      <div className="absolute inset-[34%] grid place-items-center rounded-full bg-flow text-ink-950 shadow-[0_0_80px_-10px_rgb(37_211_102/0.9)]">
         <Megaphone className="size-[38%]" aria-hidden />
         <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flow/30 [animation-duration:2.6s]" />
       </div>
@@ -159,7 +159,7 @@ function ChannelOrbit() {
               style={{ left: `${50 + Math.sin(a) * 50}%`, top: `${50 - Math.cos(a) * 50}%` }}
             >
               <span
-                className="flex animate-spin items-center gap-1 rounded-full border border-flow/35 bg-ink-850/95 py-1 pr-2 pl-1 text-[0.6rem] sm:gap-1.5 sm:py-1.5 sm:pr-3 sm:pl-1.5 sm:text-[0.7rem] font-medium whitespace-nowrap text-fg shadow-[0_10px_30px_-10px_rgb(125_255_58/0.6)] backdrop-blur [animation-direction:reverse] [animation-duration:36s] md:text-xs"
+                className="flex animate-spin items-center gap-1 rounded-full border border-flow/35 bg-ink-850/95 py-1 pr-2 pl-1 text-[0.6rem] sm:gap-1.5 sm:py-1.5 sm:pr-3 sm:pl-1.5 sm:text-[0.7rem] font-medium whitespace-nowrap text-fg shadow-[0_10px_30px_-10px_rgb(37_211_102/0.6)] backdrop-blur [animation-direction:reverse] [animation-duration:36s] md:text-xs"
                 style={reduce ? { animation: "none" } : undefined}
               >
                 <span className="grid size-5 place-items-center rounded-full bg-flow/15 text-flow sm:size-6">
@@ -187,8 +187,8 @@ function MonthSteps() {
       </Reveal>
       <div className="relative mt-12">
         <div aria-hidden className="absolute top-2 bottom-2 left-[1.35rem] w-px bg-white/10 md:top-[1.35rem] md:right-[10%] md:bottom-auto md:left-[10%] md:h-px md:w-auto">
-          <motion.div style={{ scaleY: fill }} className="absolute inset-0 origin-top bg-flow shadow-[0_0_12px_rgb(125_255_58/0.8)] md:hidden" />
-          <motion.div style={{ scaleX: fill }} className="absolute inset-0 origin-left bg-flow shadow-[0_0_12px_rgb(125_255_58/0.8)] max-md:hidden" />
+          <motion.div style={{ scaleY: fill }} className="absolute inset-0 origin-top bg-flow shadow-[0_0_12px_rgb(37_211_102/0.8)] md:hidden" />
+          <motion.div style={{ scaleX: fill }} className="absolute inset-0 origin-left bg-flow shadow-[0_0_12px_rgb(37_211_102/0.8)] max-md:hidden" />
         </div>
         <ol ref={ref} className="grid gap-6 md:grid-cols-5 md:gap-4">
           {marketingSteps.map((s, i) => (
@@ -200,7 +200,7 @@ function MonthSteps() {
               transition={{ duration: 0.8, delay: i * 0.08, ease }}
               className="relative pl-16 md:pl-0 md:text-center"
             >
-              <span className="absolute top-0 left-0 grid size-11 place-items-center rounded-full border border-flow/40 bg-ink-950 text-flow shadow-[0_0_20px_-4px_rgb(125_255_58/0.8)] md:relative md:mx-auto">
+              <span className="absolute top-0 left-0 grid size-11 place-items-center rounded-full border border-flow/40 bg-ink-950 text-flow shadow-[0_0_20px_-4px_rgb(37_211_102/0.8)] md:relative md:mx-auto">
                 <s.icon className="size-5" aria-hidden />
               </span>
               <h4 className="text-base font-semibold md:mt-4">{s.title}</h4>

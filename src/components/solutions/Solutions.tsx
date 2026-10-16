@@ -227,11 +227,11 @@ function SolutionCard({ solution: s, number }: { solution: Solution; number: num
       aria-labelledby={`solution-${s.id}-title`}
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-[1.4rem] border [background:linear-gradient(160deg,rgb(255_255_255/0.07),rgb(255_255_255/0.015)_45%),rgb(6_14_7/0.96)] shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_30px_80px_-30px_rgb(0_0_0/0.9)]",
-        premium ? "border-flow/60 shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_60px_-15px_rgb(125_255_58/0.6)]" : "border-white/15",
+        premium ? "border-flow/60 shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_60px_-15px_rgb(37_211_102/0.6)]" : "border-white/15",
       )}
     >
       {/* Smoky green light in the corner, like the reference's card imagery */}
-      <div aria-hidden className="absolute -top-20 -right-16 size-72 rounded-full bg-[radial-gradient(circle,rgb(125_255_58/0.22),rgb(40_140_30/0.1)_45%,transparent_70%)] blur-2xl" />
+      <div aria-hidden className="absolute -top-20 -right-16 size-72 rounded-full bg-[radial-gradient(circle,rgb(37_211_102/0.22),rgb(18_140_74/0.1)_45%,transparent_70%)] blur-2xl" />
       <div className="relative flex items-start justify-between p-6 pb-0">
         <span className="grid size-9 place-items-center rounded-full border border-white/15 text-flow">
           <Icon className="size-4" aria-hidden />

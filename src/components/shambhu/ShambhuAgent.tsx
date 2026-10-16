@@ -496,7 +496,7 @@ export function ShambhuAgent() {
               initial={{ opacity: 0, x: 10, scale: 0.95 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 10 }}
-              className="absolute top-1/2 right-[calc(100%+0.75rem)] -translate-y-1/2 rounded-2xl rounded-br-sm border border-flow/30 bg-ink-900/95 px-3.5 py-2 text-left text-sm whitespace-nowrap shadow-[0_10px_40px_-10px_rgb(125_255_58/0.5)] backdrop-blur"
+              className="absolute top-1/2 right-[calc(100%+0.75rem)] -translate-y-1/2 rounded-2xl rounded-br-sm border border-flow/30 bg-ink-900/95 px-3.5 py-2 text-left text-sm whitespace-nowrap shadow-[0_10px_40px_-10px_rgb(37_211_102/0.5)] backdrop-blur"
             >
               <span className="block font-semibold">Ask IBAX</span>
               <span className="block text-xs text-fg-muted">
@@ -514,7 +514,7 @@ export function ShambhuAgent() {
           className="group relative grid size-[3.25rem] place-items-center rounded-full md:size-16"
         >
           {open ? (
-            <span className="grid size-full place-items-center rounded-full border border-flow/30 bg-ink-800 shadow-[0_12px_40px_-8px_rgb(125_255_58/0.6)]">
+            <span className="grid size-full place-items-center rounded-full border border-flow/30 bg-ink-800 shadow-[0_12px_40px_-8px_rgb(37_211_102/0.6)]">
               <X className="size-6 text-fg" aria-hidden />
             </span>
           ) : (
@@ -555,7 +555,7 @@ export function ShambhuAgent() {
             onAnimationComplete={() =>
               inputRef.current?.focus({ preventScroll: true })
             }
-            className="fixed inset-x-0 bottom-0 z-[70] flex h-[85dvh] origin-bottom flex-col overflow-hidden rounded-t-[1.6rem] border border-b-0 border-flow/25 pb-[env(safe-area-inset-bottom)] md:inset-x-auto md:h-[min(34rem,calc(100dvh-9rem))] md:origin-bottom-right md:rounded-[1.6rem] md:border-b md:pb-0 [background:linear-gradient(180deg,rgb(125_255_58/0.1),transparent_30%),var(--color-ink-900)] shadow-[0_40px_100px_-30px_rgb(0_0_0/0.95),0_0_60px_-30px_rgb(125_255_58/0.6)] md:right-6 md:bottom-[6.5rem] md:w-[24rem]"
+            className="fixed inset-x-0 bottom-0 z-[70] flex h-[85dvh] origin-bottom flex-col overflow-hidden rounded-t-[1.6rem] border border-b-0 border-flow/25 pb-[env(safe-area-inset-bottom)] md:inset-x-auto md:h-[min(34rem,calc(100dvh-9rem))] md:origin-bottom-right md:rounded-[1.6rem] md:border-b md:pb-0 [background:linear-gradient(180deg,rgb(37_211_102/0.1),transparent_30%),var(--color-ink-900)] shadow-[0_40px_100px_-30px_rgb(0_0_0/0.95),0_0_60px_-30px_rgb(37_211_102/0.6)] md:right-6 md:bottom-[6.5rem] md:w-[24rem]"
           >
             {/* Header */}
             <header className="flex items-center gap-3 border-b border-white/[0.07] px-4 py-3">

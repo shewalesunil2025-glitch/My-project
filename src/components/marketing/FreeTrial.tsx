@@ -12,7 +12,7 @@ export function FreeTrial() {
     <section id="free-trial" aria-label="3-day free trial" className="relative py-16 md:py-24">
       <div className="container-x">
         <Reveal>
-          <div className="beam relative overflow-hidden rounded-[2rem] border border-flow/50 p-6 shadow-[0_40px_120px_-40px_rgb(125_255_58/0.55)] [background:radial-gradient(70%_120%_at_100%_0%,rgb(125_255_58/0.28),transparent_60%),radial-gradient(60%_100%_at_0%_100%,rgb(56_189_248/0.16),transparent_60%),var(--color-ink-850)] md:p-12">
+          <div className="beam relative overflow-hidden rounded-[2rem] border border-flow/50 p-6 shadow-[0_40px_120px_-40px_rgb(37_211_102/0.55)] [background:radial-gradient(70%_120%_at_100%_0%,rgb(37_211_102/0.28),transparent_60%),radial-gradient(60%_100%_at_0%_100%,rgb(56_189_248/0.16),transparent_60%),var(--color-ink-850)] md:p-12">
             <div aria-hidden className="grid-backdrop pointer-events-none absolute inset-0 opacity-30" />
             <div className="relative grid gap-10 md:grid-cols-[1.15fr_1fr] md:items-center">
               <div>
@@ -30,7 +30,7 @@ export function FreeTrial() {
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Link
                     href="/app/signup"
-                    className="inline-flex h-13 items-center gap-2 rounded-full bg-flow px-7 text-base font-semibold text-ink-950 shadow-[0_14px_40px_-12px_rgb(125_255_58/0.9)] transition-transform hover:scale-[1.03]"
+                    className="inline-flex h-13 items-center gap-2 rounded-full bg-flow px-7 text-base font-semibold text-ink-950 shadow-[0_14px_40px_-12px_rgb(37_211_102/0.9)] transition-transform hover:scale-[1.03]"
                   >
                     <Gift className="size-5" aria-hidden /> Start my free trial
                   </Link>

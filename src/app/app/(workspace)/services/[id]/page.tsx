@@ -250,7 +250,7 @@ export default function ServiceDetailPage() {
               <>
                 {coveredBy && <Notice tone="blue">Already included in your {serviceById(coveredBy.serviceId)?.name} plan.</Notice>}
                 {canTrial && (
-                  <div className="rounded-2xl border border-flow/40 bg-[linear-gradient(135deg,rgb(102_211_76/0.22),rgb(102_211_76/0.04))] p-4">
+                  <div className="rounded-2xl border border-flow/40 bg-[linear-gradient(135deg,rgb(37_211_102/0.22),rgb(37_211_102/0.04))] p-4">
                     <p className="flex items-center gap-2 font-semibold">
                       <Gift className="size-4 text-flow" aria-hidden /> {TRIAL_DAYS}-day FREE trial
                     </p>

@@ -16,8 +16,8 @@ export function Sparkline({ values, className, label }: { values: number[]; clas
     <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className={cn("h-8 w-full", className)} role="img" aria-label={label}>
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#66d34c" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#66d34c" stopOpacity="0" />
+          <stop offset="0" stopColor="#25d366" stopOpacity="0.35" />
+          <stop offset="1" stopColor="#25d366" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={`${line} L${w} ${h} L0 ${h}Z`} fill={`url(#${id})`} />
@@ -57,8 +57,8 @@ export function AreaChart({ data, unit, className }: { data: { date: string; val
       >
         <defs>
           <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#66d34c" stopOpacity="0.32" />
-            <stop offset="1" stopColor="#66d34c" stopOpacity="0" />
+            <stop offset="0" stopColor="#25d366" stopOpacity="0.32" />
+            <stop offset="1" stopColor="#25d366" stopOpacity="0" />
           </linearGradient>
         </defs>
         {[0.25, 0.5, 0.75].map((f) => (
