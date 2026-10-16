@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { PublishedSite } from "@/lib/sites/site";
 import { connectionState, evo, evolutionReady, instanceFor, waDigits } from "./whatsapp";
+import { dialForCountry } from "@/lib/phone";
 
 /**
  * Customer Support: IBAX answers a business's customers from the owner's own FAQs, prices,
@@ -23,7 +24,7 @@ export type SupportSetup = {
 };
 
 type WorkspaceData = {
-  business?: { name?: string; phone?: string; description?: string; hours?: string } | null;
+  business?: { name?: string; phone?: string; description?: string; hours?: string; country?: string } | null;
   automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string; paidUntil?: string }[];
   connections?: { whatsapp?: { account?: string; status?: string } };
 };
@@ -40,7 +41,8 @@ export async function supportFor(db: SupabaseClient, ownerId: string): Promise<S
 
   const c = auto?.config ?? {};
   const wa = ws?.connections?.whatsapp;
-  const digits = wa?.status === "connected" ? waDigits(String(wa.account ?? "")) : null;
+  const dial = dialForCountry(ws?.business?.country);
+  const digits = wa?.status === "connected" ? waDigits(String(wa.account ?? ""), dial) : null;
   return {
     business: str(ws?.business?.name) || "our business",
     about: str(c.about) || str(ws?.business?.description),
@@ -50,7 +52,7 @@ export async function supportFor(db: SupabaseClient, ownerId: string): Promise<S
     tone: str(c.tone) || "Warm & friendly",
     handoff: str(c.handoff) || "IBAX isn't sure of the answer",
     instance: digits ? instanceFor(digits) : null,
-    ownerPhone: waDigits(str(ws?.business?.phone)) ?? digits,
+    ownerPhone: waDigits(str(ws?.business?.phone), dial) ?? digits,
   };
 }
 

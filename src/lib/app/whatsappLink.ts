@@ -1,5 +1,6 @@
 "use client";
 
+import { phoneAccount } from "@/lib/phone";
 import { cloudAuthHeader, cloudEnabled } from "./cloud";
 
 /** Client side of /api/whatsapp: link a WhatsApp number with a pairing code or QR. */
@@ -18,10 +19,9 @@ async function call(action: "connect" | "status" | "disconnect", number: string)
   return (await res.json().catch(() => ({ ok: false, reason: "server_error" }))) as Record<string, unknown> & { ok: boolean };
 }
 
-/** "+<country code><number>", as stored on the connection (10 digits are taken as Indian). */
-export function waAccount(number: string) {
-  const d = number.replace(/\D/g, "").replace(/^0+/, "");
-  return `+${d.length === 10 ? `91${d}` : d}`;
+/** "+<country code><number>", as stored on the connection. `dial` is the business's country code (India by default). */
+export function waAccount(number: string, dial?: string) {
+  return phoneAccount(number, dial) ?? `+${number.replace(/\D/g, "")}`;
 }
 
 /** Real linking needs Supabase sign-in; without it the app keeps the preview "connect" step. */

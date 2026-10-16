@@ -1,13 +1,15 @@
 "use client";
 
 import { product } from "@/config/product";
-import { useState, type FormEvent } from "react";
-import { ArrowLeft, Send } from "lucide-react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { ArrowLeft, Bot, Send } from "lucide-react";
 import { nowIso, updateWorkspace } from "@/lib/app/store";
-import type { Channel } from "@/lib/app/types";
+import type { Channel, Conversation } from "@/lib/app/types";
+import { cloudEnabled, cloudWaBot, cloudWaChats, cloudWaOwnerReply } from "@/lib/app/cloud";
+import { buildWaConversations, type WaConversation } from "@/lib/app/whatsappChats";
 import { useWorkspace } from "@/components/app/AppShell";
 import { KindIcon } from "@/components/app/kinds";
-import { BtnLink, EmptyState, Input, PageHeader, Pill, Segmented, fmtTime, relTime } from "@/components/app/ui";
+import { Btn, BtnLink, Notice, EmptyState, Input, PageHeader, Pill, Segmented, fmtTime, relTime } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
 
 const channelLabel: Record<Channel, string> = { whatsapp: "WhatsApp", instagram: "Instagram", facebook: "Messenger", email: "Email" };
@@ -17,12 +19,56 @@ export default function InboxPage() {
   const [channel, setChannel] = useState<"all" | Channel>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [reply, setReply] = useState("");
+  const [real, setReal] = useState<WaConversation[]>([]);
+  const [problem, setProblem] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  // Real WhatsApp chats come from the server; refresh while the Inbox is open.
+  const load = useCallback(async () => {
+    if (!cloudEnabled) return;
+    const { messages, contacts } = await cloudWaChats();
+    setReal(buildWaConversations(messages, contacts));
+  }, []);
+  useEffect(() => {
+    const first = setTimeout(() => void load(), 0);
+    const timer = setInterval(() => void load(), 15000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(timer);
+    };
+  }, [load]);
+
   if (!ws) return null;
 
-  const list = ws.conversations.filter((c) => channel === "all" || c.channel === channel).sort((a, b) => b.at.localeCompare(a.at));
-  const open = ws.conversations.find((c) => c.id === openId);
+  const all: Conversation[] = [...real, ...ws.conversations];
+  const list = all.filter((c) => channel === "all" || c.channel === channel).sort((a, b) => b.at.localeCompare(a.at));
+  const open = all.find((c) => c.id === openId);
+  const openWa = real.find((c) => c.id === openId);
+
+  async function sendWa(e: FormEvent) {
+    e.preventDefault();
+    if (!openWa || !reply.trim() || busy) return;
+    setBusy(true);
+    setProblem("");
+    const r = await cloudWaOwnerReply(openWa.wa.instance, openWa.wa.phone, reply.trim());
+    setBusy(false);
+    if (!r.ok) return setProblem("Your message could not be sent on WhatsApp. Check that your WhatsApp is linked, then try again.");
+    setReply("");
+    await load();
+  }
+
+  async function botOn() {
+    if (!openWa || busy) return;
+    setBusy(true);
+    setProblem("");
+    const r = await cloudWaBot(openWa.wa.instance, openWa.wa.phone, true);
+    setBusy(false);
+    if (!r.ok) return setProblem("Could not turn the bot back on. Please try again.");
+    await load();
+  }
 
   function send(e: FormEvent) {
+    if (openWa) return void sendWa(e);
     e.preventDefault();
     if (!reply.trim() || !open) return;
     updateWorkspace((w) => {
@@ -73,6 +119,7 @@ export default function InboxPage() {
                     <p className="flex items-center gap-2 text-sm font-semibold">
                       <span className="truncate">{c.contact}</span>
                       {c.important && <Pill tone="amber">Needs you</Pill>}
+                      {"wa" in c && (c as WaConversation).wa.leadTemp === "hot" && <Pill tone="amber">Hot lead</Pill>}
                     </p>
                     <p className="truncate text-xs text-fg-muted">{c.messages[c.messages.length - 1].text}</p>
                   </div>
@@ -93,6 +140,15 @@ export default function InboxPage() {
                   <p className="text-xs text-fg-subtle">{channelLabel[open.channel]}</p>
                 </div>
               </div>
+              {openWa && !openWa.wa.botOn && (
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-400/30 bg-amber-400/[0.07] p-3 text-xs">
+                  <span>{openWa.wa.needsAttention ? `${product.assistantName} is paused for this customer — they need you.` : `${product.assistantName} is paused for this customer.`}</span>
+                  <Btn size="sm" onClick={() => void botOn()} disabled={busy}>
+                    <Bot className="size-3.5" aria-hidden /> Turn Bot Back On
+                  </Btn>
+                </div>
+              )}
+              {problem && <Notice tone="amber">{problem}</Notice>}
               <div className="flex-1 space-y-3">
                 {open.messages.map((m, i) => (
                   <div key={i} className={cn("max-w-[85%]", m.from === "customer" ? "" : "ml-auto text-right")}>

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import { fullDigits, phoneDigits } from "@/lib/phone";
 
 /**
  * Server-only helpers for WhatsApp through our Evolution API server.
@@ -15,12 +16,16 @@ export const evolution = {
 
 export const evolutionReady = () => Boolean(evolution.url && evolution.key && evolution.webhook);
 
-/** WhatsApp number as digits with country code; 10-digit numbers are taken as Indian. */
-export function waDigits(input: string): string | null {
-  const d = input.replace(/\D/g, "").replace(/^0+/, "");
-  const full = d.length === 10 ? `91${d}` : d;
-  return /^\d{11,15}$/.test(full) ? full : null;
+/**
+ * WhatsApp number as digits with country code. A number with "+" or "00" keeps its own code;
+ * one without gets `defaultDial` (India's "91" unless the caller knows the business's country).
+ */
+export function waDigits(input: string, defaultDial?: string): string | null {
+  return phoneDigits(input, defaultDial);
 }
+
+/** A number WhatsApp or our own database gave us: it already has its country code, so it is never prefixed. */
+export const waFullDigits = fullDigits;
 
 /** One Evolution instance per WhatsApp number — the same name the n8n workflows use. */
 export const instanceFor = (digits: string) => `ibax-${digits}`;

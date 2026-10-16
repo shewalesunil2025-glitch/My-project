@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { adminDb, ownerDial } from "@/lib/server/followup";
+import { rememberInstance } from "@/lib/server/wachat";
 import { connectionState, evo, evolution, evolutionReady, instanceFor, instanceToken, ownership, userFromRequest, waDigits } from "@/lib/server/whatsapp";
 
 /**
@@ -20,7 +22,8 @@ export async function POST(request: Request) {
   if (!user) return json({ ok: false, reason: "unauthorized" }, 401);
 
   const body = (await request.json().catch(() => ({}))) as { action?: Action; number?: string };
-  const digits = waDigits(String(body.number ?? ""));
+  const db = adminDb();
+  const digits = waDigits(String(body.number ?? ""), db ? await ownerDial(db, user.id) : undefined);
   if (!digits) return json({ ok: false, reason: "invalid_number" }, 400);
   const instance = instanceFor(digits);
 
@@ -31,6 +34,7 @@ export async function POST(request: Request) {
     if (body.action === "status") {
       if (owner === "none") return json({ ok: true, state: "close" });
       const state = await connectionState(instance);
+      if (state === "open" && db) await rememberInstance(db, instance, user.id);
       if (state !== "connecting") return json({ ok: true, state, instance });
       // WhatsApp replaces the QR and link code every ~20 s; hand back the current ones.
       const r = await evo(`/instance/connect/${encodeURIComponent(instance)}`);
@@ -44,6 +48,8 @@ export async function POST(request: Request) {
     }
 
     // connect
+    // Remember who owns this number, so its chats land in the right Inbox.
+    if (db && owner === "mine") await rememberInstance(db, instance, user.id);
     let qr: QrCode;
     if (owner === "none") {
       const created = await evo("/instance/create", {
@@ -63,6 +69,7 @@ export async function POST(request: Request) {
         return json({ ok: false, reason: "server_error" }, 502);
       }
       qr = (created.data as { qrcode?: QrCode }).qrcode;
+      if (db) await rememberInstance(db, instance, user.id);
     } else {
       const state = await connectionState(instance);
       if (state === "open") return json({ ok: true, state, instance });

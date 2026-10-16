@@ -154,6 +154,28 @@ export async function cloudSiteLeads(): Promise<SiteLeadRow[]> {
   return error || !data ? [] : (data as SiteLeadRow[]);
 }
 
+/* ── WhatsApp chats (wa_messages / wa_contacts, written by the server; row-level security shows owners only their own) ── */
+
+export type WaMessageRow = { id: string; instance: string; phone: string; name: string; direction: "in" | "out" | "owner"; text: string; needs_human: boolean; delivery: string; created_at: string };
+export type WaContactRow = { instance: string; phone: string; name: string; lead_temp: "hot" | "warm" | "cold"; interest: string; bot_status: "on" | "paused"; needs_attention: boolean; last_at: string };
+
+export async function cloudWaChats(): Promise<{ messages: WaMessageRow[]; contacts: WaContactRow[] }> {
+  if (!cloudEnabled) return { messages: [], contacts: [] };
+  const [m, c] = await Promise.all([
+    sb().from("wa_messages").select("id, instance, phone, name, direction, text, needs_human, delivery, created_at").order("created_at", { ascending: false }).limit(1000),
+    sb().from("wa_contacts").select("instance, phone, name, lead_temp, interest, bot_status, needs_attention, last_at").order("last_at", { ascending: false }).limit(300),
+  ]);
+  return { messages: m.error || !m.data ? [] : (m.data as WaMessageRow[]).reverse(), contacts: c.error || !c.data ? [] : (c.data as WaContactRow[]) };
+}
+
+async function waCall(path: "owner-reply" | "bot", body: Record<string, unknown>): Promise<{ ok: boolean; reason?: string }> {
+  const res = await fetch(`/api/whatsapp/${path}`, { method: "POST", headers: { "content-type": "application/json", ...(await cloudAuthHeader()) }, body: JSON.stringify(body) }).catch(() => null);
+  if (!res) return { ok: false, reason: "network" };
+  return (await res.json().catch(() => ({ ok: false, reason: "server_error" }))) as { ok: boolean; reason?: string };
+}
+export const cloudWaOwnerReply = (instance: string, phone: string, text: string) => waCall("owner-reply", { instance, phone, text });
+export const cloudWaBot = (instance: string, phone: string, on: boolean) => waCall("bot", { instance, phone, on });
+
 /* ── Paid plans (subscriptions table, written by the server after each payment, Autopay included) ── */
 
 export type PaidPlanRow = { service_id: string; period: string; renews_at: string | null };
