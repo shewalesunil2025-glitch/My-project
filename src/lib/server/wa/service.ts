@@ -36,7 +36,14 @@ export async function notifyOwner(db: SupabaseClient, ownerId: string, kind: Not
 
 async function ownerOfInstance(db: SupabaseClient, instance: string) {
   const { data } = await db.from("wa_instances").select("owner_id").eq("instance", instance).maybeSingle();
-  return (data?.owner_id as string | undefined) ?? null;
+  if (data?.owner_id) return data.owner_id as string;
+  // Numbers linked before wa_instances existed: find the account whose WhatsApp connection is this number, and remember it.
+  const digits = instance.replace(/^ibax-/, "");
+  const { data: ws } = await db.from("workspaces").select("owner_id").eq("data->connections->whatsapp->>account", `+${digits}`).limit(2);
+  if (ws?.length !== 1) return null;
+  const ownerId = ws[0].owner_id as string;
+  await db.from("wa_instances").upsert({ instance, owner_id: ownerId }, { onConflict: "instance" });
+  return ownerId;
 }
 
 const contactCols = "bot_status, needs_attention, paused_at, last_in_at, last_owner_at";
