@@ -15,7 +15,8 @@ import { cn } from "@/lib/cn";
 /** Things owners most often ask IBAX to do — one tap sends it to the chat. */
 const prompts = ["Mujhe WhatsApp automation chahiye", "Meri website banao", "Aaj business me kya hua?", "Kaunsi service mere liye best hai?"];
 
-const card = "rounded-[1.4rem] border border-white/[0.07] bg-[linear-gradient(160deg,rgb(255_255_255/0.06),rgb(255_255_255/0.015))]";
+/** Same card look as the rest of the app (Home, Services…). */
+const card = "glass relative rounded-[1.4rem]";
 
 export default function IbaxHubPage() {
   const ws = useWorkspace();
@@ -31,7 +32,7 @@ export default function IbaxHubPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[1.8rem] border border-flow/25 p-6 text-center shadow-[0_40px_100px_-40px_rgb(37_211_102/0.55)] [background:radial-gradient(ellipse_at_50%_-10%,rgb(37_211_102/0.32),transparent_60%),linear-gradient(180deg,rgb(255_255_255/0.05),rgb(255_255_255/0.01)),var(--color-ink-900)] sm:p-8">
+      <section className="relative overflow-hidden rounded-[1.8rem] border border-flow/15 p-6 text-center shadow-[0_40px_100px_-40px_rgb(37_211_102/0.3)] [background:radial-gradient(ellipse_at_50%_-10%,rgb(37_211_102/0.16),transparent_60%),linear-gradient(180deg,rgb(37_211_102/0.045),rgb(255_255_255/0.01)),var(--color-ink-850)] sm:p-8">
         <div aria-hidden className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-flow/70 to-transparent" />
         <LumiMark className="mx-auto size-16 animate-float" />
         <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{product.assistantName}</h1>
