@@ -42,7 +42,7 @@ function fakeDb(seed: Record<string, Row[]> = {}) {
 }
 
 const ws = (extra: Row = {}) => ({ notifications: [], notificationPrefs: {}, automations: [{ serviceId: "whatsapp", config: {} }], ...extra });
-const seed = () => ({
+const seed = (): Record<string, Row[]> => ({
   wa_instances: [{ instance: "ibax-919876543210", owner_id: "owner-a" }],
   workspaces: [{ owner_id: "owner-a", data: ws() }],
 });
@@ -58,6 +58,14 @@ describe("gate", () => {
   it("rejects an unknown instance", async () => {
     const { db } = fakeDb(seed());
     expect((await gate(db, msg({ instance: "ibax-911111111111" }))).reason).toBe("unknown_instance");
+  });
+  it("finds the owner of a number linked before wa_instances existed", async () => {
+    const s = seed();
+    s.wa_instances = [];
+    s.workspaces[0]["data->connections->whatsapp->>account"] = "+919876543210";
+    const { db, t } = fakeDb(s);
+    expect((await gate(db, msg())).allow).toBe(true);
+    expect(t.wa_instances[0]).toMatchObject({ instance: "ibax-919876543210", owner_id: "owner-a" });
   });
   it("blocks while paused and resumes after 24 h of silence", async () => {
     const old = new Date(Date.now() - 30 * 3_600_000).toISOString();
