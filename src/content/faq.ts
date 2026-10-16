@@ -5,7 +5,7 @@ export const faqs = [
   },
   {
     q: "What do I get with Digital Marketing?",
-    a: "Social media management for Instagram, Facebook and YouTube, content creation with a monthly calendar, Meta and Google ad campaigns, local SEO and Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report. Choose your country on the website to see the price. Ad spend is paid separately to the platforms.",
+    a: "Social media management for Instagram, Facebook and YouTube, content creation with a monthly calendar, Meta and Google ad campaigns, local SEO and Google Business Profile, WhatsApp campaigns, lead follow-up and a monthly report. The price is shown on the website in your currency. Ad spend is paid separately to the platforms.",
   },
   {
     q: "Do I have to buy every service?",
@@ -13,7 +13,7 @@ export const faqs = [
   },
   {
     q: "How much does it cost?",
-    a: "Each service has a clear starting price. Choose your country in the Automation Store to see prices in your currency (₹ for India, $ for other countries). Pay yearly and get 2 months free. Messaging automations (WhatsApp, Customer Support, Lead Follow-up, Email and Google Reviews) are free for the first 3 days.",
+    a: "Each service has a clear starting price, shown in the Automation Store in your currency (₹ for India, $ for other countries; you can change the country). Pay yearly and get 2 months free. Messaging automations (WhatsApp, Customer Support, Lead Follow-up, Email and Google Reviews) are free for the first 3 days.",
   },
   {
     q: "How fast can I go live?",

@@ -7,8 +7,9 @@ import { countryByIso, countryList, flag } from "@/content/app/countries";
 import { cn } from "@/lib/cn";
 
 /**
- * Website prices stay hidden until the visitor picks their country: India shows ₹, every
- * other country shows $. The choice is remembered on this device. Payments are always in rupees.
+ * Website prices in the visitor's currency: ₹ for India, $ for every other country. The country
+ * comes from the visitor's location and they can change it; their own choice is remembered on
+ * this device. Payments are always taken in rupees.
  */
 
 const KEY = "ibaxai-price-country";
@@ -26,17 +27,18 @@ function start() {
   started = true;
   try {
     const saved = localStorage.getItem(KEY);
-    if (saved && countryByIso(saved)) emit({ country: saved });
+    if (saved && countryByIso(saved)) return emit({ country: saved, suggested: saved });
   } catch {
     /* private mode */
   }
-  // Only pre-selects the country in the picker; prices still wait for the visitor's choice.
+  // Not remembered: a visitor who never chose keeps following their location.
   fetch("/api/geo")
     .then((r) => (r.ok ? r.json() : null))
     .then((d: { country?: string } | null) => {
-      if (d?.country && countryByIso(d.country)) emit({ suggested: d.country.toUpperCase() });
+      const iso = d?.country && countryByIso(d.country) ? d.country.toUpperCase() : "IN";
+      emit({ country: iso, suggested: iso });
     })
-    .catch(() => {});
+    .catch(() => emit({ country: "IN" }));
 }
 
 export function chooseCountry(iso: string) {
@@ -64,13 +66,13 @@ function usePriceState(): State {
   return s;
 }
 
-/** The visitor's currency, or null until they pick a country. */
+/** The visitor's currency, or null for the moment while their country is being looked up. */
 export function useCurrency(): Currency | null {
   const { country } = usePriceState();
   return country ? (country === "IN" ? "INR" : "USD") : null;
 }
 
-/** "See price" button shown in place of a price until a country is chosen. */
+/** "See price" button, for a price that is still loading. */
 export function SeePrice({ className }: { className?: string }) {
   return (
     <button
@@ -86,10 +88,10 @@ export function SeePrice({ className }: { className?: string }) {
   );
 }
 
-/** A price in the visitor's currency: <Money inr="₹699" usd="$9" />, or "See price" until they choose a country. */
+/** A price in the visitor's currency: <Money inr="₹699" usd="$9" />. */
 export function Money({ inr, usd }: { inr: string; usd: string }) {
   const c = useCurrency();
-  if (!c) return <SeePrice className="align-middle" />;
+  if (!c) return <span className="opacity-40">…</span>;
   return <>{c === "USD" ? usd : inr}</>;
 }
 

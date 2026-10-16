@@ -11,7 +11,7 @@ import { SubHead } from "./Shambhu";
 
 /**
  * Automation Store: every IBAX service can be bought on its own, each with a
- * "Starting at" price, shown once the visitor picks their country (₹ India, $ elsewhere).
+ * "Starting at" price in the visitor's currency (₹ India, $ elsewhere; they can change it).
  * Digital Marketing is the premium package.
  */
 /** Yearly price for a monthly "₹699": 10 months, so 2 months free. */
@@ -77,7 +77,7 @@ export function AutomationStore() {
                       {s.billing === "monthly" && <span className="mt-1 block text-[0.7rem] text-flow-soft">or {yearly(p(s))}/year · 2 months free</span>}
                     </>
                   ) : (
-                    <span className="mt-1 block text-xs text-fg-muted">Choose your country above</span>
+                    <span className="display mt-1 block text-[1.9rem] leading-none text-fg/40">…</span>
                   )}
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-flow">
                     Get started <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -112,7 +112,7 @@ export function AutomationStore() {
                   <span className="mt-1 block text-xs text-flow-soft">or {yearly(p(b))}/year · 2 months free</span>
                 </span>
               ) : (
-                <span className="text-xs text-fg-muted md:text-right">Choose your country above to see the price</span>
+                <span className="display text-[2rem] leading-none text-fg/40 md:text-right">…</span>
               )}
             </button>
           </Reveal>
@@ -160,7 +160,7 @@ export function AutomationStore() {
           </Reveal>
         )}
 
-        <p className="mt-6 text-center text-sm text-fg-subtle">{currency === "USD" ? "Prices in US dollars for customers outside India; payment is taken in Indian rupees at the same value." : currency === "INR" ? "Prices in Indian rupees, all-inclusive." : "Choose your country to see prices in your currency."} Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
+        <p className="mt-6 text-center text-sm text-fg-subtle">{currency === "USD" ? "Prices in US dollars for customers outside India; payment is taken in Indian rupees at the same value." : currency === "INR" ? "Prices in Indian rupees, all-inclusive." : ""} Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
       </div>
     </section>
   );
