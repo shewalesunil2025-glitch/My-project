@@ -1,5 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { connectionState, evo, evolutionReady, instanceFor, waDigits } from "./whatsapp";
+import { connectionState, evo, evolutionReady, instanceFor, waDigits, waFullDigits } from "./whatsapp";
+import { dialForCountry } from "@/lib/phone";
+import { secretMatches } from "./wa/rules";
 
 /**
  * Lead Follow-up: messages each new lead on the owner's own WhatsApp — a thank-you straight
@@ -26,14 +28,13 @@ export function adminDb(): SupabaseClient | null {
 
 /** Requests from our own n8n workflows carry the shared secret. */
 export function fromAutomationServer(request: Request) {
-  const secret = process.env.N8N_WEBHOOK_SECRET;
-  return Boolean(secret) && request.headers.get("x-ibax-secret") === secret;
+  return secretMatches(request.headers.get("x-ibax-secret"), process.env.N8N_WEBHOOK_SECRET, process.env.N8N_WEBHOOK_SECRET_NEXT);
 }
 
 export type FollowupSetup = { active: boolean; instance: string; business: string; offer: string; delayMs: number; ownerPhone: string };
 
 type WorkspaceData = {
-  business?: { name?: string; phone?: string } | null;
+  business?: { name?: string; phone?: string; country?: string } | null;
   automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string; paidUntil?: string }[];
   connections?: { whatsapp?: { account?: string; status?: string } };
 };
@@ -44,7 +45,8 @@ export async function setupFor(db: SupabaseClient, ownerId: string): Promise<Fol
   const ws = row?.data as WorkspaceData | undefined;
   const auto = ws?.automations?.find((a) => a.serviceId === "followup");
   const wa = ws?.connections?.whatsapp;
-  const digits = wa?.status === "connected" ? waDigits(String(wa.account ?? "")) : null;
+  const dial = dialForCountry(ws?.business?.country);
+  const digits = wa?.status === "connected" ? waDigits(String(wa.account ?? ""), dial) : null;
   if (!auto || !digits) return null;
   const config = auto.config ?? {};
   return {
@@ -54,7 +56,7 @@ export async function setupFor(db: SupabaseClient, ownerId: string): Promise<Fol
     business: String(ws?.business?.name ?? "").trim() || "our team",
     offer: typeof config.offer === "string" ? config.offer.trim() : "",
     delayMs: DELAYS[String(config.delay)] ?? DELAYS["1 day"],
-    ownerPhone: waDigits(String(ws?.business?.phone ?? "")) ?? digits,
+    ownerPhone: waDigits(String(ws?.business?.phone ?? ""), dial) ?? digits,
   };
 }
 
@@ -83,6 +85,12 @@ async function send(instance: string, phone: string, text: string) {
   return r.ok;
 }
 
+/** The calling code of the country the owner's business is in (India when unknown). */
+export async function ownerDial(db: SupabaseClient, ownerId: string) {
+  const { data } = await db.from("workspaces").select("data").eq("owner_id", ownerId).maybeSingle();
+  return dialForCountry((data?.data as WorkspaceData | undefined)?.business?.country);
+}
+
 export type NewLead = { name: string; phone: string; interest?: string; source?: string; leadRef?: string };
 
 /**
@@ -90,7 +98,7 @@ export type NewLead = { name: string; phone: string; interest?: string; source?:
  * and sends the thank-you straight away (or at opening time, at night).
  */
 export async function enroll(db: SupabaseClient, ownerId: string, lead: NewLead): Promise<"started" | "off" | "invalid" | "already"> {
-  const phone = waDigits(lead.phone);
+  const phone = waDigits(lead.phone, await ownerDial(db, ownerId));
   if (!phone) return "invalid";
   const setup = await setupFor(db, ownerId);
   if (!setup?.active || !evolutionReady()) return "off";
@@ -194,7 +202,7 @@ export async function sendSummaries(db: SupabaseClient) {
 
 /** A customer wrote on WhatsApp: stop reminding them. */
 export async function markReplied(db: SupabaseClient, instance: string, phone: string) {
-  const digits = waDigits(phone);
+  const digits = waFullDigits(phone);
   if (!digits || !/^ibax-\d+$/.test(instance)) return 0;
   const { data } = await db
     .from("followups")
@@ -208,7 +216,7 @@ export async function markReplied(db: SupabaseClient, instance: string, phone: s
 
 /** The owner marked the lead converted or lost: no more messages. */
 export async function stopFor(db: SupabaseClient, ownerId: string, phone: string) {
-  const digits = waDigits(phone);
+  const digits = waDigits(phone, await ownerDial(db, ownerId));
   if (!digits) return;
   await db.from("followups").update({ state: "stopped", next_at: null }).eq("owner_id", ownerId).eq("phone", digits).in("state", ["waiting", "replied"]);
 }

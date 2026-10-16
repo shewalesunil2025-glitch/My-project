@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { directReviewLink, reviewMessage } from "@/lib/reviewMessage";
 import { connectionState, evo, evolutionReady, instanceFor, ownership, waDigits } from "./whatsapp";
+import { dialForCountry } from "@/lib/phone";
 
 /**
  * Google Review requests: after a visit or a sale, IBAX asks the customer on the owner's own
@@ -13,7 +14,7 @@ const DAILY_LIMIT = 40;
 const ONCE_PER_MS = 30 * 86_400_000;
 
 type WorkspaceData = {
-  business?: { name?: string } | null;
+  business?: { name?: string; country?: string } | null;
   automations?: { serviceId: string; status: string; config?: Record<string, unknown>; trialEndsAt?: string; paidUntil?: string }[];
   connections?: { whatsapp?: { account?: string; status?: string } };
   reviewRequests?: { phone: string; at: string; status?: string }[];
@@ -25,17 +26,18 @@ const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 
 /** Sends one review request from the owner's WhatsApp, if Google Review Management is on. */
 export async function requestReview(db: SupabaseClient, ownerId: string, customer: { name: string; phone: string }): Promise<ReviewResult> {
-  const phone = waDigits(customer.phone);
-  if (!phone) return "invalid";
   const { data: row } = await db.from("workspaces").select("data").eq("owner_id", ownerId).maybeSingle();
   const ws = row?.data as WorkspaceData | undefined;
+  const dial = dialForCountry(ws?.business?.country);
+  const phone = waDigits(customer.phone, dial);
+  if (!phone) return "invalid";
   const auto = ws?.automations?.find((a) => a.serviceId === "reviews");
   const trialOver = [auto?.trialEndsAt, auto?.paidUntil].some((t) => t && Date.parse(t) <= Date.now());
   const link = directReviewLink(str(auto?.config?.reviewLink));
   if (!auto || auto.status !== "active" || trialOver || !/^https?:\/\//i.test(link) || !evolutionReady()) return "off";
 
   const wa = ws?.connections?.whatsapp;
-  const digits = wa?.status === "connected" ? waDigits(String(wa.account ?? "")) : null;
+  const digits = wa?.status === "connected" ? waDigits(String(wa.account ?? ""), dial) : null;
   if (!digits) return "not_linked";
   const instance = instanceFor(digits);
   // Only the account that linked this WhatsApp may send from it.
