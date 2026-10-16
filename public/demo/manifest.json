@@ -27,9 +27,118 @@
       ]
     },
     "manual": {
-      "duration": 29.42,
+      "duration": 29.41,
       "langs": [
-        "en"
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "whatsapp": {
+    "talk": {
+      "duration": 33.75,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 27.14,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "instagram": {
+    "talk": {
+      "duration": 35.62,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 29.33,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "facebook": {
+    "talk": {
+      "duration": 30.18,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 29.38,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "youtube": {
+    "talk": {
+      "duration": 32.39,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 29.23,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "social-pack": {
+    "talk": {
+      "duration": 32.54,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 29.3,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "email": {
+    "talk": {
+      "duration": 34.85,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 27.0,
+      "langs": [
+        "en",
+        "hi"
       ]
     }
   }
