@@ -6,12 +6,13 @@ import { BookDemoButton } from "@/components/cta/BookDemoButton";
 import { Reveal } from "@/components/effects/Reveal";
 import { useDemo } from "@/components/cta/DemoProvider";
 import { cn } from "@/lib/cn";
-import { CurrencySwitch, useCurrency } from "@/components/cta/Money";
+import { CountryChip, SeePrice, useCurrency } from "@/components/cta/Money";
 import { SubHead } from "./Shambhu";
 
 /**
  * Automation Store: every IBAX service can be bought on its own, each with a
- * "Starting at" price in INR. Digital Marketing is the premium package.
+ * "Starting at" price in the visitor's currency (₹ India, $ elsewhere; they can change it).
+ * Digital Marketing is the premium package.
  */
 /** Yearly price for a monthly "₹699": 10 months, so 2 months free. */
 const yearly = (monthly: string) => {
@@ -21,7 +22,7 @@ const yearly = (monthly: string) => {
 
 export function AutomationStore() {
   const { openDemo } = useDemo();
-  const [currency] = useCurrency();
+  const currency = useCurrency();
   const p = (x: { price: string; usd: string }) => (currency === "USD" ? x.usd : x.price);
   const regular = store.filter((s) => !s.premium && !s.bundle);
   const bundles = store.filter((s) => s.bundle);
@@ -35,7 +36,7 @@ export function AutomationStore() {
         <Reveal delay={0.1}>
           <p className="mx-auto mt-4 max-w-md text-center text-fg-muted">Every service works on its own. Add more any time.</p>
           <div className="mt-4 flex justify-center">
-            <CurrencySwitch />
+            <CountryChip />
           </div>
           <p className="mx-auto mt-5 w-fit rounded-full border border-flow/40 bg-flow/10 px-4 py-1.5 text-center text-sm font-medium text-flow-soft">
             🎁 Messaging automations are <strong className="text-flow">FREE for 3 days</strong> —{" "}
@@ -65,13 +66,19 @@ export function AutomationStore() {
                 <span className="mt-1 block text-xs leading-relaxed text-fg-muted md:text-sm">{s.body}</span>
                 <span className="mt-auto block pt-5">
                   <span className="block font-mono text-[0.58rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
-                  <span className="mt-1 flex flex-wrap items-baseline gap-x-1">
-                    <span className="display text-[1.9rem] leading-none text-fg transition-colors duration-300 group-hover:text-flow-soft">
-                      {p(s)}
-                    </span>
-                    <span className="text-xs whitespace-nowrap text-fg-muted">{s.billing === "monthly" ? "/mo" : "one-time"}</span>
-                  </span>
-                  {s.billing === "monthly" && <span className="mt-1 block text-[0.7rem] text-flow-soft">or {yearly(p(s))}/year · 2 months free</span>}
+                  {currency ? (
+                    <>
+                      <span className="mt-1 flex flex-wrap items-baseline gap-x-1">
+                        <span className="display text-[1.9rem] leading-none text-fg transition-colors duration-300 group-hover:text-flow-soft">
+                          {p(s)}
+                        </span>
+                        <span className="text-xs whitespace-nowrap text-fg-muted">{s.billing === "monthly" ? "/mo" : "one-time"}</span>
+                      </span>
+                      {s.billing === "monthly" && <span className="mt-1 block text-[0.7rem] text-flow-soft">or {yearly(p(s))}/year · 2 months free</span>}
+                    </>
+                  ) : (
+                    <span className="display mt-1 block text-[1.9rem] leading-none text-fg/40">…</span>
+                  )}
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-flow">
                     Get started <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                   </span>
@@ -98,11 +105,15 @@ export function AutomationStore() {
                 </span>
                 <span className="mt-1 block max-w-2xl text-sm text-fg-muted">{b.body}</span>
               </span>
-              <span className="md:text-right">
-                <span className="display text-[2rem] leading-none">{p(b)}</span>
-                <span className="text-sm text-fg-muted">/mo</span>
-                <span className="mt-1 block text-xs text-flow-soft">or {yearly(p(b))}/year · 2 months free</span>
-              </span>
+              {currency ? (
+                <span className="md:text-right">
+                  <span className="display text-[2rem] leading-none">{p(b)}</span>
+                  <span className="text-sm text-fg-muted">/mo</span>
+                  <span className="mt-1 block text-xs text-flow-soft">or {yearly(p(b))}/year · 2 months free</span>
+                </span>
+              ) : (
+                <span className="display text-[2rem] leading-none text-fg/40 md:text-right">…</span>
+              )}
             </button>
           </Reveal>
         ))}
@@ -127,12 +138,18 @@ export function AutomationStore() {
                   <p className="mt-2 max-w-xl text-sm text-fg-muted md:text-base">{premium.body}</p>
                 </div>
               </div>
-              <p className="md:text-right">
-                <span className="block font-mono text-[0.58rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
-                <span className="display text-[2.4rem] leading-none">{p(premium)}</span>
-                <span className="text-sm text-fg-muted">/mo</span>
-                <span className="mt-1 block text-xs text-flow-soft">or {yearly(p(premium))}/year · 2 months free</span>
-              </p>
+              {currency ? (
+                <p className="md:text-right">
+                  <span className="block font-mono text-[0.58rem] tracking-[0.14em] text-fg-subtle uppercase">Starting at</span>
+                  <span className="display text-[2.4rem] leading-none">{p(premium)}</span>
+                  <span className="text-sm text-fg-muted">/mo</span>
+                  <span className="mt-1 block text-xs text-flow-soft">or {yearly(p(premium))}/year · 2 months free</span>
+                </p>
+              ) : (
+                <p className="md:text-right">
+                  <SeePrice />
+                </p>
+              )}
               <div className="flex flex-col items-start gap-2">
                 <BookDemoButton label="Get started" interest={premium.title} icon className="w-fit" />
                 <a href={digitalMarketing.href} className="text-sm text-flow underline-offset-4 hover:underline">
@@ -143,7 +160,7 @@ export function AutomationStore() {
           </Reveal>
         )}
 
-        <p className="mt-6 text-center text-sm text-fg-subtle">{currency === "USD" ? "Prices in US dollars for customers outside India; payment is taken in Indian rupees at the same value." : "Prices in Indian rupees, all-inclusive."} Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
+        <p className="mt-6 text-center text-sm text-fg-subtle">{currency === "USD" ? "Prices in US dollars for customers outside India; payment is taken in Indian rupees at the same value." : currency === "INR" ? "Prices in Indian rupees, all-inclusive." : ""} Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
       </div>
     </section>
   );

@@ -1,78 +1,190 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
+import { Globe2, X } from "lucide-react";
 import type { Currency } from "@/config/product";
+import { countryByIso, countryList, flag } from "@/content/app/countries";
 import { cn } from "@/lib/cn";
 
 /**
- * Website prices: ₹ for visitors in India, $ for everyone else (from the visitor's country,
- * or their own choice in the ₹/$ switch). Payments are always taken in rupees.
+ * Website prices in the visitor's currency: ₹ for India, $ for every other country. The country
+ * comes from the visitor's location and they can change it; their own choice is remembered on
+ * this device. Payments are always taken in rupees.
  */
 
-const KEY = "ibaxai-currency";
-let current: Currency = "INR";
+const KEY = "ibaxai-price-country";
+type State = { country: string | null; open: boolean; suggested: string };
+let state: State = { country: null, open: false, suggested: "IN" };
 let started = false;
 const listeners = new Set<() => void>();
-
-function setCurrency(c: Currency, remember = true) {
-  current = c;
-  if (remember) {
-    try {
-      localStorage.setItem(KEY, c);
-    } catch {
-      /* private mode */
-    }
-  }
+const emit = (next: Partial<State>) => {
+  state = { ...state, ...next };
   listeners.forEach((l) => l());
-}
+};
 
 function start() {
   if (started) return;
   started = true;
-  let saved: string | null = null;
   try {
-    saved = localStorage.getItem(KEY);
+    const saved = localStorage.getItem(KEY);
+    if (saved && countryByIso(saved)) return emit({ country: saved, suggested: saved });
   } catch {
     /* private mode */
   }
-  if (saved === "INR" || saved === "USD") return setCurrency(saved, false);
+  // Not remembered: a visitor who never chose keeps following their location.
   fetch("/api/geo")
     .then((r) => (r.ok ? r.json() : null))
     .then((d: { country?: string } | null) => {
-      if (d?.country && d.country !== "IN") setCurrency("USD", false);
+      const iso = d?.country && countryByIso(d.country) ? d.country.toUpperCase() : "IN";
+      emit({ country: iso, suggested: iso });
     })
-    .catch(() => {});
+    .catch(() => emit({ country: "IN" }));
 }
 
-export function useCurrency(): [Currency, (c: Currency) => void] {
-  const value = useSyncExternalStore(
+export function chooseCountry(iso: string) {
+  try {
+    localStorage.setItem(KEY, iso);
+  } catch {
+    /* private mode */
+  }
+  emit({ country: iso, open: false });
+}
+
+export const openCountryPicker = () => emit({ open: true });
+
+const server: State = { country: null, open: false, suggested: "IN" };
+function usePriceState(): State {
+  const s = useSyncExternalStore(
     (l) => {
       listeners.add(l);
       return () => listeners.delete(l);
     },
-    () => current,
-    () => "INR" as Currency,
+    () => state,
+    () => server,
   );
   useEffect(start, []);
-  return [value, setCurrency];
+  return s;
+}
+
+/** The visitor's currency, or null for the moment while their country is being looked up. */
+export function useCurrency(): Currency | null {
+  const { country } = usePriceState();
+  return country ? (country === "IN" ? "INR" : "USD") : null;
+}
+
+/** "See price" button, for a price that is still loading. */
+export function SeePrice({ className }: { className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        openCountryPicker();
+      }}
+      className={cn("inline-flex items-center gap-1 rounded-full border border-flow/40 px-2.5 py-0.5 text-xs font-semibold text-flow hover:bg-flow/10", className)}
+    >
+      <Globe2 className="size-3" aria-hidden /> See price
+    </button>
+  );
 }
 
 /** A price in the visitor's currency: <Money inr="₹699" usd="$9" />. */
 export function Money({ inr, usd }: { inr: string; usd: string }) {
-  const [c] = useCurrency();
+  const c = useCurrency();
+  if (!c) return <span className="opacity-40">…</span>;
   return <>{c === "USD" ? usd : inr}</>;
 }
 
-/** Small ₹ / $ switch for the price lists. */
-export function CurrencySwitch({ className }: { className?: string }) {
-  const [c, set] = useCurrency();
+/** Shows the chosen country with a "change" link, or a button to choose one. */
+export function CountryChip({ className }: { className?: string }) {
+  const { country } = usePriceState();
+  const c = country ? countryByIso(country) : null;
   return (
-    <div role="group" aria-label="Currency" className={cn("inline-flex rounded-full border border-white/10 p-0.5 text-xs font-semibold", className)}>
-      {(["INR", "USD"] as const).map((x) => (
-        <button key={x} type="button" aria-pressed={c === x} onClick={() => set(x)} className={cn("rounded-full px-3 py-1", c === x ? "bg-flow text-ink-950" : "text-fg-muted")}>
-          {x === "INR" ? "₹ India" : "$ Other countries"}
+    <button
+      type="button"
+      onClick={openCountryPicker}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold",
+        c ? "border-white/15 text-fg-muted hover:border-flow/40" : "border-flow/50 bg-flow/10 text-flow hover:bg-flow/15",
+        className,
+      )}
+    >
+      {c ? (
+        <>
+          {flag(c.iso)} Prices for {c.name} ({c.iso === "IN" ? "₹" : "$"}) · <span className="text-flow underline underline-offset-4">change</span>
+        </>
+      ) : (
+        <>
+          <Globe2 className="size-4" aria-hidden /> Choose your country to see prices
+        </>
+      )}
+    </button>
+  );
+}
+
+/** One dialog for the whole page: pick a country, then every price on the page shows. */
+export function CountryDialog() {
+  const { open, country, suggested } = usePriceState();
+  const [pick, setPick] = useState("");
+  const value = pick || country || suggested;
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && emit({ open: false });
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  if (!open) return null;
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    chooseCountry(value);
+    setPick("");
+  };
+  const india = countryList.find((c) => c.iso === "IN");
+  const others = countryList.filter((c) => c.iso !== "IN");
+
+  return (
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => emit({ open: false })}>
+      <form
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="price-country-title"
+        onSubmit={submit}
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-ink-900 p-6 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.9)]"
+      >
+        <button type="button" onClick={() => emit({ open: false })} aria-label="Close" className="absolute top-3 right-3 text-fg-muted hover:text-fg">
+          <X className="size-5" aria-hidden />
         </button>
-      ))}
+        <h2 id="price-country-title" className="text-lg font-semibold">
+          Where is your business?
+        </h2>
+        <p className="mt-1 text-sm text-fg-muted">We&apos;ll show prices in your currency: ₹ for India, $ for other countries.</p>
+        <label htmlFor="price-country" className="sr-only">
+          Country
+        </label>
+        <select
+          id="price-country"
+          value={value}
+          onChange={(e) => setPick(e.target.value)}
+          className="mt-4 h-11 w-full rounded-xl border border-white/10 bg-ink-850 px-3 text-sm focus:border-flow/50 focus:outline-none"
+        >
+          {india && (
+            <option value={india.iso}>
+              {flag(india.iso)} {india.name}
+            </option>
+          )}
+          {others.map((c) => (
+            <option key={c.iso} value={c.iso}>
+              {flag(c.iso)} {c.name}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className="mt-4 h-11 w-full rounded-full bg-flow text-sm font-semibold text-ink-950">
+          Show prices
+        </button>
+      </form>
     </div>
   );
 }
