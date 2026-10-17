@@ -1,14 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ExternalLink, Unplug } from "lucide-react";
+import { Camera, Clapperboard, ExternalLink, Globe, Mail, MessageCircle, PhoneCall, Star, ThumbsUp, Unplug, type LucideIcon } from "lucide-react";
 import { product } from "@/config/product";
 import { providerInfo, serviceById } from "@/content/app/services";
 import { audit, logActivity, notify, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { ProviderId, Workspace } from "@/lib/app/types";
 import { unlinkWhatsApp, waAccount, whatsappLinkAvailable } from "@/lib/app/whatsappLink";
-import { Btn, Field, Input, Pill, fmtDate } from "./ui";
+import { Btn, Field, Input, fmtDate } from "./ui";
+import { cn } from "@/lib/cn";
 import { WhatsAppLink } from "./WhatsAppLink";
+
+const providerIcon: Record<ProviderId, LucideIcon> = {
+  whatsapp: MessageCircle,
+  youtube: Clapperboard,
+  instagram: Camera,
+  facebook: ThumbsUp,
+  google: Star,
+  gmail: Mail,
+  phone: PhoneCall,
+  website: Globe,
+};
 
 /**
  * Connect / disconnect one platform account.
@@ -47,27 +59,40 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
     });
   }
 
+  const PIcon = providerIcon[provider];
   return (
-    <div className={compact ? "" : "rounded-xl border border-white/10 bg-ink-900 p-4"}>
-      <div className="flex flex-wrap items-center gap-3">
+    <div className={compact ? "" : cn("rounded-2xl border p-4 transition-colors", conn ? "border-flow/30 bg-[linear-gradient(135deg,rgb(37_211_102/0.08),transparent_60%),var(--color-ink-900)]" : "border-white/10 bg-ink-900")}>
+      <div className="flex items-center gap-3">
+        <span className={cn("relative grid size-11 shrink-0 place-items-center rounded-2xl", conn ? "bg-flow/15 text-flow ring-1 ring-flow/40" : "bg-white/[0.05] text-fg-muted ring-1 ring-white/10")}>
+          <PIcon className="size-5" aria-hidden />
+          {conn && <span aria-hidden className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" />}
+        </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">{info.name}</p>
-          <p className="truncate text-xs text-fg-subtle">
-            {conn ? `${conn.account} · since ${fmtDate(conn.connectedAt)}` : info.help}
-          </p>
+          <p className="truncate text-sm font-semibold">{info.name}</p>
+          {conn ? (
+            <p className="mt-1 flex min-w-0 items-center gap-2 text-xs text-fg-subtle">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-flow/12 px-2 py-0.5 text-[0.62rem] font-semibold tracking-wide text-flow uppercase ring-1 ring-flow/30">
+                <span aria-hidden className="size-1.5 rounded-full bg-flow" /> Connected
+              </span>
+              <span className="truncate">{conn.account}</span>
+            </p>
+          ) : (
+            <p className="mt-0.5 truncate text-xs text-fg-subtle">{info.help}</p>
+          )}
         </div>
         {conn ? (
-          <>
-            <Pill tone="green">
-              <Check className="size-3" aria-hidden /> Connected
-            </Pill>
-            <Btn variant="subtle" size="sm" onClick={disconnect} aria-label={`Disconnect ${info.name}`}>
-              <Unplug className="size-4" aria-hidden /> Disconnect
-            </Btn>
-          </>
+          <button
+            type="button"
+            onClick={disconnect}
+            aria-label={`Disconnect ${info.name}`}
+            title="Disconnect"
+            className="grid size-10 shrink-0 place-items-center rounded-full border border-white/10 text-fg-muted transition-colors hover:border-red-400/40 hover:text-red-300"
+          >
+            <Unplug className="size-4" aria-hidden />
+          </button>
         ) : (
           !open && (
-            <Btn size="sm" onClick={() => setOpen(true)}>
+            <Btn size="sm" onClick={() => setOpen(true)} className="shrink-0">
               Connect
             </Btn>
           )
