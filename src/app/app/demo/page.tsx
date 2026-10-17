@@ -29,7 +29,7 @@ export default function DemoLibraryPage() {
         </p>
 
         <Link
-          href="/app/demo/tour"
+          href="/app/demo/intro"
           className="glass mt-8 flex items-center gap-4 rounded-3xl p-5 [background:radial-gradient(70%_120%_at_100%_0%,rgb(37_211_102/0.22),transparent_60%),var(--color-ink-850)] sm:p-7"
         >
           <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-flow text-ink-950 shadow-[0_12px_40px_-10px_rgb(37_211_102/0.9)]">

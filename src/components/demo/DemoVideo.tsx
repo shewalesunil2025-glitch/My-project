@@ -13,7 +13,10 @@ const LANG_KEY = "ibaxai-demo-lang";
  * A service's demo video: one MP4 per language, with IBAX's narration inside.
  * Below the video there are only three choices: Just say it, Manually, Language.
  */
-export function DemoVideo({ svc }: { svc: ServiceDef }) {
+export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
+  // A service's two videos, or (with only `id`) one video such as the app tour.
+  const vid = id ?? svc?.id ?? "";
+  const single = !svc;
   const [mode, setMode] = useState<DemoMode>("talk");
   const [lang, setLang] = useState<DemoLang>("en");
   const [manifest, setManifest] = useState<Manifest | null>(null);
@@ -42,7 +45,7 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
       });
   }, []);
 
-  const info = manifest?.[svc.id]?.[mode];
+  const info = manifest?.[vid]?.[mode];
   const langs = demoLangs.filter((l) => !info || info.langs.includes(l.code));
   const voice = info && !info.langs.includes(lang) ? "en" : lang;
   const base = `/demo`;
@@ -122,8 +125,8 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
     }
   }
 
-  const has = (m: DemoMode) => !manifest || Boolean(manifest[svc.id]?.[m]);
-  if (manifest && !manifest[svc.id]) {
+  const has = (m: DemoMode) => !manifest || Boolean(manifest[vid]?.[m]);
+  if (manifest && !manifest[vid]) {
     return <p className="mx-auto mt-10 max-w-sm rounded-2xl border border-white/10 p-6 text-center text-sm text-fg-muted">This demo video is coming soon.</p>;
   }
 
@@ -133,8 +136,8 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
         <video
           key={`${mode}-${voice}`}
           ref={video}
-          src={`${base}/video/${svc.id}-${mode}-${voice}.mp4`}
-          poster={`${base}/poster/${svc.id}-${mode}.jpg`}
+          src={single ? `${base}/video/${vid}-${voice}.mp4` : `${base}/video/${vid}-${mode}-${voice}.mp4`}
+          poster={single ? `${base}/poster/${vid}.jpg` : `${base}/poster/${vid}-${mode}.jpg`}
           playsInline
           preload="auto"
           onClick={toggle}
@@ -173,7 +176,7 @@ export function DemoVideo({ svc }: { svc: ServiceDef }) {
       </div>
 
       {/* The only three choices */}
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className={cn("mt-4 grid grid-cols-2 gap-2", single && "hidden")}>
         <button
           type="button"
           onClick={() => pick("talk")}
