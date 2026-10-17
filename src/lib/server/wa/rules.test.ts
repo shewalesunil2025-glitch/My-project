@@ -47,3 +47,22 @@ describe("server secret", () => {
     expect(secretMatches("", "", "")).toBe(false);
   });
 });
+
+describe("owner typing on their own WhatsApp", () => {
+  it("tells the owner's messages from the server's", async () => {
+    const { typedByOwner } = await import("./rules");
+    expect(typedByOwner(true, "3A923620ED6C5FA388EF")).toBe(true); // iPhone
+    expect(typedByOwner(true, "BB2D3F0A1C8E44F19A71C2D3E4F5A6B7")).toBe(true); // Android
+    expect(typedByOwner(true, "3EB0C431D3F2A1B2C3D4E5")).toBe(false); // sent by the server
+    expect(typedByOwner(false, "3A923620ED6C5FA388EF")).toBe(false); // from the customer
+  });
+  it("stops a reply when the owner stepped in after it was started", async () => {
+    const { maySend } = await import("./rules");
+    const since = Date.parse("2026-10-17T12:00:00Z");
+    expect(maySend(null, since)).toBe(true);
+    expect(maySend({ bot_status: "on", last_owner_at: null }, since)).toBe(true);
+    expect(maySend({ bot_status: "paused", last_owner_at: null }, since)).toBe(false);
+    expect(maySend({ bot_status: "on", last_owner_at: "2026-10-17T12:00:05Z" }, since)).toBe(false);
+    expect(maySend({ bot_status: "on", last_owner_at: "2026-10-17T11:00:00Z" }, since)).toBe(true);
+  });
+});

@@ -49,3 +49,18 @@ function eq(a: string, b: string) {
   for (let i = 0; i < len; i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
   return diff === 0;
 }
+
+/**
+ * Messages the owner typed themselves (phone app, desktop) as opposed to ones the server sent
+ * through the WhatsApp API: API-sent message ids start with "3EB0" (or the older "BAE5").
+ */
+export function typedByOwner(fromMe: boolean, messageId: string | null | undefined): boolean {
+  return fromMe && Boolean(messageId) && !/^(3EB0|BAE5)/i.test(String(messageId));
+}
+
+/** May the bot still send a reply it started writing at `since`? Not if the owner stepped in since then. */
+export function maySend(c: Pick<ContactState, "bot_status" | "last_owner_at"> | null, since: number): boolean {
+  if (!c) return true;
+  if (c.bot_status === "paused") return false;
+  return !(c.last_owner_at && Date.parse(c.last_owner_at) >= since - 1000);
+}
