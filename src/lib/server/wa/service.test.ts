@@ -115,3 +115,17 @@ describe("tenant isolation", () => {
     expect(t.wa_contacts[0]).toMatchObject({ bot_status: "on", needs_attention: false });
   });
 });
+
+describe("owner writes from their own phone", () => {
+  it("pauses the bot for that customer, once, and blocks the next reply", async () => {
+    const { ownerTyped, canSend } = await import("./service");
+    const { db, t } = fakeDb(seed());
+    const since = Date.now() - 2000;
+    await ownerTyped(db, { instance: "ibax-919876543210", phone: "919000000001", text: "Main dekhta hoon", messageId: "3A1E68FC90321BF93EED" });
+    expect(await ownerTyped(db, { instance: "ibax-919876543210", phone: "919000000001", text: "Main dekhta hoon", messageId: "3A1E68FC90321BF93EED" })).toEqual({ ok: true, duplicate: true });
+    expect(t.wa_contacts[0]).toMatchObject({ bot_status: "paused" });
+    expect(t.wa_messages.filter((m) => m.direction === "owner")).toHaveLength(1);
+    expect(await canSend(db, "ibax-919876543210", "919000000001", since)).toBe(false);
+    expect((await gate(db, msg({ messageId: "M9" }))).reason).toBe("paused");
+  });
+});

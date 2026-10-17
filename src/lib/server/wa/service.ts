@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AppNotification, NotificationKind, Workspace } from "@/lib/app/types";
 import { connectionState, evo, waFullDigits } from "../whatsapp";
-import { clip, dailyLimit, shouldAutoResume, type ContactState, type Gate } from "./rules";
+import { clip, dailyLimit, maySend, shouldAutoResume, type ContactState, type Gate } from "./rules";
 
 /**
  * WhatsApp Inbox service: n8n asks `gate` before each bot reply and reports with `deliver` /
@@ -131,6 +131,30 @@ export async function failure(db: SupabaseClient, f: { instance: string; phone: 
   const why = f.kind === "quota" ? "the AI limit was reached" : f.kind === "timeout" ? "the AI took too long" : "the AI had an error";
   const notified = await notifyOwner(db, ownerId, "automation_failed", "IBAX could not answer a customer", `A customer (${f.name || `+${phone}`}) is waiting: ${why}. Please reply in the Inbox.`);
   return { ok: true as const, notified };
+}
+
+/**
+ * The owner wrote to a customer from their own WhatsApp (phone): the bot steps back for that
+ * customer so the two never talk over each other. It comes back after 24 h of silence, or with
+ * "Turn bot back on" in the Inbox.
+ */
+export async function ownerTyped(db: SupabaseClient, b: { instance: string; phone: string; text: string; messageId: string | null }) {
+  const ownerId = await ownerOfInstance(db, b.instance);
+  const phone = waFullDigits(b.phone);
+  if (!ownerId || !phone) return { ok: false as const, reason: "unknown_instance" };
+  const now = new Date().toISOString();
+  const ins = await db.from("wa_messages").insert({ owner_id: ownerId, instance: b.instance, phone, direction: "owner", text: clip(b.text, 2000), msg_id: b.messageId, created_at: now });
+  if (ins.error?.code === "23505") return { ok: true as const, duplicate: true };
+  await db.from("wa_contacts").upsert({ owner_id: ownerId, instance: b.instance, phone, bot_status: "paused", paused_at: now, last_owner_at: now, last_at: now }, { onConflict: "instance,phone" });
+  return { ok: true as const };
+}
+
+/** Last check right before the bot sends a reply it started writing at `since` (ms). */
+export async function canSend(db: SupabaseClient, instance: string, to: string, since: number) {
+  const phone = waFullDigits(to);
+  if (!phone) return false;
+  const { data } = await db.from("wa_contacts").select("bot_status, last_owner_at").eq("instance", instance).eq("phone", phone).maybeSingle();
+  return maySend(data as Pick<ContactState, "bot_status" | "last_owner_at"> | null, since);
 }
 
 /** The owner replies from the Inbox: sends on WhatsApp, stores it, and pauses the bot for that customer. */
