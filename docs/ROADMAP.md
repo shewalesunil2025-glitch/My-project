@@ -2,7 +2,7 @@
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 
-## Where we are (updated 2026-10-14)
+## Where we are (updated 2026-10-17)
 
 **Launch plan (owner's decision):** build 3–4 services fully first — Website (self-service builder), WhatsApp, Lead Follow-up, Customer Support — then add Razorpay and launch.
 
@@ -26,6 +26,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Demo videos | ✅ `/app/demo` (open without an account): the app tour plus MP4 demo videos for every service (`/app/demo/<id>`), in English, Hindi and Marathi. Two videos per service, both opening with the tagline: **Just say it** (switch it on by talking to IBAX) and **Manually** (tap through it yourself). The app's own screens are drawn as motion graphics (`src/components/demo/Film.tsx`), narrated in IBAX's Gemini voice, never mentioning prices. Under the video only three choices: Just say it · Manually · Language. Made with `node scripts/demo-videos.mjs` (scripts in `src/content/demoScripts.ts`; output `public/demo/`) | More languages: scripts for Gujarati, Bengali, Tamil, Telugu, Kannada, Malayalam, Punjabi, Spanish and Arabic are written — run the script with `--langs` to add them |
 | App icon | ✅ New icons (`/icons/`, `/ibaxai.webmanifest`) match the iPhone App Store icon on Android too | Owner: remove the old home-screen icon, clear Chrome's site data for ibaxai.com, add it again |
 | Meta / Google / YouTube approvals | ⏳ | Owner applies early (2–4 weeks) |
+| Play Store launch (Android) | ⏳ Checklist ready: **`docs/PLAY-STORE-LAUNCH.md`** (Part A finish started work → B Play prep → C 14-day closed test with 12 testers → D launch). App Store later ($99/yr) | Next item in that checklist |
 
 ## Phase 0 — Foundation (1–2 weeks)
 
