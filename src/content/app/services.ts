@@ -316,8 +316,8 @@ export const services: ServiceDef[] = [
     group: "assistant",
     icon: "Headset",
     description:
-      "ibaxai answers your customers' common questions — timings, prices, location, orders, bookings — on your website chat, WhatsApp, Instagram, Facebook and email, and hands anything tricky to you.",
-    features: ["Answers on every connected channel", "Your FAQs, prices and policies", "Order and booking status questions", "Hands complaints to a person", "Every conversation visible in ibaxai"],
+      "ibaxai answers your customers' common questions — timings, prices, location, orders, bookings — on your ibaxai website chat and, when your WhatsApp is linked, on WhatsApp too, and hands anything tricky to you. Instagram, Facebook and email answers are coming next.",
+    features: ["Answers on your website chat", "Answers on WhatsApp when it's linked", "Your FAQs, prices and policies", "Hands complaints to you on WhatsApp", "Every conversation visible in ibaxai"],
     price: 599,
     usd: 49,
     setupTime: "Same day",
@@ -399,7 +399,7 @@ export const serviceById = (id: string) => services.find((s) => s.id === id);
  * waitlist instead of payment. Add a service's id here once its automation is
  * built and tested (see docs/ROADMAP.md).
  */
-export const liveServices: readonly string[] = ["website", "whatsapp", "followup", "reviews", "custom"];
+export const liveServices: readonly string[] = ["website", "whatsapp", "followup", "reviews", "support", "custom"];
 export const isLive = (id: string) => liveServices.includes(id);
 
 /**
