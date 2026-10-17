@@ -3,7 +3,8 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
-import { tourParts, tourScript } from "@/content/tourScript";
+import { spoken, tourParts, tourScript } from "@/content/tourScript";
+import type { DemoLang } from "@/content/demoScripts";
 import { TourFilm } from "@/components/demo/TourFilm";
 
 /** Renders frames of "ibaxai in 2 minutes" for scripts/tour-video.mjs (not for people). */
@@ -15,7 +16,10 @@ function Frame() {
     const w = window as unknown as Record<string, unknown>;
     w.__setT = (x: number) => flushSync(() => setT(x));
     w.__parts = tourParts;
-    w.__scripts = tourScript;
+    // The narration as it should be spoken (brand names spelled the way they sound).
+    w.__scripts = Object.fromEntries(
+      Object.entries(tourScript).map(([lang, parts]) => [lang, Object.fromEntries(Object.entries(parts ?? {}).map(([k, v]) => [k, spoken(lang as DemoLang, v)]))]),
+    );
     w.__ready = true;
   }, []);
   return (
