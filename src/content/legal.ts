@@ -12,7 +12,7 @@ export const legal = {
   email: siteConfig.email,
   phoneDisplay: siteConfig.phoneDisplay,
   /** Shown as "Last updated" on both pages. Change it whenever either page changes. */
-  updated: "9 October 2026",
+  updated: "18 October 2026",
 } as const;
 
 export const operatorLine = `${legal.brand} is operated by ${legal.operator}, ${legal.form} based in ${legal.city}, ${legal.state}, ${legal.country}.`;

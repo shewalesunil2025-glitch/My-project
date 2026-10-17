@@ -49,6 +49,7 @@ const sections: LegalSection[] = [
         <li>You must be at least 18 and give accurate details.</li>
         <li>Keep your password safe. You are responsible for what happens in your account.</li>
         <li>Tell us straight away if you think someone else has used it.</li>
+        <li>The same account and these terms apply on our website and in our Android app.</li>
       </ul>
     ),
   },
@@ -122,6 +123,24 @@ const sections: LegalSection[] = [
           <li>attack, overload or try to get around the security of the service.</li>
         </ul>
         <p>If you do, we may pause or close the service without a refund.</p>
+      </>
+    ),
+  },
+  {
+    id: "whatsapp",
+    title: "WhatsApp and other connected accounts",
+    body: (
+      <>
+        <p>
+          You may connect only accounts and numbers you own or are allowed to manage. When you link WhatsApp with a link code or QR code, it works
+          like WhatsApp Web on a linked device. This way of linking is not an official WhatsApp Business API connection, so WhatsApp can limit or
+          block a number that breaks its rules, for example by sending bulk or unwanted messages. Use it for replies and follow-ups to people who
+          contacted you, not for promotions to strangers.
+        </p>
+        <p>
+          Keep the phone with that WhatsApp connected to the internet at least once every 14 days, or the link stops. You can unlink at any time in
+          the app or in WhatsApp → Linked devices.
+        </p>
       </>
     ),
   },

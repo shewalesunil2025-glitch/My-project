@@ -61,6 +61,38 @@ const sections: LegalSection[] = [
     ),
   },
   {
+    id: "whatsapp",
+    title: "WhatsApp linking",
+    body: (
+      <>
+        <p>
+          WhatsApp automation links your WhatsApp number to {legal.brand} the same way WhatsApp Web does: you enter a link code (or scan a QR code)
+          in WhatsApp → Linked devices. We never see your WhatsApp password or the SMS code.
+        </p>
+        <p>
+          While it is linked, our WhatsApp server receives the messages of that number so {legal.brand} can reply for you, save the chats to your
+          Inbox and send the follow-ups and review requests you switched on. We use them only for those services. We do not read or use your
+          personal chats for anything else, and groups are ignored.
+        </p>
+        <p>
+          You can unlink at any time: in the app (Settings → Connected accounts → Disconnect), or on your phone in WhatsApp → Linked devices → tap
+          the device → Log out. Unlinking stops our access straight away.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "android",
+    title: "Our Android app",
+    body: (
+      <p>
+        The {legal.brand} app on Google Play opens the same {legal.brand} app you use on the web, so this policy covers it in full. It does not
+        read your contacts, photos, location, SMS or call history. It uses the microphone only when you tap the mic to talk to IBAX, and files
+        only when you choose one to attach. Notifications are shown only if you allow them.
+      </p>
+    ),
+  },
+  {
     id: "use",
     title: "How we use it",
     body: (
@@ -124,7 +156,7 @@ const sections: LegalSection[] = [
         <p>We do not sell personal data. We share it only with the services we use to run {legal.brand}, and only what each one needs:</p>
         <ul>
           <li>Hosting and database: Vercel and Supabase.</li>
-          <li>Automation: n8n.</li>
+          <li>Automation: n8n, and our WhatsApp connection server (hosted by Bluehost in India).</li>
           <li>AI models: Google (Gemini) and Anthropic (Claude).</li>
           <li>Messaging and platforms you connect: Meta (WhatsApp, Instagram, Facebook), Google, YouTube and email providers.</li>
           <li>Payments: our payment provider (for example, Razorpay).</li>

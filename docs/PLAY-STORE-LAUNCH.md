@@ -6,6 +6,8 @@ The **Apple App Store** comes later ($99/year). Work one item at a time, tick it
 
 Legend: 👤 the owner does it by hand · 🤖 Claude does it · ✅ done · ⏳ in progress · ⬜ not started
 
+**Next for the owner:** A1 (Supabase SQL) → B1 (Play developer account, $25) → B4 (payments decision) → B10 (support email). Claude then finishes B2/B3 and helps fill the Play Console.
+
 Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D launch.**
 
 ## Part A — Finish what's already started
@@ -24,14 +26,14 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 | # | Task | Who | Status | Notes |
 |---|---|---|---|---|
 | B1 | Google Play **developer account** ($25 one-time ≈ ₹2,100) + identity check (PAN/Aadhaar) | 👤 | ⬜ | Personal account → 12 testers × 14 days rule (C1). Organization account needs a D-U-N-S number and skips that rule |
-| B2 | Android app: wrap the live app (`/app`) as a Trusted Web Activity (Bubblewrap), package `com.ibaxai.app`, signed `.aab` | 🤖 | ⬜ | The app keeps updating from the website — no store update for most changes |
-| B3 | `/.well-known/assetlinks.json` so Android trusts www.ibaxai.com (no browser bar) | 🤖 | ⬜ | Needs the Play App Signing fingerprint from B1 |
+| B2 | Android app: wrap the live app (`/app`) as a Trusted Web Activity (Bubblewrap), package `com.ibaxai.app`, signed `.aab` | 🤖 + 👤 | ⏳ | Ready: `android/twa-manifest.json` + build steps in `android/README.md`. The `.aab` is built once B1 is done (needs Java + Android SDK on a computer, or Claude builds it here). The app keeps updating from the website — no store update for most changes |
+| B3 | `/.well-known/assetlinks.json` so Android trusts www.ibaxai.com (no browser bar) | 🤖 + 👤 | ⏳ | Live at www.ibaxai.com/.well-known/assetlinks.json (empty `[]` for now). After B1: copy the SHA-256 fingerprints from Play Console → App integrity into Vercel env `ANDROID_SHA256_FINGERPRINTS` (comma-separated) and redeploy |
 | B4 | **Payments rule:** inside the Play app, digital subscriptions must use Google Play Billing (fee ~15%) — decide: send buying to the website, or add Play Billing | 👤 decides, 🤖 builds | ⬜ | Most important policy item; get it right before review |
 | B5 | Account deletion: in-app (Settings → Delete account ✅) **and** a public web page explaining how (`/privacy#data-deletion` ✅) | 🤖 | ✅ | Play requires both |
-| B6 | Store listing: name "ibaxai", short description (80 chars), full description (4000), in English + Hindi | 🤖 writes, 👤 approves | ⬜ | No prices in screenshots |
-| B7 | Graphics: icon 512×512 ✅ (`/icons/`), feature graphic 1024×500, 4–8 phone screenshots, optional promo video (YouTube) | 🤖 | ⬜ | Screenshots from the sample restaurant |
-| B8 | Data safety form + content rating (IARC) + target audience 18+ + category "Business" | 🤖 prepares, 👤 submits | ⬜ | Answers must match the Privacy Policy |
-| B9 | Privacy Policy / Terms updated for the Android app and WhatsApp linking (what data, why, how to unlink) | 🤖 | ⬜ | `/privacy`, `/terms` |
+| B6 | Store listing: name "ibaxai", short description (80 chars), full description (4000), in English + Hindi | 🤖 writes, 👤 approves | ✅ | `docs/play-store/listing.md` — name "ibaxai: AI Business Assistant", English + Hindi, release notes. Owner reads once before pasting |
+| B7 | Graphics: icon 512×512 ✅ (`/icons/`), feature graphic 1024×500, 4–8 phone screenshots, optional promo video (YouTube) | 🤖 | ✅ | `docs/play-store/assets/`: 8 phone screenshots (1080×1920, sample clinic "CareWell Clinic", no prices) + feature graphic 1024×500. Promo video: the "ibaxai in 2 minutes" tour once on YouTube |
+| B8 | Data safety form + content rating (IARC) + target audience 18+ + category "Business" | 🤖 prepares, 👤 submits | ✅ (prepared) | `docs/play-store/data-safety.md` — every answer to copy into Play Console; matches `/privacy` |
+| B9 | Privacy Policy / Terms updated for the Android app and WhatsApp linking (what data, why, how to unlink) | 🤖 | ✅ | `/privacy` (WhatsApp linking, Android app sections) and `/terms` (WhatsApp section), dated 18 Oct 2026 |
 | B10 | Support email + website on the listing (`siteConfig.email`, www.ibaxai.com) | 👤 | ⬜ | Must be monitored |
 | B11 | Meta Business Verification (Udyam certificate, business email/website) | 👤 | ⬜ | Opens the official WhatsApp API (no ban risk, "Connect with Facebook" + coexistence) **and** Instagram/Facebook. 2–6 weeks — start early. Not needed for the Play launch itself |
 
