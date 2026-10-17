@@ -272,7 +272,11 @@ export async function activateService(serviceId: string): Promise<ActivationResu
         // The logo is a large image the automation server doesn't need; it would push the request over the size limit.
         business: ws.business ? { ...ws.business, logo: undefined } : null,
         config: after.config,
-        accounts: Object.fromEntries(svc.connect.map((p) => [p, ws.connections[p]?.account ?? ""])),
+        accounts: {
+          ...Object.fromEntries(svc.connect.map((p) => [p, ws.connections[p]?.account ?? ""])),
+          // Customer Support also answers on WhatsApp when it's linked — unless WhatsApp Automation already does.
+          ...(svc.id === "support" && ws.connections.whatsapp?.account && automationFor(ws, "whatsapp")?.status !== "active" ? { whatsapp: ws.connections.whatsapp.account } : {}),
+        },
         // On the free trial the automation server stops at this time unless the service is paid.
         trialEndsAt: after.trialEndsAt ?? after.paidUntil ?? null,
       }),

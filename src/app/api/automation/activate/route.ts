@@ -28,10 +28,12 @@ export async function POST(request: Request) {
   if (!svc || typeof body.workspaceId !== "string") return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
 
   // WhatsApp replies and Lead Follow-up send from the owner's number: only the account that linked it may switch them on.
-  if ((svc.id === "whatsapp" || svc.id === "followup") && evolutionReady()) {
+  const accounts = (body.accounts ?? {}) as Record<string, unknown>;
+  // Customer Support answers on WhatsApp only when a number is linked; without one it's the website chat alone.
+  const supportOnWhatsApp = svc.id === "support" && Boolean(accounts.whatsapp);
+  if ((svc.id === "whatsapp" || svc.id === "followup" || supportOnWhatsApp) && evolutionReady()) {
     const user = await userFromRequest(request);
     if (!user) return NextResponse.json({ ok: false, reason: "unauthorized" }, { status: 401 });
-    const accounts = (body.accounts ?? {}) as Record<string, unknown>;
     const digits = waDigits(String(accounts.whatsapp ?? ""));
     if (!digits || (await ownership(user.id, instanceFor(digits))) !== "mine") {
       return NextResponse.json({ ok: false, reason: "not_linked" }, { status: 403 });
