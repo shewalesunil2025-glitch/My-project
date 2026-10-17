@@ -135,10 +135,83 @@
       ]
     },
     "manual": {
-      "duration": 27.0,
+      "duration": 27,
       "langs": [
         "en",
-        "hi"
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "reviews": {
+    "talk": {
+      "duration": 31.83,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 27.79,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "followup": {
+    "talk": {
+      "duration": 33.39,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 27.05,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "support": {
+    "talk": {
+      "duration": 27.57,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 23.6,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    }
+  },
+  "digital-marketing": {
+    "talk": {
+      "duration": 38.42,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
+      ]
+    },
+    "manual": {
+      "duration": 31.26,
+      "langs": [
+        "en",
+        "hi",
+        "mr"
       ]
     }
   }
