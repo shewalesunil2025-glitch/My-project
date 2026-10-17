@@ -1,6 +1,6 @@
 # ibaxai — notes for Claude
 
-**The owner's plan lives in `docs/ROADMAP.md`.** When the owner says "road map" / "roadmap" (or asks what's next), read it, start from the **Where we are** table, and take the next pending item — then update that table in the same PR when an item moves.
+**The owner's plan lives in `docs/ROADMAP.md`.** The Play Store launch checklist is `docs/PLAY-STORE-LAUNCH.md` — when the owner asks about launching the app, start there. When the owner says "road map" / "roadmap" (or asks what's next), read it, start from the **Where we are** table, and take the next pending item — then update that table in the same PR when an item moves.
 
 How the owner likes to work:
 - Reply in Hinglish (Hindi in Latin script), simple words, no jargon.
