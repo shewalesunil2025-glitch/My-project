@@ -50,3 +50,13 @@ export const tourScript: Partial<Record<DemoLang, Record<TourPart, string>>> = {
     outro: "आजच तुमचं फ्री अकाउंट बनवा. फक्त सांगा, IBAX करून देईल.",
   },
 };
+
+/**
+ * How the narration should say the brand names: the voice reads "IBAX" as "E-bax", so the
+ * spoken text spells them the way they sound — "Eye-backs" (आइबैक्स). On-screen text is unchanged.
+ */
+export function spoken(lang: DemoLang, text: string): string {
+  const ibax = lang === "en" ? "Eye-backs" : "आइबैक्स";
+  const ai = lang === "en" ? "Eye-backs A.I." : "आइबैक्स ए.आई.";
+  return text.replace(/\bibaxai\b/gi, ai).replace(/\bIBAX\b/g, ibax);
+}

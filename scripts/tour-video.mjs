@@ -108,6 +108,6 @@ for (const lang of langs) {
 }
 const manifestFile = join(OUT, "manifest.json");
 const manifest = existsSync(manifestFile) ? JSON.parse(readFileSync(manifestFile, "utf8")) : {};
-manifest.tour = { talk: { duration: Number(total.toFixed(2)), langs } };
+manifest.tour = { talk: { duration: Number(total.toFixed(2)), langs: [...new Set([...(manifest.tour?.talk?.langs ?? []), ...langs])] } };
 writeFileSync(manifestFile, JSON.stringify(manifest, null, 2));
 console.log("Done.");
