@@ -18,13 +18,13 @@ const ease = (x: number) => 1 - Math.pow(1 - clamp(x), 3);
 const lerp = (a: number, b: number, x: number) => a + (b - a) * x;
 
 /** Fades and lifts in `delay` seconds into a part. */
-function enter(lt: number, delay = 0, len = 0.5): CSSProperties {
+export function enter(lt: number, delay = 0, len = 0.5): CSSProperties {
   const x = ease((lt - delay) / len);
   return { opacity: x, transform: `translateY(${(1 - x) * 14}px) scale(${0.97 + 0.03 * x})` };
 }
 
 /** A finger that glides to `to` and taps it. Returns the finger and whether the tap happened. */
-function finger(lt: number, dur: number, to: { x: number; y: number }, at = 0.55) {
+export function finger(lt: number, dur: number, to: { x: number; y: number }, at = 0.55) {
   const from = { x: 300, y: 610 };
   const tapAt = dur * at;
   const move = ease((lt - (tapAt - 0.9)) / 0.8);
@@ -46,7 +46,7 @@ function finger(lt: number, dur: number, to: { x: number; y: number }, at = 0.55
 }
 
 /** Where the phone sits in the 360×640 frame. */
-const PT = 70;
+export const PT = 70;
 const navItems = [
   { label: "Home", icon: House },
   { label: "IBAX", icon: null },
@@ -56,7 +56,7 @@ const navItems = [
 ];
 
 /** The ibaxai app as it looks on a phone: header, page and the bottom menu. */
-function Phone({ title, tab, children }: { title: string; tab: "IBAX" | "Services"; children: ReactNode }) {
+export function Phone({ title, tab, children }: { title: string; tab: "Home" | "IBAX" | "Services" | "Activity" | ""; children: ReactNode }) {
   return (
     <div style={{ position: "absolute", left: 28, top: PT, width: 304, height: 46 + 420 + 54 }} className="overflow-hidden rounded-[30px] border border-white/12 bg-[#050c07] shadow-[0_30px_80px_-20px_rgba(0,0,0,.9),0_0_60px_-25px_rgba(102,211,76,.7)]">
       <div className="flex h-[46px] items-center gap-2 border-b border-white/[0.06] bg-[#07110a] px-4">
@@ -82,7 +82,7 @@ function Phone({ title, tab, children }: { title: string; tab: "IBAX" | "Service
   );
 }
 
-function Bubble({ me, style, children }: { me?: boolean; style?: CSSProperties; children: ReactNode }) {
+export function Bubble({ me, style, children }: { me?: boolean; style?: CSSProperties; children: ReactNode }) {
   return (
     <div
       style={style}
@@ -93,7 +93,7 @@ function Bubble({ me, style, children }: { me?: boolean; style?: CSSProperties; 
   );
 }
 
-const Btn = ({ children, ghost, done }: { children: ReactNode; ghost?: boolean; done?: boolean }) => (
+export const Btn = ({ children, ghost, done }: { children: ReactNode; ghost?: boolean; done?: boolean }) => (
   <div
     className={
       done
@@ -108,7 +108,7 @@ const Btn = ({ children, ghost, done }: { children: ReactNode; ghost?: boolean; 
 );
 
 /** Typewriter: the first part of `text` at time lt. */
-const typed = (text: string, lt: number, start = 0.2, cps = 22) => text.slice(0, Math.max(0, Math.floor((lt - start) * cps)));
+export const typed = (text: string, lt: number, start = 0.2, cps = 22) => text.slice(0, Math.max(0, Math.floor((lt - start) * cps)));
 
 export type FilmProps = { svc: ServiceDef; mode: DemoMode; durations: number[]; t: number };
 
