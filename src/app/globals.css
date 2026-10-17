@@ -573,7 +573,7 @@ body {
 }
 
 /* ── IBAX app opening screen (src/components/app/AppSplash.tsx) ──
-   ~2.8 s premium logo reveal, then the screen lifts away. */
+   IBAX's signature: two halves meet and click, the sparkle is born, the name appears. ~3.4 s. */
 .ibax-splash {
   position: fixed;
   inset: 0;
@@ -582,75 +582,113 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse 70% 55% at 50% 40%, #0d2616 0%, #061109 55%, #030703 100%);
+  overflow: hidden;
+  background: radial-gradient(ellipse 75% 55% at 50% 40%, #0b2114 0%, #050e08 55%, #020502 100%);
   pointer-events: none;
-  animation: ibax-splash-out 0.65s var(--ease-in-out-quart) 2.75s forwards;
+  animation: ibax-splash-out 0.6s var(--ease-in-out-quart) 3.1s forwards;
 }
 .ibax-splash-seen .ibax-splash { display: none; }
 .ibax-splash-glow {
   position: absolute;
   top: 40%;
   left: 50%;
-  width: 24rem;
-  height: 24rem;
+  width: 26rem;
+  height: 26rem;
   translate: -50% -50%;
   border-radius: 999px;
-  background: radial-gradient(circle, rgb(37 211 102 / 0.26), transparent 65%);
-  filter: blur(12px);
-  animation: ibax-splash-glow 2.8s ease-out both;
+  background: radial-gradient(circle, rgb(37 211 102 / 0.28), transparent 65%);
+  filter: blur(14px);
+  animation: ibax-splash-glow 3s ease-out 0.9s both;
 }
 .ibax-splash-stage {
   position: relative;
   width: 7.5rem;
   height: 7.5rem;
+  animation: ibax-splash-thud 0.45s ease-out 1s both;
 }
 .ibax-splash-mark {
   position: absolute;
   inset: 0;
-  filter: drop-shadow(0 0 26px rgb(37 211 102 / 0.45));
-  animation: ibax-splash-mark 0.95s var(--ease-out-expo) 0.1s both;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 26px rgb(37 211 102 / 0.4));
 }
-/* The "i" rises from its base, then the sparkle pops in and twinkles. */
+/* 1 · A seed of light waits in the dark. */
+.ibax-splash-seed {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 999px;
+  background: #eafff1;
+  box-shadow: 0 0 18px 6px rgb(37 211 102 / 0.7), 0 0 60px 20px rgb(37 211 102 / 0.25);
+  animation: ibax-splash-seed 1.05s ease-in-out both;
+}
+/* 2 · The two halves glide in from both sides, like two hands, and click together. */
+.ibax-splash-half { transform-box: view-box; transform-origin: 50% 50%; }
+.ibax-splash-left { animation: ibax-splash-left 0.85s cubic-bezier(0.7, 0, 0.2, 1) 0.2s both; }
+.ibax-splash-right { animation: ibax-splash-right 0.85s cubic-bezier(0.7, 0, 0.2, 1) 0.2s both; }
+.ibax-splash-seam { opacity: 0; animation: ibax-splash-seam 0.55s ease-out 1.02s forwards; }
+/* 3 · The click sends out rings of light. */
+.ibax-splash-wave {
+  position: absolute;
+  inset: 0;
+  border-radius: 30%;
+  border: 1.5px solid rgb(197 242 214 / 0.8);
+  opacity: 0;
+  animation: ibax-splash-wave 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) 1.03s forwards;
+}
+.ibax-splash-wave-2 { animation-delay: 1.18s; border-color: rgb(37 211 102 / 0.6); }
+/* 4 · The "i" rises, the sparkle is born with a burst of rays. */
 .ibax-splash-stem {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: ibax-splash-stem 0.6s var(--ease-out-expo) 0.55s both;
+  animation: ibax-splash-stem 0.45s var(--ease-out-expo) 1.2s both;
 }
 .ibax-splash-spark {
   transform-box: fill-box;
   transform-origin: 50% 50%;
   animation:
-    ibax-splash-spark 0.7s var(--ease-out-expo) 0.8s both,
-    ibax-splash-twinkle 0.9s ease-in-out 1.75s both;
+    ibax-splash-spark 0.6s var(--ease-out-expo) 1.45s both,
+    ibax-splash-twinkle 0.8s ease-in-out 2.4s both;
 }
-/* A soft band of light sweeps across the tile. */
+.ibax-splash-rays {
+  transform-box: view-box;
+  transform-origin: 512px 288px;
+  opacity: 0;
+  animation: ibax-splash-rays 0.7s ease-out 1.5s both;
+}
+/* 5 · A shine crosses the tile. */
 .ibax-splash-sweep {
-  opacity: 0.28;
-  animation: ibax-splash-sweep 0.9s var(--ease-in-out-quart) 1.25s both;
+  opacity: 0.3;
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: ibax-splash-sweep 0.9s var(--ease-in-out-quart) 1.65s both;
 }
-/* A thin ring of light draws itself around the mark, then fades. */
-.ibax-splash-ring {
-  position: absolute;
-  inset: -1.4rem;
-  width: calc(100% + 2.8rem);
-  height: calc(100% + 2.8rem);
-  overflow: visible;
-  rotate: -90deg;
-  animation: ibax-splash-ring-fade 1.6s ease-out 0.9s both;
-}
-.ibax-splash-ring circle {
-  fill: none;
-  stroke: url(#ibax-ring);
-  stroke-width: 1.2;
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  animation: ibax-splash-ring 1.1s var(--ease-in-out-quart) 0.9s both;
-}
-/* The wordmark is unveiled left to right, the tagline settles under it. */
+/* 6 · "ibaxai" appears letter by letter; the tagline settles. */
 .ibax-splash-word {
   position: relative;
-  margin-top: 2.4rem;
-  animation: ibax-splash-word 0.9s var(--ease-out-expo) 1.15s both;
+  display: inline-flex;
+  align-items: baseline;
+  margin-top: 2.3rem;
+  font-size: 3.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #fff;
+}
+.ibax-splash-letter {
+  display: inline-block;
+  animation: ibax-splash-letter 0.6s var(--ease-out-expo) both;
+}
+.ibax-splash-ai {
+  background: linear-gradient(90deg, #8be860, #55cb45);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .ibax-splash-tag {
   position: relative;
@@ -661,45 +699,70 @@ body {
   text-transform: uppercase;
   color: #a9b8aa;
   white-space: nowrap;
-  animation: ibax-splash-tag 1.1s var(--ease-out-expo) 1.55s both;
+  animation: ibax-splash-tag 1s var(--ease-out-expo) 2.35s both;
+}
+@media (min-width: 640px) { .ibax-splash-word { font-size: 4.2rem; } }
+@keyframes ibax-splash-seed {
+  0% { opacity: 0; transform: scale(0.2); }
+  25% { opacity: 1; transform: scale(1); }
+  55% { opacity: 0.6; transform: scale(0.75); }
+  85% { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 0; transform: scale(3); }
+}
+@keyframes ibax-splash-left {
+  from { transform: translateX(-140%) rotate(-14deg); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes ibax-splash-right {
+  from { transform: translateX(140%) rotate(14deg); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes ibax-splash-seam {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+@keyframes ibax-splash-thud {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.07); }
+  60% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+@keyframes ibax-splash-wave {
+  0% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.6); }
 }
 @keyframes ibax-splash-glow {
   0% { opacity: 0; scale: 0.5; }
-  40% { opacity: 1; scale: 1.1; }
+  35% { opacity: 1; scale: 1.12; }
   100% { opacity: 0.75; scale: 1; }
-}
-@keyframes ibax-splash-mark {
-  from { opacity: 0; transform: translateY(16px) scale(0.68) rotate(-8deg); filter: blur(10px) drop-shadow(0 0 0 rgb(37 211 102 / 0)); }
-  to { opacity: 1; transform: none; filter: blur(0) drop-shadow(0 0 26px rgb(37 211 102 / 0.45)); }
 }
 @keyframes ibax-splash-stem {
   from { transform: scaleY(0); }
   to { transform: scaleY(1); }
 }
 @keyframes ibax-splash-spark {
-  0% { opacity: 0; transform: scale(0) rotate(-90deg); }
-  70% { opacity: 1; transform: scale(1.18) rotate(8deg); }
+  0% { opacity: 0; transform: scale(0) rotate(-120deg); }
+  65% { opacity: 1; transform: scale(1.25) rotate(10deg); }
   100% { opacity: 1; transform: scale(1) rotate(0); }
 }
 @keyframes ibax-splash-twinkle {
   0%, 100% { transform: scale(1) rotate(0); }
-  50% { transform: scale(0.82) rotate(45deg); }
+  50% { transform: scale(0.8) rotate(45deg); }
+}
+@keyframes ibax-splash-rays {
+  0% { opacity: 0; transform: scale(0.6); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(1.5); }
 }
 @keyframes ibax-splash-sweep {
   from { transform: rotate(20deg) translateX(0); }
-  to { transform: rotate(20deg) translateX(1500px); }
+  to { transform: rotate(20deg) translateX(1700px); }
 }
-@keyframes ibax-splash-ring {
-  from { stroke-dashoffset: 100; }
-  to { stroke-dashoffset: 0; }
-}
-@keyframes ibax-splash-ring-fade {
-  0%, 60% { opacity: 1; scale: 1; }
-  100% { opacity: 0; scale: 1.12; }
-}
-@keyframes ibax-splash-word {
-  from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateY(8px); filter: blur(6px); }
-  to { opacity: 1; clip-path: inset(0 -5% 0 0); transform: none; filter: blur(0); }
+@keyframes ibax-splash-letter {
+  from { opacity: 0; transform: translateY(0.35em) scale(0.9); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
 }
 @keyframes ibax-splash-tag {
   from { opacity: 0; letter-spacing: 0.7em; }
@@ -714,7 +777,7 @@ body {
   to { opacity: 1; letter-spacing: 0.18em; }
 }
 @keyframes ibax-splash-out {
-  to { opacity: 0; transform: scale(1.06); visibility: hidden; }
+  to { opacity: 0; transform: scale(1.05); visibility: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ibax-splash { animation-duration: 0.3s !important; animation-delay: 0.6s !important; }
