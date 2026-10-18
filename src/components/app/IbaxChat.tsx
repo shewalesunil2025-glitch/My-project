@@ -55,7 +55,7 @@ import {
   transcribe,
   type Capture,
 } from "@/lib/app/voiceCapture";
-import { captureErrorTip, isAppleMobile, micErrorTip } from "@/lib/app/micTips";
+import { captureErrorTip, isAppleMobile, micErrorTip, preferRecording } from "@/lib/app/micTips";
 import {
   prefetchLive,
   startLiveCall,
@@ -665,7 +665,7 @@ export function IbaxChat({
       else recRef.current?.stop();
       return;
     }
-    if ((isAppleMobile() || !getRecognition() || recognitionFailedRef.current) && canRecord()) {
+    if ((preferRecording() || !getRecognition() || recognitionFailedRef.current) && canRecord()) {
       // Unlock audio inside the tap so IBAX's spoken answer can play on iPhone.
       if (!muted) {
         unlockAudio();
