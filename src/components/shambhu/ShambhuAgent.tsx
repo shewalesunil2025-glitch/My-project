@@ -44,7 +44,7 @@ import {
   transcribe,
   type Capture,
 } from "@/lib/app/voiceCapture";
-import { captureErrorTip, isAppleMobile, micErrorTip } from "@/lib/app/micTips";
+import { captureErrorTip, isAppleMobile, micErrorTip, preferRecording } from "@/lib/app/micTips";
 import {
   prefetchLive,
   startLiveCall,
@@ -363,7 +363,7 @@ export function ShambhuAgent() {
       else recRef.current?.stop();
       return;
     }
-    if ((isAppleMobile() || !getRecognition() || recognitionFailedRef.current) && canRecord()) {
+    if ((preferRecording() || !getRecognition() || recognitionFailedRef.current) && canRecord()) {
       if (!muted) unlockAudio();
       void recordAndAsk();
       return;
