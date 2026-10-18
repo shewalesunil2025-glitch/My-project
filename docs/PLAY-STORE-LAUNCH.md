@@ -17,7 +17,7 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 | A1 | Run `supabase/migrations/0005_whatsapp_reliability.sql` in Supabase → SQL Editor | 👤 | ⬜ | Needs a computer. Enables the Inbox's real WhatsApp chats, "Turn Bot Back On" and the link-health checks. Until then the bot's pause works through n8n's own contacts table |
 | A2 | Real ₹499 payment test (a friend pays), then refund it from Razorpay | 👤 | ⬜ | Proves live payments end to end |
 | A3 | Autopay: Razorpay webhook to `/api/pay/webhook` + `RAZORPAY_WEBHOOK_SECRET` in Vercel | 👤 + 🤖 | ⬜ | Claude gives click-by-click steps; the secret goes straight into Vercel |
-| A4 | Hindi + Marathi voice for "ibaxai in 2 minutes" with "आइबैक्स" said right | 🤖 | ⏳ | Scheduled automatically (Gemini voice daily limit) |
+| A4 | Hindi + Marathi voice for "ibaxai in 2 minutes" with "आइबैक्स" said right | 🤖 | ✅ | Live since 18 Oct (en, hi, mr) |
 | A5 | Security: move the n8n secrets into n8n credentials, then rotate them (`docs/SECRET-ROTATION.md`) | 👤 + 🤖 | ⬜ | Before more clients join |
 | A6 | Customer Support tested end to end on a real client website | 👤 + 🤖 | ⬜ | Live since 17 Oct |
 
