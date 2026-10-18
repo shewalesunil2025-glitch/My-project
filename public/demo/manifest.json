@@ -217,10 +217,11 @@
   },
   "tour": {
     "talk": {
-      "duration": 89.57,
+      "duration": 95.33,
       "langs": [
         "en",
-        "hi"
+        "hi",
+        "mr"
       ]
     }
   }
