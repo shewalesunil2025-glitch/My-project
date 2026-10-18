@@ -233,6 +233,27 @@ export async function cloudChangePassword(email: string, current: string, next: 
   return { ok: true, value: null };
 }
 
+/** On the reset page: true once the email link has signed the owner in to choose a new password. */
+export async function cloudRecoveryReady(): Promise<boolean> {
+  if (!cloudEnabled) return false;
+  const db = sb();
+  const { data } = await db.auth.getSession();
+  if (data.session) return true;
+  // The link's tokens are read from the address a moment after the page loads.
+  return new Promise((resolve) => {
+    const { data: sub } = db.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN")) (sub.subscription.unsubscribe(), resolve(true));
+    });
+    setTimeout(() => (sub.subscription.unsubscribe(), resolve(false)), 4000);
+  });
+}
+
+export async function cloudSetNewPassword(next: string): Promise<CloudResult<null>> {
+  const { error } = await sb().auth.updateUser({ password: next });
+  if (error) return { ok: false, error: /different from the old/i.test(error.message) ? "Choose a password different from your old one." : friendly(error.message) };
+  return { ok: true, value: null };
+}
+
 /** Deletes the account and everything stored for it (rows cascade from auth.users). */
 export async function cloudDeleteAccount(): Promise<boolean> {
   const { data } = await sb().auth.getSession();
