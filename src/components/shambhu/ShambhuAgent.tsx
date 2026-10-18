@@ -34,6 +34,7 @@ import { AttachMenu, AttachmentChip, SentFile } from "@/components/chat/Attach";
 import type { Attachment } from "@/lib/attachments";
 import {
   speakNaturally,
+  speechChunks,
   stopNaturalVoice,
   unlockAudio,
 } from "@/lib/app/naturalVoice";
@@ -237,18 +238,25 @@ export function ShambhuAgent() {
     if (!("speechSynthesis" in window)) return setStatus("idle");
     const synth = window.speechSynthesis;
     synth.cancel();
-    const utter = new SpeechSynthesisUtterance(
-      text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""),
-    );
     const voice = pickVoice(replyLang);
-    if (voice) utter.voice = voice;
-    utter.lang = voice?.lang ?? agentLanguages[replyLang].speech;
-    utter.pitch = PHONE_PITCH;
-    utter.rate = PHONE_RATE;
-    utter.onstart = () => setStatus("speaking");
-    utter.onend = utter.onerror = () =>
-      setStatus((s) => (s === "speaking" ? "idle" : s));
-    synth.speak(utter);
+    const done = () => setStatus((s) => (s === "speaking" ? "idle" : s));
+    // One sentence at a time: Android stops a long utterance after about 15 seconds.
+    const chunks = speechChunks(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""), 180);
+    if (!chunks.length) return done();
+    chunks.forEach((chunk, i) => {
+      const utter = new SpeechSynthesisUtterance(chunk);
+      if (voice) utter.voice = voice;
+      utter.lang = voice?.lang ?? agentLanguages[replyLang].speech;
+      utter.pitch = PHONE_PITCH;
+      utter.rate = PHONE_RATE;
+      utter.onstart = () => setStatus("speaking");
+      if (i === chunks.length - 1) utter.onend = done;
+      utter.onerror = (e) => {
+        if (e.error !== "interrupted" && e.error !== "canceled") synth.cancel();
+        done();
+      };
+      synth.speak(utter);
+    });
   }, []);
 
   /** IBAX speaks in the same natural voice as in the app; the phone's voice if that isn't available. */
@@ -259,12 +267,12 @@ export function ShambhuAgent() {
       // "speaking" starts only when audio really starts, so a silent failure never locks the chat.
       setStatus("idle");
       if (muted) return;
-      const handled = await speakNaturally(
+      const rest = await speakNaturally(
         text,
         () => setStatus("speaking"),
         () => setStatus((s) => (s === "speaking" ? "idle" : s)),
       );
-      if (!handled) speakWithPhone(text, replyLang);
+      if (rest) speakWithPhone(rest, replyLang);
     },
     [muted, speakWithPhone],
   );
