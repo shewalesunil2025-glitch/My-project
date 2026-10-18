@@ -7,10 +7,30 @@ import { product } from "@/config/product";
  * the IBAX star streaks in like a shooting star and lands where it belongs. Where it
  * lands, light traces the tile's outline, the green fills out from the star, the "i"
  * rises and little nodes circle once, like automations starting up. Then a shine,
- * "ibaxai" letter by letter, and the tagline. Pure CSS, so it plays before the app's
- * JavaScript loads; shown once per visit. The mark is drawn exactly like LogoMark.
+ * "ibaxai" letter by letter, and the tagline. Pure CSS (and a tiny script for the sound),
+ * so it plays before the app's JavaScript loads; shown once per visit. The mark is drawn exactly like LogoMark.
  */
 const letters = ["i", "b", "a", "x", "a", "i"];
+
+/**
+ * The opening sound, in time with the animation. Only when the phone lets a page play sound
+ * on its own (Chrome allows it for the app added to the home screen; otherwise it stays quiet
+ * rather than playing late). "ambient" follows the iPhone's silent switch. Not played when
+ * the owner turned IBAX's voice off, or for reduced motion.
+ */
+const SOUND = `(function(){try{
+var d=document.documentElement;
+if(d.classList.contains('ibax-splash-seen')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+try{if(localStorage.getItem('ibax-muted')==='1')return}catch(e){}
+var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+if(navigator.audioSession)navigator.audioSession.type='ambient';
+var t0=performance.now(),ctx=new AC();
+fetch('/brand/intro-sound.mp3').then(function(r){return r.arrayBuffer()}).then(function(b){return new Promise(function(ok,no){ctx.decodeAudioData(b,ok,no)})}).then(function(buf){
+var late=(performance.now()-t0)/1000;
+if(ctx.state!=='running'||late>0.8){ctx.close();return}
+var s=ctx.createBufferSource();s.buffer=buf;s.connect(ctx.destination);s.onended=function(){ctx.close()};s.start(0,late);
+}).catch(function(){try{ctx.close()}catch(e){}});
+}catch(e){}})();`;
 const SPARK = "M512 150C524 250 544 272 650 288 544 304 524 326 512 426 500 326 480 304 374 288 480 272 500 250 512 150Z";
 
 export function AppSplash() {
@@ -23,6 +43,7 @@ export function AppSplash() {
             "try{if(sessionStorage.getItem('ibax-splash'))document.documentElement.classList.add('ibax-splash-seen');else sessionStorage.setItem('ibax-splash','1')}catch(e){}",
         }}
       />
+      <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: SOUND }} />
       <div aria-hidden className="ibax-splash">
         <div className="ibax-splash-glow" />
         <div className="ibax-splash-stage">
