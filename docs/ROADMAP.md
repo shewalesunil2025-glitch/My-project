@@ -26,7 +26,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Demo videos | ✅ `/app/demo` (open without an account): the app tour plus MP4 demo videos for every service (`/app/demo/<id>`), in English, Hindi and Marathi. Two videos per service, both opening with the tagline: **Just say it** (switch it on by talking to IBAX) and **Manually** (tap through it yourself). The app's own screens are drawn as motion graphics (`src/components/demo/Film.tsx`), narrated in IBAX's Gemini voice, never mentioning prices. Under the video only three choices: Just say it · Manually · Language. Made with `node scripts/demo-videos.mjs` (scripts in `src/content/demoScripts.ts`; output `public/demo/`) | More languages: scripts for Gujarati, Bengali, Tamil, Telugu, Kannada, Malayalam, Punjabi, Spanish and Arabic are written — run the script with `--langs` to add them |
 | App icon | ✅ New icons (`/icons/`, `/ibaxai.webmanifest`) match the iPhone App Store icon on Android too | Owner: remove the old home-screen icon, clear Chrome's site data for ibaxai.com, add it again |
 | Meta / Google / YouTube approvals | ⏳ | Owner applies early (2–4 weeks) |
-| Play Store launch (Android) | ⏳ Checklist: **`docs/PLAY-STORE-LAUNCH.md`**. Done: B5–B9 (listing en+hi, screenshots, data safety, privacy/terms); B2/B3 prepared (`android/`, assetlinks live). App Store later ($99/yr) | Owner: A1, then B1 (Play account $25) |
+| Play Store launch (Android) | ⏳ Checklist: **`docs/PLAY-STORE-LAUNCH.md`**. Done: B5–B9 (listing en+hi, screenshots, data safety, privacy/terms); B2/B3 prepared (`android/`, assetlinks live). App Store later ($99/yr) | Owner: A2 (payment test), then B1 (Play account $25) |
 
 ## Phase 0 — Foundation (1–2 weeks)
 

@@ -6,7 +6,7 @@ The **Apple App Store** comes later ($99/year). Work one item at a time, tick it
 
 Legend: 👤 the owner does it by hand · 🤖 Claude does it · ✅ done · ⏳ in progress · ⬜ not started
 
-**Next for the owner:** A1 (Supabase SQL) → B1 (Play developer account, $25) → B4 (payments decision) → B10 (support email). Claude then finishes B2/B3 and helps fill the Play Console.
+**Next for the owner:** A2 (₹499 payment test) → B1 (Play developer account, $25) → B4 (payments decision) → B10 (support email). Claude then finishes B2/B3 and helps fill the Play Console.
 
 Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D launch.**
 
@@ -14,7 +14,7 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 
 | # | Task | Who | Status | Notes |
 |---|---|---|---|---|
-| A1 | Run `supabase/migrations/0005_whatsapp_reliability.sql` in Supabase → SQL Editor | 👤 | ⬜ | Needs a computer. Enables the Inbox's real WhatsApp chats, "Turn Bot Back On" and the link-health checks. Until then the bot's pause works through n8n's own contacts table |
+| A1 | Run `supabase/migrations/0005_whatsapp_reliability.sql` in Supabase → SQL Editor | 👤 | ✅ | Run on 18 Oct. Enables the Inbox's real WhatsApp chats, "Turn Bot Back On" and the link-health checks |
 | A2 | Real ₹499 payment test (a friend pays), then refund it from Razorpay | 👤 | ⬜ | Proves live payments end to end |
 | A3 | Autopay: Razorpay webhook to `/api/pay/webhook` + `RAZORPAY_WEBHOOK_SECRET` in Vercel | 👤 + 🤖 | ⬜ | Claude gives click-by-click steps; the secret goes straight into Vercel |
 | A4 | Hindi + Marathi voice for "ibaxai in 2 minutes" with "आइबैक्स" said right | 🤖 | ✅ | Live since 18 Oct (en, hi, mr) |
