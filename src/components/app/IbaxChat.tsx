@@ -55,6 +55,7 @@ import {
   transcribe,
   type Capture,
 } from "@/lib/app/voiceCapture";
+import { captureErrorTip, isAppleMobile, micErrorTip } from "@/lib/app/micTips";
 import {
   prefetchLive,
   startLiveCall,
@@ -97,23 +98,8 @@ const noopSubscribe = () => () => {};
  * chimes), above all in the home-screen app. The keyboard's own mic (dictation) works well,
  * so on Apple phones the mic button opens the keyboard instead.
  */
-const isAppleMobile = () =>
-  typeof navigator !== "undefined" &&
-  (/iP(hone|ad|od)/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
 const MIC_TIP =
   "iPhone par keyboard ka 🎤 dabakar boliye — IBAX sun lega. (Keyboard ke neeche, right side)";
-/** Opened inside WhatsApp, Instagram or Facebook: their built-in browser often can't use the mic. */
-const isInAppBrowser = () =>
-  typeof navigator !== "undefined" && /\bwv\b|WhatsApp|Instagram|FBAN|FBAV|FB_IAB/i.test(navigator.userAgent);
-const micErrorTip = (error?: string) =>
-  error === "not-allowed" || error === "service-not-allowed"
-    ? isInAppBrowser()
-      ? "Yeh page WhatsApp/Instagram ke andar khula hai, wahan mic nahi chalta. Upar ⋮ dabakar \"Chrome mein kholiye\", phir mic dabaiye."
-      : "Mic ki permission band hai. Upar address bar mein 🔒 dabaiye → Permissions → Microphone → Allow, phir page reload kariye. Tab tak keyboard ka 🎤 use kar sakte hain."
-    : error === "no-speech"
-      ? "Kuch sunai nahi diya. Dobara mic dabakar boliye."
-      : "Mic abhi kaam nahi kar raha. Likh kar ya keyboard ke 🎤 se boliye.";
 
 type Lang = "en" | "hi" | "mr";
 const languages: { code: Lang; label: string; speech: string }[] = [
@@ -547,8 +533,8 @@ export function IbaxChat({
     let cap: Capture;
     try {
       cap = await startCapture();
-    } catch {
-      setTip(micErrorTip("not-allowed"));
+    } catch (error) {
+      setTip(captureErrorTip(error));
       return;
     }
     captureRef.current = cap;
@@ -598,8 +584,8 @@ export function IbaxChat({
     let cap: Capture;
     try {
       cap = await startCapture(undefined, { audio: c.audio, waitMs: 12000 });
-    } catch {
-      return endCall(micErrorTip("not-allowed"));
+    } catch (error) {
+      return endCall(captureErrorTip(error));
     }
     if (callRef.current !== c) return cap.cancel();
     captureRef.current = cap;
