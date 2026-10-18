@@ -6,6 +6,7 @@ import { flushSync } from "react-dom";
 import { serviceById } from "@/content/app/services";
 import { demoLangs, demoScript, demoServices, type DemoMode } from "@/content/demoScripts";
 import { Film } from "@/components/demo/Film";
+import { spoken } from "@/content/tourScript";
 
 /**
  * Renders demo-video frames for scripts/demo-videos.mjs (not for people): the page shows
@@ -22,7 +23,8 @@ function Frame() {
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>;
     w.__setT = (x: number) => flushSync(() => setT(x));
-    if (svc) w.__scripts = Object.fromEntries(demoLangs.map((l) => [l.code, demoScript(svc, mode, l.code)]));
+    // The narration as it should be spoken (brand names spelled the way they sound).
+    if (svc) w.__scripts = Object.fromEntries(demoLangs.map((l) => [l.code, demoScript(svc, mode, l.code).map((p) => spoken(l.code, p))]));
     w.__services = demoServices.map((s) => s.id);
     w.__ready = true;
   }, [svc, mode]);

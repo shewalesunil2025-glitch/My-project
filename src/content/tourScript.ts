@@ -56,6 +56,7 @@ export const tourScript: Partial<Record<DemoLang, Record<TourPart, string>>> = {
  * spoken text spells them the way they sound — "Eye-backs" (आइबैक्स). On-screen text is unchanged.
  */
 export function spoken(lang: DemoLang, text: string): string {
+  if (lang !== "en" && lang !== "hi" && lang !== "mr") return text;
   const ibax = lang === "en" ? "Eye-backs" : "आइबैक्स";
   const ai = lang === "en" ? "Eye-backs A.I." : "आइबैक्स ए.आई.";
   return text.replace(/\bibaxai\b/gi, ai).replace(/\bIBAX\b/g, ibax);
