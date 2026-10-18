@@ -23,10 +23,9 @@ function Arc({ className }: { className: string }) {
   );
 }
 
+/** The app's own primary button (glowing green ring, see .btn-3d), just taller. */
 const primary =
-  "group inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-full text-[1.02rem] font-semibold tracking-tight text-[#04170b] " +
-  "bg-[linear-gradient(180deg,#8ff0b0_0%,#3fdc7a_45%,#1daa55_100%)] shadow-[0_10px_40px_-8px_rgb(37_211_102/0.65),inset_0_1px_0_rgb(255_255_255/0.45)] " +
-  "transition-[transform,box-shadow] duration-200 hover:shadow-[0_12px_48px_-6px_rgb(37_211_102/0.8),inset_0_1px_0_rgb(255_255_255/0.5)] active:scale-[0.98]";
+  "btn-3d group inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-full text-[1.02rem] font-semibold tracking-tight transition-transform duration-200 active:scale-[0.98]";
 const secondary =
   "group inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-full border border-flow/45 bg-white/[0.02] text-[1.02rem] font-semibold tracking-tight text-fg " +
   "backdrop-blur-sm transition-colors duration-200 hover:border-flow/70 hover:bg-flow/[0.06] active:scale-[0.98]";
