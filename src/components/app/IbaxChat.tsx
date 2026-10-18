@@ -103,9 +103,14 @@ const isAppleMobile = () =>
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
 const MIC_TIP =
   "iPhone par keyboard ka 🎤 dabakar boliye — IBAX sun lega. (Keyboard ke neeche, right side)";
+/** Opened inside WhatsApp, Instagram or Facebook: their built-in browser often can't use the mic. */
+const isInAppBrowser = () =>
+  typeof navigator !== "undefined" && /\bwv\b|WhatsApp|Instagram|FBAN|FBAV|FB_IAB/i.test(navigator.userAgent);
 const micErrorTip = (error?: string) =>
   error === "not-allowed" || error === "service-not-allowed"
-    ? "Mic ki permission nahi mili. Keyboard ka 🎤 use kariye, ya browser settings mein mic allow kariye."
+    ? isInAppBrowser()
+      ? "Yeh page WhatsApp/Instagram ke andar khula hai, wahan mic nahi chalta. Upar ⋮ dabakar \"Chrome mein kholiye\", phir mic dabaiye."
+      : "Mic ki permission band hai. Upar address bar mein 🔒 dabaiye → Permissions → Microphone → Allow, phir page reload kariye. Tab tak keyboard ka 🎤 use kar sakte hain."
     : error === "no-speech"
       ? "Kuch sunai nahi diya. Dobara mic dabakar boliye."
       : "Mic abhi kaam nahi kar raha. Likh kar ya keyboard ke 🎤 se boliye.";
@@ -437,6 +442,8 @@ export function IbaxChat({
   const listenRef = useRef<() => void>(() => {});
   const captureRef = useRef<Capture | null>(null);
   const recRef = useRef<Recognition | null>(null);
+  /** The browser refused its own speech recognition once: record the voice instead. */
+  const recognitionFailedRef = useRef(false);
   const lastSpoken = useRef<string | null>(ws.chat.at(-1)?.id ?? null);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -672,7 +679,7 @@ export function IbaxChat({
       else recRef.current?.stop();
       return;
     }
-    if ((isAppleMobile() || !getRecognition()) && canRecord()) {
+    if ((isAppleMobile() || !getRecognition() || recognitionFailedRef.current) && canRecord()) {
       // Unlock audio inside the tap so IBAX's spoken answer can play on iPhone.
       if (!muted) {
         unlockAudio();
@@ -696,6 +703,7 @@ export function IbaxChat({
     rec.interimResults = true;
     rec.continuous = false;
     let finalText = "";
+    let fallBackToRecording = false;
     rec.onresult = (e) => {
       let live = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -707,12 +715,20 @@ export function IbaxChat({
     };
     rec.onerror = (e) => {
       setInterim("");
+      // Some Android browsers (Samsung Internet, in-app browsers) have speech recognition but
+      // refuse it: record the voice instead, from now on.
+      if (["not-allowed", "service-not-allowed", "network", "audio-capture"].includes(e.error ?? "") && canRecord() && !recognitionFailedRef.current) {
+        recognitionFailedRef.current = true;
+        fallBackToRecording = true;
+        return;
+      }
       if (e.error !== "aborted") setTip(micErrorTip(e.error));
     };
     rec.onend = () => {
       recRef.current = null;
       setListening(false);
       setInterim("");
+      if (fallBackToRecording) return void recordAndSend();
       if (finalText.trim()) send(finalText);
     };
     recRef.current = rec;

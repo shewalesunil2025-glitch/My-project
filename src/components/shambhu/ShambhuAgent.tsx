@@ -107,9 +107,14 @@ const isAppleMobile = () =>
   typeof navigator !== "undefined" &&
   (/iP(hone|ad|od)/.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+/** Opened inside WhatsApp, Instagram or Facebook: their built-in browser often can't use the mic. */
+const isInAppBrowser = () =>
+  typeof navigator !== "undefined" && /\bwv\b|WhatsApp|Instagram|FBAN|FBAV|FB_IAB/i.test(navigator.userAgent);
 const micErrorTip = (error?: string) =>
   error === "not-allowed" || error === "service-not-allowed"
-    ? "Mic ki permission nahi mili. Keyboard ka 🎤 use kariye, ya browser settings mein mic allow kariye."
+    ? isInAppBrowser()
+      ? "Yeh page WhatsApp/Instagram ke andar khula hai, wahan mic nahi chalta. Upar ⋮ dabakar \"Chrome mein kholiye\", phir mic dabaiye."
+      : "Mic ki permission band hai. Upar address bar mein 🔒 dabaiye → Permissions → Microphone → Allow, phir page reload kariye. Tab tak keyboard ka 🎤 use kar sakte hain."
     : error === "no-speech"
       ? "Kuch sunai nahi diya. Dobara mic dabakar boliye."
       : "Mic abhi kaam nahi kar raha. Likh kar ya keyboard ke 🎤 se boliye.";
@@ -176,6 +181,8 @@ export function ShambhuAgent() {
   const desktop = useMediaQuery("(min-width: 768px)");
 
   const recRef = useRef<Recognition | null>(null);
+  /** The browser refused its own speech recognition once: record the voice instead. */
+  const recognitionFailedRef = useRef(false);
   /** Set once the AI endpoint is unavailable; IBAX then answers from the site's content (free mode). */
   const localRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -375,7 +382,7 @@ export function ShambhuAgent() {
       else recRef.current?.stop();
       return;
     }
-    if ((isAppleMobile() || !getRecognition()) && canRecord()) {
+    if ((isAppleMobile() || !getRecognition() || recognitionFailedRef.current) && canRecord()) {
       if (!muted) unlockAudio();
       void recordAndAsk();
       return;
@@ -388,6 +395,7 @@ export function ShambhuAgent() {
     rec.interimResults = true;
     rec.continuous = false;
     let finalText = "";
+    let fallBackToRecording = false;
     rec.onresult = (e) => {
       let live = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -399,11 +407,19 @@ export function ShambhuAgent() {
     };
     rec.onerror = (e) => {
       setInterim("");
+      // Some Android browsers (Samsung Internet, in-app browsers) have speech recognition but
+      // refuse it: record the voice instead, from now on.
+      if (["not-allowed", "service-not-allowed", "network", "audio-capture"].includes(e.error) && canRecord() && !recognitionFailedRef.current) {
+        recognitionFailedRef.current = true;
+        fallBackToRecording = true;
+        return;
+      }
       if (e.error !== "aborted") setTip(micErrorTip(e.error));
     };
     rec.onend = () => {
       recRef.current = null;
       setStatus((s) => (s === "listening" ? "idle" : s));
+      if (fallBackToRecording) return void recordAndAsk();
       if (finalText.trim()) void ask(finalText);
       else setInterim("");
     };
