@@ -62,7 +62,7 @@ import {
   type LiveCall,
   type LiveState,
 } from "@/lib/app/liveCall";
-import { speakNaturally, stopNaturalVoice, unlockAudio } from "@/lib/app/naturalVoice";
+import { speakNaturally, speechChunks, stopNaturalVoice, unlockAudio } from "@/lib/app/naturalVoice";
 import { Btn, Spinner } from "./ui";
 
 /* ── Voice: speak to IBAX and hear the answer (browser speech, where supported) ── */
@@ -146,19 +146,26 @@ function speakWithPhone(
   if (!("speechSynthesis" in window)) return onEnd?.();
   const synth = window.speechSynthesis;
   synth.cancel();
-  const utter = new SpeechSynthesisUtterance(
-    text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""),
-  );
   const tag =
     /[\u0900-\u097F]/.test(text) && lang === "en" ? "hi-IN" : speechTag(lang);
   const voice = pickVoice(tag);
-  if (voice) utter.voice = voice;
-  utter.lang = voice?.lang ?? tag;
-  utter.pitch = 1.08;
-  utter.rate = 1.08;
-  utter.onstart = () => onStart?.();
-  utter.onend = utter.onerror = () => onEnd?.();
-  synth.speak(utter);
+  // One sentence at a time: Android stops a long utterance after about 15 seconds.
+  const chunks = speechChunks(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""), 180);
+  if (!chunks.length) return onEnd?.();
+  chunks.forEach((chunk, i) => {
+    const utter = new SpeechSynthesisUtterance(chunk);
+    if (voice) utter.voice = voice;
+    utter.lang = voice?.lang ?? tag;
+    utter.pitch = 1.08;
+    utter.rate = 1.08;
+    if (i === 0) utter.onstart = () => onStart?.();
+    if (i === chunks.length - 1) utter.onend = () => onEnd?.();
+    utter.onerror = (e) => {
+      if (e.error !== "interrupted" && e.error !== "canceled") synth.cancel();
+      onEnd?.();
+    };
+    synth.speak(utter);
+  });
 }
 
 function stopSpeaking() {
@@ -174,8 +181,8 @@ async function speak(
   onEnd?: () => void,
 ) {
   stopSpeaking();
-  if (await speakNaturally(text, onStart, onEnd)) return;
-  speakWithPhone(text, lang, onStart, onEnd);
+  const rest = await speakNaturally(text, onStart, onEnd);
+  if (rest) speakWithPhone(rest, lang, onStart, onEnd);
 }
 
 /* ── Action cards ── */
