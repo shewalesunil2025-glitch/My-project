@@ -56,6 +56,11 @@ export default function LoginPage() {
         <Field label="Password" htmlFor="password">
           <Input id="password" name="password" type="password" autoComplete="current-password" required />
         </Field>
+        <p className="-mt-2 text-right">
+          <Link href="/app/forgot" className="text-sm font-medium text-flow hover:underline">
+            Forgot password?
+          </Link>
+        </p>
         {error && <Notice tone="amber">{error}</Notice>}
         {info && <Notice tone="blue">{info}</Notice>}
         <Btn type="submit" size="lg" className="w-full" disabled={busy}>
