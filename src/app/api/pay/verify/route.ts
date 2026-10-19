@@ -3,7 +3,7 @@ import { adminDb } from "@/lib/server/followup";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { chargeInInr } from "@/config/product";
 import { markAutopay, recordPaidRow } from "@/lib/server/billing";
-import { fetchOrder, fetchPayment, fetchSubscription, razorpayReady, validSignature, validSubscriptionSignature } from "@/lib/server/razorpay";
+import { capturePayment, fetchOrder, fetchPayment, fetchSubscription, razorpayReady, validSignature, validSubscriptionSignature } from "@/lib/server/razorpay";
 import { userFromRequest } from "@/lib/server/whatsapp";
 
 /**
@@ -31,6 +31,12 @@ export async function POST(request: Request) {
     const notes = order.notes ?? {};
     if (notes.user !== user.id || payment.order_id !== orderId || !["captured", "authorized"].includes(payment.status)) {
       return NextResponse.json({ ok: false, reason: "mismatch" }, { status: 400 });
+    }
+    // Take the money now if Razorpay only authorized it; otherwise it would be refunded in a few days.
+    if (payment.status === "authorized") {
+      await capturePayment(paymentId, payment.amount).catch((error: Error) => {
+        if (!/already been captured/i.test(error.message)) throw error;
+      });
     }
     const period = notes.period === "annual" || notes.period === "one-time" ? notes.period : "monthly";
     // Recorded once per payment, even if the browser confirms twice.
