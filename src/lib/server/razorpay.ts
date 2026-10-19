@@ -31,6 +31,13 @@ export const fetchOrder = (id: string) => api<RazorpayOrder>(`/orders/${encodeUR
 
 export const fetchPayment = (id: string) => api<{ id: string; order_id: string; status: string; amount: number }>(`/payments/${encodeURIComponent(id)}`);
 
+/**
+ * Takes the money of an "authorized" payment. Without this (and without auto-capture switched
+ * on in the Razorpay dashboard) the money never settles and Razorpay refunds it after a few days.
+ */
+export const capturePayment = (id: string, amountPaise: number) =>
+  api<{ id: string; status: string }>(`/payments/${encodeURIComponent(id)}/capture`, { method: "POST", body: JSON.stringify({ amount: amountPaise, currency: "INR" }) });
+
 /** Razorpay signs order_id|payment_id with the key secret; only a real payment carries a valid signature. */
 export function validSignature(orderId: string, paymentId: string, signature: string) {
   const expected = createHmac("sha256", process.env.RAZORPAY_KEY_SECRET ?? "").update(`${orderId}|${paymentId}`).digest("hex");
