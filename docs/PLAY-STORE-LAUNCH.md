@@ -26,7 +26,7 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 
 | # | Task | Who | Status | Notes |
 |---|---|---|---|---|
-| B1 | Google Play **developer account** ($25 one-time ≈ ₹2,100) + identity check (PAN/Aadhaar) | 👤 | ⬜ | Personal account → 12 testers × 14 days rule (C1). Organization account needs a D-U-N-S number and skips that rule |
+| B1 | Google Play **developer account** ($25 one-time ≈ ₹2,100) + identity check (PAN/Aadhaar) | 👤 | ⏳ Personal | Personal account → 12 testers × 14 days rule (C1). Organization account needs a D-U-N-S number and skips that rule |
 | B2 | Android app: wrap the live app (`/app`) as a Trusted Web Activity (Bubblewrap), package `com.ibaxai.app`, signed `.aab` | 🤖 + 👤 | ⏳ | Ready: `android/twa-manifest.json` + build steps in `android/README.md`. The `.aab` is built once B1 is done (needs Java + Android SDK on a computer, or Claude builds it here). The app keeps updating from the website — no store update for most changes |
 | B3 | `/.well-known/assetlinks.json` so Android trusts www.ibaxai.com (no browser bar) | 🤖 + 👤 | ⏳ | Live at www.ibaxai.com/.well-known/assetlinks.json (empty `[]` for now). After B1: copy the SHA-256 fingerprints from Play Console → App integrity into Vercel env `ANDROID_SHA256_FINGERPRINTS` (comma-separated) and redeploy |
 | B4 | **Payments rule:** inside the Play app, digital subscriptions must use Google Play Billing (fee ~15%) — decide: send buying to the website, or add Play Billing | 👤 decides, 🤖 builds | ⬜ | Most important policy item; get it right before review |
@@ -37,6 +37,7 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 | B9 | Privacy Policy / Terms updated for the Android app and WhatsApp linking (what data, why, how to unlink) | 🤖 | ✅ | `/privacy` (WhatsApp linking, Android app sections) and `/terms` (WhatsApp section), dated 18 Oct 2026 |
 | B10 | Support email + website on the listing (`siteConfig.email`, www.ibaxai.com) | 👤 | ⬜ | Must be monitored |
 | B11 | Meta Business Verification (Udyam certificate, business email/website) | 👤 | ⬜ | Opens the official WhatsApp API (no ban risk, "Connect with Facebook" + coexistence) **and** Instagram/Facebook. 2–6 weeks — start early. Not needed for the Play launch itself |
+| B12 | **Remind the owner:** after launch, switch the personal Play account to an **organization** account ("IBAXAI" shown on the store): get a free D-U-N-S number first | 👤 + 🤖 reminds | ⬜ | Owner chose personal first (19 Oct) and asked to be reminded. Reminder scheduled for 16 Nov |
 
 ## Part C — Testing (about 14 days)
 
