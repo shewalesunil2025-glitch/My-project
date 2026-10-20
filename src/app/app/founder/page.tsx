@@ -6,7 +6,7 @@ import { ArrowLeft, LifeBuoy, MessageCircle, Phone, Search, ShieldCheck } from "
 import { cloudAuthHeader } from "@/lib/app/cloud";
 import { waLink } from "@/lib/app/founder";
 import { serviceById } from "@/content/app/services";
-import { EmptyState, Input, Notice, PageHeader, Pill, Spinner, Stat, fmtDate, relTime } from "@/components/app/ui";
+import { EmptyState, Input, Notice, PageHeader, Pill, WalkingIbax, Stat, fmtDate, relTime } from "@/components/app/ui";
 
 type FounderClient = {
   id: string;
@@ -77,8 +77,8 @@ export default function FounderConsole() {
       <PageHeader eyebrow="Founder" title="Founder Console" subtitle="Every client, their services and where they are stuck. Only your founder account can open this." />
 
       {state === "loading" && (
-        <div className="flex justify-center py-16">
-          <Spinner className="size-6" />
+        <div className="flex justify-center py-10" role="status" aria-label="Loading">
+          <WalkingIbax />
         </div>
       )}
       {state === "denied" && (
