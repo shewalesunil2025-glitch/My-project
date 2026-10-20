@@ -226,7 +226,8 @@ const sections: LegalSection[] = [
     title: "Security",
     body: (
       <p>
-        Data is encrypted in transit (HTTPS). Access is limited by account: each business can see only its own workspace. Secret keys stay on our
+        Data is encrypted in transit (HTTPS). Access is limited by account: each business can see only its own workspace. To help you when something is stuck, the
+        {legal.brand} founder can view your account and services from a protected support page; every such action is logged. Secret keys stay on our
         servers. No system is perfectly secure. If a breach affects your data, we will tell you and the authorities as the law requires.
       </p>
     ),
