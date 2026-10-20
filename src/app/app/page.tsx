@@ -5,6 +5,7 @@ import { ArrowRight, CirclePlay } from "lucide-react";
 import { product } from "@/config/product";
 import { useSession } from "@/lib/app/store";
 import { BrandMark } from "@/components/app/ui";
+import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { Wordmark } from "@/components/navigation/Logo";
 import { cn } from "@/lib/cn";
 
@@ -40,6 +41,7 @@ export default function WelcomePage() {
       <Arc className="-top-[40vmax] -left-[30vmax] w-[64vmax]" />
       <Arc className="-right-[34vmax] -bottom-[44vmax] w-[66vmax]" />
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgb(37_211_102/0.10),transparent_60%)]" />
+      <ThemeToggle className="absolute top-[max(env(safe-area-inset-top),0.75rem)] right-3 z-10" />
 
       <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-7 pt-[max(env(safe-area-inset-top),2rem)] pb-[max(env(safe-area-inset-bottom),1.75rem)]">
         <section className="flex flex-1 flex-col items-center justify-center text-center">
