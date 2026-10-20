@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CirclePlay, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CirclePlay, Crown, LogOut } from "lucide-react";
+import { cloudAuthHeader } from "@/lib/app/cloud";
 import { logOut } from "@/lib/app/store";
 import { useWorkspace, workspaceNav } from "@/components/app/AppShell";
 import { PageHeader } from "@/components/app/ui";
@@ -10,12 +12,28 @@ import { PageHeader } from "@/components/app/ui";
 export default function MorePage() {
   const ws = useWorkspace();
   const router = useRouter();
+  const [founder, setFounder] = useState(false);
+  useEffect(() => {
+    // The server decides; this only shows the link to the founder's own account.
+    void (async () => {
+      const res = await fetch("/api/founder?check=1", { headers: await cloudAuthHeader() }).catch(() => null);
+      setFounder(Boolean(res?.ok));
+    })();
+  }, []);
   if (!ws) return null;
   const items = workspaceNav.filter((n) => !["/app/home", "/app/assistant", "/app/services", "/app/activity"].includes(n.href));
   return (
     <div>
       <PageHeader title="More" />
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {founder && (
+          <li>
+            <Link href="/app/founder" className="glass flex h-24 flex-col justify-between rounded-2xl border-flow/40 p-4 hover:border-flow/60">
+              <Crown className="size-5 text-flow" aria-hidden />
+              <span className="text-sm font-medium">Founder Console</span>
+            </Link>
+          </li>
+        )}
         {items.map((n) => (
           <li key={n.href}>
             <Link href={n.href} className="glass flex h-24 flex-col justify-between rounded-2xl p-4 hover:border-white/20">
