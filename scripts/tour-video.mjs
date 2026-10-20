@@ -14,6 +14,12 @@ import { spawn, execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+/**
+ * Loudness levelling also lifts the faint hiss in the pauses (it sounded like a radio between
+ * and after sentences); this gate keeps the pauses silent and leaves the voice untouched.
+ */
+const QUIET = "agate=threshold=0.015:ratio=20:range=0.003:attack=8:release=180:knee=3";
+
 const arg = (name, def) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > 0 ? process.argv[i + 1] : def;
@@ -102,8 +108,8 @@ for (const lang of langs) {
   const list = join(CACHE, `tour-${lang}.txt`);
   writeFileSync(list, pieces.map((p) => `file '${p.replace(/^\.demo-cache\//, "")}'`).join("\n"));
   const m4a = join(CACHE, `tour-${lang}.m4a`);
-  execFileSync("ffmpeg", ["-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", list, "-af", "loudnorm=I=-16:TP=-1.5", "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "48k", m4a]);
-  execFileSync("ffmpeg", ["-y", "-v", "error", "-i", silent, "-i", m4a, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "64k", "-ac", "1", "-ar", "44100", "-shortest", "-movflags", "+faststart", join(OUT, "video", `tour-${lang}.mp4`)]);
+  execFileSync("ffmpeg", ["-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", list, "-af", `loudnorm=I=-16:TP=-1.5,${QUIET}`, "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "96k", m4a]);
+  execFileSync("ffmpeg", ["-y", "-v", "error", "-i", silent, "-i", m4a, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy", "-shortest", "-movflags", "+faststart", join(OUT, "video", `tour-${lang}.mp4`)]);
   console.log(`  ✓ ${lang}`);
 }
 const manifestFile = join(OUT, "manifest.json");

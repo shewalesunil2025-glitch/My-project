@@ -16,6 +16,12 @@ import { spawn, execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+/**
+ * Loudness levelling also lifts the faint hiss in the pauses (it sounded like a radio between
+ * and after sentences); this gate keeps the pauses silent and leaves the voice untouched.
+ */
+const QUIET = "agate=threshold=0.015:ratio=20:range=0.003:attack=8:release=180:knee=3";
+
 const arg = (name, def) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > 0 ? process.argv[i + 1] : def;
@@ -144,9 +150,10 @@ for (const id of ids) {
       const dur = probe(wav);
       const fit = Math.min(1.3, Math.max(0.88, dur / (video - 0.8)));
       const m4a = join(CACHE, `${id}-${mode}-${lang}.m4a`);
-      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", wav, "-af", `adelay=300|300,atempo=${fit.toFixed(3)},loudnorm=I=-16:TP=-1.5,aresample=44100,apad`, "-t", video.toFixed(2), "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "40k", m4a]);
+      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", wav, "-af", `adelay=300|300,atempo=${fit.toFixed(3)},loudnorm=I=-16:TP=-1.5,${QUIET},aresample=44100,apad`, "-t", video.toFixed(2), "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "96k", m4a]);
       // One MP4 per language with the voice inside: plays smoothly everywhere, nothing to sync.
-      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "64k", "-ac", "1", "-ar", "44100", "-shortest", "-movflags", "+faststart", join(OUT, "video", `${id}-${mode}-${lang}.mp4`)]);
+      // The voice is compressed once (96k): compressing it twice gave a tinny, radio-like sound.
+      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy", "-shortest", "-movflags", "+faststart", join(OUT, "video", `${id}-${mode}-${lang}.mp4`)]);
       if (PREVIEW) {
         mkdirSync(PREVIEW, { recursive: true });
         execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-c:v", "copy", "-ac", "2", "-ar", "44100", "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", join(PREVIEW, `${id}-${mode}-${lang}.mp4`)]);
