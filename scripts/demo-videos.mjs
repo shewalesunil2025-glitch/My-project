@@ -15,6 +15,7 @@ import { createHash } from "node:crypto";
 import { spawn, execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { cleanWav } from "./tts-clean.mjs";
 
 /**
  * Loudness levelling also lifts the faint hiss in the pauses (it sounded like a radio between
@@ -62,6 +63,7 @@ async function speech(text) {
       if (res?.ok) {
         const p = `${file}.${i}.wav`;
         writeFileSync(p, Buffer.from(await res.arrayBuffer()));
+        cleanWav(p); // the voice service can end a clip with a burst of static
         parts.push(p);
         break;
       }
@@ -150,7 +152,10 @@ for (const id of ids) {
       const dur = probe(wav);
       const fit = Math.min(1.3, Math.max(0.88, dur / (video - 0.8)));
       const m4a = join(CACHE, `${id}-${mode}-${lang}.m4a`);
-      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", wav, "-af", `adelay=300|300,atempo=${fit.toFixed(3)},loudnorm=I=-16:TP=-1.5,${QUIET},aresample=44100,apad`, "-t", video.toFixed(2), "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "96k", m4a]);
+      const pcm = join(CACHE, `${id}-${mode}-${lang}.wav`);
+      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", wav, "-af", `adelay=300|300,atempo=${fit.toFixed(3)},loudnorm=I=-16:TP=-1.5,${QUIET},aresample=44100,apad`, "-t", video.toFixed(2), "-ac", "1", "-ar", "44100", "-c:a", "pcm_s16le", pcm]);
+      cleanWav(pcm);
+      execFileSync("ffmpeg", ["-y", "-v", "error", "-i", pcm, "-c:a", "aac", "-b:a", "96k", m4a]);
       // One MP4 per language with the voice inside: plays smoothly everywhere, nothing to sync.
       // The voice is compressed once (96k): compressing it twice gave a tinny, radio-like sound.
       execFileSync("ffmpeg", ["-y", "-v", "error", "-i", mp4, "-i", m4a, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy", "-shortest", "-movflags", "+faststart", join(OUT, "video", `${id}-${mode}-${lang}.mp4`)]);

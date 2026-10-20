@@ -13,6 +13,7 @@ import { createHash } from "node:crypto";
 import { spawn, execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { cleanWav } from "./tts-clean.mjs";
 
 /**
  * Loudness levelling also lifts the faint hiss in the pauses (it sounded like a radio between
@@ -42,6 +43,7 @@ async function speech(text) {
     const res = await fetch(TTS_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }) }).catch(() => null);
     if (res?.ok) {
       writeFileSync(file, Buffer.from(await res.arrayBuffer()));
+      cleanWav(file); // the voice service can end a clip with a burst of static
       return file;
     }
     if (attempt >= 6) throw new Error(`speech failed (${res?.status})`);
@@ -108,7 +110,10 @@ for (const lang of langs) {
   const list = join(CACHE, `tour-${lang}.txt`);
   writeFileSync(list, pieces.map((p) => `file '${p.replace(/^\.demo-cache\//, "")}'`).join("\n"));
   const m4a = join(CACHE, `tour-${lang}.m4a`);
-  execFileSync("ffmpeg", ["-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", list, "-af", `loudnorm=I=-16:TP=-1.5,${QUIET}`, "-ac", "1", "-ar", "44100", "-c:a", "aac", "-b:a", "96k", m4a]);
+  const pcm = join(CACHE, `tour-${lang}.wav`);
+  execFileSync("ffmpeg", ["-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", list, "-af", `loudnorm=I=-16:TP=-1.5,${QUIET}`, "-ac", "1", "-ar", "44100", "-c:a", "pcm_s16le", pcm]);
+  cleanWav(pcm);
+  execFileSync("ffmpeg", ["-y", "-v", "error", "-i", pcm, "-c:a", "aac", "-b:a", "96k", m4a]);
   execFileSync("ffmpeg", ["-y", "-v", "error", "-i", silent, "-i", m4a, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy", "-shortest", "-movflags", "+faststart", join(OUT, "video", `tour-${lang}.mp4`)]);
   console.log(`  ✓ ${lang}`);
 }

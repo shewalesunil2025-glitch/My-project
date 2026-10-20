@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { muteStaticBursts } from "./ttsClean";
 
 /**
  * Runs one IBAX turn on Google Gemini (free tier) when no Claude key is set.
@@ -256,7 +257,9 @@ export async function geminiSpeak(text: string): Promise<Buffer | null> {
       const audio = data.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
       if (!audio?.data) continue;
       const rate = Number(audio.mimeType?.match(/rate=(\d+)/)?.[1] ?? 24000);
-      return pcmToWav(Buffer.from(audio.data, "base64"), rate);
+      const pcm = Buffer.from(audio.data, "base64");
+      muteStaticBursts(new Int16Array(pcm.buffer, pcm.byteOffset, pcm.length >> 1), rate);
+      return pcmToWav(pcm, rate);
     } catch (error) {
       console.error(`[speak] ${model} failed`, error instanceof Error ? error.message : error);
     }
