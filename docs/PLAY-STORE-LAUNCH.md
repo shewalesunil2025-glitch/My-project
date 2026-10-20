@@ -6,7 +6,7 @@ The **Apple App Store** comes later ($99/year). Work one item at a time, tick it
 
 Legend: 👤 the owner does it by hand · 🤖 Claude does it · ✅ done · ⏳ in progress · ⬜ not started
 
-**Next for the owner:** B1 (Play developer account, $25) → B4 (payments decision) → B10 (support email). Claude then finishes B2/B3 and helps fill the Play Console.
+**Next:** Claude builds the signed `.aab` (B2) → owner creates the app in Play Console and uploads it → B3 fingerprints → B4 (payments decision) → B10 (support email).
 
 Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D launch.**
 
@@ -26,7 +26,7 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 
 | # | Task | Who | Status | Notes |
 |---|---|---|---|---|
-| B1 | Google Play **developer account** ($25 one-time ≈ ₹2,100) + identity check (PAN/Aadhaar) | 👤 | ⏳ Personal: paid 19 Oct, ID uploaded, Android-device check pending | Personal account → 12 testers × 14 days rule (C1). Organization account needs a D-U-N-S number and skips that rule |
+| B1 | Google Play **developer account** ($25 one-time ≈ ₹2,100) + identity check (PAN/Aadhaar) | 👤 | ✅ Personal account: paid 19 Oct, ID uploaded, Android-device check done 20 Oct | Personal account → 12 testers × 14 days rule (C1). Organization account needs a D-U-N-S number and skips that rule |
 | B2 | Android app: wrap the live app (`/app`) as a Trusted Web Activity (Bubblewrap), package `com.ibaxai.app`, signed `.aab` | 🤖 + 👤 | ⏳ | Ready: `android/twa-manifest.json` + build steps in `android/README.md`. The `.aab` is built once B1 is done (needs Java + Android SDK on a computer, or Claude builds it here). The app keeps updating from the website — no store update for most changes |
 | B3 | `/.well-known/assetlinks.json` so Android trusts www.ibaxai.com (no browser bar) | 🤖 + 👤 | ⏳ | Live at www.ibaxai.com/.well-known/assetlinks.json (empty `[]` for now). After B1: copy the SHA-256 fingerprints from Play Console → App integrity into Vercel env `ANDROID_SHA256_FINGERPRINTS` (comma-separated) and redeploy |
 | B4 | **Payments rule:** inside the Play app, digital subscriptions must use Google Play Billing (fee ~15%) — decide: send buying to the website, or add Play Billing | 👤 decides, 🤖 builds | ⬜ | Most important policy item; get it right before review |
