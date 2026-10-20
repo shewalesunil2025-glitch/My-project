@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Hand, Languages, Play, RotateCcw, Sparkles } from "lucide-react";
+import { Hand, Languages, Pause, Play, RotateCcw, RotateCw, Sparkles } from "lucide-react";
 import type { ServiceDef } from "@/content/app/services";
 import { demoLangs, demoTagline, type DemoLang, type DemoMode } from "@/content/demoScripts";
 import { cn } from "@/lib/cn";
 
 type Manifest = Record<string, Partial<Record<DemoMode, { duration: number; langs: string[] }>>>;
 const LANG_KEY = "ibaxai-demo-lang";
+const clock = (secs: number) => `${Math.floor(secs / 60)}:${String(Math.floor(secs % 60)).padStart(2, "0")}`;
 
 /**
  * A service's demo video: one MP4 per language, with IBAX's narration inside.
- * Below the video there are only three choices: Just say it, Manually, Language.
+ * Under the video: play/pause, back/forward 10 seconds and a seek bar, then three choices:
+ * Just say it, Manually, Language.
  */
 export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
   // A service's two videos, or (with only `id`) one video such as the app tour.
@@ -22,8 +24,8 @@ export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [playing, setPlaying] = useState(false);
   const [ended, setEnded] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [time, setTime] = useState(0);
+  const [length, setLength] = useState(0);
   const video = useRef<HTMLVideoElement>(null);
   const resume = useRef(false);
   const startAt = useRef(0);
@@ -61,7 +63,7 @@ export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
     const onPause = () => setPlaying(false);
     const onTime = () => {
       setTime(v.currentTime);
-      setProgress(v.duration ? v.currentTime / v.duration : 0);
+      if (v.duration) setLength(v.duration);
     };
     const onEnd = () => {
       setPlaying(false);
@@ -70,11 +72,13 @@ export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
     v.addEventListener("timeupdate", onTime);
+    v.addEventListener("loadedmetadata", onTime);
     v.addEventListener("ended", onEnd);
     return () => {
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("timeupdate", onTime);
+      v.removeEventListener("loadedmetadata", onTime);
       v.removeEventListener("ended", onEnd);
     };
   }, [mode, voice]);
@@ -99,6 +103,15 @@ export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
       void v.play().catch(() => {});
     } else v.pause();
   }
+  /** Jump to a moment (seconds), e.g. back 10 s to hear a point again. */
+  function seekTo(at: number) {
+    const v = video.current;
+    if (!v) return;
+    const end = v.duration || length;
+    v.currentTime = Math.min(Math.max(0, at), end ? end - 0.05 : at);
+    setTime(v.currentTime);
+    if (v.currentTime < end - 0.1) setEnded(false);
+  }
   function pick(next: DemoMode) {
     if (next === mode) {
       const v = video.current;
@@ -110,7 +123,7 @@ export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
     }
     resume.current = true;
     setMode(next);
-    setProgress(0);
+    setTime(0);
     setEnded(false);
   }
   function chooseLang(code: DemoLang) {
@@ -157,22 +170,37 @@ export function DemoVideo({ svc, id }: { svc?: ServiceDef; id?: string }) {
           </button>
         )}
 
-        {/* Progress (tap to jump) */}
-        <button
-          type="button"
+      </div>
+
+      {/* Controls: play/pause, back/forward 10 s and a seek bar to hear any point again. */}
+      <div className="mt-3 rounded-2xl border border-white/12 px-3 pt-2.5 pb-2">
+        <input
+          type="range"
+          min={0}
+          max={(length || info?.duration || 0) || 1}
+          step={0.1}
+          value={Math.min(time, (length || info?.duration || 0) || 0)}
+          onChange={(e) => seekTo(Number(e.target.value))}
           aria-label="Seek"
-          onClick={(e) => {
-            const v = video.current;
-            if (!v?.duration) return;
-            const r = e.currentTarget.getBoundingClientRect();
-            v.currentTime = ((e.clientX - r.left) / r.width) * v.duration;
-          }}
-          className="absolute inset-x-0 bottom-0 h-4"
-        >
-          <span className="absolute inset-x-0 bottom-0 h-1 bg-white/15">
-            <span className="block h-full bg-flow" style={{ width: `${progress * 100}%` }} />
-          </span>
-        </button>
+          className="block h-6 w-full cursor-pointer accent-[#25d366]"
+        />
+        <div className="mt-1 flex items-center justify-between">
+          <span className="w-12 font-mono text-xs text-fg-muted tabular-nums">{clock(time)}</span>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => seekTo(time - 10)} aria-label="Back 10 seconds" className="relative grid size-11 place-items-center rounded-full text-fg hover:bg-white/[0.06]">
+              <RotateCcw className="size-6" aria-hidden />
+              <span className="absolute text-[0.55rem] font-bold">10</span>
+            </button>
+            <button type="button" onClick={toggle} aria-label={playing ? "Pause" : ended ? "Watch again" : "Play"} className="grid size-12 place-items-center rounded-full bg-flow text-ink-950">
+              {playing ? <Pause className="size-5 fill-current" aria-hidden /> : ended ? <RotateCcw className="size-5" aria-hidden /> : <Play className="ml-0.5 size-5 fill-current" aria-hidden />}
+            </button>
+            <button type="button" onClick={() => seekTo(time + 10)} aria-label="Forward 10 seconds" className="relative grid size-11 place-items-center rounded-full text-fg hover:bg-white/[0.06]">
+              <RotateCw className="size-6" aria-hidden />
+              <span className="absolute text-[0.55rem] font-bold">10</span>
+            </button>
+          </div>
+          <span className="w-12 text-right font-mono text-xs text-fg-muted tabular-nums">{clock((length || info?.duration || 0))}</span>
+        </div>
       </div>
 
       {/* The only three choices */}
