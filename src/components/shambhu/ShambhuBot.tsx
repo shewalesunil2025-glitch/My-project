@@ -8,6 +8,9 @@ export type BotMood = "idle" | "listening" | "thinking" | "speaking";
 /** Soft WhatsApp-style greens for the rim of light, the glass core and the inner glow. */
 const RIM = ["#9fe3bd", "#6fd89c", "#25d366", "#1daa55", "#25c062", "#128c4a", "#0f7a45", "#4fcf88", "#a6e6c3", "#9fe3bd"];
 const CORE = ["#0f4a3a", "#0a2f25", "#03120d"];
+// Day mode (html[data-theme="light"]): a white glass orb with dark eyes.
+const CORE_DAY = ["#ffffff", "#f1fbf4", "#d3f1de"];
+const isDay = () => typeof document !== "undefined" && document.documentElement.dataset.theme === "light";
 const WISP = ["#25d366", "#6fd89c"];
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
@@ -117,8 +120,9 @@ export function ShambhuBot({ mood = "idle", className, bleed = 0.92 }: { mood?: 
       const Rc = R * 0.8;
       ctx.save();
       ctx.translate(hx, hy); ctx.scale(sq, 2 - sq); ctx.translate(-hx, -hy);
+      const day = isDay(), cc = day ? CORE_DAY : CORE;
       const core = ctx.createRadialGradient(hx - Rc * 0.15, hy - Rc * 0.3, Rc * 0.1, hx, hy, Rc);
-      core.addColorStop(0, CORE[0]); core.addColorStop(0.55, CORE[1]); core.addColorStop(1, CORE[2]);
+      core.addColorStop(0, cc[0]); core.addColorStop(0.55, cc[1]); core.addColorStop(1, cc[2]);
       ctx.fillStyle = core;
       ctx.beginPath(); ctx.arc(hx, hy, Rc, 0, 6.2832); ctx.fill();
 
@@ -185,8 +189,9 @@ export function ShambhuBot({ mood = "idle", className, bleed = 0.92 }: { mood?: 
       ctx.save();
       ctx.translate(hx + look.x * R * 0.36, hy + look.y * R * 0.32 - R * 0.02);
       ctx.rotate(turn * look.y * 0.5 + turn * 0.08);
-      ctx.shadowColor = "rgba(255,255,255,0.6)"; ctx.shadowBlur = R * 0.07;
-      ctx.fillStyle = "#fff"; ctx.strokeStyle = "#fff"; ctx.lineCap = "round";
+      const eye = day ? "#0c1a0f" : "#fff";
+      ctx.shadowColor = day ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.6)"; ctx.shadowBlur = R * 0.07;
+      ctx.fillStyle = eye; ctx.strokeStyle = eye; ctx.lineCap = "round";
       for (const e of [-1, 1]) {
         if (m === "speaking") {
           ctx.lineWidth = ew * 0.75;
