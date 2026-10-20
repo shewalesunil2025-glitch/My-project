@@ -1038,3 +1038,106 @@ body {
 @keyframes demo-ripple { from { opacity: 1; transform: scale(0.4); } to { opacity: 0; transform: scale(1.8); } }
 @keyframes demo-ken { from { transform: scale(1.04) translateY(4px); } to { transform: none; } }
 @keyframes demo-type { to { width: 100%; } }
+
+/* ── Day (light) theme for the app ──────────────────
+   The client picks Day or Night (src/components/app/ThemeToggle.tsx); Day sets
+   html[data-theme="light"]. Night is the default look above. Only the /app routes change.
+   Unlayered on purpose, so these win over the Tailwind utilities they remap. */
+:root[data-theme="light"]:has(.theme-lumi) {
+  color-scheme: light;
+  --color-ink-950: #f4f8f3;
+  --color-ink-900: #ffffff;
+  --color-ink-850: #ffffff;
+  --color-ink-800: #ecf2ea;
+  --color-ink-700: #d9e3d6;
+
+  --color-fg: #0c1a0f;
+  --color-fg-muted: #4a5b4d;
+  --color-fg-subtle: #5f7063;
+
+  --color-flow: #1aa152;
+  --color-flow-strong: #138540;
+  --color-flow-soft: #12873f;
+  --color-live: #0d5c2b;
+}
+:root[data-theme="light"]:has(.theme-lumi),
+:root[data-theme="light"]:has(.theme-lumi) body {
+  color-scheme: light;
+  background: #f4f8f3 !important;
+  color: var(--color-fg) !important;
+}
+[data-theme="light"] .theme-lumi {
+  /* Cards: white with a soft green edge and a light shadow. */
+  & .glass {
+    background: linear-gradient(180deg, rgb(37 211 102 / 0.05), rgb(255 255 255 / 0)), #ffffff;
+    border-color: rgb(22 120 60 / 0.14);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 14px 34px -22px rgb(16 60 30 / 0.35);
+  }
+  & .text-metal {
+    background: linear-gradient(180deg, #0c1a0f 40%, #3c5442 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  & .grid-backdrop {
+    background-image:
+      linear-gradient(rgb(22 120 60 / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(22 120 60 / 0.07) 1px, transparent 1px);
+  }
+
+  /* Faint white lines and fills (made for a dark page) become faint dark ones. */
+  & :is([class^="border-white/"], [class*=" border-white/"]) { border-color: rgb(16 50 26 / 0.13); }
+  & :is([class^="bg-white/"], [class*=" bg-white/"]) { background-color: rgb(16 50 26 / 0.045); }
+  & [class*="hover:bg-white/"]:hover { background-color: rgb(16 50 26 / 0.08); }
+  & [class*="hover:border-white/"]:hover { border-color: rgb(16 50 26 / 0.25); }
+  & [class*="divide-white/"] > * + * { border-color: rgb(16 50 26 / 0.1); }
+
+  /* White text on no colour of its own (e.g. the "iba" of the wordmark) turns dark;
+     white text on green, red or dark buttons stays white. */
+  & .text-white:not(.btn-3d, [class*=" bg-"], [class^="bg-"]) { color: var(--color-fg); }
+  & .text-white[class*="bg-ink-9"] { color: var(--color-fg); }
+  /* Dark text on green stays dark. */
+  & .text-ink-950 { color: #030703; }
+  /* Solid white things (light button, switch knob) keep an edge on the white page. */
+  & .bg-white { box-shadow: 0 0 0 1px rgb(16 50 26 / 0.1), 0 2px 6px -2px rgb(16 50 26 / 0.2); }
+
+  /* Status colours, made deep enough to read on white. */
+  & :is(.text-emerald-300, .text-emerald-200) { color: #047857; }
+  & :is(.text-red-300, .text-red-200) { color: #b91c1c; }
+  & :is(.text-amber-100, .text-amber-200, .text-amber-300) { color: #a16207; }
+  & :is(.text-sky-100, .text-sky-300) { color: #0369a1; }
+  & .text-violet-300 { color: #6d28d9; }
+  & .text-blue-300 { color: #1d4ed8; }
+
+  /* Home: the big welcome card turns into soft mint. */
+  & .home-hero {
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgb(37 211 102 / 0.2), transparent 55%),
+      linear-gradient(160deg, #e6f7ea, #f7fcf7 60%, #ffffff);
+    box-shadow: 0 24px 60px -36px rgb(22 120 60 / 0.45);
+  }
+
+  /* The glowing green-ring button: white inside with black letters (the ring stays). */
+  & .btn-3d {
+    color: #0c1a0f;
+    background:
+      linear-gradient(180deg, #ffffff 0%, #f3fbf5 55%, #e9f7ee 100%) padding-box,
+      var(--btn-ring) border-box;
+    background-size: 100% 100%, 200% 100%;
+    box-shadow:
+      inset 0 -6px 14px -10px rgb(37 211 102 / 0.45),
+      -8px 6px 22px -12px rgb(47 191 90 / 0.6),
+      8px 6px 22px -12px rgb(111 227 160 / 0.65),
+      0 10px 26px -14px rgb(22 120 60 / 0.5);
+  }
+  & .btn-3d.text-white { color: #0c1a0f; }
+  & .btn-3d:hover { filter: brightness(1.02) saturate(1.1); }
+
+  /* Opening animation on a white page. */
+  & .ibax-splash { background: radial-gradient(ellipse 75% 55% at 50% 40%, #e3f7e9 0%, #f6fbf6 55%, #ffffff 100%); }
+  & .ibax-splash-word { color: #0c1a0f; }
+  & .ibax-splash-tag { color: #4a5b4d; }
+
+  /* First page and dialogs. */
+  & .bg-\[\#020a05\] { background-color: #f4f8f3; }
+  & :is(.bg-black\/60, .bg-black\/70) { background-color: rgb(10 30 15 / 0.35); }
+}

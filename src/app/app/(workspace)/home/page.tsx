@@ -79,7 +79,7 @@ function Dashboard() {
     <div className="space-y-8">
       {!ws.sample && <RenewalBanner ws={ws} className="mb-4" />}
       {!ws.sample && <TrialBanner ws={ws} />}
-      <section className="relative overflow-hidden rounded-[1.75rem] border border-flow/20 bg-[radial-gradient(120%_90%_at_100%_0%,rgb(37_211_102/0.22),transparent_55%),linear-gradient(160deg,#0e2414,#06100a_60%,#040905)] p-5 shadow-[0_30px_80px_-40px_rgb(37_211_102/0.55)] sm:p-7">
+      <section className="home-hero relative overflow-hidden rounded-[1.75rem] border border-flow/20 bg-[radial-gradient(120%_90%_at_100%_0%,rgb(37_211_102/0.22),transparent_55%),linear-gradient(160deg,#0e2414,#06100a_60%,#040905)] p-5 shadow-[0_30px_80px_-40px_rgb(37_211_102/0.55)] sm:p-7">
         <div aria-hidden className="grid-backdrop pointer-events-none absolute inset-0 opacity-40" />
         <div aria-hidden className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-flow/20 blur-3xl" />
         <div className="relative">

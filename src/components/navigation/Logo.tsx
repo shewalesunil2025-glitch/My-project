@@ -39,9 +39,9 @@ export function Wordmark({ className }: { className?: string }) {
       aria-label={siteConfig.name}
     >
       <span aria-hidden className="text-white">iba</span>
-      <svg aria-hidden viewBox="0 0 100 100" className="mx-[0.03em] h-[0.6em] w-[0.6em]">
-        <line x1="12" y1="12" x2="88" y2="88" stroke="#fff" strokeWidth="19" strokeLinecap="round" />
-        <line x1="12" y1="88" x2="88" y2="12" stroke="#fff" strokeWidth="19" strokeLinecap="round" />
+      <svg aria-hidden viewBox="0 0 100 100" className="mx-[0.03em] h-[0.6em] w-[0.6em] text-white">
+        <line x1="12" y1="12" x2="88" y2="88" stroke="currentColor" strokeWidth="19" strokeLinecap="round" />
+        <line x1="12" y1="88" x2="88" y2="12" stroke="currentColor" strokeWidth="19" strokeLinecap="round" />
       </svg>
       <span aria-hidden className="bg-gradient-to-r from-[#8be860] to-[#55cb45] bg-clip-text text-transparent">ai</span>
     </span>

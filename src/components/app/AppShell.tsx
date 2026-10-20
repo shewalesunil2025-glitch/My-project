@@ -32,6 +32,7 @@ import { syncPaidPlans } from "@/lib/app/renewal";
 import type { Workspace } from "@/lib/app/types";
 import { BrandLogo, BrandMark, FullScreenLoader, LumiMark } from "./ui";
 import { IbaxLauncher } from "./IbaxLauncher";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const workspaceNav = [
   { href: "/app/home", label: "Home", icon: House },
@@ -163,7 +164,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="hidden truncate text-sm text-fg-muted lg:block">
             {workspace.business.name} <span className="text-fg-subtle">· {workspace.business.category}</span>
           </p>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1">
             {workspace.sample ? (
               <span className="hidden rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[0.7rem] font-medium text-amber-200 sm:inline">Sample workspace</span>
             ) : (
@@ -173,6 +174,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </span>
               )
             )}
+            <ThemeToggle />
             <Link
               href="/app/notifications"
               className="relative grid size-10 place-items-center rounded-full text-fg-muted hover:bg-white/[0.06] hover:text-fg"
