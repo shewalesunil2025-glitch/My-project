@@ -1039,6 +1039,13 @@ body {
 @keyframes demo-ken { from { transform: scale(1.04) translateY(4px); } to { transform: none; } }
 @keyframes demo-type { to { width: 100%; } }
 
+/* IBAX walking loader: the video's edges melt into the page. */
+.walk-loader { -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
+.walk-loader video { display: block; object-fit: contain; }
+.walk-loader .walk-day { display: none; }
+[data-theme="light"] .walk-loader .walk-day { display: block; }
+[data-theme="light"] .walk-loader .walk-night { display: none; }
+
 /* ── Day (light) theme for the app ──────────────────
    The client picks Day or Night (src/components/app/ThemeToggle.tsx); Day sets
    html[data-theme="light"]. Night is the default look above. Only the /app routes change.
@@ -1095,6 +1102,7 @@ body {
      white text on green, red or dark buttons stays white. */
   & .text-white:not(.btn-3d, [class*=" bg-"], [class^="bg-"]) { color: var(--color-fg); }
   & .text-white[class*="bg-ink-9"] { color: var(--color-fg); }
+  & .border-t-white { border-top-color: var(--color-flow); }
   /* Dark text on green stays dark. */
   & .text-ink-950 { color: #030703; }
   /* Solid white things (light button, switch knob) keep an edge on the white page. */

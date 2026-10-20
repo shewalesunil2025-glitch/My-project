@@ -8,7 +8,7 @@ import { cloudAuthHeader } from "@/lib/app/cloud";
 import { waLink } from "@/lib/app/founder";
 import { serviceById } from "@/content/app/services";
 import type { Business, LogEntry, Ticket } from "@/lib/app/types";
-import { Btn, Card, Input, Notice, PageHeader, Pill, SectionTitle, Spinner, fmtDate, fmtDateTime, relTime } from "@/components/app/ui";
+import { Btn, Card, Input, Notice, PageHeader, Pill, SectionTitle, WalkingIbax, fmtDate, fmtDateTime, relTime } from "@/components/app/ui";
 
 
 type Sub = { id: string; service_id: string; period: string; price: number; status: string; started_at: string; renews_at: string | null; payment_ref: string | null };
@@ -82,8 +82,8 @@ export default function FounderClientPage() {
       </Link>
 
       {state === "loading" && (
-        <div className="flex justify-center py-16">
-          <Spinner className="size-6" />
+        <div className="flex justify-center py-10" role="status" aria-label="Loading">
+          <WalkingIbax />
         </div>
       )}
       {state === "denied" && <Notice tone="amber">This page is only for the ibaxai founder. Log in with the founder account to open it.</Notice>}

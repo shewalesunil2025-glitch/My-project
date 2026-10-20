@@ -296,10 +296,35 @@ export function Spinner({ className }: { className?: string }) {
   return <span aria-hidden className={cn("inline-block size-4 animate-spin rounded-full border-2 border-white/25 border-t-white", className)} />;
 }
 
+/** IBAX walking: the app's loading animation, one video for Night and one for Day (see globals.css). */
+export function WalkingIbax({ className }: { className?: string }) {
+  const video = (theme: "day" | "night") => (
+    <video
+      className={`walk-${theme} size-full`}
+      src={`/brand/ibax-walk-${theme}.mp4`}
+      poster={`/brand/ibax-walk-${theme}.jpg`}
+      autoPlay
+      muted
+      loop
+      playsInline
+      aria-hidden
+    />
+  );
+  return (
+    <span className={cn("walk-loader inline-block size-44", className)}>
+      {video("night")}
+      {video("day")}
+    </span>
+  );
+}
+
 export function FullScreenLoader() {
   return (
     <div className="grid min-h-dvh place-items-center" role="status" aria-label="Loading">
-      <BrandMark className="size-12 animate-pulse" />
+      <div className="flex flex-col items-center">
+        <WalkingIbax />
+        <p className="text-sm text-fg-muted">Loading…</p>
+      </div>
     </div>
   );
 }
