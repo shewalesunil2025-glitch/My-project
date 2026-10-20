@@ -6,7 +6,8 @@ website update reaches the app without a new store release. Config: `twa-manifes
 
 ## Build (after the Play developer account exists)
 
-Needs Node, JDK 17 and the Android SDK (Bubblewrap can download both on first run).
+Needs Node, a JDK (17+) and the Android SDK (platform 35+, build-tools). minSdk is 24 (Android 7.0):
+the current androidbrowserhelper library needs it.
 
 ```bash
 npm i -g @bubblewrap/cli
@@ -18,6 +19,14 @@ bubblewrap build                                  # → app-release-bundle.aab (
 The first `build` asks to create the **upload key** (`ibaxai-upload.keystore`). The owner keeps that
 file and its passwords safe and private — never commit them, never paste them in chat. In Play
 Console turn on **Play App Signing** (Google keeps the real signing key).
+
+Notes from the first build (20 Oct 2026, version 1.0.0, code 1):
+- If Maven Central answers 429 (too many requests), add Google's mirror
+  `maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }` before `mavenCentral()`
+  in the generated `build.gradle` (and replace the dead `jcenter()`).
+- Without the interactive CLI: generate the project with `@bubblewrap/core` (`TwaGenerator.createTwaProject`),
+  run `./gradlew bundleRelease`, then sign `app-release.aab` with `jarsigner` (SHA256withRSA) using the upload key.
+- Upload key SHA-256 (public, safe to share): `32:63:47:D7:D7:02:C4:9B:90:7A:80:1E:D3:22:8B:0C:85:11:24:0D:8F:76:11:86:22:34:E6:87:DA:1D:C6:85`
 
 ## Link the app to the website (no browser bar)
 
