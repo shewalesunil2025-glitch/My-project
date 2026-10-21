@@ -26,6 +26,9 @@ const jsonLd = {
   "@type": "ProfessionalService",
   name: siteConfig.name,
   url: siteConfig.url,
+  // The logo Google shows for the business (the green "i").
+  logo: `${siteConfig.url}/icons/ibaxai-512.png`,
+  image: `${siteConfig.url}/icons/ibaxai-512.png`,
   email: siteConfig.email,
   founder: { "@type": "Person", name: founder.name, jobTitle: founder.role },
   description: siteConfig.description,
