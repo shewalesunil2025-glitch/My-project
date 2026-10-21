@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { product } from "@/config/product";
 import { inTrial, isLive, services, TRIAL_DAYS, type ServiceDef } from "@/content/app/services";
 import { onWaitlist } from "@/lib/app/agentActions";
@@ -108,7 +108,17 @@ export default function ServicesPage() {
                   )}
                 </div>
                 <p className="mt-5 text-lg font-semibold tracking-tight">{s.name}</p>
-                <p className="mt-1 flex-1 text-sm leading-relaxed text-fg-muted">{s.short}</p>
+                <p className="mt-1 text-sm leading-relaxed text-fg-muted">{s.short}</p>
+                {/* What the client gets, at a glance (the full list is on the service page). */}
+                <ul className="mt-4 flex-1 space-y-1.5 text-sm">
+                  {s.features.slice(0, 4).map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-fg-muted">
+                      <Check className="mt-0.5 size-4 shrink-0 text-flow" aria-hidden />
+                      {f}
+                    </li>
+                  ))}
+                  {s.features.length > 4 && <li className="pl-6 text-xs text-fg-subtle">+ {s.features.length - 4} more</li>}
+                </ul>
                 {s.price === null ? (
                   <p className="mt-5 text-xl font-semibold">Custom quote</p>
                 ) : (

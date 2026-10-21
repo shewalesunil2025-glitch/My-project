@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ChevronRight, CreditCard, Crown, Globe, LifeBuoy, Link2, Mail, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronRight, CreditCard, Crown, Globe, LifeBuoy, Link2, Mail, MessageCircle } from "lucide-react";
 import { product } from "@/config/product";
-import { isLive, services } from "@/content/app/services";
+import { inTrial, isLive, providerInfo, services } from "@/content/app/services";
+import type { ProviderId } from "@/lib/app/types";
+import { trialState } from "@/lib/app/trial";
+import { TrialBanner } from "@/components/app/TrialBanner";
+import { ConnectAccount } from "@/components/app/ConnectAccount";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { automationStatus } from "@/components/app/status";
@@ -26,11 +30,16 @@ export default function IbaxHubPage() {
   const live = mine.filter((a) => a.status !== "setup").length;
   const connected = Object.values(ws.connections).filter(Boolean).length;
   const leadsWeek = ws.leads.filter((l) => withinDays(l.createdAt, 7)).length;
-  const owned = new Set(mine.map((a) => a.serviceId));
-  const offer = services.filter((s) => s.price !== null && !owned.has(s.id)).sort((a, b) => Number(isLive(b.id)) - Number(isLive(a.id)));
+  const cur = appCurrency(ws);
+  const trialOpen = !ws.sample && trialState(ws).phase !== "over";
+  // Ready-to-use services first, then the ones coming soon.
+  const all = [...services].sort((a, b) => Number(isLive(b.id)) - Number(isLive(a.id)));
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
+      {/* The free trial first: the easiest way to start. */}
+      {!ws.sample && <TrialBanner ws={ws} />}
+
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[1.8rem] border border-flow/15 p-6 text-center shadow-[0_40px_100px_-40px_rgb(37_211_102/0.3)] [background:radial-gradient(ellipse_at_50%_-10%,rgb(37_211_102/0.16),transparent_60%),linear-gradient(180deg,rgb(37_211_102/0.045),rgb(255_255_255/0.01)),var(--color-ink-850)] sm:p-8">
         <div aria-hidden className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-flow/70 to-transparent" />
@@ -108,54 +117,82 @@ export default function IbaxHubPage() {
         )}
       </section>
 
-      {/* Premium services */}
+      {/* Every service, two per row, with its price */}
       <section>
-        <SectionTitle action={<Link href="/app/services" className="text-xs font-semibold text-flow-soft">All services</Link>}>
+        <SectionTitle action={<Link href="/app/services" className="text-xs font-semibold text-flow-soft">Details</Link>}>
           <span className="inline-flex items-center gap-2">
-            <Crown className="size-4 text-flow" aria-hidden /> Premium services
+            <Crown className="size-4 text-flow" aria-hidden /> All services
           </span>
         </SectionTitle>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          {offer.map((s) => {
+        <ul className="mt-3 grid grid-cols-2 gap-3">
+          {all.map((s) => {
+            const a = mine.find((x) => x.serviceId === s.id);
             const available = isLive(s.id);
-            const waiting = onWaitlist(ws, s.id);
+            const free = !a && available && trialOpen && inTrial(s.id);
+            const action = a ? "Open" : !available ? (onWaitlist(ws, s.id) ? "On waitlist ✓" : "Coming soon") : s.price === null ? "Get a quote" : free ? "Start free" : "Get it";
             return (
-              <li key={s.id} className={cn(card, "relative flex flex-col overflow-hidden p-4", available && "border-flow/25")}>
-                {available && <div aria-hidden className="pointer-events-none absolute -top-16 -right-16 size-40 rounded-full bg-flow/15 blur-3xl" />}
-                <div className="flex items-start gap-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-flow/12 text-flow-soft ring-1 ring-flow/20">
-                    <Icon name={s.icon} className="size-5" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold">{s.name}</p>
-                    <p className="mt-0.5 text-xs leading-snug text-fg-subtle">{s.short}</p>
+              <li key={s.id}>
+                <Link
+                  href={a ? `/app/automations/${a.id}` : `/app/services/${s.id}`}
+                  className={cn(card, "flex h-full flex-col p-3.5 transition-colors hover:border-flow/35 sm:p-4", available && "border-flow/20")}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-flow/12 text-flow-soft ring-1 ring-flow/20">
+                      <Icon name={s.icon} className="size-5" />
+                    </span>
+                    {a ? (
+                      <Pill tone={automationStatus[a.status].tone} className="text-[0.62rem]">
+                        {a.trialEndsAt && a.status !== "paused" ? "Trial" : automationStatus[a.status].label}
+                      </Pill>
+                    ) : free ? (
+                      <Pill tone="green" className="text-[0.62rem]">
+                        🎁 Free
+                      </Pill>
+                    ) : !available ? (
+                      <Pill tone="amber" className="text-[0.62rem]">
+                        Soon
+                      </Pill>
+                    ) : null}
                   </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between gap-2">
-                  <p className="text-sm">
-                    <span className="font-semibold">{money(svcPrice(s, ws)!, appCurrency(ws))}</span>
-                    <span className="text-xs text-fg-subtle">{s.billing === "one-time" ? " one-time" : " /month"}</span>
+                  <p className="mt-3 text-sm leading-snug font-semibold">{s.name}</p>
+                  <p className="mt-1 line-clamp-2 flex-1 text-xs leading-snug text-fg-subtle">{s.short}</p>
+                  <p className="mt-3 text-sm">
+                    {s.price === null ? (
+                      <span className="font-semibold">Custom quote</span>
+                    ) : (
+                      <>
+                        <span className="text-base font-semibold tabular-nums">{money(svcPrice(s, ws)!, cur)}</span>
+                        <span className="text-xs text-fg-subtle">{s.billing === "one-time" ? " once" : " /mo"}</span>
+                      </>
+                    )}
                   </p>
-                  {available ? (
-                    <button
-                      type="button"
-                      onClick={() => openIbaxChat(`I want ${s.name}`)}
-                      className="btn-3d btn-3d-sm inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-white"
-                    >
-                      <Sparkles className="size-3.5" aria-hidden /> Start with {product.assistantName}
-                    </button>
-                  ) : waiting ? (
-                    <Pill tone="green">On the waitlist</Pill>
-                  ) : (
-                    <Link href={`/app/services/${s.id}`} className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-fg-muted hover:text-fg">
-                      Coming soon
-                    </Link>
-                  )}
-                </div>
+                  <span
+                    className={cn(
+                      "mt-3 inline-flex h-9 items-center justify-center rounded-full text-xs font-semibold",
+                      available || a ? "btn-3d btn-3d-sm text-white" : "border border-white/10 text-fg-muted",
+                    )}
+                  >
+                    {action}
+                  </span>
+                </Link>
               </li>
             );
           })}
         </ul>
+      </section>
+
+      {/* Link the accounts the services work with */}
+      <section>
+        <SectionTitle action={<Link href="/app/settings#accounts" className="text-xs font-semibold text-flow-soft">Settings</Link>}>
+          <span className="inline-flex items-center gap-2">
+            <Link2 className="size-4 text-flow" aria-hidden /> Connect your accounts
+          </span>
+        </SectionTitle>
+        <div className="mt-3 space-y-3">
+          {(Object.keys(providerInfo) as ProviderId[]).map((p) => (
+            <ConnectAccount key={p} ws={ws} provider={p} />
+          ))}
+        </div>
       </section>
 
       {/* Account & help */}
