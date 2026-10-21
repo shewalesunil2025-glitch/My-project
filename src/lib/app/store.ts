@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { markUnlocked } from "./appLock";
 import type { ActivityEvent, AppNotification, Database, NotificationKind, User, Workspace } from "./types";
 import {
   cloudChangePassword,
@@ -140,6 +141,7 @@ export async function signUp(input: Omit<User, "id" | "createdAt" | "passwordHas
     if (!res.ok) return res;
     if (res.value === "confirm-email") return { ok: true, confirmEmail: true };
     openCloudAccount(res.value);
+    markUnlocked(res.value.id);
     return { ok: true };
   }
   const db = structuredClone(load());
@@ -151,6 +153,7 @@ export async function signUp(input: Omit<User, "id" | "createdAt" | "passwordHas
   db.workspaces[user.id].team.push({ id: uid(), name: user.name, email, role: "owner" });
   db.sessionUserId = user.id;
   save(db);
+  markUnlocked(user.id);
   return { ok: true };
 }
 
@@ -165,6 +168,8 @@ export async function logIn(emailRaw: string, password: string): Promise<AuthRes
   db.sessionUserId = user.id;
   db.workspaces[user.id]?.audit.unshift({ at: nowIso(), action: "Signed in" });
   save(db);
+  // Just proved it's them with the password: the app lock doesn't ask again right away.
+  markUnlocked(user.id);
   return { ok: true };
 }
 
@@ -315,6 +320,7 @@ async function cloudLogIn(email: string, password: string): Promise<AuthResult> 
   const res = await cloudSignIn(email, password);
   if (res.ok) {
     openCloudAccount(res.value);
+    markUnlocked(res.value.id);
     updateWorkspace((ws) => audit(ws, "Signed in"));
     return { ok: true };
   }
@@ -331,6 +337,7 @@ async function cloudLogIn(email: string, password: string): Promise<AuthResult> 
     moved.users = moved.users.filter((u) => u.id !== legacy.id);
     save(moved);
     openCloudAccount(created.value, ws ? structuredClone(ws) : undefined);
+    markUnlocked(created.value.id);
     return { ok: true };
   }
   return res;

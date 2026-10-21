@@ -7,6 +7,7 @@ import { product } from "@/config/product";
 import { businessCategories, providerInfo } from "@/content/app/services";
 import { audit, changePassword, deleteAccount, uid, updateWorkspace, useSession } from "@/lib/app/store";
 import type { AssistantProfile, Business, NotificationKind, ProviderId, TeamRole } from "@/lib/app/types";
+import { AppLockSettings } from "@/components/app/AppLockSettings";
 import { ConnectAccount } from "@/components/app/ConnectAccount";
 import { PhoneInput } from "@/components/app/PhoneInput";
 import { Btn, Card, Field, Input, Notice, PageHeader, Pill, Select, TextArea, Toggle, fmtDateTime } from "@/components/app/ui";
@@ -224,7 +225,9 @@ export default function SettingsPage() {
       </Section>
 
       <Section id="security" title="Security">
-        <form onSubmit={onPassword} className="space-y-3">
+        <AppLockSettings userId={user.id} label={user.email} />
+
+        <form onSubmit={onPassword} className="space-y-3 border-t border-white/[0.06] pt-4">
           <p className="text-sm font-semibold">Change password</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Current password" htmlFor="pw-cur">
