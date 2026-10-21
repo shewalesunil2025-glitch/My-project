@@ -1,0 +1,94 @@
+import { MotionConfig } from 'framer-motion';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter, createMemoryRouter, Navigate, RouterProvider, type RouteObject } from 'react-router-dom';
+import { AuthProvider } from '@/context/AuthContext';
+import { BookingProvider } from '@/context/BookingContext';
+import { ToastProvider } from '@/context/ToastContext';
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { RequireAdmin, RequireAuth } from '@/components/layout/Guards';
+import { LoadingState } from '@/components/ui/States';
+import HomePage from '@/pages/HomePage';
+
+// Route-level code splitting: only the home page ships in the first bundle.
+const SeatSelectionPage = lazy(() => import('@/pages/SeatSelectionPage'));
+const CheckoutSummaryPage = lazy(() => import('@/pages/CheckoutSummaryPage'));
+const BookingConfirmationPage = lazy(() => import('@/pages/BookingConfirmationPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
+const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const AdminLoginPage = lazy(() => import('@/pages/admin/AdminLoginPage'));
+const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
+const AdminMoviesPage = lazy(() => import('@/pages/admin/AdminMoviesPage'));
+const AdminTheatresPage = lazy(() => import('@/pages/admin/AdminTheatresPage'));
+const AdminShowsPage = lazy(() => import('@/pages/admin/AdminShowsPage'));
+const AdminBookingsPage = lazy(() => import('@/pages/admin/AdminBookingsPage'));
+const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
+
+const auth = (el: React.ReactNode) => <RequireAuth>{el}</RequireAuth>;
+
+const routes: RouteObject[] = [
+  {
+    element: <AppLayout />,
+    children: [
+      { index: true, element: <HomePage /> },
+      // Single-auditorium site: old catalogue URLs lead back to the booking page.
+      ...['movies', 'movies/:slug', 'theatres', 'theatres/:slug', 'book/:slug'].map((path) => ({ path, element: <Navigate to="/#book" replace /> })),
+      { path: 'book/show/:showId/seats', element: <SeatSelectionPage /> },
+      { path: 'checkout/:bookingId/summary', element: auth(<CheckoutSummaryPage />) },
+      { path: 'booking/:bookingId', element: auth(<BookingConfirmationPage />) },
+      { path: 'tickets/:bookingId', element: auth(<BookingConfirmationPage fresh={false} />) },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'my-bookings', element: auth(<MyBookingsPage />) },
+      { path: 'profile', element: auth(<ProfilePage />) },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  {
+    path: 'admin/login',
+    element: (
+      <Suspense fallback={<LoadingState className="min-h-dvh" />}>
+        <AdminLoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: 'admin',
+    element: (
+      <RequireAdmin>
+        <AdminLayout />
+      </RequireAdmin>
+    ),
+    children: [
+      { index: true, element: <AdminDashboardPage /> },
+      { path: 'movies', element: <AdminMoviesPage /> },
+      { path: 'theatres', element: <AdminTheatresPage /> },
+      { path: 'shows', element: <AdminShowsPage /> },
+      { path: 'bookings', element: <AdminBookingsPage /> },
+      { path: 'users', element: <AdminUsersPage /> },
+    ],
+  },
+];
+
+// VITE_ROUTER=memory builds a self-contained preview that doesn't depend on the page URL
+// (used for sandboxed hosting); normal builds use real, shareable URLs.
+const router = import.meta.env.VITE_ROUTER === 'memory' ? createMemoryRouter(routes) : createBrowserRouter(routes);
+
+export default function App() {
+  return (
+    <MotionConfig reducedMotion="user">
+      <ToastProvider>
+        <AuthProvider>
+          <BookingProvider>
+            <RouterProvider router={router} />
+          </BookingProvider>
+        </AuthProvider>
+      </ToastProvider>
+    </MotionConfig>
+  );
+}
