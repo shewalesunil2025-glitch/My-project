@@ -2,24 +2,17 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { CirclePlay, Crown, LogOut } from "lucide-react";
-import { cloudAuthHeader } from "@/lib/app/cloud";
-import { logOut } from "@/lib/app/store";
+import { useIsFounder } from "@/lib/app/founder";
+import { logOut, useSession } from "@/lib/app/store";
 import { useWorkspace, workspaceNav } from "@/components/app/AppShell";
 import { PageHeader } from "@/components/app/ui";
 
 export default function MorePage() {
   const ws = useWorkspace();
   const router = useRouter();
-  const [founder, setFounder] = useState(false);
-  useEffect(() => {
-    // The server decides; this only shows the link to the founder's own account.
-    void (async () => {
-      const res = await fetch("/api/founder?check=1", { headers: await cloudAuthHeader() }).catch(() => null);
-      setFounder(Boolean(res?.ok));
-    })();
-  }, []);
+  const { user } = useSession();
+  const founder = useIsFounder(ws?.sample ? undefined : user?.id);
   if (!ws) return null;
   const items = workspaceNav.filter((n) => !["/app/home", "/app/assistant", "/app/services", "/app/activity"].includes(n.href));
   return (
