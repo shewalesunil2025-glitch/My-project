@@ -8,7 +8,7 @@
  */
 
 const players: HTMLAudioElement[] = [];
-let naturalVoice = true; // turned off for this visit if the server can't make speech
+let restUntil = 0; // the voice server said no (limit reached): the phone's voice for a little while
 let speakToken = 0;
 const SILENCE = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
 
@@ -55,12 +55,12 @@ export function stopNaturalVoice() {
 
 /**
  * The text in pieces that grow: the first sentence on its own (IBAX starts talking quickly),
- * then pieces of up to ~120, ~200 and `max` characters. Each piece is made while the one before
- * plays, and a short piece before a long one means the long one is ready in time.
+ * then pieces of up to `sizes[0]`, `sizes[1]`… and then `max` characters. Each piece is made
+ * while the one before plays, and a short piece before a long one means the long one is ready in time.
  */
-export function speechChunks(text: string, max = 260): string[] {
+export function speechChunks(text: string, max = 260, sizes = [120, 200]): string[] {
   const sentences = text.trim().match(/[^.!?।\n]+(?:[.!?।]+|\n+|$)\s*/g)?.map((s) => s.trim()).filter(Boolean) ?? [];
-  const limit = (i: number) => Math.min(max, [0, 120, 200][i] ?? max);
+  const limit = (i: number) => Math.min(max, sizes[i - 1] ?? max);
   const chunks: string[] = [];
   let cur = "";
   for (const s of sentences.flatMap((x) => (x.length > max ? x.match(new RegExp(`.{1,${max}}(?:\\s|$)`, "g")) ?? [x] : [x]))) {
@@ -76,7 +76,7 @@ export function speechChunks(text: string, max = 260): string[] {
 }
 
 async function naturalAudio(text: string, signal: AbortSignal): Promise<Blob | null> {
-  for (let attempt = 0; attempt < 2 && !signal.aborted; attempt++) {
+  for (let attempt = 0; attempt < 2 && !signal.aborted && Date.now() >= restUntil; attempt++) {
     // Each try gives up after 15 s, or as soon as the answer is stopped.
     const ctl = new AbortController();
     const quit = () => ctl.abort();
@@ -85,8 +85,10 @@ async function naturalAudio(text: string, signal: AbortSignal): Promise<Blob | n
     try {
       const res = await fetch("/api/speak", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }), signal: ctl.signal });
       if (res.ok) return await res.blob();
-      if (res.status === 503 && attempt) naturalVoice = false;
-      if (res.status === 400) return null;
+      // The server already tried every voice model: don't ask again for a while (it would only
+      // use up more of the limit), the phone's voice speaks meanwhile.
+      if (res.status === 503) restUntil = Date.now() + 90_000;
+      return null;
     } catch {
       /* try once more */
     } finally {
@@ -137,8 +139,10 @@ function play(p: HTMLAudioElement, url: string, onStart?: () => void) {
  */
 export async function speakNaturally(text: string, onStart?: () => void, onEnd?: () => void): Promise<string> {
   const token = speakToken;
-  if (!naturalVoice || !players.length) return text;
-  const chunks = speechChunks(text);
+  if (Date.now() < restUntil || !players.length) return text;
+  // Few, growing pieces: the first sentence, up to 140 characters, then up to 600 — at most
+  // three requests for most answers (the voice server has a per-minute limit).
+  const chunks = speechChunks(text, 650, [140, 600]);
   const abort = new AbortController();
   const clips: Promise<Blob | null>[] = [];
   const fetchUpTo = (i: number) => {

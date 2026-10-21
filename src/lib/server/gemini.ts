@@ -235,12 +235,27 @@ function pcmToWav(pcm: Buffer, rate: number) {
  * IBAX's spoken reply in a warm, natural woman's voice. Returns WAV, or null if TTS isn't available.
  * Only the reply goes to the model: a style instruction in front of it sometimes gets read out loud.
  */
-export async function geminiSpeak(text: string): Promise<Buffer | null> {
+/** What happened with each voice model on one request (names and status codes only), for the logs and the app. */
+export type SpeakTry = { model: string; status: number | "timeout" | "error" | "empty"; ms: number };
+
+/* A model that hit its limit or failed is rested for a while, so the next request goes straight to one that works. */
+const resting = new Map<string, number>();
+
+export async function geminiSpeak(text: string, tried: SpeakTry[] = []): Promise<Buffer | null> {
   const voice = process.env.GEMINI_TTS_VOICE || "Sulafat";
-  const models = process.env.GEMINI_TTS_MODEL ? [process.env.GEMINI_TTS_MODEL] : await geminiTtsModels();
-  // Two models at most, 12 s each: the app switches to the phone's voice rather than wait longer.
-  for (const model of models.slice(0, 2)) {
+  const all = process.env.GEMINI_TTS_MODEL ? [process.env.GEMINI_TTS_MODEL] : await geminiTtsModels();
+  const now = Date.now();
+  const ready = all.filter((m) => (resting.get(m) ?? 0) <= now);
+  // At most ~14 s in all: the app switches to the phone's voice rather than wait longer.
+  const deadline = now + 14_000;
+  for (const model of ready.length ? ready : all) {
+    const left = deadline - Date.now();
+    if (left < 1500) break;
     const started = Date.now();
+    const note = (status: SpeakTry["status"], restFor = 0) => {
+      tried.push({ model, status, ms: Date.now() - started });
+      if (restFor) resting.set(model, Date.now() + restFor);
+    };
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",
@@ -249,24 +264,31 @@ export async function geminiSpeak(text: string): Promise<Buffer | null> {
           contents: [{ role: "user", parts: [{ text }] }],
           generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
         }),
-        signal: AbortSignal.timeout(12_000),
+        signal: AbortSignal.timeout(Math.min(12_000, left)),
       });
       if (!res.ok) {
-        console.error(`[speak] ${model} ${res.status} after ${Date.now() - started} ms`, (await res.text()).slice(0, 200));
+        // 429: this model's limit is used up for now; 5xx: Google had a problem.
+        note(res.status, res.status === 429 ? 60_000 : res.status >= 500 ? 20_000 : res.status === 404 || res.status === 400 ? 600_000 : 0);
+        console.error(`[speak] ${model} ${res.status} after ${Date.now() - started} ms`, (await res.text()).slice(0, 300));
         continue;
       }
       const data = (await res.json()) as { candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[] };
       const audio = data.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
-      if (!audio?.data) continue;
+      if (!audio?.data) {
+        note("empty");
+        continue;
+      }
       const rate = Number(audio.mimeType?.match(/rate=(\d+)/)?.[1] ?? 24000);
       const pcm = Buffer.from(audio.data, "base64");
       const samples = new Int16Array(pcm.buffer, pcm.byteOffset, pcm.length >> 1);
       muteStaticBursts(samples, rate);
       const [from, to] = speechSpan(samples, rate);
-      const ms = Date.now() - started;
-      if (ms > 6000) console.warn(`[speak] ${model} slow: ${ms} ms for ${text.length} chars`);
+      note(200);
+      if (Date.now() - started > 6000) console.warn(`[speak] ${model} slow: ${Date.now() - started} ms for ${text.length} chars`);
       return pcmToWav(Buffer.from(pcm.subarray(from * 2, to * 2)), rate);
     } catch (error) {
+      const timeout = error instanceof Error && error.name === "TimeoutError";
+      note(timeout ? "timeout" : "error", timeout ? 30_000 : 0);
       console.error(`[speak] ${model} failed after ${Date.now() - started} ms`, error instanceof Error ? error.message : error);
     }
   }

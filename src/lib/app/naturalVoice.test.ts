@@ -41,8 +41,10 @@ describe("speakNaturally", () => {
   let delays: Record<number, number> = {};
   let calls = 0;
 
+  let clock = Date.UTC(2030, 0, 1);
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.setSystemTime((clock += 3_600_000)); // each test an hour later, past any rest from the one before
     played.length = 0;
     delays = {};
     calls = 0;
@@ -92,7 +94,7 @@ describe("speakNaturally", () => {
 
   it("hands the rest to the phone's voice when a piece is late, instead of going quiet", async () => {
     unlockAudio();
-    const chunks = speechChunks(answer);
+    const chunks = speechChunks(answer, 650, [140, 600]);
     delays = { 1: 60_000 }; // the second piece never comes in time
     const done = speakNaturally(answer);
     await vi.advanceTimersByTimeAsync(500 + 1000 + WAIT_NEXT_MS + 100);
@@ -107,6 +109,27 @@ describe("speakNaturally", () => {
     await vi.advanceTimersByTimeAsync(WAIT_FIRST_MS + 100);
     expect(await done).toBe(speechChunks(answer).join(" "));
     expect(played).toEqual([]);
+  });
+
+  it("uses the phone's voice for a while when the voice server is at its limit, without asking again", async () => {
+    unlockAudio();
+    vi.stubGlobal("fetch", () => {
+      calls++;
+      return Promise.resolve({ ok: false, status: 503 });
+    });
+    const first = speakNaturally(answer);
+    await vi.runAllTimersAsync();
+    expect(await first).toBe(answer);
+    const asked = calls;
+    expect(await speakNaturally(answer)).toBe(answer); // straight away, no new request
+    expect(calls).toBe(asked);
+    await vi.advanceTimersByTimeAsync(91_000);
+    vi.stubGlobal("fetch", (_: string, init: { body: string }) =>
+      Promise.resolve({ ok: true, status: 200, blob: async () => ({ text: (JSON.parse(init.body) as { text: string }).text }) }),
+    );
+    const later = speakNaturally(answer);
+    await vi.runAllTimersAsync();
+    expect(await later).toBe(""); // the natural voice is back
   });
 
   it("says nothing more once stopped", async () => {
