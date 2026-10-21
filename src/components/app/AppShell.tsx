@@ -10,6 +10,7 @@ import {
   Bot,
   ChartColumn,
   Clapperboard,
+  Crown,
   CreditCard,
   Ellipsis,
   Globe,
@@ -29,6 +30,7 @@ import { cn } from "@/lib/cn";
 import { ensureStarterProfile, logOut, useSession } from "@/lib/app/store";
 import { expireTrials } from "@/lib/app/trial";
 import { syncPaidPlans } from "@/lib/app/renewal";
+import { useIsFounder } from "@/lib/app/founder";
 import type { Workspace } from "@/lib/app/types";
 import { BrandLogo, BrandMark, FullScreenLoader, LumiMark } from "./ui";
 import { IbaxLauncher } from "./IbaxLauncher";
@@ -63,6 +65,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { ready, user, workspace } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const founder = useIsFounder(workspace?.sample ? undefined : user?.id);
 
   useEffect(() => {
     if (!ready) return;
@@ -117,6 +120,17 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
         <nav aria-label="Workspace" className="no-scrollbar flex-1 overflow-y-auto px-3 pb-4">
           <ul className="space-y-0.5">
+            {founder && (
+              <li className="mb-2 border-b border-white/[0.06] pb-2">
+                <Link
+                  href="/app/founder"
+                  className="flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-flow transition-colors hover:bg-flow/10"
+                >
+                  <Crown className="size-[1.05rem]" aria-hidden />
+                  Founder Console
+                </Link>
+              </li>
+            )}
             {workspaceNav.map((item) => (
               <li key={item.href}>
                 <Link
@@ -176,6 +190,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                   Preview mode
                 </span>
               )
+            )}
+            {founder && (
+              <Link
+                href="/app/founder"
+                className="grid size-10 place-items-center rounded-full text-flow hover:bg-flow/10"
+                aria-label="Founder Console"
+                title="Founder Console — all clients"
+              >
+                <Crown className="size-[1.15rem]" aria-hidden />
+              </Link>
             )}
             <ThemeToggle />
             <Link
