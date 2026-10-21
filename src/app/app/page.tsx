@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CirclePlay } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, CirclePlay, LogIn, UserPlus } from "lucide-react";
 import { product } from "@/config/product";
-import { useSession } from "@/lib/app/store";
+import { logOut, useSession } from "@/lib/app/store";
 import { BrandMark } from "@/components/app/ui";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { Wordmark } from "@/components/navigation/Logo";
@@ -34,7 +35,13 @@ const secondary =
 /** The app's first page: the brand, the slogan and the next step — nothing else. */
 export default function WelcomePage() {
   const { ready, user, workspace } = useSession();
+  const router = useRouter();
   const signedIn = ready && user && !workspace?.sample;
+  /** Another account on this phone: sign the current one out first (its data stays safe in the cloud). */
+  const switchTo = (path: "/app/signup" | "/app/login") => {
+    logOut();
+    router.push(path);
+  };
 
   return (
     <div className="relative flex min-h-dvh flex-col overflow-hidden bg-[#020a05]">
@@ -66,9 +73,18 @@ export default function WelcomePage() {
                 Continue to {workspace?.business?.name ?? "your workspace"}
                 <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden />
               </Link>
-              <Link href="/app/demo" className={secondary}>
-                <CirclePlay className="size-5 text-flow" aria-hidden /> Watch Demo
-              </Link>
+              <p className="-mt-1 max-w-full truncate text-xs text-fg-subtle">Logged in as {user.email}</p>
+              <button type="button" onClick={() => switchTo("/app/signup")} className={secondary}>
+                <UserPlus className="size-5 text-flow" aria-hidden /> Create New Account
+              </button>
+              <div className="mt-1 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-fg-muted">
+                <button type="button" onClick={() => switchTo("/app/login")} className="inline-flex items-center gap-1.5 py-2 transition-colors hover:text-fg">
+                  <LogIn className="size-4 text-flow" aria-hidden /> Login to another account
+                </button>
+                <Link href="/app/demo" className="inline-flex items-center gap-1.5 py-2 transition-colors hover:text-fg">
+                  <CirclePlay className="size-4 text-flow" aria-hidden /> Watch Demo
+                </Link>
+              </div>
             </>
           ) : (
             <>
