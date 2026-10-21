@@ -1039,6 +1039,13 @@ body {
 @keyframes demo-ken { from { transform: scale(1.04) translateY(4px); } to { transform: none; } }
 @keyframes demo-type { to { width: 100%; } }
 
+/* App lock: the PIN dots shake on a wrong PIN. */
+@keyframes lock-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
 /* IBAX walking loader: the video's edges melt into the page. */
 .walk-loader { -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
 .walk-loader video { display: block; object-fit: contain; }
