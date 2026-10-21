@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Gift, Timer } from "lucide-react";
 import { TRIAL_DAYS, isLive, trialServices } from "@/content/app/services";
 import { beginTrial, timeLeft, trialServiceNames, trialState } from "@/lib/app/trial";
+import { businessReady } from "@/lib/app/store";
 import type { Workspace } from "@/lib/app/types";
 import { Btn, BtnLink } from "./ui";
 import { cn } from "@/lib/cn";
@@ -65,6 +66,7 @@ export function TrialBanner({ ws, className }: { ws: Workspace; className?: stri
               size="lg"
               className="w-full sm:w-auto"
               onClick={() => {
+                if (!businessReady(ws)) return router.push(`/app/setup?next=${encodeURIComponent("/app/services")}`);
                 if (beginTrial()) router.push("/app/services");
               }}
             >

@@ -29,7 +29,7 @@ export default function SignUpPage() {
     setBusy(false);
     if (!res.ok) return setError(res.error);
     if (res.confirmEmail) return setSentTo(get("email"));
-    router.push("/app/setup");
+    router.push("/app/home");
   }
 
   if (sentTo)

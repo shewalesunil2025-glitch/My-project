@@ -70,7 +70,7 @@ export default function WelcomePage() {
           {signedIn ? (
             <>
               <Link href="/app/home" className={primary}>
-                Continue to {workspace?.business?.name ?? "your workspace"}
+                Continue to {workspace?.business?.name || "your workspace"}
                 <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden />
               </Link>
               <p className="-mt-1 max-w-full truncate text-xs text-fg-subtle">Logged in as {user.email}</p>

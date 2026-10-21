@@ -254,7 +254,7 @@ export default function BillingPage() {
             <p className="font-mono text-sm">{invoice.number}</p>
             <p className="mt-4 text-xs text-ink-muted">Billed to</p>
             <p className="text-sm">
-              {ws.business.name}
+              {ws.business.name || ws.business.ownerName}
               <br />
               {ws.business.address && (
                 <>

@@ -158,6 +158,7 @@ async function runTool(block: Anthropic.Beta.BetaToolUseBlock, out: Required<Pic
       if (!svc) return { content: "Unknown service.", is_error: true };
       const result = await activateService(svc.id);
       if (result.ok) out.cards.push({ type: "activated", serviceId: svc.id, automationId: result.automationId });
+      else if (result.reason === "no_business") out.links.push({ href: "/app/setup", label: "Add your business details" });
       return { content: JSON.stringify(result), is_error: !result.ok };
     }
     case "join_waitlist": {

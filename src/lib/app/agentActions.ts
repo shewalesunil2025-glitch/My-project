@@ -5,7 +5,7 @@ import { cloudAuthHeader } from "./cloud";
 import { beginTrial, paidUntilFor, trialOver } from "./trial";
 import { appCurrency, money, svcPrice } from "./money";
 import { paymentsAreLive } from "./payment";
-import { audit, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
+import { audit, businessReady, currentWorkspace, logActivity, notify, nowIso, uid, updateWorkspace } from "./store";
 import type { Automation, PlanPeriod, ProviderId, Workspace } from "./types";
 
 /**
@@ -241,13 +241,15 @@ export function connectProvider(provider: ProviderId, account: string, simulated
 
 export type ActivationResult =
   | { ok: true; automationId: string; note?: string; approvalNote?: string; backend: "preview" | "sent" | "failed" }
-  | { ok: false; reason: "unknown_service" | "not_paid" | "missing_details" | "not_connected"; missing: string[] };
+  | { ok: false; reason: "unknown_service" | "no_business" | "not_paid" | "missing_details" | "not_connected"; missing: string[] };
 
 /** Runs the test and switches the service on, then hands it to the automation backend. */
 export async function activateService(serviceId: string): Promise<ActivationResult> {
   const svc = serviceById(serviceId);
   if (!svc) return { ok: false, reason: "unknown_service", missing: [] };
   const ws = currentWorkspace();
+  // A service runs on the business details: none go live without them.
+  if (!businessReady(ws)) return { ok: false, reason: "no_business", missing: [] };
   const a = ws && automationFor(ws, svc.id);
   if (!ws || !a || trialOver(a)) return { ok: false, reason: "not_paid", missing: [] };
   const details = missingDetails(svc, a);

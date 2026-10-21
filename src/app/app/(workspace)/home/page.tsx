@@ -8,7 +8,9 @@ import { ArrowRight, CalendarClock, Check, Globe, MessageCircle, PhoneCall, Spar
 import { serviceById } from "@/content/app/services";
 import { suggestions } from "@/lib/app/assistant";
 import { useWorkspace } from "@/components/app/AppShell";
+import { AddBusinessCard } from "@/components/app/AddBusinessCard";
 import { AppLockTip } from "@/components/app/AppLockTip";
+import { businessReady } from "@/lib/app/store";
 import { AskBar } from "@/components/app/AskBar";
 import { RenewalBanner } from "@/components/app/RenewalBanner";
 import { TrialBanner } from "@/components/app/TrialBanner";
@@ -78,6 +80,7 @@ function Dashboard() {
 
   return (
     <div className="space-y-8">
+      {!ws.sample && !businessReady(ws) && <AddBusinessCard />}
       {!ws.sample && <RenewalBanner ws={ws} className="mb-4" />}
       {!ws.sample && <TrialBanner ws={ws} />}
       {!ws.sample && <AppLockTip />}
@@ -101,7 +104,7 @@ function Dashboard() {
           <p className="mt-5 text-sm text-fg-muted">
             {greeting}, {first} 👋
           </p>
-          <h1 className="display text-metal mt-1 text-3xl sm:text-4xl">{ws.business.name}</h1>
+          <h1 className="display text-metal mt-1 text-3xl sm:text-4xl">{ws.business.name || `Welcome to ${product.name}`}</h1>
           <p className="mt-2 max-w-xl text-sm text-fg-muted">
             Today so far: <span className="text-fg">{count(callsToday, "call")}</span> · <span className="text-fg">{count(msgsToday, "message")}</span> ·{" "}
             <span className="text-fg">{count(leadsToday, "new lead")}</span> · <span className="text-fg">{count(reviewsToday, "review")}</span>
@@ -116,7 +119,7 @@ function Dashboard() {
         <Notice className="flex items-start gap-3">
           <Sparkles className="mt-0.5 size-4 shrink-0" aria-hidden />
           <div className="flex-1">
-            <p className="font-semibold text-fg">{name} is ready for {ws.business.name}.</p>
+            <p className="font-semibold text-fg">{name} is ready for {ws.business.name || "you"}.</p>
             <p className="mt-0.5 text-fg-muted">
               {params.get("welcome") === "website"
                 ? "You told us you don't have a website yet — build one in minutes, then pick the services you want."

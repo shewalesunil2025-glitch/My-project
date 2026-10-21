@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, Globe } from "lucide-react";
@@ -7,7 +8,7 @@ import { product } from "@/config/product";
 import { businessCategories } from "@/content/app/services";
 import { countries } from "@/content/app/countries";
 import { PhoneInput } from "@/components/app/PhoneInput";
-import { audit, logActivity, nowIso, updateWorkspace, useSession } from "@/lib/app/store";
+import { audit, businessReady, logActivity, nowIso, updateWorkspace, useSession } from "@/lib/app/store";
 import type { AssistantProfile, Business, User } from "@/lib/app/types";
 import { BrandLogo, Btn, Field, FullScreenLoader, Input, Notice, Select, TextArea } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
@@ -26,19 +27,19 @@ export default function SetupPage() {
   useEffect(() => {
     if (!ready || finished.current) return;
     if (!user) router.replace("/app/login");
-    else if (workspace?.business && workspace.assistant) router.replace("/app/home");
+    else if (businessReady(workspace)) router.replace("/app/home");
   }, [ready, user, workspace, router]);
 
   if (!ready || !user) return <FullScreenLoader />;
-  return <SetupWizard user={user} onFinish={() => (finished.current = true)} />;
+  return <SetupWizard user={user} start={workspace?.business ?? null} onFinish={() => (finished.current = true)} />;
 }
 
-function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
+function SetupWizard({ user, start, onFinish }: { user: User; start: Business | null; onFinish: () => void }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [error, setError] = useState("");
   const [hasSite, setHasSite] = useState<"yes" | "no" | "">("");
-  const [biz, setBiz] = useState<Business>({
+  const [biz, setBiz] = useState<Business>(() => ({
     category: "",
     name: "",
     ownerName: user.name,
@@ -53,7 +54,9 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
     services: "",
     targetCustomers: "",
     socialLinks: "",
-  });
+    // What was already saved (e.g. told to IBAX in the chat) is kept.
+    ...Object.fromEntries(Object.entries(start ?? {}).filter(([, v]) => v)),
+  }));
   // IBAX is set up with sensible defaults; the owner can change them any time in Settings.
   const assistant: AssistantProfile = { name: product.assistantName, language: "English", tone: tones[0], personality: personalities[0], welcome: "" };
 
@@ -82,6 +85,9 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
       logActivity(ws, { kind: "system", title: `${product.assistantName} is ready for ${biz.name}` });
       audit(ws, "Business profile and assistant created");
     });
+    // Came here from a service or the website builder: go back there.
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (next?.startsWith("/app/")) return router.push(next);
     router.push(hasSite === "no" ? "/app/home?welcome=website" : "/app/home?welcome=1");
   }
 
@@ -93,8 +99,11 @@ function SetupWizard({ user, onFinish }: { user: User; onFinish: () => void }) {
           <span className="ml-auto text-xs text-fg-subtle">
             Step {step + 1} of {steps.length}
           </span>
+          <Link href="/app/home" className="ml-3 text-xs font-medium text-fg-muted underline-offset-4 hover:text-fg hover:underline">
+            Skip for now
+          </Link>
         </div>
-        <div className="mt-4 grid grid-cols-4 gap-1.5" aria-hidden>
+        <div className="mt-4 grid grid-cols-3 gap-1.5" aria-hidden>
           {steps.map((s, i) => (
             <span key={s} className={cn("h-1 rounded-full", i <= step ? "bg-flow" : "bg-white/10")} />
           ))}

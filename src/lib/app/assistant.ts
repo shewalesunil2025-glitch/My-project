@@ -61,7 +61,7 @@ function notActive(ws: Workspace, id: string, what: string): Reply {
 /** Answers from the workspace's own data. Never invents numbers. */
 export function localAnswer(ws: Workspace, raw: string): Reply {
   const q = raw.toLowerCase().trim();
-  const biz = ws.business?.name ?? "your business";
+  const biz = ws.business?.name || "your business";
 
   // Help & how-to
   const howTo = q.match(/(?:activate|set ?up|start|turn on|buy|get)\s+(?:the\s+)?([a-z ]+?)(?:\?|$| automation| assistant)/);
@@ -279,7 +279,7 @@ function findService(text: string) {
 /** Template-based content idea from the business profile (used without an AI key). */
 export function contentIdea(ws: Workspace, platform: ContentItem["platform"]) {
   const b = ws.business;
-  const name = b?.name ?? "our business";
+  const name = b?.name || "our business";
   const first = (b?.services ?? "our best work").split(",")[0].trim();
   const city = b?.city ? ` in ${b.city}` : "";
   const tag = (s: string) => "#" + s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -301,7 +301,9 @@ export function workspaceContext(ws: Workspace) {
   const b = ws.business;
   const today = ws.activity.filter((e) => isToday(e.at));
   return [
-    b ? `Business: ${b.name} (${b.category}) in ${b.city}, ${b.country}. ${b.description} Hours: ${b.hours}. Offers: ${b.services}.` : "Business profile not completed yet.",
+    b?.name && b.category
+      ? `Business: ${b.name} (${b.category}) in ${b.city}, ${b.country}. ${b.description} Hours: ${b.hours}. Offers: ${b.services}.`
+      : "Business details not added yet: the owner is exploring the app. Answer anything; before a service can go live, ask them to add their business details (Add your business details, /app/setup) — or take the details in the chat with update_business_profile.",
     `Assistant name: ${product.assistantName}; tone: ${ws.assistant?.tone ?? "Warm & friendly"}; language: ${ws.assistant?.language ?? "English"}.`,
     `Active services: ${ws.automations.map((a) => `${serviceById(a.serviceId)?.name} (${a.status})`).join(", ") || "none"}.`,
     `Today's activity: ${today.map((e) => `${time(e.at)} ${e.title}`).join("; ") || "none"}.`,

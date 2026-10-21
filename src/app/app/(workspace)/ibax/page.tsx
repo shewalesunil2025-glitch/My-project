@@ -38,7 +38,7 @@ export default function IbaxHubPage() {
         <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{product.assistantName}</h1>
         <p className="mt-1 text-sm font-medium text-flow-soft">{product.slogan}</p>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-fg-muted">
-          Your AI business manager for <span className="font-semibold text-fg">{ws.business.name}</span>. Tell {product.assistantName} what you need — it sets up services, answers questions and keeps your business running.
+          Your AI business manager for <span className="font-semibold text-fg">{ws.business.name || "your business"}</span>. Tell {product.assistantName} what you need — it sets up services, answers questions and keeps your business running.
         </p>
 
         <div className="mt-6 grid grid-cols-3 gap-2 text-left">

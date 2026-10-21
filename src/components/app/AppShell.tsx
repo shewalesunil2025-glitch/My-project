@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { product } from "@/config/product";
 import { cn } from "@/lib/cn";
-import { logOut, useSession } from "@/lib/app/store";
+import { ensureStarterProfile, logOut, useSession } from "@/lib/app/store";
 import { expireTrials } from "@/lib/app/trial";
 import { syncPaidPlans } from "@/lib/app/renewal";
 import type { Workspace } from "@/lib/app/types";
@@ -67,7 +67,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     if (!user) router.replace("/app/login");
-    else if (!workspace?.business || !workspace.assistant) router.replace("/app/setup");
+    // A new account goes straight into the app; business details are added when the owner wants.
+    else if (!workspace?.business || !workspace.assistant) ensureStarterProfile(user);
   }, [ready, user, workspace, router]);
 
   // Autopay renewals recorded by the server while the app was closed.
@@ -137,7 +138,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 rounded-xl px-2 py-2">
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/[0.08] text-sm font-semibold">{user.name.charAt(0).toUpperCase()}</span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{workspace.business.name}</p>
+              <p className="truncate text-sm font-medium">{workspace.business.name || user.name}</p>
               <p className="truncate text-xs text-fg-subtle">{user.email}</p>
             </div>
             <button
@@ -161,10 +162,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
           <Link href="/app/home" className="flex min-w-0 items-center gap-2 lg:hidden">
             <BrandMark className="size-7" />
-            <span className="truncate text-[0.95rem] font-semibold">{workspace.business.name}</span>
+            <span className="truncate text-[0.95rem] font-semibold">{workspace.business.name || product.name}</span>
           </Link>
           <p className="hidden truncate text-sm text-fg-muted lg:block">
-            {workspace.business.name} <span className="text-fg-subtle">· {workspace.business.category}</span>
+            {workspace.business.name || user.name} {workspace.business.category && <span className="text-fg-subtle">· {workspace.business.category}</span>}
           </p>
           <div className="ml-auto flex items-center gap-1">
             {workspace.sample ? (

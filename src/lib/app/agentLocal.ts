@@ -144,6 +144,15 @@ export async function flowNext(svc: ServiceDef, flow: AgentFlow): Promise<LocalR
 
   setFlow(null);
   const result = await activateService(svc.id);
+  if (!result.ok && result.reason === "no_business")
+    return {
+      text: t(lang, {
+        en: "First add your business details — the service works from them. It takes 2 minutes.",
+        hi: "पहले अपनी बिज़नेस डिटेल्स डालिए — सर्विस उन्हीं से चलती है। 2 मिनट लगेंगे।",
+        hl: "Pehle apni business details daaliye — service unhi se chalti hai. 2 minute lagenge.",
+      }),
+      links: [{ href: "/app/setup", label: "Add your business details" }],
+    };
   if (!result.ok) return { text: t(lang, { en: "Something is still missing — let's check it together.", hi: "अभी कुछ बाकी है — चलिए साथ में देखते हैं।", hl: "Abhi kuch baaki hai — chaliye saath me dekhte hain." }) };
   const extra = [result.note, result.approvalNote].filter(Boolean).join(" ");
   const preview =
