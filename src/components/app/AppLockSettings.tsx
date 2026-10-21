@@ -94,7 +94,10 @@ export function AppLockSettings({ userId, label }: { userId: string; label: stri
           <LockKeyhole className="size-5" aria-hidden />
         </span>
         <div>
-          <p className="text-sm font-semibold">App lock {lock && <span className="ml-1 text-xs font-medium text-flow">· On</span>}</p>
+          <p className="text-sm font-semibold">
+            {bioOk ? "PIN · Fingerprint · Face ID" : "6-digit PIN"}{" "}
+            <span className={lock ? "ml-1 text-xs font-medium text-flow" : "ml-1 text-xs font-medium text-fg-subtle"}>· {lock ? "On" : "Off"}</span>
+          </p>
           <p className="text-sm text-fg-muted">
             Open ibaxai on this phone only with your {PIN_LENGTH}-digit PIN{bioOk ? ", fingerprint or Face ID" : ""} — so nobody who picks up your phone can open your account.
           </p>
