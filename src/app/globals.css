@@ -276,8 +276,7 @@ body {
   position: relative;
   font-weight: 600;
   letter-spacing: 0.32em;
-  text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: 0.8rem; /* the brand is written in lowercase: ibaxai */
   color: var(--color-fg-muted);
   animation: intro-fade 0.8s ease-out 0.2s both;
 }

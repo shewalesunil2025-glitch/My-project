@@ -1,3 +1,4 @@
+import { siteConfig } from "@/config/site";
 import { LogoMark } from "@/components/navigation/Logo";
 
 /** When the hero entrances should start: part-way into the curtain lift (ms after the intro starts). */
@@ -23,7 +24,7 @@ export function IntroLoader() {
         <div className="intro-mark">
           <LogoMark className="size-14" />
         </div>
-        <p className="intro-name">Nexa Flow AI</p>
+        <p className="intro-name">{siteConfig.name}</p>
         <div className="intro-line">
           <span />
         </div>
