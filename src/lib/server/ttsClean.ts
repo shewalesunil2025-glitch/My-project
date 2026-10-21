@@ -45,3 +45,23 @@ export function muteStaticBursts(pcm: Int16Array, rate: number): number {
   }
   return found;
 }
+
+/**
+ * The span of the clip worth playing: the voice model leaves ~0.25 s of silence at the start
+ * and end of every clip, which became a pause between the pieces of one answer. Keeps 60 ms
+ * before the first sound and 150 ms after the last (so words still end naturally).
+ */
+export function speechSpan(pcm: Int16Array, rate: number): [number, number] {
+  const W = Math.round(rate / 100);
+  const loud = (i: number) => {
+    let sq = 0;
+    for (let j = i; j < Math.min(i + W, pcm.length); j++) sq += pcm[j] * pcm[j];
+    return Math.sqrt(sq / W) > 330; // about -40 dB
+  };
+  let start = 0;
+  while (start < pcm.length && !loud(start)) start += W;
+  let end = pcm.length;
+  while (end > start && !loud(Math.max(0, end - W))) end -= W;
+  if (start >= end) return [0, pcm.length];
+  return [Math.max(0, start - Math.round(rate * 0.06)), Math.min(pcm.length, end + Math.round(rate * 0.15))];
+}

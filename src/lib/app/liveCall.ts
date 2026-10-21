@@ -1,5 +1,7 @@
 "use client";
 
+import { bargeDetector } from "./bargeIn";
+
 /**
  * Live voice call with IBAX (Gemini Live): the owner's voice streams straight to Google and
  * IBAX's voice streams back, so it answers in about a second — like a phone call. Our server
@@ -101,6 +103,9 @@ function takeStart(audience: string) {
 }
 
 export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Promise<LiveCall | null> {
+  // Android may pause the sound engine when the mic opens or another sound plays: wake it again.
+  const wake = () => audio.state !== "running" && audio.state !== "closed" && void audio.resume().catch(() => {});
+  audio.addEventListener("statechange", wake);
   // The pass and the microphone at the same time.
   const audience = opts.audience ?? "app";
   const micAsk = navigator.mediaDevices
@@ -135,6 +140,10 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   let ownerShown = false;
   let skipping = false; // the owner cut IBAX off: drop the rest of that answer
   let nextAt = 0;
+  // A small cushion of IBAX's voice before it starts playing, so a slow moment on the phone's
+  // network doesn't cut its words; it grows a little whenever the voice ran out mid-answer.
+  let cushion = 0.2;
+  let midAnswer = false;
   // IBAX's voice goes through a gentle compressor so loud and soft words come out evenly.
   const leveller = audio.createDynamicsCompressor();
   leveller.threshold.value = -26;
@@ -171,11 +180,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   let tap: AudioWorkletNode | null = null;
   let pending: Float32Array[] = [];
   let pendingLength = 0;
-  let micLevel = 0;
-  let outLevel = 0;
-  let echo = 0; // how much of IBAX's own voice reaches the mic, learned during the call
-  let learned = 0; // seconds of IBAX's voice heard so far; it learns its echo first
-  let talkingFor = 0; // seconds the owner has been talking over IBAX
+  const barge = bargeDetector();
   let preRoll: Float32Array[] = []; // the last half second, so the owner's first words aren't lost
   let preRollLength = 0;
   const rms = (a: Float32Array) => {
@@ -186,22 +191,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   /** True when the owner (not IBAX's echo) is talking while IBAX speaks. */
   const ownerTalking = (chunk: Float32Array) => {
     outTap.getFloatTimeDomainData(outBuf);
-    micLevel = micLevel * 0.85 + rms(chunk) * 0.15;
-    outLevel = Math.max(rms(outBuf), outLevel * 0.97); // held a little: the speaker reaches the mic late
-    const seconds = chunk.length / audio.sampleRate;
-    if (outLevel > 0.01) {
-      const ratio = micLevel / outLevel;
-      if (learned < 0.8) {
-        // The first moments of IBAX's voice: learn how loud its echo is.
-        learned += seconds;
-        echo = echo * 0.95 + ratio * 0.05;
-        return false;
-      }
-      echo = ratio < echo ? echo * 0.7 + ratio * 0.3 : echo * 0.998 + ratio * 0.002;
-    }
-    const louder = micLevel > 0.035 && micLevel > echo * outLevel * 2.5 + 0.02;
-    talkingFor = louder ? talkingFor + seconds : Math.max(0, talkingFor - seconds / 2);
-    return talkingFor >= 0.25;
+    return barge.hear(rms(chunk), rms(outBuf), chunk.length / audio.sampleRate);
   };
   try {
     const url = URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" }));
@@ -258,11 +248,12 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     }
     playing.clear();
     nextAt = 0;
+    midAnswer = false;
   };
 
   const bargeIn = () => {
     skipping = true; // drop the rest of the answer IBAX was giving
-    talkingFor = 0;
+    barge.reset();
     stopPlayback();
     setState("listening");
   };
@@ -273,6 +264,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   };
 
   const finishTurn = () => {
+    midAnswer = false;
     flushOwner();
     if (ibaxText.trim()) opts.onIbaxSaid(ibaxText.trim());
     ownerText = "";
@@ -293,7 +285,9 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     const src = audio.createBufferSource();
     src.buffer = buffer;
     src.connect(leveller);
-    nextAt = Math.max(nextAt, audio.currentTime + 0.05);
+    if (midAnswer && nextAt < audio.currentTime) cushion = Math.min(0.6, cushion + 0.1); // ran out mid-answer
+    midAnswer = true;
+    if (nextAt < audio.currentTime) nextAt = audio.currentTime + (playing.size ? 0.05 : cushion);
     src.start(nextAt);
     nextAt += buffer.duration;
     playing.add(src);
@@ -308,6 +302,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   const end = (reason?: string) => {
     if (ended) return;
     ended = true;
+    audio.removeEventListener("statechange", wake);
     stopPlayback();
     tap?.port.close();
     source?.disconnect();
@@ -323,7 +318,12 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   ws.onopen = () => ws.send(JSON.stringify({ setup }));
   ws.onerror = () => end("network");
   ws.onclose = (e) => end(ready ? (e.code === 1000 ? "closed" : "network") : `setup:${e.code}:${e.reason}`.slice(0, 120));
-  ws.onmessage = async (e: MessageEvent<string | Blob>) => {
+  // Messages are handled strictly one after another, so IBAX's voice is never played out of order.
+  let queue = Promise.resolve();
+  ws.onmessage = (e: MessageEvent<string | Blob>) => {
+    queue = queue.then(() => handle(e)).catch(() => {});
+  };
+  const handle = async (e: MessageEvent<string | Blob>) => {
     let msg: ServerMessage;
     try {
       msg = JSON.parse(typeof e.data === "string" ? e.data : await e.data.text()) as ServerMessage;
@@ -361,12 +361,16 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
       }
       if (sc.turnComplete) finishTurn();
     }
-    for (const call of msg.toolCall?.functionCalls ?? []) {
-      flushOwner();
-      const r = await opts.onAction(call.name, call.args ?? {}).catch(() => ({ content: "That didn't work.", is_error: true }));
-      if (ws.readyState === WebSocket.OPEN)
-        ws.send(JSON.stringify({ toolResponse: { functionResponses: [{ id: call.id, name: call.name, response: r.is_error ? { error: r.content } : { result: r.content } }] } }));
-    }
+    const calls = msg.toolCall?.functionCalls ?? [];
+    if (calls.length) flushOwner();
+    // Actions run on the side (one may wait for a payment), so the call's sound keeps flowing.
+    void (async () => {
+      for (const call of calls) {
+        const r = await opts.onAction(call.name, call.args ?? {}).catch(() => ({ content: "That didn't work.", is_error: true }));
+        if (ws.readyState === WebSocket.OPEN)
+          ws.send(JSON.stringify({ toolResponse: { functionResponses: [{ id: call.id, name: call.name, response: r.is_error ? { error: r.content } : { result: r.content } }] } }));
+      }
+    })();
   };
 
   return {

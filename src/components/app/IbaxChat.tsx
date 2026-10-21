@@ -62,7 +62,7 @@ import {
   type LiveCall,
   type LiveState,
 } from "@/lib/app/liveCall";
-import { speakNaturally, speechChunks, stopNaturalVoice, unlockAudio } from "@/lib/app/naturalVoice";
+import { speakNaturally, speakQueue, speechChunks, stopNaturalVoice, unlockAudio } from "@/lib/app/naturalVoice";
 import { Btn, Spinner } from "./ui";
 
 /* ── Voice: speak to IBAX and hear the answer (browser speech, where supported) ── */
@@ -145,14 +145,13 @@ function speakWithPhone(
 ) {
   if (!("speechSynthesis" in window)) return onEnd?.();
   const synth = window.speechSynthesis;
-  synth.cancel();
   const tag =
     /[\u0900-\u097F]/.test(text) && lang === "en" ? "hi-IN" : speechTag(lang);
   const voice = pickVoice(tag);
   // One sentence at a time: Android stops a long utterance after about 15 seconds.
   const chunks = speechChunks(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""), 180);
   if (!chunks.length) return onEnd?.();
-  chunks.forEach((chunk, i) => {
+  const utterances = chunks.map((chunk, i) => {
     const utter = new SpeechSynthesisUtterance(chunk);
     if (voice) utter.voice = voice;
     utter.lang = voice?.lang ?? tag;
@@ -164,8 +163,9 @@ function speakWithPhone(
       if (e.error !== "interrupted" && e.error !== "canceled") synth.cancel();
       onEnd?.();
     };
-    synth.speak(utter);
+    return utter;
   });
+  speakQueue(utterances);
 }
 
 function stopSpeaking() {

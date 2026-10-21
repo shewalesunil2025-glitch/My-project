@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { muteStaticBursts } from "./ttsClean";
+import { muteStaticBursts, speechSpan } from "./ttsClean";
 
 const RATE = 24000;
 const tone = (secs: number, freq: number, amp = 12000) =>
@@ -27,5 +27,21 @@ describe("muteStaticBursts", () => {
   it("leaves a hissy sound that runs into speech alone", () => {
     const pcm = Int16Array.from([...silence(0.4), ...staticBurst(0.1), ...tone(0.8, 200), ...silence(0.3)]);
     expect(muteStaticBursts(pcm, RATE)).toBe(0);
+  });
+});
+
+describe("speechSpan", () => {
+  it("cuts the silence at both ends but keeps a little air around the voice", () => {
+    const pcm = Int16Array.from([...silence(0.3), ...tone(1, 220), ...silence(0.4)]);
+    const [a, b] = speechSpan(pcm, RATE);
+    expect(a / RATE).toBeGreaterThan(0.2);
+    expect(a / RATE).toBeLessThan(0.26);
+    expect(b / RATE).toBeGreaterThan(1.42);
+    expect(b / RATE).toBeLessThan(1.48);
+  });
+
+  it("keeps a clip that is all silence as it is", () => {
+    const pcm = Int16Array.from(silence(0.5));
+    expect(speechSpan(pcm, RATE)).toEqual([0, pcm.length]);
   });
 });
