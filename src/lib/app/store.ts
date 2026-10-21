@@ -230,6 +230,35 @@ export function currentWorkspace(): Workspace | null {
   return db.sessionUserId ? (db.workspaces[db.sessionUserId] ?? null) : null;
 }
 
+/** True once the owner added their business details (name and type): needed before a service goes live. */
+export const businessReady = (ws: Workspace | null | undefined) => Boolean(ws?.business?.name?.trim() && ws.business.category);
+
+/**
+ * A new account opens the whole app straight away: an empty business profile (filled in later
+ * from "Add your business details") and IBAX with its default style.
+ */
+export function ensureStarterProfile(user: User) {
+  updateWorkspace((ws) => {
+    ws.business ??= {
+      category: "",
+      name: "",
+      ownerName: user.name,
+      phone: user.phone,
+      email: user.email,
+      address: "",
+      city: "",
+      country: user.country,
+      websiteUrl: "",
+      description: "",
+      hours: "",
+      services: "",
+      targetCustomers: "",
+      socialLinks: "",
+    };
+    ws.assistant ??= { name: "IBAX", language: "English", tone: "Warm & friendly", personality: "Helpful host", welcome: "" };
+  });
+}
+
 /** Apply a change to the signed-in user's workspace. */
 export function updateWorkspace(mutate: (ws: Workspace) => void) {
   const db = structuredClone(load());

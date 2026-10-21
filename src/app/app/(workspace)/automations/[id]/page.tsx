@@ -10,7 +10,7 @@ import { activateService } from "@/lib/app/agentActions";
 import { isDirectReviewLink, reviewMessage } from "@/lib/reviewMessage";
 import { contentIdea } from "@/lib/app/assistant";
 import { activate, missingConnections, runTest, setAutomationStatus } from "@/lib/app/automation";
-import { audit, nowIso, updateWorkspace } from "@/lib/app/store";
+import { audit, businessReady, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { Automation, Business, Workspace } from "@/lib/app/types";
 import { useWorkspace } from "@/components/app/AppShell";
 import { ConnectAccount } from "@/components/app/ConnectAccount";
@@ -305,6 +305,8 @@ function Wizard({ ws, a, svc, editing }: { ws: Workspace; a: Automation; svc: Se
           <Btn
             size="lg"
             onClick={() => {
+              // The service runs on the business details: add them first, then come back here.
+              if (!businessReady(ws)) return router.push(`/app/setup?next=${encodeURIComponent(`/app/automations/${a.id}`)}`);
               activate(a.id);
               router.replace(`/app/automations/${a.id}?activated=1`);
             }}

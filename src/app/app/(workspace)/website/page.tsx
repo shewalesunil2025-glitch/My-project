@@ -7,7 +7,7 @@ import { beginTrial, timeLeft, trialState, websiteAccess } from "@/lib/app/trial
 import { setAutomationStatus } from "@/lib/app/automation";
 import { cloudEnabled, cloudPublishSite, cloudUnpublishSite } from "@/lib/app/cloud";
 import { openIbaxChat } from "@/lib/app/ibaxEvents";
-import { audit, logActivity, nowIso, updateWorkspace, useSession } from "@/lib/app/store";
+import { audit, businessReady, logActivity, nowIso, updateWorkspace, useSession } from "@/lib/app/store";
 import type { SiteSection, WebsiteProject } from "@/lib/app/types";
 import { accents, allSections, buildSite, premiumTemplate, slugify, templates, validSlug, withDefaults } from "@/lib/sites/site";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
@@ -117,9 +117,16 @@ export default function WebsitePage() {
               <p className="relative mt-2 text-sm leading-relaxed text-fg-muted">
                 Start your free trial to pick a premium template and see your website exactly as customers will. Publishing it on the internet needs the Website service ({money(svcPrice(svc, ws)!, appCurrency(ws))} one-time).
               </p>
-              <Btn size="lg" className="relative mt-5" onClick={() => beginTrial()}>
-                <Gift className="size-4" aria-hidden /> Start free trial
-              </Btn>
+              {businessReady(ws) ? (
+                <Btn size="lg" className="relative mt-5" onClick={() => beginTrial()}>
+                  <Gift className="size-4" aria-hidden /> Start free trial
+                </Btn>
+              ) : (
+                // The website is built from the business details: those come first.
+                <BtnLink size="lg" className="relative mt-5" href={`/app/setup?next=${encodeURIComponent("/app/website")}`}>
+                  <Gift className="size-4" aria-hidden /> Start free trial
+                </BtnLink>
+              )}
             </>
           ) : (
             <>

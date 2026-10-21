@@ -9,7 +9,7 @@ import { ArrowLeft, Check, CirclePlay, Clock, Gift, Info, Link2 } from "lucide-r
 import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, TRIAL_DAYS } from "@/content/app/services";
 import { joinWaitlist, onWaitlist, startTrialService } from "@/lib/app/agentActions";
 import { timeLeft, trialOver, trialState } from "@/lib/app/trial";
-import { audit, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
+import { audit, businessReady, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { useWorkspace } from "@/components/app/AppShell";
 import { automationStatus } from "@/components/app/status";
@@ -36,6 +36,8 @@ export default function ServiceDetailPage() {
   const canTrial = !owned && !ws.sample && isLive(svc.id) && inTrial(svc.id) && trial.phase !== "over";
 
   function startTrial() {
+    // The trial clock starts only once the business details are in (they're what the service uses).
+    if (!businessReady(ws)) return router.push(`/app/setup?next=${encodeURIComponent(`/app/services/${svc!.id}`)}`);
     const id = startTrialService(svc!.id);
     if (id) router.push(`/app/automations/${id}`);
   }

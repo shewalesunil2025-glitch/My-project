@@ -19,7 +19,7 @@ export default function LoginPage() {
 
   // Already signed in, e.g. back from the email-confirmation link.
   useEffect(() => {
-    if (user && workspace && !workspace.sample) router.replace(workspace.business ? "/app/home" : "/app/setup");
+    if (user && workspace && !workspace.sample) router.replace("/app/home");
   }, [user, workspace, router]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
