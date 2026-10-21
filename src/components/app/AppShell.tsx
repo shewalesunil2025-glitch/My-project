@@ -178,6 +178,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
             <ThemeToggle />
             <Link
+              href="/app/settings"
+              className="grid size-10 place-items-center rounded-full text-fg-muted hover:bg-white/[0.06] hover:text-fg"
+              aria-label="Settings"
+              title="Settings (app lock, password, account)"
+            >
+              <Settings className="size-[1.15rem]" aria-hidden />
+            </Link>
+            <Link
               href="/app/notifications"
               className="relative grid size-10 place-items-center rounded-full text-fg-muted hover:bg-white/[0.06] hover:text-fg"
               aria-label={`Notifications${unread ? ` (${unread} unread)` : ""}`}
