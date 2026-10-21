@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { speechChunks } from "./naturalVoice";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { WAIT_FIRST_MS, WAIT_NEXT_MS, speakNaturally, speechChunks, stopNaturalVoice, unlockAudio } from "./naturalVoice";
 
 describe("speechChunks", () => {
   it("says the first sentence on its own, then groups the rest", () => {
@@ -22,5 +22,100 @@ describe("speechChunks", () => {
     const chunks = speechChunks(text, 100);
     expect(chunks.join(" ").replace(/\s+/g, " ")).toBe(text);
     expect(chunks.every((c) => c.length <= 100)).toBe(true);
+  });
+});
+
+describe("speechChunks sizes", () => {
+  it("starts small and grows, so each next piece is ready before the one before it ends", () => {
+    const text = Array.from({ length: 20 }, (_, i) => `Yeh vaakya number ${i + 1} hai, thoda lamba.`).join(" ");
+    const chunks = speechChunks(text);
+    expect(chunks[1].length).toBeLessThanOrEqual(120);
+    expect(chunks[2].length).toBeLessThanOrEqual(200);
+    expect(chunks.join(" ")).toBe(text);
+  });
+});
+
+/* A fake speaker and voice server, to check IBAX never goes quiet in the middle of an answer. */
+describe("speakNaturally", () => {
+  const played: string[] = [];
+  let delays: Record<number, number> = {};
+  let calls = 0;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    played.length = 0;
+    delays = {};
+    calls = 0;
+    class FakeAudio {
+      src = "";
+      onplaying: (() => void) | null = null;
+      onended: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      load() {}
+      pause() {}
+      play() {
+        if (this.src.startsWith("blob:")) {
+          played.push(this.src.slice(5));
+          setTimeout(() => this.onplaying?.(), 10);
+          setTimeout(() => this.onended?.(), 1000); // every piece speaks for 1 s
+        }
+        return Promise.resolve();
+      }
+    }
+    vi.stubGlobal("Audio", FakeAudio);
+    vi.stubGlobal("URL", { createObjectURL: (b: { text: string }) => `blob:${b.text}`, revokeObjectURL: () => {} });
+    vi.stubGlobal("fetch", (_: string, init: { body: string; signal: AbortSignal }) => {
+      const n = calls++;
+      const { text } = JSON.parse(init.body) as { text: string };
+      return new Promise((resolve, reject) => {
+        const t = setTimeout(() => resolve({ ok: true, status: 200, blob: async () => ({ text }) }), delays[n] ?? 500);
+        init.signal.addEventListener("abort", () => (clearTimeout(t), reject(new Error("aborted"))));
+      });
+    });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  const answer = "Pehla vaakya. Doosra vaakya yahan hai. Teesra vaakya bhi hai. Chautha aur aakhri vaakya.";
+
+  it("says the whole answer when the voice server is quick", async () => {
+    unlockAudio();
+    const ended = vi.fn();
+    const done = speakNaturally(answer, undefined, ended);
+    await vi.runAllTimersAsync();
+    expect(await done).toBe("");
+    expect(ended).toHaveBeenCalled();
+    expect(played.join(" ")).toBe(answer);
+  });
+
+  it("hands the rest to the phone's voice when a piece is late, instead of going quiet", async () => {
+    unlockAudio();
+    const chunks = speechChunks(answer);
+    delays = { 1: 60_000 }; // the second piece never comes in time
+    const done = speakNaturally(answer);
+    await vi.advanceTimersByTimeAsync(500 + 1000 + WAIT_NEXT_MS + 100);
+    expect(await done).toBe(chunks.slice(1).join(" "));
+    expect(played).toEqual([chunks[0]]);
+  });
+
+  it("uses the phone's voice for everything when the first piece is too slow", async () => {
+    unlockAudio();
+    delays = { 0: 60_000 };
+    const done = speakNaturally(answer);
+    await vi.advanceTimersByTimeAsync(WAIT_FIRST_MS + 100);
+    expect(await done).toBe(speechChunks(answer).join(" "));
+    expect(played).toEqual([]);
+  });
+
+  it("says nothing more once stopped", async () => {
+    unlockAudio();
+    const done = speakNaturally(answer);
+    await vi.advanceTimersByTimeAsync(700);
+    stopNaturalVoice();
+    await vi.runAllTimersAsync();
+    expect(await done).toBe("");
+    expect(played.length).toBeLessThanOrEqual(1);
   });
 });

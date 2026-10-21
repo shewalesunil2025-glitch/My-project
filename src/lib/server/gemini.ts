@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { muteStaticBursts } from "./ttsClean";
+import { muteStaticBursts, speechSpan } from "./ttsClean";
 
 /**
  * Runs one IBAX turn on Google Gemini (free tier) when no Claude key is set.
@@ -238,7 +238,9 @@ function pcmToWav(pcm: Buffer, rate: number) {
 export async function geminiSpeak(text: string): Promise<Buffer | null> {
   const voice = process.env.GEMINI_TTS_VOICE || "Sulafat";
   const models = process.env.GEMINI_TTS_MODEL ? [process.env.GEMINI_TTS_MODEL] : await geminiTtsModels();
-  for (const model of models.slice(0, 3)) {
+  // Two models at most, 12 s each: the app switches to the phone's voice rather than wait longer.
+  for (const model of models.slice(0, 2)) {
+    const started = Date.now();
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",
@@ -247,10 +249,10 @@ export async function geminiSpeak(text: string): Promise<Buffer | null> {
           contents: [{ role: "user", parts: [{ text }] }],
           generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
         }),
-        signal: AbortSignal.timeout(25_000),
+        signal: AbortSignal.timeout(12_000),
       });
       if (!res.ok) {
-        console.error(`[speak] ${model} ${res.status}`, (await res.text()).slice(0, 200));
+        console.error(`[speak] ${model} ${res.status} after ${Date.now() - started} ms`, (await res.text()).slice(0, 200));
         continue;
       }
       const data = (await res.json()) as { candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[] };
@@ -258,10 +260,14 @@ export async function geminiSpeak(text: string): Promise<Buffer | null> {
       if (!audio?.data) continue;
       const rate = Number(audio.mimeType?.match(/rate=(\d+)/)?.[1] ?? 24000);
       const pcm = Buffer.from(audio.data, "base64");
-      muteStaticBursts(new Int16Array(pcm.buffer, pcm.byteOffset, pcm.length >> 1), rate);
-      return pcmToWav(pcm, rate);
+      const samples = new Int16Array(pcm.buffer, pcm.byteOffset, pcm.length >> 1);
+      muteStaticBursts(samples, rate);
+      const [from, to] = speechSpan(samples, rate);
+      const ms = Date.now() - started;
+      if (ms > 6000) console.warn(`[speak] ${model} slow: ${ms} ms for ${text.length} chars`);
+      return pcmToWav(Buffer.from(pcm.subarray(from * 2, to * 2)), rate);
     } catch (error) {
-      console.error(`[speak] ${model} failed`, error instanceof Error ? error.message : error);
+      console.error(`[speak] ${model} failed after ${Date.now() - started} ms`, error instanceof Error ? error.message : error);
     }
   }
   return null;

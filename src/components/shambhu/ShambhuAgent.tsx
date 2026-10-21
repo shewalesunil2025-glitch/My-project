@@ -34,6 +34,7 @@ import { AttachMenu, AttachmentChip, SentFile } from "@/components/chat/Attach";
 import type { Attachment } from "@/lib/attachments";
 import {
   speakNaturally,
+  speakQueue,
   speechChunks,
   stopNaturalVoice,
   unlockAudio,
@@ -237,13 +238,12 @@ export function ShambhuAgent() {
   const speakWithPhone = useCallback((text: string, replyLang: AgentLang) => {
     if (!("speechSynthesis" in window)) return setStatus("idle");
     const synth = window.speechSynthesis;
-    synth.cancel();
     const voice = pickVoice(replyLang);
     const done = () => setStatus((s) => (s === "speaking" ? "idle" : s));
     // One sentence at a time: Android stops a long utterance after about 15 seconds.
     const chunks = speechChunks(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""), 180);
     if (!chunks.length) return done();
-    chunks.forEach((chunk, i) => {
+    const utterances = chunks.map((chunk, i) => {
       const utter = new SpeechSynthesisUtterance(chunk);
       if (voice) utter.voice = voice;
       utter.lang = voice?.lang ?? agentLanguages[replyLang].speech;
@@ -255,8 +255,9 @@ export function ShambhuAgent() {
         if (e.error !== "interrupted" && e.error !== "canceled") synth.cancel();
         done();
       };
-      synth.speak(utter);
+      return utter;
     });
+    speakQueue(utterances);
   }, []);
 
   /** IBAX speaks in the same natural voice as in the app; the phone's voice if that isn't available. */
