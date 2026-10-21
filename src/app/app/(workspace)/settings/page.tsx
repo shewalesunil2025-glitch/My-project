@@ -100,7 +100,11 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-10">
-      <PageHeader title="Settings" subtitle="Business, assistant, connected accounts, notifications, security and privacy." />
+      <PageHeader title="Settings" subtitle="App lock, business, assistant, connected accounts, notifications, security and privacy." />
+      {/* First on the page: the client's PIN / fingerprint / Face ID lock. */}
+      <Section id="app-lock" title="App lock">
+        <AppLockSettings userId={user.id} label={user.email} />
+      </Section>
       {saved && (
         <div role="status" className="fixed inset-x-0 top-16 z-50 mx-auto w-fit rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg">
           {saved}
@@ -225,9 +229,7 @@ export default function SettingsPage() {
       </Section>
 
       <Section id="security" title="Security">
-        <AppLockSettings userId={user.id} label={user.email} />
-
-        <form onSubmit={onPassword} className="space-y-3 border-t border-white/[0.06] pt-4">
+        <form onSubmit={onPassword} className="space-y-3">
           <p className="text-sm font-semibold">Change password</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Current password" htmlFor="pw-cur">

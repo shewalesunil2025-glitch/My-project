@@ -44,7 +44,7 @@ export function AppLockTip() {
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold">Keep your account safe</p>
         <p className="text-sm text-fg-muted">Lock ibaxai with a PIN, fingerprint or Face ID — takes 30 seconds.</p>
-        <Link href="/app/settings#security" className="mt-1.5 inline-block text-sm font-semibold text-flow hover:underline">
+        <Link href="/app/settings#app-lock" className="mt-1.5 inline-block text-sm font-semibold text-flow hover:underline">
           Turn on app lock →
         </Link>
       </div>
