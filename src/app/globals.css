@@ -1045,6 +1045,55 @@ body {
   40%, 80% { transform: translateX(8px); }
 }
 
+/* App lock (src/components/app/AppLockGate.tsx): an iPhone-like passcode screen in ibaxai green. */
+.lock-screen { background: #06120a; color: #fff; }
+.lock-bg {
+  background:
+    radial-gradient(40% 30% at 20% 18%, rgb(37 211 102 / 0.5), transparent 70%),
+    radial-gradient(45% 35% at 85% 55%, rgb(14 120 60 / 0.55), transparent 70%),
+    radial-gradient(40% 30% at 30% 92%, rgb(244 207 107 / 0.22), transparent 70%);
+  filter: blur(28px);
+}
+.lock-sub { color: rgb(255 255 255 / 0.65); }
+.lock-dot { border: 1.6px solid currentColor; }
+.lock-dot-on { background: currentColor; }
+.lock-eye { color: rgb(255 255 255 / 0.75); }
+.lock-eye:active { background: rgb(255 255 255 / 0.12); }
+.lock-key, .lock-key-plain {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 4.85rem; height: 4.85rem; border-radius: 9999px;
+  -webkit-tap-highlight-color: transparent; user-select: none;
+}
+.lock-key {
+  background: rgb(255 255 255 / 0.14);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease, transform 0.2s ease;
+}
+.lock-key:active, .lock-key-lit {
+  background: rgb(255 255 255 / 0.88); color: #06200f;
+  box-shadow: 0 0 30px rgb(255 255 255 / 0.4);
+  transition-duration: 0.05s;
+}
+.lock-key-plain { color: rgb(255 255 255 / 0.85); }
+@media (max-height: 740px) {
+  .lock-key, .lock-key-plain { width: 4.3rem; height: 4.3rem; }
+}
+.lock-key-plain:active { background: rgb(255 255 255 / 0.1); }
+[data-theme="light"] .theme-lumi {
+  & .lock-screen { background: #eef7f0; color: #0c1a0f; }
+  & .lock-bg {
+    background:
+      radial-gradient(40% 30% at 20% 18%, rgb(37 211 102 / 0.35), transparent 70%),
+      radial-gradient(45% 35% at 85% 55%, rgb(120 210 150 / 0.4), transparent 70%),
+      radial-gradient(40% 30% at 30% 92%, rgb(244 207 107 / 0.3), transparent 70%);
+  }
+  & .lock-sub { color: rgb(12 26 15 / 0.6); }
+  & .lock-eye { color: rgb(12 26 15 / 0.7); }
+  & .lock-key { background: rgb(255 255 255 / 0.6); box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 6px 16px -10px rgb(16 60 30 / 0.4); }
+  & .lock-key:active, & .lock-key-lit { background: #0c3a1e; color: #fff; box-shadow: 0 0 26px rgb(37 211 102 / 0.45); }
+  & .lock-key-plain { color: rgb(12 26 15 / 0.75); }
+}
+
 /* IBAX walking loader: the video's edges melt into the page. */
 .walk-loader { -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
 .walk-loader video { display: block; object-fit: contain; }
