@@ -147,7 +147,7 @@ export function localAnswer(ws: Workspace, raw: string): Reply {
         text: ws.automations.length
           ? `Nothing new at ${biz} yet today. I'll post every call, message, lead and upload here as it happens.`
           : `It's quiet because no automations are active yet. Start one from Services and today's activity will appear here.`,
-        links: [{ label: "Activity Centre", href: "/app/activity" }],
+        links: [{ label: "Media & activity", href: "/app/activity" }],
       };
     }
     const count = (k: string) => today.filter((e) => e.kind === k).length;
