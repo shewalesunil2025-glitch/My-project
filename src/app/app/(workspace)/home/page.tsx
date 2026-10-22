@@ -452,11 +452,6 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* Today / 7 days / Month / All time: what the card, the numbers and the list below cover */}
-      <div {...rise(1)} className="dash-in -mt-3 flex justify-center">
-        <Segmented label="Show numbers for" value={range} onChange={setRange} options={RANGES} />
-      </div>
-
       {/* Offers */}
       <section {...rise(2)} aria-labelledby="offers">
         <SectionTitle>
@@ -574,6 +569,10 @@ function Dashboard() {
 
       {/* Today's numbers — each opens the details */}
       <section {...rise(4)} aria-labelledby="today">
+        {/* Today / 7 days / Month / All time: what the numbers, the lists behind them and "IBAX did" cover */}
+        <div className="mb-4 flex justify-center">
+          <Segmented label="Show numbers for" value={range} onChange={setRange} options={RANGES} />
+        </div>
         <SectionTitle>
           <span id="today">{range === "today" ? "Today\u2019s numbers" : `Numbers · ${span}`}</span>
         </SectionTitle>
