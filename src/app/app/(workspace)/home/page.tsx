@@ -4,7 +4,7 @@ import { product } from "@/config/product";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
-import { ArrowRight, Check, Globe, Pencil, Sparkles, X } from "lucide-react";
+import { ArrowRight, Globe, Pencil, Sparkles, X } from "lucide-react";
 import { serviceById, TRIAL_DAYS } from "@/content/app/services";
 import { suggestions } from "@/lib/app/assistant";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -217,7 +217,6 @@ function Dashboard() {
   const setupPending = ws.automations.filter((a) => a.status === "setup");
   const live = ws.automations.filter((a) => a.status !== "setup");
   const rating = ws.reviews.length ? ws.reviews.reduce((t, r) => t + r.rating, 0) / ws.reviews.length : 0;
-  const fresh = ws.automations.length === 0;
 
   const metrics: Metric[] = [
     {
@@ -489,50 +488,6 @@ function Dashboard() {
         </Notice>
       )}
 
-      {fresh && (
-        <Card>
-          <SectionTitle>Get started</SectionTitle>
-          <ol className="space-y-2">
-            {[
-              {
-                done: true,
-                label: "Create your account and business profile",
-                href: "/app/settings",
-              },
-              {
-                done: true,
-                label: `Set up ${name}, your AI assistant`,
-                href: "/app/settings#assistant",
-              },
-              {
-                done: !!ws.website,
-                label: ws.business.websiteUrl ? "Website connected" : "Build your website",
-                href: "/app/website",
-              },
-              {
-                done: false,
-                label: "Choose your first service",
-                href: "/app/services",
-              },
-              {
-                done: Object.keys(ws.connections).length > 1,
-                label: "Connect your accounts",
-                href: "/app/settings#accounts",
-              },
-            ].map((s) => (
-              <li key={s.label}>
-                <Link href={s.href} className="flex items-center gap-3 rounded-xl px-2 py-2 text-sm hover:bg-white/[0.04]">
-                  <span className={`grid size-6 place-items-center rounded-full ${s.done ? "bg-emerald-400/20 text-emerald-300" : "border border-white/15"}`}>
-                    {s.done && <Check className="size-3.5" aria-hidden />}
-                  </span>
-                  <span className={s.done ? "text-fg-muted line-through" : ""}>{s.label}</span>
-                  {!s.done && <ArrowRight className="ml-auto size-4 text-fg-subtle" aria-hidden />}
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </Card>
-      )}
 
       {/* What didn't happen yet */}
       {needs.length ? (
