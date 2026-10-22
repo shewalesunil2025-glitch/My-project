@@ -32,7 +32,7 @@ import { expireTrials } from "@/lib/app/trial";
 import { syncPaidPlans } from "@/lib/app/renewal";
 import { useIsFounder } from "@/lib/app/founder";
 import type { Workspace } from "@/lib/app/types";
-import { BrandLogo, BrandMark, FullScreenLoader, LumiMark } from "./ui";
+import { BrandLogo, FullScreenLoader, LumiMark } from "./ui";
 import { IbaxLauncher } from "./IbaxLauncher";
 import { ThemeToggle } from "./ThemeToggle";
 import { AppLockGate } from "./AppLockGate";
@@ -174,9 +174,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Top bar */}
       <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-ink-950/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
-          <Link href="/app/home" className="flex min-w-0 items-center gap-2 lg:hidden">
-            <BrandMark className="size-7" />
-            <span className="truncate text-[0.95rem] font-semibold">{workspace.business.name || product.name}</span>
+          <Link href="/app/home" aria-label={`${product.name} home`} className="flex min-w-0 items-center lg:hidden">
+            <BrandLogo size="sm" />
           </Link>
           <p className="hidden truncate text-sm text-fg-muted lg:block">
             {workspace.business.name || user.name} {workspace.business.category && <span className="text-fg-subtle">· {workspace.business.category}</span>}
