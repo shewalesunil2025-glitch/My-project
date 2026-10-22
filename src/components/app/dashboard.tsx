@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, Camera, Crown, X } from "lucide-react";
+import { ArrowRight, Crown, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 /* Pieces of the owner's Home dashboard (src/app/app/(workspace)/home/page.tsx). */
@@ -24,39 +24,135 @@ export function CountUp({ value, className }: { value: number; className?: strin
   return <span className={cn("tabular-nums", className)}>{shown}</span>;
 }
 
-/** Shrinks a photo to a square of `size` px (cropped to the middle, or a wide logo fitted whole), so it saves small and loads fast. */
-export function squarePhoto(file: File, size = 320): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
+type Pic = { src: string; w: number; h: number };
+const loadPic = (src: string) =>
+  new Promise<Pic>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => (img.naturalWidth && img.naturalHeight ? resolve({ src, w: img.naturalWidth, h: img.naturalHeight }) : reject(new Error("unreadable")));
+    img.onerror = () => reject(new Error("unreadable"));
+    img.src = src;
+  });
+
+const FRAME = 280; // the crop square on screen (px)
+const OUT = 400; // the saved photo (px)
+const MAX_ZOOM = 4;
+
+/**
+ * Crop a photo into the square badge: drag to move it, pinch or use the slider to zoom.
+ * The photo always fills the whole square. Saves a 400 px JPEG.
+ */
+export function PhotoCropper({ pic, onCancel, onSave }: { pic: Pic; onCancel: () => void; onSave: (dataUrl: string) => void }) {
+  const base = FRAME / Math.min(pic.w, pic.h); // smallest scale that still fills the square
+  const [view, setView] = useState(() => ({ z: 1, x: (FRAME - pic.w * base) / 2, y: (FRAME - pic.h * base) / 2 }));
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef(0);
+
+  const fit = (z: number, x: number, y: number) => {
+    const zoom = Math.min(MAX_ZOOM, Math.max(1, z));
+    const sc = base * zoom;
+    return { z: zoom, x: Math.min(0, Math.max(FRAME - pic.w * sc, x)), y: Math.min(0, Math.max(FRAME - pic.h * sc, y)) };
+  };
+  // Zoom keeping the middle of the square where it is.
+  const zoomTo = (v: typeof view, z: number) => {
+    const old = base * v.z;
+    const now = base * Math.min(MAX_ZOOM, Math.max(1, z));
+    const cx = (FRAME / 2 - v.x) / old;
+    const cy = (FRAME / 2 - v.y) / old;
+    return fit(z, FRAME / 2 - cx * now, FRAME / 2 - cy * now);
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onCancel();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  function save() {
     const img = new Image();
     img.onload = () => {
-      const { naturalWidth: w, naturalHeight: h } = img;
-      const side = Math.min(w, h);
       const canvas = document.createElement("canvas");
-      canvas.width = canvas.height = size;
+      canvas.width = canvas.height = OUT;
       const ctx = canvas.getContext("2d");
-      URL.revokeObjectURL(url);
-      if (!ctx || !side) return reject(new Error("unreadable"));
-      ctx.fillStyle = "#ffffff"; // see-through logos get a white back, like on invoices
-      ctx.fillRect(0, 0, size, size);
-      if (w / h > 1.4 || h / w > 1.4) {
-        // A wide or tall logo is shown whole (on white), not cut.
-        const scale = size / Math.max(w, h);
-        ctx.drawImage(img, (size - w * scale) / 2, (size - h * scale) / 2, w * scale, h * scale);
-      } else ctx.drawImage(img, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size);
-      resolve(canvas.toDataURL("image/jpeg", 0.88));
+      if (!ctx) return;
+      const sc = base * view.z;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, OUT, OUT);
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, -view.x / sc, -view.y / sc, FRAME / sc, FRAME / sc, 0, 0, OUT, OUT);
+      onSave(canvas.toDataURL("image/jpeg", 0.9));
     };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("unreadable"));
-    };
-    img.src = url;
-  });
+    img.src = pic.src;
+  }
+
+  const sc = base * view.z;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label="Adjust your photo" onClick={onCancel}>
+      <div className="dash-sheet w-full max-w-sm rounded-t-3xl border border-white/10 bg-ink-900 p-5 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+        <p className="text-center text-base font-bold tracking-tight">Adjust your photo</p>
+        <p className="mt-0.5 text-center text-xs text-fg-muted">Drag to move · pinch or slide to zoom</p>
+        <div
+          className="relative mx-auto mt-4 cursor-grab touch-none overflow-hidden rounded-3xl bg-black select-none active:cursor-grabbing"
+          style={{ width: FRAME, height: FRAME }}
+          onPointerDown={(e) => {
+            e.currentTarget.setPointerCapture(e.pointerId);
+            pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            if (pointers.current.size === 2) {
+              const [p1, p2] = [...pointers.current.values()];
+              pinch.current = Math.hypot(p1!.x - p2!.x, p1!.y - p2!.y);
+            }
+          }}
+          onPointerMove={(e) => {
+            const last = pointers.current.get(e.pointerId);
+            if (!last) return;
+            const now = { x: e.clientX, y: e.clientY };
+            pointers.current.set(e.pointerId, now);
+            if (pointers.current.size === 1) setView((v) => fit(v.z, v.x + now.x - last.x, v.y + now.y - last.y));
+            else if (pointers.current.size === 2 && pinch.current) {
+              const [p1, p2] = [...pointers.current.values()];
+              const d = Math.hypot(p1!.x - p2!.x, p1!.y - p2!.y);
+              const ratio = d / pinch.current;
+              pinch.current = d;
+              setView((v) => zoomTo(v, v.z * ratio));
+            }
+          }}
+          onPointerUp={(e) => {
+            pointers.current.delete(e.pointerId);
+            pinch.current = 0;
+          }}
+          onPointerCancel={(e) => {
+            pointers.current.delete(e.pointerId);
+            pinch.current = 0;
+          }}
+          onWheel={(e) => setView((v) => zoomTo(v, v.z * (e.deltaY < 0 ? 1.08 : 1 / 1.08)))}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- a photo picked on this phone */}
+          <img src={pic.src} alt="" draggable={false} className="pointer-events-none absolute top-0 left-0 max-w-none origin-top-left" style={{ width: pic.w * sc, height: pic.h * sc, transform: `translate(${view.x}px, ${view.y}px)` }} />
+          <div aria-hidden className="pointer-events-none absolute inset-0 rounded-3xl ring-2 ring-white/70 ring-inset" />
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,transparent_33%,rgb(255_255_255/0.25)_33%,rgb(255_255_255/0.25)_calc(33%+1px),transparent_calc(33%+1px),transparent_66%,rgb(255_255_255/0.25)_66%,rgb(255_255_255/0.25)_calc(66%+1px),transparent_calc(66%+1px)),linear-gradient(to_bottom,transparent_33%,rgb(255_255_255/0.25)_33%,rgb(255_255_255/0.25)_calc(33%+1px),transparent_calc(33%+1px),transparent_66%,rgb(255_255_255/0.25)_66%,rgb(255_255_255/0.25)_calc(66%+1px),transparent_calc(66%+1px))]" />
+        </div>
+        <label className="mt-4 flex items-center gap-3 text-fg-muted">
+          <span className="text-xs">−</span>
+          <input type="range" min={1} max={MAX_ZOOM} step={0.01} value={view.z} onChange={(e) => setView((v) => zoomTo(v, Number(e.target.value)))} className="flex-1 accent-[#25d366]" aria-label="Zoom" />
+          <span className="text-sm">+</span>
+        </label>
+        <div className="mt-5 grid grid-cols-2 gap-2.5">
+          <button type="button" onClick={onCancel} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold">
+            Cancel
+          </button>
+          <button type="button" onClick={save} className="rounded-xl bg-flow px-4 py-3 text-sm font-bold text-ink-950">
+            Save photo
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-/** The owner's badge: their photo or logo (or initials) with a gold crown on top. Tap it to upload a new photo. */
-export function OwnerAvatar({ name, logo, onPhoto }: { name: string; logo?: string; onPhoto?: (dataUrl: string) => void }) {
-  const [busy, setBusy] = useState(false);
+/** The owner's badge: their photo or logo (or initials) with a gold crown on top. Tap it to change the photo. */
+export function OwnerAvatar({ name, logo, onPhoto }: { name: string; logo?: string; onPhoto?: (dataUrl: string | undefined) => void }) {
+  const [menu, setMenu] = useState(false);
+  const [pic, setPic] = useState<Pic | null>(null);
+  const file = useRef<HTMLInputElement>(null);
   const initials =
     name
       .split(" ")
@@ -64,49 +160,79 @@ export function OwnerAvatar({ name, logo, onPhoto }: { name: string; logo?: stri
       .slice(0, 2)
       .map((w) => w[0]!.toUpperCase())
       .join("") || "O";
-  const box = (
-    <span className="dash-owner-box grid size-14 place-items-center overflow-hidden rounded-2xl text-lg font-bold">
-      {logo ? (
-        // eslint-disable-next-line @next/next/no-img-element -- the owner's own photo (data URL)
-        <img src={logo} alt="" className="size-full object-cover" />
-      ) : (
-        initials
-      )}
-    </span>
-  );
-  const crown = <Crown className="dash-crown absolute -top-3.5 left-1/2 size-6" aria-hidden />;
-  if (!onPhoto)
-    return (
-      <span className="relative inline-grid size-14 shrink-0 place-items-center">
-        {crown}
-        {box}
+  const badge = (
+    <>
+      <Crown className="dash-crown absolute -top-3.5 left-1/2 size-6" aria-hidden />
+      <span className="dash-owner-box grid size-14 place-items-center overflow-hidden rounded-2xl text-lg font-bold">
+        {logo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- the owner's own photo (data URL)
+          <img src={logo} alt="" className="size-full object-cover" />
+        ) : (
+          initials
+        )}
       </span>
-    );
+    </>
+  );
+  if (!onPhoto) return <span className="relative inline-grid size-14 shrink-0 place-items-center">{badge}</span>;
+
+  const open = (src: string) =>
+    loadPic(src)
+      .then(setPic)
+      .catch(() => window.alert("That photo couldn't be opened — please pick a JPG or PNG photo."));
+  const item = "flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium hover:bg-white/[0.06]";
+
   return (
-    <label className="relative inline-grid size-14 shrink-0 cursor-pointer place-items-center" title={logo ? "Change photo" : "Add your photo or logo"}>
-      {crown}
-      {box}
-      <span className="dash-owner-cam absolute -right-1.5 -bottom-1.5 grid size-6 place-items-center rounded-full">{busy ? <span className="size-2.5 animate-ping rounded-full bg-current" /> : <Camera className="size-3.5" aria-hidden />}</span>
+    <span className="relative inline-grid shrink-0">
+      <button type="button" onClick={() => setMenu((m) => !m)} aria-label={logo ? "Change your photo" : "Add your photo or logo"} aria-expanded={menu} className="relative inline-grid size-14 place-items-center rounded-2xl transition-transform active:scale-95">
+        {badge}
+      </button>
+      {menu && (
+        <>
+          <span className="fixed inset-0 z-40" aria-hidden onClick={() => setMenu(false)} />
+          <span role="menu" className="dash-menu absolute top-full left-0 z-50 mt-2 w-48 rounded-2xl border border-white/10 bg-ink-900 p-1.5 text-fg shadow-[0_20px_50px_-20px_rgb(0_0_0/0.8)]">
+            <button type="button" role="menuitem" className={item} onClick={() => (setMenu(false), file.current?.click())}>
+              {logo ? "Change photo" : "Add photo or logo"}
+            </button>
+            {logo && (
+              <button type="button" role="menuitem" className={item} onClick={() => (setMenu(false), void open(logo))}>
+                Adjust photo
+              </button>
+            )}
+            {logo && (
+              <button type="button" role="menuitem" className={cn(item, "text-red-300")} onClick={() => (setMenu(false), onPhoto(undefined))}>
+                Remove photo
+              </button>
+            )}
+          </span>
+        </>
+      )}
       <input
+        ref={file}
         type="file"
         accept="image/*"
         className="sr-only"
-        aria-label={logo ? "Change your photo or logo" : "Upload your photo or logo"}
-        onChange={async (e) => {
-          const file = e.target.files?.[0];
+        tabIndex={-1}
+        aria-hidden
+        onChange={(e) => {
+          const f = e.target.files?.[0];
           e.target.value = "";
-          if (!file) return;
-          setBusy(true);
-          try {
-            onPhoto(await squarePhoto(file));
-          } catch {
-            window.alert("That photo couldn't be opened — please pick a JPG or PNG photo.");
-          } finally {
-            setBusy(false);
-          }
+          if (!f) return;
+          const reader = new FileReader();
+          reader.onload = () => void open(String(reader.result));
+          reader.readAsDataURL(f);
         }}
       />
-    </label>
+      {pic && (
+        <PhotoCropper
+          pic={pic}
+          onCancel={() => setPic(null)}
+          onSave={(url) => {
+            setPic(null);
+            onPhoto(url);
+          }}
+        />
+      )}
+    </span>
   );
 }
 

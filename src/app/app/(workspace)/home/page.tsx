@@ -394,7 +394,7 @@ function Dashboard() {
                   updateWorkspace((w) => {
                     if (!w.business) return;
                     w.business.logo = logo;
-                    audit(w, "Changed the business photo");
+                    audit(w, logo ? "Changed the business photo" : "Removed the business photo");
                   })
                 }
               />
