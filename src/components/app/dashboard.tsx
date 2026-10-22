@@ -148,7 +148,7 @@ export function PhotoCropper({ pic, onCancel, onSave }: { pic: Pic; onCancel: ()
   );
 }
 
-/** The owner's photo or logo (or initials) in a square badge with a gold edge and a small gold tick. */
+/** The owner's photo or logo (or initials) in a clean square badge. */
 export function OwnerBadge({ name, logo, size = "md" }: { name: string; logo?: string; size?: "md" | "lg" }) {
   const initials =
     name
@@ -167,9 +167,6 @@ export function OwnerBadge({ name, logo, size = "md" }: { name: string; logo?: s
         ) : (
           initials
         )}
-      </span>
-      <span className={cn("dash-verified absolute grid place-items-center rounded-full font-black", big ? "-right-2 -bottom-2 size-8 text-base" : "-right-1.5 -bottom-1.5 size-5.5 text-[0.7rem]")} aria-hidden>
-        ✓
       </span>
     </span>
   );
