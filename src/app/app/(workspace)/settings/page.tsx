@@ -10,7 +10,7 @@ import type { AssistantProfile, Business, NotificationKind, ProviderId, TeamRole
 import { AppLockSettings } from "@/components/app/AppLockSettings";
 import { ConnectAccount } from "@/components/app/ConnectAccount";
 import { PhoneInput } from "@/components/app/PhoneInput";
-import { Btn, Card, Field, Input, Notice, PageHeader, Pill, Select, TextArea, Toggle, fmtDateTime } from "@/components/app/ui";
+import { Btn, Card, Field, Input, PasswordInput, Notice, PageHeader, Pill, Select, TextArea, Toggle, fmtDateTime } from "@/components/app/ui";
 
 function Section({ id, title, subtitle, children }: { id: string; title: string; subtitle?: string; children: ReactNode }) {
   return (
@@ -233,10 +233,10 @@ export default function SettingsPage() {
           <p className="text-sm font-semibold">Change password</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Current password" htmlFor="pw-cur">
-              <Input id="pw-cur" name="current" type="password" autoComplete="current-password" required />
+              <PasswordInput id="pw-cur" name="current" autoComplete="current-password" required />
             </Field>
             <Field label="New password" htmlFor="pw-new">
-              <Input id="pw-new" name="next" type="password" autoComplete="new-password" minLength={8} required />
+              <PasswordInput id="pw-new" name="next" autoComplete="new-password" minLength={8} required />
             </Field>
           </div>
           {pwMsg && <Notice tone={pwMsg.ok ? "blue" : "amber"}>{pwMsg.text}</Notice>}

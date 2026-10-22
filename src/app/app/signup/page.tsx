@@ -9,7 +9,7 @@ import { cloudEnabled } from "@/lib/app/cloud";
 import { signUp } from "@/lib/app/store";
 import { AuthFrame } from "@/components/app/AuthFrame";
 import { SocialSignIn } from "@/components/app/SocialSignIn";
-import { Btn, Field, Input, Notice, Select, Spinner } from "@/components/app/ui";
+import { Btn, Field, Input, PasswordInput, Notice, Select, Spinner } from "@/components/app/ui";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -68,10 +68,10 @@ export default function SignUpPage() {
         </Field>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Password" htmlFor="password" required help="At least 8 characters">
-            <Input id="password" name="password" type="password" autoComplete="new-password" minLength={8} required />
+            <PasswordInput id="password" name="password" autoComplete="new-password" minLength={8} required />
           </Field>
           <Field label="Confirm password" htmlFor="confirm" required>
-            <Input id="confirm" name="confirm" type="password" autoComplete="new-password" required />
+            <PasswordInput id="confirm" name="confirm" autoComplete="new-password" required />
           </Field>
         </div>
         <label className="flex items-start gap-3 text-sm text-fg-muted">

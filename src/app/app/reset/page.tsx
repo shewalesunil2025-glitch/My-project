@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { cloudRecoveryReady, cloudSetNewPassword } from "@/lib/app/cloud";
 import { AuthFrame } from "@/components/app/AuthFrame";
-import { Btn, Field, Input, Notice, Spinner } from "@/components/app/ui";
+import { Btn, Field, Input, PasswordInput, Notice, Spinner } from "@/components/app/ui";
 
 /** Where the reset email's link lands: choose a new password. */
 export default function ResetPasswordPage() {
@@ -53,10 +53,10 @@ export default function ResetPasswordPage() {
       {state === "ready" && (
         <form onSubmit={onSubmit} className="space-y-4">
           <Field label="New password" htmlFor="password" help="At least 8 characters.">
-            <Input id="password" name="password" type="password" autoComplete="new-password" minLength={8} required />
+            <PasswordInput id="password" name="password" autoComplete="new-password" minLength={8} required />
           </Field>
           <Field label="Type it again" htmlFor="confirm">
-            <Input id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={8} required />
+            <PasswordInput id="confirm" name="confirm" autoComplete="new-password" minLength={8} required />
           </Field>
           {error && <Notice tone="amber">{error}</Notice>}
           <Btn type="submit" size="lg" className="w-full" disabled={busy}>

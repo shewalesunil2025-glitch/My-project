@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
+import { useState, type ComponentProps, type ReactNode } from "react";
 import {
   Bell,
   CircleDot,
@@ -26,6 +26,8 @@ import {
   Search,
   BarChart3,
   Headset,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { LogoMark, Wordmark } from "@/components/navigation/Logo";
@@ -230,6 +232,24 @@ export function Field({ label, help, children, htmlFor, required }: { label: str
 
 export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={cn(inputCls, className)} {...props} />;
+}
+/** A password (or PIN) box with an eye button: hidden while the eye is closed, shown when it's tapped open. */
+export function PasswordInput({ className, ...props }: Omit<ComponentProps<"input">, "type">) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <input type={show ? "text" : "password"} className={cn(inputCls, "pr-11", className)} {...props} />
+      <button
+        type="button"
+        onClick={() => setShow((v) => !v)}
+        className="absolute inset-y-0 right-0 grid w-11 place-items-center text-fg-subtle hover:text-fg"
+        aria-label={show ? "Hide" : "Show"}
+        aria-pressed={show}
+      >
+        {show ? <EyeOff className="size-[1.1rem]" aria-hidden /> : <Eye className="size-[1.1rem]" aria-hidden />}
+      </button>
+    </div>
+  );
 }
 export function TextArea({ className, ...props }: ComponentProps<"textarea">) {
   return <textarea className={cn(inputCls, "min-h-24 resize-y", className)} {...props} />;
