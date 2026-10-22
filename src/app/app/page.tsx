@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { ArrowRight, CirclePlay, Fingerprint, KeyRound, LogIn, ScanFace, UserPlus } from "lucide-react";
 import { product } from "@/config/product";
 import { logOut, useSession } from "@/lib/app/store";
-import { LOCK_EVENT, getLock, isUnlocked, unlockWithBiometric } from "@/lib/app/appLock";
+import { LOCK_EVENT, bioName, forgetUnlocked, getLock, unlockWithBiometric } from "@/lib/app/appLock";
 import { BrandMark } from "@/components/app/ui";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { Wordmark } from "@/components/navigation/Logo";
@@ -35,7 +35,6 @@ const onLockChange = (cb: () => void) => {
     window.removeEventListener("storage", cb);
   };
 };
-const never = () => () => {};
 
 /** The app's own primary button (glowing green ring, see .btn-3d), just taller. */
 const primary =
@@ -49,23 +48,29 @@ export default function WelcomePage() {
   const { ready, user, workspace } = useSession();
   const router = useRouter();
   const signedIn = ready && user && !workspace?.sample;
-  // This account has an app lock on this phone (and isn't unlocked right now): open it with the PIN,
-  // fingerprint or Face ID straight from here — no email or password.
+  // This account has an app lock on this phone: it opens with what the client set up — Face ID,
+  // fingerprint and/or PIN — straight from here, with no email or password.
   const lockState = useSyncExternalStore(
     onLockChange,
     () => {
       const lock = user ? getLock(user.id) : null;
-      return !lock || isUnlocked(user!.id, lock) ? "" : lock.credentialId ? "bio" : "pin";
+      if (!lock) return "";
+      return `${lock.credentialId ? (lock.bioKind ?? "face") : ""}|${lock.hash ? "pin" : ""}`;
     },
     () => "",
   );
-  const apple = useSyncExternalStore(never, () => /iPhone|iPad|Macintosh/.test(navigator.userAgent), () => false);
+  const [bioKind, pinOn] = lockState.split("|");
+  const bioLabel = bioName(bioKind === "fingerprint" ? "fingerprint" : "face");
   const [bioError, setBioError] = useState("");
   const locked = signedIn && lockState !== "";
+  // Opening the app always asks again (also when it was unlocked a moment ago).
+  useEffect(() => {
+    if (locked) forgetUnlocked();
+  }, [locked]);
   const bio = async () => {
     setBioError("");
     if (user && (await unlockWithBiometric(user.id))) router.push("/app/home");
-    else setBioError(`${apple ? "Face ID" : "Fingerprint"} didn't match — use your PIN.`);
+    else setBioError(`${bioLabel} didn't match${pinOn ? " — use your PIN" : " — try again"}.`);
   };
   /** Another account on this phone: sign the current one out first (its data stays safe in the cloud). */
   const switchTo = (path: "/app/signup" | "/app/login") => {
@@ -102,15 +107,17 @@ export default function WelcomePage() {
               <p className="mb-1 max-w-full truncate text-sm text-fg-muted">
                 Welcome back{workspace?.business?.name ? `, ${workspace.business.name}` : ""}
               </p>
-              {lockState === "bio" && (
+              {bioKind && (
                 <button type="button" onClick={() => void bio()} className={primary}>
-                  {apple ? <ScanFace className="size-5" aria-hidden /> : <Fingerprint className="size-5" aria-hidden />}
-                  Unlock with {apple ? "Face ID" : "Fingerprint"}
+                  {bioKind === "fingerprint" ? <Fingerprint className="size-5" aria-hidden /> : <ScanFace className="size-5" aria-hidden />}
+                  Unlock with {bioLabel}
                 </button>
               )}
-              <Link href="/app/home" className={lockState === "bio" ? secondary : primary}>
-                <KeyRound className="size-5 text-flow" aria-hidden /> Unlock with PIN
-              </Link>
+              {pinOn && (
+                <Link href="/app/home" className={bioKind ? secondary : primary}>
+                  <KeyRound className="size-5 text-flow" aria-hidden /> Unlock with PIN
+                </Link>
+              )}
               {bioError && (
                 <p role="alert" className="text-sm text-red-300">
                   {bioError}
