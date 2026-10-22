@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, Crown, X } from "lucide-react";
+import { ArrowRight, Camera, Crown, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 /* Pieces of the owner's Home dashboard (src/app/app/(workspace)/home/page.tsx). */
@@ -24,8 +24,39 @@ export function CountUp({ value, className }: { value: number; className?: strin
   return <span className={cn("tabular-nums", className)}>{shown}</span>;
 }
 
-/** The owner's badge: their logo (or initials) with a gold crown on top. */
-export function OwnerAvatar({ name, logo }: { name: string; logo?: string }) {
+/** Shrinks a photo to a square of `size` px (cropped to the middle, or a wide logo fitted whole), so it saves small and loads fast. */
+export function squarePhoto(file: File, size = 320): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const { naturalWidth: w, naturalHeight: h } = img;
+      const side = Math.min(w, h);
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      URL.revokeObjectURL(url);
+      if (!ctx || !side) return reject(new Error("unreadable"));
+      ctx.fillStyle = "#ffffff"; // see-through logos get a white back, like on invoices
+      ctx.fillRect(0, 0, size, size);
+      if (w / h > 1.4 || h / w > 1.4) {
+        // A wide or tall logo is shown whole (on white), not cut.
+        const scale = size / Math.max(w, h);
+        ctx.drawImage(img, (size - w * scale) / 2, (size - h * scale) / 2, w * scale, h * scale);
+      } else ctx.drawImage(img, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size);
+      resolve(canvas.toDataURL("image/jpeg", 0.88));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("unreadable"));
+    };
+    img.src = url;
+  });
+}
+
+/** The owner's badge: their photo or logo (or initials) with a gold crown on top. Tap it to upload a new photo. */
+export function OwnerAvatar({ name, logo, onPhoto }: { name: string; logo?: string; onPhoto?: (dataUrl: string) => void }) {
+  const [busy, setBusy] = useState(false);
   const initials =
     name
       .split(" ")
@@ -33,18 +64,49 @@ export function OwnerAvatar({ name, logo }: { name: string; logo?: string }) {
       .slice(0, 2)
       .map((w) => w[0]!.toUpperCase())
       .join("") || "O";
-  return (
-    <span className="dash-owner relative inline-grid size-14 shrink-0 place-items-center">
-      <Crown className="dash-crown absolute -top-3.5 left-1/2 size-6" aria-hidden />
-      <span className="grid size-14 place-items-center overflow-hidden rounded-2xl text-lg font-bold">
-        {logo ? (
-          // eslint-disable-next-line @next/next/no-img-element -- the owner's own logo (data URL or any host)
-          <img src={logo} alt="" className="size-full object-cover" />
-        ) : (
-          initials
-        )}
-      </span>
+  const box = (
+    <span className="dash-owner-box grid size-14 place-items-center overflow-hidden rounded-2xl text-lg font-bold">
+      {logo ? (
+        // eslint-disable-next-line @next/next/no-img-element -- the owner's own photo (data URL)
+        <img src={logo} alt="" className="size-full object-cover" />
+      ) : (
+        initials
+      )}
     </span>
+  );
+  const crown = <Crown className="dash-crown absolute -top-3.5 left-1/2 size-6" aria-hidden />;
+  if (!onPhoto)
+    return (
+      <span className="relative inline-grid size-14 shrink-0 place-items-center">
+        {crown}
+        {box}
+      </span>
+    );
+  return (
+    <label className="relative inline-grid size-14 shrink-0 cursor-pointer place-items-center" title={logo ? "Change photo" : "Add your photo or logo"}>
+      {crown}
+      {box}
+      <span className="dash-owner-cam absolute -right-1.5 -bottom-1.5 grid size-6 place-items-center rounded-full">{busy ? <span className="size-2.5 animate-ping rounded-full bg-current" /> : <Camera className="size-3.5" aria-hidden />}</span>
+      <input
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        aria-label={logo ? "Change your photo or logo" : "Upload your photo or logo"}
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (!file) return;
+          setBusy(true);
+          try {
+            onPhoto(await squarePhoto(file));
+          } catch {
+            window.alert("That photo couldn't be opened — please pick a JPG or PNG photo.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      />
+    </label>
   );
 }
 
