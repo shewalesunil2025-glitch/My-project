@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { LOGOUT_AFTER, PAUSE_AFTER, checkPin, forgetUnlocked, getLock, isUnlocked, markAway, setPin, weakPin } from "./appLock";
+import { LOGOUT_AFTER, PAUSE_AFTER, checkPin, forgetUnlocked, getLock, isUnlocked, markAway, removeBiometric, removePin, setPin, updateLock, weakPin } from "./appLock";
 
 /* A browser's two storages, in memory. */
 const storage = () => {
@@ -80,5 +80,30 @@ describe("when the app asks", () => {
     await setPin("u2", "739104");
     // u2 was unlocked last on this phone: u1 must enter its own PIN.
     expect(isUnlocked("u1", getLock("u1")!)).toBe(false);
+  });
+});
+
+describe("PIN, Face ID and fingerprint on their own", () => {
+  it("keeps the lock when the PIN goes but Face ID stays", async () => {
+    await setPin("u1", "482915");
+    updateLock("u1", { credentialId: "abc", bioKind: "face" });
+    removePin("u1");
+    const lock = getLock("u1");
+    expect(lock?.hash).toBeUndefined();
+    expect(lock?.credentialId).toBe("abc");
+    // With no PIN, no PIN opens it.
+    expect((await checkPin("u1", "482915")).ok).toBe(false);
+    removeBiometric("u1");
+    expect(getLock("u1")).toBeNull();
+  });
+
+  it("keeps the PIN when fingerprint is turned off, and keeps the fingerprint when the PIN changes", async () => {
+    await setPin("u1", "482915");
+    updateLock("u1", { credentialId: "abc", bioKind: "fingerprint" });
+    await setPin("u1", "593104");
+    expect(getLock("u1")).toMatchObject({ credentialId: "abc", bioKind: "fingerprint" });
+    removeBiometric("u1");
+    expect(getLock("u1")?.credentialId).toBeUndefined();
+    expect((await checkPin("u1", "593104")).ok).toBe(true);
   });
 });

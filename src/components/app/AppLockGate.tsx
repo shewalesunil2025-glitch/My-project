@@ -2,11 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore, type MouseEvent, type PointerEvent, type ReactNode } from "react";
-import { Delete, Eye, EyeOff, Fingerprint } from "lucide-react";
+import { Delete, Eye, EyeOff, Fingerprint, ScanFace } from "lucide-react";
 import { logOut } from "@/lib/app/store";
 import {
   LOCK_EVENT,
   PIN_LENGTH,
+  bioName,
   checkPin,
   forgetUnlocked,
   getLock,
@@ -74,12 +75,16 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
   const [shake, setShake] = useState(false);
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
-  const hasBio = Boolean(getLock(userId)?.credentialId);
+  const lock = getLock(userId);
+  const hasBio = Boolean(lock?.credentialId);
+  const hasPin = Boolean(lock?.hash);
+  const bioLabel = bioName(lock?.bioKind);
+  const BioIcon = lock?.bioKind === "fingerprint" ? Fingerprint : ScanFace;
 
   const bio = useCallback(async () => {
     setError("");
-    if (!(await unlockWithBiometric(userId))) setError("Fingerprint / Face ID didn't match. Use your PIN.");
-  }, [userId]);
+    if (!(await unlockWithBiometric(userId))) setError(`${bioLabel} didn't match. ${hasPin ? "Use your PIN." : "Try again, or log in with your password."}`);
+  }, [userId, bioLabel, hasPin]);
 
   const forgot = useCallback(() => {
     // The PIN can't be recovered: log in again with the password, then set a new one.
@@ -163,6 +168,29 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
       <span className="mt-0.5 h-3 text-[0.6rem] font-bold tracking-[0.16em] opacity-80">{letters[d] ?? ""}</span>
     </button>
   );
+  // Face ID / fingerprint only (no PIN): one big button.
+  if (!hasPin)
+    return (
+      <div className="lock-screen fixed inset-0 z-[300] flex flex-col items-center overflow-hidden px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-[max(env(safe-area-inset-bottom),1.25rem)]" role="dialog" aria-modal="true" aria-label="App locked">
+        <div aria-hidden className="lock-bg pointer-events-none absolute -inset-10" />
+        <div className="relative flex flex-1 flex-col items-center justify-center text-center">
+          <BrandMark className="size-13" />
+          <h1 className="mt-4 text-xl font-medium">ibaxai is locked</h1>
+          <p className="lock-sub mt-1 text-xs">{name ? `${name} · ibaxai` : "ibaxai"}</p>
+          <button type="button" {...tap(() => void bio())} className="lock-key mt-12 size-28!" aria-label={`Unlock with ${bioLabel}`}>
+            <BioIcon className="size-12 text-flow" aria-hidden />
+          </button>
+          <p className="mt-4 text-base font-medium">Unlock with {bioLabel}</p>
+          <p role="alert" className="mt-3 min-h-10 max-w-xs text-sm text-red-300">
+            {error}
+          </p>
+        </div>
+        <button type="button" onClick={forgot} className="lock-sub relative py-2 text-sm hover:underline">
+          Can&apos;t unlock? Log in with your password
+        </button>
+      </div>
+    );
+
   return (
     <div className="lock-screen fixed inset-0 z-[300] flex flex-col items-center overflow-hidden px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-[max(env(safe-area-inset-bottom),1.25rem)]" role="dialog" aria-modal="true" aria-label="App locked">
       <div aria-hidden className="lock-bg pointer-events-none absolute -inset-10" />
@@ -194,8 +222,8 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
       <div className="relative mt-auto grid grid-cols-3 gap-x-6 gap-y-3.5 sm:mt-6">
         {keys.map(digit)}
         {hasBio ? (
-          <button type="button" onClick={() => void bio()} className="lock-key-plain text-flow" aria-label="Unlock with fingerprint or Face ID">
-            <Fingerprint className="size-8" aria-hidden />
+          <button type="button" onClick={() => void bio()} className="lock-key-plain text-flow" aria-label={`Unlock with ${bioLabel}`}>
+            <BioIcon className="size-8" aria-hidden />
           </button>
         ) : (
           <span />

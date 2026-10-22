@@ -9,17 +9,22 @@
  */
 
 export type AppLock = {
-  /** PBKDF2-SHA-256 of the PIN, base64. */
-  hash: string;
-  salt: string;
+  /** PBKDF2-SHA-256 of the PIN, base64 — absent when the client uses only Face ID / fingerprint. */
+  hash?: string;
+  salt?: string;
   /** The phone's fingerprint / Face ID key for this app, if turned on (base64url id). */
   credentialId?: string;
+  /** What the client chose to call it: their face or their finger (the phone decides which it checks). */
+  bioKind?: BioKind;
   /** Lock again after the app was in the background this long (seconds; 0 = every time). */
   after: number;
   /** Wrong PINs in a row, and until when entering is blocked (ms). */
   fails: number;
   blockedUntil: number;
 };
+
+export type BioKind = "face" | "fingerprint";
+export const bioName = (kind: BioKind | undefined) => (kind === "fingerprint" ? "Fingerprint" : "Face ID");
 
 const key = (userId: string) => `ibax-lock:${userId}`;
 const OPEN = "ibax-unlocked"; // sessionStorage: { userId, at } while the app is open and unlocked
@@ -71,11 +76,11 @@ export function weakPin(pin: string) {
 export async function setPin(userId: string, pin: string, after = 60) {
   const salt = random(16);
   const old = getLock(userId);
-  saveLock(userId, { hash: await hashPin(pin, salt), salt: b64(salt), credentialId: old?.credentialId, after: old?.after ?? after, fails: 0, blockedUntil: 0 });
+  saveLock(userId, { hash: await hashPin(pin, salt), salt: b64(salt), credentialId: old?.credentialId, bioKind: old?.bioKind, after: old?.after ?? after, fails: 0, blockedUntil: 0 });
   markUnlocked(userId);
 }
 
-export function updateLock(userId: string, change: Partial<Pick<AppLock, "after" | "credentialId">>) {
+export function updateLock(userId: string, change: Partial<Pick<AppLock, "after" | "credentialId" | "bioKind">>) {
   const lock = getLock(userId);
   if (lock) saveLock(userId, { ...lock, ...change });
 }
@@ -84,12 +89,27 @@ export function removeLock(userId: string) {
   saveLock(userId, null);
 }
 
+/** Turns the PIN off; the lock stays if Face ID / fingerprint is still on. */
+export function removePin(userId: string) {
+  const lock = getLock(userId);
+  if (lock?.credentialId) saveLock(userId, { ...lock, hash: undefined, salt: undefined, fails: 0, blockedUntil: 0 });
+  else saveLock(userId, null);
+}
+
+/** Turns Face ID / fingerprint off; the lock stays if there is a PIN. */
+export function removeBiometric(userId: string) {
+  const lock = getLock(userId);
+  if (lock?.hash) saveLock(userId, { ...lock, credentialId: undefined, bioKind: undefined });
+  else saveLock(userId, null);
+}
+
 export type PinResult = { ok: true } | { ok: false; left: number; blockedFor: number; logout: boolean };
 
 /** Checks a PIN; counts wrong ones (a pause after 5, logged out after 10). */
 export async function checkPin(userId: string, pin: string): Promise<PinResult> {
   const lock = getLock(userId);
   if (!lock) return { ok: true };
+  if (!lock.hash || !lock.salt) return { ok: false, left: LOGOUT_AFTER, blockedFor: 0, logout: false };
   if (Date.now() < lock.blockedUntil) return { ok: false, left: LOGOUT_AFTER - lock.fails, blockedFor: lock.blockedUntil - Date.now(), logout: false };
   if ((await hashPin(pin, unb64(lock.salt))) === lock.hash) {
     saveLock(userId, { ...lock, fails: 0, blockedUntil: 0 });
@@ -114,8 +134,11 @@ export async function biometricAvailable() {
   }
 }
 
-/** Asks the phone to register a fingerprint / Face ID key for this account. Call from a tap. */
-export async function enrollBiometric(userId: string, label: string) {
+/**
+ * Asks the phone to register a fingerprint / Face ID key for this account (with or without a PIN).
+ * Call from a tap.
+ */
+export async function enrollBiometric(userId: string, label: string, kind: BioKind = "face") {
   const cred = (await navigator.credentials.create({
     publicKey: {
       challenge: random(32),
@@ -130,7 +153,9 @@ export async function enrollBiometric(userId: string, label: string) {
     },
   })) as PublicKeyCredential | null;
   if (!cred) throw new Error("cancelled");
-  updateLock(userId, { credentialId: b64url(cred.rawId) });
+  const old = getLock(userId);
+  saveLock(userId, { ...(old ?? { after: 60, fails: 0, blockedUntil: 0 }), credentialId: b64url(cred.rawId), bioKind: kind });
+  markUnlocked(userId);
 }
 
 /** The phone checks the fingerprint / face. True when it matched. Call from a tap. */
