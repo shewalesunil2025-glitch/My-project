@@ -1172,8 +1172,7 @@ body {
 .dash-edit { color: #f6d98e; }
 .dash-edit:hover { background: rgb(240 197 106 / 0.12); }
 .dash-owner-box { color: #3a2600; background: linear-gradient(140deg, #fbe7ad, #e0a93e); }
-.dash-badge .dash-owner-box { box-shadow: 0 0 0 2.5px #e6b955, 0 0 20px -4px rgb(240 190 80 / 0.7); }
-.dash-verified { color: #3a2600; background: linear-gradient(140deg, #fbe08f, #d9a13a); box-shadow: 0 0 0 2.5px #0c3a1e; }
+.dash-badge .dash-owner-box { box-shadow: 0 0 0 2px rgb(255 255 255 / 0.2), 0 10px 24px -12px rgb(0 0 0 / 0.8); }
 .dash-offer { color: #fff; }
 .dash-offer-violet { background: radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.22), transparent 45%), linear-gradient(135deg, #6b3df0, #2a1670); }
 .dash-offer-gold { background: radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.22), transparent 45%), linear-gradient(135deg, #d48a00, #6b3f00); }
