@@ -20,7 +20,7 @@ export default function IbaxPackagesPage() {
   const cur = appCurrency(ws);
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader eyebrow={`${product.assistantName} Premium`} title="Our Premium Packages" subtitle={`One plan, and ${product.assistantName} runs your marketing and social media for you.`} />
+      <PageHeader eyebrow={`${product.assistantName} Premium`} title="Premium Packages" subtitle={`One plan, and ${product.assistantName} runs your marketing and social media for you.`} />
       {packages.map((id, i) => {
         const s = serviceById(id);
         if (!s) return null;
@@ -43,11 +43,9 @@ export default function IbaxPackagesPage() {
                   <Icon name={s.icon} className="size-6" />
                 </span>
                 <div className="flex flex-wrap justify-end gap-1.5">
-                  {i === 0 && (
-                    <Pill tone="ember">
-                      <Crown className="size-3" aria-hidden /> Premium
-                    </Pill>
-                  )}
+                  <Pill tone="ember">
+                    <Crown className="size-3" aria-hidden /> Premium
+                  </Pill>
                   {a ? <Pill tone={automationStatus[a.status].tone}>{automationStatus[a.status].label}</Pill> : !live && <Pill tone="amber">Coming soon</Pill>}
                 </div>
               </div>
