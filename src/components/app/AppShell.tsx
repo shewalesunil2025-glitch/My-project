@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import {
-  Activity,
+  Images,
   Bell,
   Bot,
   ChartColumn,
@@ -45,7 +45,7 @@ export const workspaceNav = [
   { href: "/app/inbox", label: "Inbox", icon: Inbox },
   { href: "/app/calls", label: "Calls", icon: PhoneCall },
   { href: "/app/content", label: "Content", icon: Clapperboard },
-  { href: "/app/activity", label: "Activity", icon: Activity },
+  { href: "/app/activity", label: "Media", icon: Images },
   { href: "/app/leads", label: "Leads & Customers", icon: Users },
   { href: "/app/reviews", label: "Reviews", icon: Star },
   { href: "/app/analytics", label: "Analytics", icon: ChartColumn },
@@ -101,7 +101,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { href: "/app/home", label: "Home", icon: House },
     { href: "/app/ibax", label: product.assistantName, icon: Bot, lumi: true },
     { href: "/app/services", label: "Services", icon: LayoutGrid },
-    { href: "/app/activity", label: "Activity", icon: Activity },
+    { href: "/app/activity", label: "Media", icon: Images },
     { href: "/app/more", label: "More", icon: Ellipsis },
   ];
 

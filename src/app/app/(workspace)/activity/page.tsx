@@ -222,7 +222,7 @@ export default function ActivityPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Activity Centre" title="Activity" subtitle="Every photo, reel and video IBAX made or posted on Instagram, Facebook and YouTube — and the full history of your business." />
+      <PageHeader eyebrow="Media" title="Posts & Media" subtitle="Every photo, reel and video IBAX made or posted on Instagram, Facebook and YouTube — and the full history of your business." />
       <div className="mb-5">
         <Segmented label="Show" value={tab} onChange={setTab} options={tabs} />
       </div>
