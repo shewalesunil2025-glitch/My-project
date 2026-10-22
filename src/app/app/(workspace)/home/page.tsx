@@ -564,17 +564,13 @@ function Dashboard() {
           </div>
         </section>
       ) : (
-        /* Nothing waiting: the slogan, in the spotlight */
-        <Link {...rise(3)} href="/app/ibax" className="dash-in dash-slogan group relative block overflow-hidden rounded-[1.75rem] px-5 py-7 text-center">
+        /* Nothing waiting: just the slogan, in the spotlight (not a button) */
+        <div {...rise(3)} className="dash-in dash-slogan relative overflow-hidden rounded-[1.75rem] px-5 py-8 text-center">
           <span aria-hidden className="pointer-events-none absolute -top-16 left-1/2 size-48 -translate-x-1/2 rounded-full bg-flow/25 blur-3xl" />
-          <span className="relative block text-[1.6rem] leading-tight font-extrabold tracking-tight sm:text-3xl">
+          <h2 className="relative text-[1.6rem] leading-tight font-extrabold tracking-tight sm:text-3xl">
             Just say it. <span className="dash-slogan-ibax">{name}</span> does it.
-          </span>
-          <span className="relative mt-2 block text-sm text-fg-muted">Nothing is waiting for you — tell {name} what you need next.</span>
-          <span className="relative mt-4 inline-flex items-center gap-1.5 rounded-full bg-flow px-4 py-2 text-sm font-bold text-ink-950 transition-transform group-active:scale-95">
-            Talk to {name} <ArrowRight className="size-4" aria-hidden />
-          </span>
-        </Link>
+          </h2>
+        </div>
       )}
 
       {/* Today's numbers — each opens the details */}
