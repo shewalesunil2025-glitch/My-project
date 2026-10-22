@@ -93,7 +93,7 @@ export function OfferCarousel({ offers }: { offers: Offer[] }) {
         className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
       >
         {offers.map((o) => (
-          <Link key={o.title} href={o.href} className={cn("dash-offer dash-shine relative w-[82%] max-w-[22rem] shrink-0 snap-start overflow-hidden rounded-2xl p-4", `dash-offer-${o.tone}`)}>
+          <Link key={o.title} href={o.href} className={cn("dash-offer relative w-[82%] max-w-[22rem] shrink-0 snap-start overflow-hidden rounded-2xl p-4", `dash-offer-${o.tone}`)}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-[0.7rem] font-bold tracking-[0.1em]">{o.tag}</span>
               {o.price && <span className="dash-chip rounded-lg px-2 py-0.5 text-xs font-bold">{o.price}</span>}
