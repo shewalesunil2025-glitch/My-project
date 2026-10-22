@@ -35,11 +35,12 @@ export function LogoMark({ className }: { className?: string }) {
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span
-      className={cn("inline-flex items-baseline font-[family-name:var(--font-poppins)] font-bold tracking-[-0.03em] leading-none", className)}
+      className={cn("inline-block font-[family-name:var(--font-poppins)] font-bold tracking-[-0.03em] whitespace-nowrap leading-none", className)}
       aria-label={siteConfig.name}
     >
       <span aria-hidden className="text-white">iba</span>
-      <svg aria-hidden viewBox="0 0 100 100" className="mx-[0.03em] h-[0.6em] w-[0.6em] text-white">
+      {/* Sits on the baseline and is exactly as tall as the small letters (Poppins x-height ≈ 0.55em). */}
+      <svg aria-hidden viewBox="0 0 100 100" className="mx-[0.04em] inline-block h-[0.55em] w-[0.55em] align-baseline text-white">
         <line x1="12" y1="12" x2="88" y2="88" stroke="currentColor" strokeWidth="19" strokeLinecap="round" />
         <line x1="12" y1="88" x2="88" y2="12" stroke="currentColor" strokeWidth="19" strokeLinecap="round" />
       </svg>
