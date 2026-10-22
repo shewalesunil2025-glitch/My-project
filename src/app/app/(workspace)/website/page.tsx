@@ -159,7 +159,7 @@ export default function WebsitePage() {
       {access === "trial" && trial.phase === "on" && (
         <Notice className="mb-6 flex flex-wrap items-center gap-3">
           <Gift className="size-4 shrink-0" aria-hidden />
-          <span className="min-w-0 flex-1">
+          <span className="min-w-[12rem] flex-1">
             <strong>Free trial · {timeLeft(trial.msLeft)}.</strong> Build and preview your website free. To put it on the internet, get the Website service ({money(svcPrice(svc, ws)!, appCurrency(ws))} one-time).
           </span>
           <BtnLink size="sm" href="/app/services/website">
@@ -173,7 +173,7 @@ export default function WebsitePage() {
           <span className="grid size-10 place-items-center rounded-full bg-flow/15 text-flow">
             <Rocket className="size-5" aria-hidden />
           </span>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-[10rem] flex-1">
             <p className="text-sm font-semibold">Your website is live</p>
             <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="block truncate text-sm text-flow-soft underline underline-offset-2">
               {liveUrl.replace(/^https?:\/\//, "")}

@@ -230,11 +230,13 @@ export default function ReviewsPage() {
         <AskForReview ws={ws} />
       ) : (
         <Card className="mb-6 flex flex-wrap items-center gap-4 border-flow/30">
-          <div className="min-w-0 flex-1">
+          <div className="min-w-[14rem] flex-1">
             <p className="font-semibold">Get more real Google reviews</p>
             <p className="mt-1 text-sm text-fg-muted">IBAX asks your customers for a review on your WhatsApp — automatically after a sale, or with one tap.</p>
           </div>
-          <BtnLink href="/app/services/reviews">{active ? "Finish setup" : "Get Google Review Management"}</BtnLink>
+          <BtnLink href="/app/services/reviews" className="w-full sm:w-auto">
+            {active ? "Finish setup" : "Get Google Review Management"}
+          </BtnLink>
         </Card>
       )}
       {reviewsOn(ws) && <ReplyHelper ws={ws} />}
