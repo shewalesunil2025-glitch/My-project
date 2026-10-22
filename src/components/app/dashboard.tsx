@@ -148,10 +148,8 @@ export function PhotoCropper({ pic, onCancel, onSave }: { pic: Pic; onCancel: ()
   );
 }
 
-export type BadgeLook = "plain" | "verified" | "ring";
-
-/** The owner's photo or logo (or initials) in a square badge. */
-export function OwnerBadge({ name, logo, look = "verified", size = "md" }: { name: string; logo?: string; look?: BadgeLook; size?: "md" | "lg" }) {
+/** The owner's photo or logo (or initials) in a square badge with a gold edge and a small gold tick. */
+export function OwnerBadge({ name, logo, size = "md" }: { name: string; logo?: string; size?: "md" | "lg" }) {
   const initials =
     name
       .split(" ")
@@ -161,8 +159,8 @@ export function OwnerBadge({ name, logo, look = "verified", size = "md" }: { nam
       .join("") || "O";
   const big = size === "lg";
   return (
-    <span className={cn("dash-badge relative inline-grid shrink-0 place-items-center", `dash-badge-${look}`, big ? "size-28" : "size-14")}>
-      <span className={cn("dash-owner-box grid size-full place-items-center overflow-hidden font-bold", look === "ring" ? "rounded-full" : big ? "rounded-[1.75rem]" : "rounded-2xl", big ? "text-3xl" : "text-lg")}>
+    <span className={cn("dash-badge relative inline-grid shrink-0 place-items-center", big ? "size-28" : "size-14")}>
+      <span className={cn("dash-owner-box grid size-full place-items-center overflow-hidden font-bold", big ? "rounded-[1.75rem]" : "rounded-2xl", big ? "text-3xl" : "text-lg")}>
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- the owner's own photo (data URL)
           <img src={logo} alt="" className="size-full object-cover" />
@@ -170,11 +168,9 @@ export function OwnerBadge({ name, logo, look = "verified", size = "md" }: { nam
           initials
         )}
       </span>
-      {look === "verified" && (
-        <span className={cn("dash-verified absolute grid place-items-center rounded-full font-black", big ? "-right-2 -bottom-2 size-8 text-base" : "-right-1.5 -bottom-1.5 size-5.5 text-[0.7rem]")} aria-hidden>
-          ✓
-        </span>
-      )}
+      <span className={cn("dash-verified absolute grid place-items-center rounded-full font-black", big ? "-right-2 -bottom-2 size-8 text-base" : "-right-1.5 -bottom-1.5 size-5.5 text-[0.7rem]")} aria-hidden>
+        ✓
+      </span>
     </span>
   );
 }
@@ -184,14 +180,12 @@ export function BusinessProfileSheet({
   business,
   owner,
   logo,
-  look,
   onClose,
   onSave,
 }: {
   business: string;
   owner: string;
   logo?: string;
-  look?: BadgeLook;
   onClose: () => void;
   onSave: (v: { business: string; owner: string; logo?: string }) => void;
 }) {
@@ -230,7 +224,7 @@ export function BusinessProfileSheet({
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-fg-subtle/40 sm:hidden" aria-hidden />
         <p className="text-center text-base font-bold tracking-tight">Business profile</p>
         <div className="mt-5 flex justify-center">
-          <OwnerBadge name={draft.owner || draft.business} logo={draft.logo} look={look} size="lg" />
+          <OwnerBadge name={draft.owner || draft.business} logo={draft.logo} size="lg" />
         </div>
         <div className="mt-5 flex gap-2.5">
           <button type="button" className={btn} onClick={() => file.current?.click()}>

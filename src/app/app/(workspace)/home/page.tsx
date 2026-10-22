@@ -15,7 +15,7 @@ import { AskBar } from "@/components/app/AskBar";
 import { RenewalBanner } from "@/components/app/RenewalBanner";
 import { KindIcon } from "@/components/app/kinds";
 import { automationStatus } from "@/components/app/status";
-import { CountUp, DetailRow, DetailSheet, BusinessProfileSheet, OfferCarousel, OwnerBadge, type BadgeLook, type Offer } from "@/components/app/dashboard";
+import { CountUp, DetailRow, DetailSheet, BusinessProfileSheet, OfferCarousel, OwnerBadge, type Offer } from "@/components/app/dashboard";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { BtnLink, Card, EmptyState, Icon, Notice, Pill, SectionTitle, fmtDateTime, fmtTime } from "@/components/app/ui";
 import type { Call, Conversation, Lead, Review, Workspace } from "@/lib/app/types";
@@ -172,7 +172,6 @@ function Dashboard() {
   const params = useSearchParams();
   const [open, setOpen] = useState<MetricKey | null>(null);
   const [profile, setProfile] = useState(false);
-  const look = (["plain", "verified", "ring"].includes(params.get("look") ?? "") ? params.get("look") : "verified") as BadgeLook;
   if (!ws?.business || !ws.assistant) return null;
 
   const name = product.assistantName;
@@ -394,7 +393,7 @@ function Dashboard() {
               </span>
             </div>
             <div className="mt-4 flex items-center gap-4">
-              <OwnerBadge name={owner || ws.business.name} logo={ws.business.logo} look={look} />
+              <OwnerBadge name={owner || ws.business.name} logo={ws.business.logo} />
               <div className="min-w-0">
                 <p className="truncate text-sm opacity-85">
                   {greeting}, {first} 👋
@@ -660,7 +659,6 @@ function Dashboard() {
           business={ws.business.name}
           owner={owner}
           logo={ws.business.logo}
-          look={look}
           onClose={() => setProfile(false)}
           onSave={(v) => {
             updateWorkspace((w) => {
