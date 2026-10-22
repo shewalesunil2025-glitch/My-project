@@ -56,7 +56,7 @@ let touchedAt = -Infinity;
 
 /**
  * Lights a key up straight away, like an iPhone's passcode screen. It's done on the element itself
- * (not through React state) so the light appears in the same frame as the touch, then fades out.
+ * (not through React state) so the light appears in the same frame as the touch, and it is gone again ~0.2 s later.
  */
 function flash(el: HTMLElement | null) {
   if (!el) return;
@@ -64,7 +64,7 @@ function flash(el: HTMLElement | null) {
   void el.offsetWidth; // restart the fade when the same key is pressed again quickly
   el.classList.add("lock-key-lit");
   clearTimeout(Number(el.dataset.timer));
-  el.dataset.timer = String(window.setTimeout(() => el.classList.remove("lock-key-lit"), 160));
+  el.dataset.timer = String(window.setTimeout(() => el.classList.remove("lock-key-lit"), 90));
 }
 
 function LockScreen({ userId, name }: { userId: string; name: string }) {

@@ -1069,8 +1069,8 @@ body {
 .lock-key {
   background: rgb(255 255 255 / 0.14);
   will-change: transform;
-  /* Lights up at once on touch; the light fades away gently after. */
-  transition: background-color 0.32s ease-out, color 0.32s ease-out, box-shadow 0.32s ease-out, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Lights up at once on touch and goes off just as quickly, like an iPhone. */
+  transition: background-color 0.1s ease-out, color 0.1s ease-out, box-shadow 0.1s ease-out, transform 0.1s ease-out;
 }
 .lock-key-lit {
   background: rgb(255 255 255 / 0.9); color: #06200f;
