@@ -10,7 +10,7 @@ import { suggestions } from "@/lib/app/assistant";
 import { useWorkspace } from "@/components/app/AppShell";
 import { AddBusinessCard } from "@/components/app/AddBusinessCard";
 import { AppLockTip } from "@/components/app/AppLockTip";
-import { businessReady } from "@/lib/app/store";
+import { audit, businessReady, updateWorkspace } from "@/lib/app/store";
 import { AskBar } from "@/components/app/AskBar";
 import { RenewalBanner } from "@/components/app/RenewalBanner";
 import { KindIcon } from "@/components/app/kinds";
@@ -387,7 +387,17 @@ function Dashboard() {
               <span className="dash-owner-pill inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.68rem] font-bold tracking-[0.12em]">♛ OWNER</span>
             </div>
             <div className="mt-4 flex items-center gap-4">
-              <OwnerAvatar name={owner || ws.business.name} logo={ws.business.logo} />
+              <OwnerAvatar
+                name={owner || ws.business.name}
+                logo={ws.business.logo}
+                onPhoto={(logo) =>
+                  updateWorkspace((w) => {
+                    if (!w.business) return;
+                    w.business.logo = logo;
+                    audit(w, "Changed the business photo");
+                  })
+                }
+              />
               <div className="min-w-0">
                 <p className="truncate text-sm opacity-85">
                   {greeting}, {first} 👋
