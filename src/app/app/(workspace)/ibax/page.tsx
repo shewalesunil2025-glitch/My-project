@@ -12,7 +12,7 @@ import { Icon, PageHeader, Pill } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
 
 /** The two packages IBAX runs end to end; single services are on the Services page. */
-const packages = ["social-pack", "digital-marketing"];
+const packages = ["digital-marketing", "social-pack"];
 
 export default function IbaxPackagesPage() {
   const ws = useWorkspace();
@@ -20,7 +20,7 @@ export default function IbaxPackagesPage() {
   const cur = appCurrency(ws);
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader eyebrow={product.assistantName} title="Packages" subtitle={`Let ${product.assistantName} run your social media and marketing — everything in one plan.`} />
+      <PageHeader eyebrow={`${product.assistantName} Premium`} title="Our Premium Packages" subtitle={`One plan, and ${product.assistantName} runs your marketing and social media for you.`} />
       {packages.map((id, i) => {
         const s = serviceById(id);
         if (!s) return null;
@@ -33,7 +33,7 @@ export default function IbaxPackagesPage() {
             href={a ? `/app/automations/${a.id}` : `/app/services/${s.id}`}
             className={cn(
               "group relative block overflow-hidden rounded-3xl border p-5 transition-colors sm:p-7",
-              i === 1 ? "border-flow/40 bg-[linear-gradient(135deg,rgb(37_211_102/0.2),rgb(37_211_102/0.03)_60%)]" : "glass border-flow/20 hover:border-flow/40",
+              i === 0 ? "border-flow/40 bg-[linear-gradient(135deg,rgb(37_211_102/0.2),rgb(37_211_102/0.03)_60%)]" : "glass border-flow/20 hover:border-flow/40",
             )}
           >
             <div aria-hidden className="pointer-events-none absolute -top-20 -right-16 size-64 rounded-full bg-flow/15 blur-3xl" />
@@ -43,7 +43,7 @@ export default function IbaxPackagesPage() {
                   <Icon name={s.icon} className="size-6" />
                 </span>
                 <div className="flex flex-wrap justify-end gap-1.5">
-                  {i === 1 && (
+                  {i === 0 && (
                     <Pill tone="ember">
                       <Crown className="size-3" aria-hidden /> Premium
                     </Pill>
