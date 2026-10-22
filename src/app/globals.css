@@ -1048,15 +1048,17 @@ body {
 /* App lock (src/components/app/AppLockGate.tsx): an iPhone-like passcode screen in ibaxai green. */
 .lock-screen { background: #06120a; color: #fff; touch-action: manipulation; }
 .lock-bg {
+  /* Soft colour without a live blur filter, so the phone has nothing heavy to redraw when a key lights up. */
   background:
-    radial-gradient(40% 30% at 20% 18%, rgb(37 211 102 / 0.5), transparent 70%),
-    radial-gradient(45% 35% at 85% 55%, rgb(14 120 60 / 0.55), transparent 70%),
-    radial-gradient(40% 30% at 30% 92%, rgb(244 207 107 / 0.22), transparent 70%);
-  filter: blur(28px);
+    radial-gradient(55% 40% at 20% 18%, rgb(37 211 102 / 0.42), transparent 75%),
+    radial-gradient(60% 45% at 85% 55%, rgb(14 120 60 / 0.5), transparent 75%),
+    radial-gradient(55% 40% at 30% 92%, rgb(244 207 107 / 0.18), transparent 75%);
+  transform: translateZ(0);
 }
 .lock-sub { color: rgb(255 255 255 / 0.65); }
 .lock-dot { border: 1.6px solid currentColor; }
-.lock-dot-on { background: currentColor; }
+.lock-dot-on { background: currentColor; animation: lock-pop 0.18s ease-out; }
+@keyframes lock-pop { 0% { transform: scale(0.6); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
 .lock-eye { color: rgb(255 255 255 / 0.75); }
 .lock-eye:active { background: rgb(255 255 255 / 0.12); }
 .lock-key, .lock-key-plain {
@@ -1066,13 +1068,15 @@ body {
 }
 .lock-key {
   background: rgb(255 255 255 / 0.14);
-  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
-  transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease, transform 0.2s ease;
+  will-change: transform;
+  /* Lights up at once on touch; the light fades away gently after. */
+  transition: background-color 0.32s ease-out, color 0.32s ease-out, box-shadow 0.32s ease-out, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.lock-key:active, .lock-key-lit {
-  background: rgb(255 255 255 / 0.88); color: #06200f;
-  box-shadow: 0 0 30px rgb(255 255 255 / 0.4);
-  transition-duration: 0.05s;
+.lock-key-lit {
+  background: rgb(255 255 255 / 0.9); color: #06200f;
+  box-shadow: 0 0 28px rgb(255 255 255 / 0.35);
+  transform: scale(0.95);
+  transition: none;
 }
 .lock-key-plain { color: rgb(255 255 255 / 0.85); }
 @media (max-height: 740px) {
@@ -1090,7 +1094,7 @@ body {
   & .lock-sub { color: rgb(12 26 15 / 0.6); }
   & .lock-eye { color: rgb(12 26 15 / 0.7); }
   & .lock-key { background: rgb(255 255 255 / 0.6); box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 6px 16px -10px rgb(16 60 30 / 0.4); }
-  & .lock-key:active, & .lock-key-lit { background: #0c3a1e; color: #fff; box-shadow: 0 0 26px rgb(37 211 102 / 0.45); }
+  & .lock-key-lit { background: #0c3a1e; color: #fff; box-shadow: 0 0 26px rgb(37 211 102 / 0.45); }
   & .lock-key-plain { color: rgb(12 26 15 / 0.75); }
 }
 
