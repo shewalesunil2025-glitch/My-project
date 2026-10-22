@@ -13,7 +13,6 @@ import { AppLockTip } from "@/components/app/AppLockTip";
 import { businessReady } from "@/lib/app/store";
 import { AskBar } from "@/components/app/AskBar";
 import { RenewalBanner } from "@/components/app/RenewalBanner";
-import { TrialBanner } from "@/components/app/TrialBanner";
 import { KindIcon } from "@/components/app/kinds";
 import { automationStatus } from "@/components/app/status";
 import { CountUp, DetailRow, DetailSheet, OfferCarousel, OwnerAvatar, type Offer } from "@/components/app/dashboard";
@@ -368,7 +367,6 @@ function Dashboard() {
     <div className="space-y-7">
       {!ws.sample && !businessReady(ws) && <AddBusinessCard />}
       {!ws.sample && <RenewalBanner ws={ws} className="mb-4" />}
-      {!ws.sample && <TrialBanner ws={ws} />}
       {!ws.sample && <AppLockTip />}
 
       {/* The owner's card */}
