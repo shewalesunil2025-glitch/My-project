@@ -54,6 +54,19 @@ export function AppLockGate({ userId, name, children }: { userId: string; name: 
 /** When a key was last touched (the click that follows is the same press). */
 let touchedAt = -Infinity;
 
+/**
+ * Lights a key up straight away, like an iPhone's passcode screen. It's done on the element itself
+ * (not through React state) so the light appears in the same frame as the touch, then fades out.
+ */
+function flash(el: HTMLElement | null) {
+  if (!el) return;
+  el.classList.remove("lock-key-lit");
+  void el.offsetWidth; // restart the fade when the same key is pressed again quickly
+  el.classList.add("lock-key-lit");
+  clearTimeout(Number(el.dataset.timer));
+  el.dataset.timer = String(window.setTimeout(() => el.classList.remove("lock-key-lit"), 160));
+}
+
 function LockScreen({ userId, name }: { userId: string; name: string }) {
   const router = useRouter();
   const [pin, setPin] = useState("");
@@ -61,7 +74,6 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
   const [shake, setShake] = useState(false);
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
-  const [lit, setLit] = useState("");
   const hasBio = Boolean(getLock(userId)?.credentialId);
 
   const bio = useCallback(async () => {
@@ -99,10 +111,7 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
   const press = useCallback(
     (d: string) => {
       if (busy) return;
-      // The key lights up for a moment, like an iPhone's passcode screen (and a tiny buzz on Android).
-      setLit(d);
-      setTimeout(() => setLit((x) => (x === d ? "" : x)), 280);
-      navigator.vibrate?.(8);
+      navigator.vibrate?.(8); // a tiny buzz on Android
       setError("");
       setPin((p) => {
         const next = (p + d).slice(0, PIN_LENGTH);
@@ -121,7 +130,10 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
   // A keyboard works too (tablet, desktop).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (/^\d$/.test(e.key)) press(e.key);
+      if (/^\d$/.test(e.key)) {
+        flash(document.querySelector<HTMLElement>(`.lock-key[data-key="${e.key}"]`));
+        press(e.key);
+      }
       else if (e.key === "Backspace") setPin((p) => p.slice(0, -1));
     };
     window.addEventListener("keydown", onKey);
@@ -137,6 +149,7 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
       if (e.button !== 0) return;
       e.preventDefault();
       touchedAt = e.timeStamp;
+      flash(e.currentTarget);
       fn();
     },
     onClick: (e: MouseEvent<HTMLButtonElement>) => {
@@ -145,7 +158,7 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
     },
   });
   const digit = (d: string) => (
-    <button key={d} type="button" {...tap(() => press(d))} className={cn("lock-key", lit === d && "lock-key-lit")} aria-label={d}>
+    <button key={d} type="button" {...tap(() => press(d))} className="lock-key" data-key={d} aria-label={d}>
       <span className="text-[2.1rem] leading-none font-light">{d}</span>
       <span className="mt-0.5 h-3 text-[0.6rem] font-bold tracking-[0.16em] opacity-80">{letters[d] ?? ""}</span>
     </button>
@@ -170,7 +183,7 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
             )}
           </div>
           <button type="button" onClick={() => setShow((v) => !v)} className="lock-eye absolute -right-12 grid size-9 place-items-center rounded-full" aria-label={show ? "Hide PIN" : "Show PIN"} aria-pressed={show}>
-            {show ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
+            {show ? <Eye className="size-5" aria-hidden /> : <EyeOff className="size-5" aria-hidden />}
           </button>
         </div>
         <p role="alert" className="mt-3 min-h-10 max-w-xs text-sm text-red-300">

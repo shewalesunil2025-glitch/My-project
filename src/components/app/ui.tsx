@@ -233,7 +233,7 @@ export function Field({ label, help, children, htmlFor, required }: { label: str
 export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={cn(inputCls, className)} {...props} />;
 }
-/** A password (or PIN) box with an eye button: hidden while the eye is closed, shown when it's tapped open. */
+/** A password (or PIN) box with an eye button: a closed eye while hidden; tap it and the eye opens and the text shows. */
 export function PasswordInput({ className, ...props }: Omit<ComponentProps<"input">, "type">) {
   const [show, setShow] = useState(false);
   return (
@@ -246,7 +246,7 @@ export function PasswordInput({ className, ...props }: Omit<ComponentProps<"inpu
         aria-label={show ? "Hide" : "Show"}
         aria-pressed={show}
       >
-        {show ? <EyeOff className="size-[1.1rem]" aria-hidden /> : <Eye className="size-[1.1rem]" aria-hidden />}
+        {show ? <Eye className="size-[1.1rem]" aria-hidden /> : <EyeOff className="size-[1.1rem]" aria-hidden />}
       </button>
     </div>
   );
