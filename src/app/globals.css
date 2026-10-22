@@ -1155,3 +1155,60 @@ body {
   & .bg-\[\#020a05\] { background-color: #f4f8f3; }
   & :is(.bg-black\/60, .bg-black\/70) { background-color: rgb(10 30 15 / 0.35); }
 }
+
+/* ── Owner dashboard on Home (src/app/app/(workspace)/home/page.tsx, components/app/dashboard.tsx) ──
+   The owner's card and the offers stay deep and colourful in Day and Night alike. */
+.dash-in { opacity: 0; transform: translateY(14px); animation: dash-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+@keyframes dash-up { to { opacity: 1; transform: none; } }
+.dash-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.22), transparent);
+  animation: dash-shine 3.4s ease-in-out 1s infinite;
+}
+@keyframes dash-shine {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  60%, 100% { transform: translateX(300%) skewX(-20deg); }
+}
+.dash-hero {
+  color: #f1fff5;
+  background: radial-gradient(120% 90% at 100% 0%, rgb(37 211 102 / 0.5), transparent 60%), linear-gradient(160deg, #0c3a1e, #06140b);
+  border: 1px solid rgb(37 211 102 / 0.25);
+  box-shadow: 0 30px 70px -40px rgb(37 211 102 / 0.6);
+}
+.dash-stat { background: rgb(255 255 255 / 0.11); }
+.dash-gold { background: linear-gradient(90deg, #f8e3a6, #e2b04c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dash-owner-pill { color: #f6d98e; border: 1px solid rgb(240 197 106 / 0.55); background: rgb(240 197 106 / 0.1); }
+.dash-owner > span:last-child {
+  color: #3a2600;
+  background: linear-gradient(140deg, #fbe7ad, #e0a93e);
+  box-shadow: 0 0 0 2px rgb(248 227 166 / 0.6), 0 10px 26px -10px rgb(240 180 60 / 0.8);
+}
+.dash-crown { z-index: 1; color: #f6c34f; fill: #f6c34f; filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.45)); animation: dash-crown 3s ease-in-out infinite; }
+.dash-crown { transform: translateX(-50%); }
+@keyframes dash-crown { 50% { transform: translate(-50%, -2px) rotate(-6deg); } 0%, 100% { transform: translate(-50%, 0); } }
+.dash-offer { color: #fff; }
+.dash-offer-violet { background: radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.22), transparent 45%), linear-gradient(135deg, #6b3df0, #2a1670); }
+.dash-offer-gold { background: radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.22), transparent 45%), linear-gradient(135deg, #d48a00, #6b3f00); }
+.dash-offer-green { background: radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.22), transparent 45%), linear-gradient(135deg, #1fbf62, #0a4a22); }
+.dash-chip { background: rgb(255 255 255 / 0.2); }
+.dash-offer-cta { background: #fff; color: #14301c; }
+.dash-alert {
+  background: color-mix(in srgb, #ff6b6b 11%, var(--color-ink-850));
+  border: 1px solid rgb(255 107 107 / 0.3);
+  transition: transform 0.15s;
+}
+.dash-alert:active { transform: scale(0.98); }
+.dash-tile { --t: #25d366; background: color-mix(in srgb, var(--t) 14%, var(--color-ink-850)); border: 1px solid color-mix(in srgb, var(--t) 28%, transparent); }
+.dash-tile-blue { --t: #4ea4ff; }
+.dash-tile-green { --t: #25d366; }
+.dash-tile-violet { --t: #a47bff; }
+.dash-tile-amber { --t: #f5a623; }
+.dash-tile-gold { --t: #e8b84a; }
+.dash-tile-sky { --t: #38bdf8; }
+.dash-sheet { animation: dash-sheet 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes dash-sheet { from { transform: translateY(40px); opacity: 0; } }
+[data-theme="light"] .theme-lumi .dash-hero { box-shadow: 0 24px 50px -28px rgb(10 80 35 / 0.6); }
