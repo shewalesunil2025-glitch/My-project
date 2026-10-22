@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore, type MouseEvent, type PointerEvent, type ReactNode } from "react";
 import { Delete, Eye, EyeOff, Fingerprint } from "lucide-react";
 import { logOut } from "@/lib/app/store";
 import {
@@ -51,6 +51,9 @@ export function AppLockGate({ userId, name, children }: { userId: string; name: 
   return <LockScreen userId={userId} name={name} />;
 }
 
+/** When a key was last touched (the click that follows is the same press). */
+let touchedAt = -Infinity;
+
 function LockScreen({ userId, name }: { userId: string; name: string }) {
   const router = useRouter();
   const [pin, setPin] = useState("");
@@ -98,7 +101,7 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
       if (busy) return;
       // The key lights up for a moment, like an iPhone's passcode screen (and a tiny buzz on Android).
       setLit(d);
-      setTimeout(() => setLit((x) => (x === d ? "" : x)), 220);
+      setTimeout(() => setLit((x) => (x === d ? "" : x)), 280);
       navigator.vibrate?.(8);
       setError("");
       setPin((p) => {
@@ -127,8 +130,22 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
 
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
   const letters: Record<string, string> = { "2": "ABC", "3": "DEF", "4": "GHI", "5": "JKL", "6": "MNO", "7": "PQRS", "8": "TUV", "9": "WXYZ" };
+  // Keys react the moment the finger touches them (not when it lifts, which feels late on phones);
+  // a keyboard's Enter / Space still works through the click.
+  const tap = (fn: () => void) => ({
+    onPointerDown: (e: PointerEvent<HTMLButtonElement>) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      touchedAt = e.timeStamp;
+      fn();
+    },
+    onClick: (e: MouseEvent<HTMLButtonElement>) => {
+      // The click that follows a touch is the same press — only a keyboard's click counts here.
+      if (e.timeStamp - touchedAt > 1000) fn();
+    },
+  });
   const digit = (d: string) => (
-    <button key={d} type="button" onClick={() => press(d)} className={cn("lock-key", lit === d && "lock-key-lit")} aria-label={d}>
+    <button key={d} type="button" {...tap(() => press(d))} className={cn("lock-key", lit === d && "lock-key-lit")} aria-label={d}>
       <span className="text-[2.1rem] leading-none font-light">{d}</span>
       <span className="mt-0.5 h-3 text-[0.6rem] font-bold tracking-[0.16em] opacity-80">{letters[d] ?? ""}</span>
     </button>
@@ -171,7 +188,7 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
           <span />
         )}
         {digit("0")}
-        <button type="button" onClick={() => setPin((p) => p.slice(0, -1))} className="lock-key-plain" aria-label="Delete last digit">
+        <button type="button" {...tap(() => setPin((p) => p.slice(0, -1)))} className="lock-key-plain" aria-label="Delete last digit">
           <Delete className="size-6" aria-hidden />
         </button>
       </div>

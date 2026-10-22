@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import { Fingerprint, LockKeyhole } from "lucide-react";
 import { LOCK_EVENT, PIN_LENGTH, biometricAvailable, checkPin, enrollBiometric, getLock, removeLock, setPin, updateLock, validPin, weakPin } from "@/lib/app/appLock";
-import { Btn, Field, Input, Notice, Select, Toggle } from "./ui";
+import { Btn, Field, Notice, PasswordInput, Select, Toggle } from "./ui";
 
 const subscribe = (onChange: () => void) => {
   window.addEventListener(LOCK_EVENT, onChange);
@@ -12,10 +12,9 @@ const subscribe = (onChange: () => void) => {
 
 const pinInput = (id: string, label: string, autoFocus = false) => (
   <Field label={label} htmlFor={id}>
-    <Input
+    <PasswordInput
       id={id}
       name={id}
-      type="password"
       inputMode="numeric"
       autoComplete="off"
       pattern={`\\d{${PIN_LENGTH}}`}

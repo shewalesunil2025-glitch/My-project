@@ -1046,7 +1046,7 @@ body {
 }
 
 /* App lock (src/components/app/AppLockGate.tsx): an iPhone-like passcode screen in ibaxai green. */
-.lock-screen { background: #06120a; color: #fff; }
+.lock-screen { background: #06120a; color: #fff; touch-action: manipulation; }
 .lock-bg {
   background:
     radial-gradient(40% 30% at 20% 18%, rgb(37 211 102 / 0.5), transparent 70%),
@@ -1062,7 +1062,7 @@ body {
 .lock-key, .lock-key-plain {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   width: 4.85rem; height: 4.85rem; border-radius: 9999px;
-  -webkit-tap-highlight-color: transparent; user-select: none;
+  -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; touch-action: manipulation;
 }
 .lock-key {
   background: rgb(255 255 255 / 0.14);

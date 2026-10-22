@@ -8,7 +8,7 @@ import { logIn, openSampleWorkspace, useSession } from "@/lib/app/store";
 import { buildSampleWorkspace } from "@/lib/app/sample";
 import { AuthFrame } from "@/components/app/AuthFrame";
 import { SocialSignIn } from "@/components/app/SocialSignIn";
-import { Btn, Field, Input, Notice, Spinner } from "@/components/app/ui";
+import { Btn, Field, Input, PasswordInput, Notice, Spinner } from "@/components/app/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function LoginPage() {
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </Field>
         <Field label="Password" htmlFor="password">
-          <Input id="password" name="password" type="password" autoComplete="current-password" required />
+          <PasswordInput id="password" name="password" autoComplete="current-password" required />
         </Field>
         <p className="-mt-2 text-right">
           <Link href="/app/forgot" className="text-sm font-medium text-flow hover:underline">
