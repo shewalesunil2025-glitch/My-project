@@ -4,7 +4,7 @@ import { product } from "@/config/product";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
-import { ArrowRight, Check, Globe, Sparkles, X } from "lucide-react";
+import { ArrowRight, Check, Globe, Pencil, Sparkles, X } from "lucide-react";
 import { serviceById, TRIAL_DAYS } from "@/content/app/services";
 import { suggestions } from "@/lib/app/assistant";
 import { useWorkspace } from "@/components/app/AppShell";
@@ -15,7 +15,7 @@ import { AskBar } from "@/components/app/AskBar";
 import { RenewalBanner } from "@/components/app/RenewalBanner";
 import { KindIcon } from "@/components/app/kinds";
 import { automationStatus } from "@/components/app/status";
-import { CountUp, DetailRow, DetailSheet, OfferCarousel, OwnerAvatar, type Offer } from "@/components/app/dashboard";
+import { CountUp, DetailRow, DetailSheet, BusinessProfileSheet, OfferCarousel, OwnerBadge, type Offer } from "@/components/app/dashboard";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
 import { BtnLink, Card, EmptyState, Icon, Notice, Pill, SectionTitle, fmtDateTime, fmtTime } from "@/components/app/ui";
 import type { Call, Conversation, Lead, Review, Workspace } from "@/lib/app/types";
@@ -171,6 +171,7 @@ function Dashboard() {
   const ws = useWorkspace();
   const params = useSearchParams();
   const [open, setOpen] = useState<MetricKey | null>(null);
+  const [profile, setProfile] = useState(false);
   if (!ws?.business || !ws.assistant) return null;
 
   const name = product.assistantName;
@@ -384,20 +385,15 @@ function Dashboard() {
                   })
                   .toUpperCase()}
               </p>
-              <span className="dash-owner-pill inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.68rem] font-bold tracking-[0.12em]">♛ OWNER</span>
+              <span className="flex items-center gap-2">
+                <button type="button" onClick={() => setProfile(true)} className="dash-edit inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-bold">
+                  <Pencil className="size-3" aria-hidden /> Edit
+                </button>
+                <span className="dash-owner-pill inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.68rem] font-bold tracking-[0.12em]">♛ OWNER</span>
+              </span>
             </div>
             <div className="mt-4 flex items-center gap-4">
-              <OwnerAvatar
-                name={owner || ws.business.name}
-                logo={ws.business.logo}
-                onPhoto={(logo) =>
-                  updateWorkspace((w) => {
-                    if (!w.business) return;
-                    w.business.logo = logo;
-                    audit(w, "Changed the business photo");
-                  })
-                }
-              />
+              <OwnerBadge name={owner || ws.business.name} logo={ws.business.logo} />
               <div className="min-w-0">
                 <p className="truncate text-sm opacity-85">
                   {greeting}, {first} 👋
@@ -658,6 +654,24 @@ function Dashboard() {
         </section>
       </div>
 
+      {profile && (
+        <BusinessProfileSheet
+          business={ws.business.name}
+          owner={owner}
+          logo={ws.business.logo}
+          onClose={() => setProfile(false)}
+          onSave={(v) => {
+            updateWorkspace((w) => {
+              if (!w.business) return;
+              if (w.business.logo !== v.logo) audit(w, v.logo ? "Changed the business photo" : "Removed the business photo");
+              w.business.name = v.business || w.business.name;
+              w.business.ownerName = v.owner;
+              w.business.logo = v.logo;
+            });
+            setProfile(false);
+          }}
+        />
+      )}
       {metric && <MetricSheet ws={ws} metric={metric} onClose={() => setOpen(null)} />}
     </div>
   );

@@ -1169,15 +1169,11 @@ body {
 .dash-stat { background: rgb(255 255 255 / 0.11); }
 .dash-gold { background: linear-gradient(90deg, #f8e3a6, #e2b04c); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .dash-owner-pill { color: #f6d98e; border: 1px solid rgb(240 197 106 / 0.55); background: rgb(240 197 106 / 0.1); }
-.dash-owner-box {
-  color: #3a2600;
-  background: linear-gradient(140deg, #fbe7ad, #e0a93e);
-  box-shadow: 0 0 0 2px rgb(248 227 166 / 0.6), 0 10px 26px -10px rgb(240 180 60 / 0.8);
-}
-.dash-owner-cam { z-index: 1; color: #3a2600; background: #fbe7ad; box-shadow: 0 0 0 2px #0c3a1e, 0 4px 10px -2px rgb(0 0 0 / 0.5); }
-.dash-crown { z-index: 1; color: #f6c34f; fill: #f6c34f; filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.45)); animation: dash-crown 3s ease-in-out infinite; }
-.dash-crown { transform: translateX(-50%); }
-@keyframes dash-crown { 50% { transform: translate(-50%, -2px) rotate(-6deg); } 0%, 100% { transform: translate(-50%, 0); } }
+.dash-edit { color: #f6d98e; }
+.dash-edit:hover { background: rgb(240 197 106 / 0.12); }
+.dash-owner-box { color: #3a2600; background: linear-gradient(140deg, #fbe7ad, #e0a93e); }
+.dash-badge .dash-owner-box { box-shadow: 0 0 0 2.5px #e6b955, 0 0 20px -4px rgb(240 190 80 / 0.7); }
+.dash-verified { color: #3a2600; background: linear-gradient(140deg, #fbe08f, #d9a13a); box-shadow: 0 0 0 2.5px #0c3a1e; }
 .dash-offer { color: #fff; }
 .dash-offer-violet { background: radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.22), transparent 45%), linear-gradient(135deg, #6b3df0, #2a1670); }
 .dash-offer-gold { background: radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.22), transparent 45%), linear-gradient(135deg, #d48a00, #6b3f00); }
@@ -1197,6 +1193,7 @@ body {
 .dash-tile-amber { --t: #f5a623; }
 .dash-tile-gold { --t: #e8b84a; }
 .dash-tile-sky { --t: #38bdf8; }
+.dash-menu { animation: dash-sheet 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .dash-sheet { animation: dash-sheet 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes dash-sheet { from { transform: translateY(40px); opacity: 0; } }
 [data-theme="light"] .theme-lumi .dash-hero { box-shadow: 0 24px 50px -28px rgb(10 80 35 / 0.6); }
