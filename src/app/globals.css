@@ -1160,19 +1160,6 @@ body {
    The owner's card and the offers stay deep and colourful in Day and Night alike. */
 .dash-in { opacity: 0; transform: translateY(14px); animation: dash-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 @keyframes dash-up { to { opacity: 1; transform: none; } }
-.dash-shine::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  width: 40%;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.22), transparent);
-  animation: dash-shine 3.4s ease-in-out 1s infinite;
-}
-@keyframes dash-shine {
-  0% { transform: translateX(-120%) skewX(-20deg); }
-  60%, 100% { transform: translateX(300%) skewX(-20deg); }
-}
 .dash-hero {
   color: #f1fff5;
   background: radial-gradient(120% 90% at 100% 0%, rgb(37 211 102 / 0.5), transparent 60%), linear-gradient(160deg, #0c3a1e, #06140b);

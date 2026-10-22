@@ -371,7 +371,7 @@ function Dashboard() {
 
       {/* The owner's card */}
       <section {...rise(1)}>
-        <div className="dash-hero dash-shine relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7">
+        <div className="dash-hero relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7">
           <div aria-hidden className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-flow/30 blur-3xl" />
           <div className="relative">
             <div className="flex items-start justify-between gap-3">
