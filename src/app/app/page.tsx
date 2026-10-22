@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CirclePlay, LogIn, UserPlus } from "lucide-react";
+import { useState, useSyncExternalStore } from "react";
+import { ArrowRight, CirclePlay, Fingerprint, KeyRound, LogIn, ScanFace, UserPlus } from "lucide-react";
 import { product } from "@/config/product";
 import { logOut, useSession } from "@/lib/app/store";
+import { LOCK_EVENT, getLock, isUnlocked, unlockWithBiometric } from "@/lib/app/appLock";
 import { BrandMark } from "@/components/app/ui";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { Wordmark } from "@/components/navigation/Logo";
@@ -25,6 +27,16 @@ function Arc({ className }: { className: string }) {
   );
 }
 
+const onLockChange = (cb: () => void) => {
+  window.addEventListener(LOCK_EVENT, cb);
+  window.addEventListener("storage", cb);
+  return () => {
+    window.removeEventListener(LOCK_EVENT, cb);
+    window.removeEventListener("storage", cb);
+  };
+};
+const never = () => () => {};
+
 /** The app's own primary button (glowing green ring, see .btn-3d), just taller. */
 const primary =
   "btn-3d group inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-full text-[1.02rem] font-semibold tracking-tight transition-transform duration-200 active:scale-[0.98]";
@@ -37,6 +49,24 @@ export default function WelcomePage() {
   const { ready, user, workspace } = useSession();
   const router = useRouter();
   const signedIn = ready && user && !workspace?.sample;
+  // This account has an app lock on this phone (and isn't unlocked right now): open it with the PIN,
+  // fingerprint or Face ID straight from here — no email or password.
+  const lockState = useSyncExternalStore(
+    onLockChange,
+    () => {
+      const lock = user ? getLock(user.id) : null;
+      return !lock || isUnlocked(user!.id, lock) ? "" : lock.credentialId ? "bio" : "pin";
+    },
+    () => "",
+  );
+  const apple = useSyncExternalStore(never, () => /iPhone|iPad|Macintosh/.test(navigator.userAgent), () => false);
+  const [bioError, setBioError] = useState("");
+  const locked = signedIn && lockState !== "";
+  const bio = async () => {
+    setBioError("");
+    if (user && (await unlockWithBiometric(user.id))) router.push("/app/home");
+    else setBioError(`${apple ? "Face ID" : "Fingerprint"} didn't match — use your PIN.`);
+  };
   /** Another account on this phone: sign the current one out first (its data stays safe in the cloud). */
   const switchTo = (path: "/app/signup" | "/app/login") => {
     logOut();
@@ -67,7 +97,35 @@ export default function WelcomePage() {
         </section>
 
         <nav aria-label="Get started" className="flex flex-col items-center gap-3.5">
-          {signedIn ? (
+          {locked ? (
+            <>
+              <p className="mb-1 max-w-full truncate text-sm text-fg-muted">
+                Welcome back{workspace?.business?.name ? `, ${workspace.business.name}` : ""}
+              </p>
+              {lockState === "bio" && (
+                <button type="button" onClick={() => void bio()} className={primary}>
+                  {apple ? <ScanFace className="size-5" aria-hidden /> : <Fingerprint className="size-5" aria-hidden />}
+                  Unlock with {apple ? "Face ID" : "Fingerprint"}
+                </button>
+              )}
+              <Link href="/app/home" className={lockState === "bio" ? secondary : primary}>
+                <KeyRound className="size-5 text-flow" aria-hidden /> Unlock with PIN
+              </Link>
+              {bioError && (
+                <p role="alert" className="text-sm text-red-300">
+                  {bioError}
+                </p>
+              )}
+              <div className="mt-1 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-fg-muted">
+                <button type="button" onClick={() => switchTo("/app/login")} className="inline-flex items-center gap-1.5 py-2 transition-colors hover:text-fg">
+                  <LogIn className="size-4 text-flow" aria-hidden /> Use another account
+                </button>
+                <button type="button" onClick={() => switchTo("/app/signup")} className="inline-flex items-center gap-1.5 py-2 transition-colors hover:text-fg">
+                  <UserPlus className="size-4 text-flow" aria-hidden /> Create account
+                </button>
+              </div>
+            </>
+          ) : signedIn ? (
             <>
               <Link href="/app/home" className={primary}>
                 Continue to {workspace?.business?.name || "your workspace"}
