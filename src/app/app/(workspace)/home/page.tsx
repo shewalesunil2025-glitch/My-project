@@ -17,11 +17,27 @@ import { KindIcon } from "@/components/app/kinds";
 import { automationStatus } from "@/components/app/status";
 import { CountUp, DetailRow, DetailSheet, BusinessProfileSheet, OfferCarousel, OwnerBadge, type Offer } from "@/components/app/dashboard";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
-import { BtnLink, Card, EmptyState, Icon, Notice, Pill, SectionTitle, fmtDateTime, fmtTime } from "@/components/app/ui";
+import { BtnLink, Card, EmptyState, Icon, Notice, Pill, SectionTitle, Segmented, fmtDateTime, fmtTime } from "@/components/app/ui";
 import type { Call, Conversation, Lead, Review, Workspace } from "@/lib/app/types";
 import { cn } from "@/lib/cn";
 
 const isToday = (iso?: string) => !!iso && new Date(iso).toDateString() === new Date().toDateString();
+
+/** Which stretch of time the dashboard shows: today, the last 7 or 30 days, or everything. */
+type Range = "today" | "week" | "month" | "all";
+const RANGES: { value: Range; label: string }[] = [
+  { value: "today", label: "Today" },
+  { value: "week", label: "7 days" },
+  { value: "month", label: "Month" },
+  { value: "all", label: "All time" },
+];
+const RANGE_TITLE: Record<Range, string> = { today: "Today", week: "Last 7 days", month: "Last 30 days", all: "All time" };
+const inRange = (iso: string | undefined, range: Range) => {
+  if (!iso) return false;
+  if (range === "all") return true;
+  if (range === "today") return isToday(iso);
+  return new Date().getTime() - new Date(iso).getTime() < (range === "week" ? 7 : 30) * 86_400_000;
+};
 const stars = (n: number) => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
 const lastText = (c: Conversation) => c.messages[c.messages.length - 1]?.text ?? "";
 
@@ -51,13 +67,13 @@ const leadState = (l: Lead) =>
       ? `Follow up ${fmtDateTime(l.followUpAt)}`
       : "Follow-up due";
 
-/** Today's items behind each number; when there are none today, the latest ones are shown as "Earlier". */
-function details(ws: Workspace, key: MetricKey) {
+/** The items behind each number for the chosen range; when there are none today, the latest ones are shown as "Earlier". */
+function details(ws: Workspace, key: MetricKey, range: Range) {
   const byNew = <T,>(list: T[], at: (x: T) => string | undefined) => [...list].sort((a, b) => (at(b) ?? "").localeCompare(at(a) ?? ""));
   const split = <T,>(list: T[], at: (x: T) => string | undefined) => {
     const sorted = byNew(list, at);
-    const today = sorted.filter((x) => isToday(at(x)));
-    return { today, earlier: today.length ? [] : sorted.slice(0, 5) };
+    const today = sorted.filter((x) => inRange(at(x), range));
+    return { today, earlier: today.length || range !== "today" ? [] : sorted.slice(0, 5) };
   };
   const call = (c: Call) => (
     <DetailRow
@@ -139,8 +155,8 @@ function details(ws: Workspace, key: MetricKey) {
   }
 }
 
-function MetricSheet({ ws, metric, onClose }: { ws: Workspace; metric: Metric; onClose: () => void }) {
-  const d = details(ws, metric.key) as {
+function MetricSheet({ ws, metric, range, onClose }: { ws: Workspace; metric: Metric; range: Range; onClose: () => void }) {
+  const d = details(ws, metric.key, range) as {
     today: unknown[];
     earlier: unknown[];
     row: (x: never) => ReactNode;
@@ -148,7 +164,13 @@ function MetricSheet({ ws, metric, onClose }: { ws: Workspace; metric: Metric; o
   return (
     <DetailSheet
       title={metric.title}
-      subtitle={d.today.length ? `${d.today.length} ${metric.key === "followups" ? "waiting" : "today"} · tap one to open it` : "Nothing today yet"}
+      subtitle={
+        d.today.length
+          ? `${d.today.length} ${metric.key === "followups" ? "waiting" : RANGE_TITLE[range].toLowerCase()} · tap one to open it`
+          : range === "today"
+            ? "Nothing today yet"
+            : `Nothing in ${RANGE_TITLE[range].toLowerCase()}`
+      }
       href={metric.href}
       hrefLabel={metric.hrefLabel}
       onClose={onClose}
@@ -157,7 +179,7 @@ function MetricSheet({ ws, metric, onClose }: { ws: Workspace; metric: Metric; o
       {d.today.length === 0 && (
         <div className="px-2 pb-2">
           <p className="rounded-2xl bg-white/[0.04] p-4 text-center text-sm text-fg-muted">
-            {metric.emoji} No {metric.label.toLowerCase()} today yet — they appear here the moment they happen.
+            {metric.emoji} No {metric.label.toLowerCase()} {range === "today" ? "today yet" : `in ${RANGE_TITLE[range].toLowerCase()}`} — they appear here the moment they happen.
           </p>
           {d.earlier.length > 0 && <p className="mt-4 mb-1 px-1 text-xs font-semibold tracking-wide text-fg-subtle uppercase">Earlier</p>}
         </div>
@@ -172,6 +194,7 @@ function Dashboard() {
   const params = useSearchParams();
   const [open, setOpen] = useState<MetricKey | null>(null);
   const [profile, setProfile] = useState(false);
+  const [range, setRange] = useState<Range>("today");
   if (!ws?.business || !ws.assistant) return null;
 
   const name = product.assistantName;
@@ -181,11 +204,12 @@ function Dashboard() {
   const first = owner.split(" ")[0] || "there";
   const cur = appCurrency(ws);
 
-  const todayActivity = ws.activity.filter((e) => isToday(e.at));
-  const today = <T,>(list: T[], at: (x: T) => string | undefined) => list.filter((x) => isToday(at(x)));
-  const callsToday = today(ws.calls, (c) => c.at);
-  const missedToday = callsToday.filter((c) => c.outcome === "missed");
-  const chatsToday = today(ws.conversations, (c) => c.at);
+  const shown = <T,>(list: T[], at: (x: T) => string | undefined) => list.filter((x) => inRange(at(x), range));
+  const rangeActivity = shown(ws.activity, (e) => e.at);
+  const rangeCalls = shown(ws.calls, (c) => c.at);
+  const missedToday = ws.calls.filter((c) => isToday(c.at) && c.outcome === "missed");
+  const rangeChats = shown(ws.conversations, (c) => c.at);
+  const span = RANGE_TITLE[range];
   const followUps = ws.leads.filter((l) => l.status === "follow_up" || l.auto?.state === "waiting");
   const approvals = ws.content.filter((c) => c.status === "approval");
   const attention = ws.automations.filter((a) => ["attention", "failed"].includes(a.status));
@@ -200,9 +224,9 @@ function Dashboard() {
       key: "calls",
       emoji: "📞",
       label: "Calls",
-      value: callsToday.length,
+      value: rangeCalls.length,
       tone: "blue",
-      title: "Today's calls",
+      title: `Calls · ${span}`,
       href: "/app/calls",
       hrefLabel: "All calls",
     },
@@ -210,9 +234,9 @@ function Dashboard() {
       key: "messages",
       emoji: "💬",
       label: "Messages",
-      value: chatsToday.filter((c) => c.channel !== "email").length,
+      value: rangeChats.filter((c) => c.channel !== "email").length,
       tone: "green",
-      title: "Today's messages",
+      title: `Messages · ${span}`,
       href: "/app/inbox",
       hrefLabel: "Open inbox",
     },
@@ -220,9 +244,9 @@ function Dashboard() {
       key: "leads",
       emoji: "🎯",
       label: "New leads",
-      value: today(ws.leads, (l) => l.createdAt).length,
+      value: shown(ws.leads, (l) => l.createdAt).length,
       tone: "violet",
-      title: "Today's new leads",
+      title: `New leads · ${span}`,
       href: "/app/leads",
       hrefLabel: "All leads",
     },
@@ -232,7 +256,7 @@ function Dashboard() {
       label: "Follow-ups",
       value: followUps.length,
       tone: "amber",
-      title: "Follow-ups",
+      title: "Follow-ups waiting",
       href: "/app/leads",
       hrefLabel: "All leads",
     },
@@ -240,9 +264,9 @@ function Dashboard() {
       key: "reviews",
       emoji: "⭐",
       label: "Reviews",
-      value: today(ws.reviews, (r) => r.at).length,
+      value: shown(ws.reviews, (r) => r.at).length,
       tone: "gold",
-      title: "Today's reviews",
+      title: `Reviews · ${span}`,
       href: "/app/reviews",
       hrefLabel: "All reviews",
     },
@@ -250,9 +274,9 @@ function Dashboard() {
       key: "emails",
       emoji: "✉️",
       label: "Emails",
-      value: chatsToday.filter((c) => c.channel === "email").length,
+      value: rangeChats.filter((c) => c.channel === "email").length,
       tone: "sky",
-      title: "Today's emails",
+      title: `Emails · ${span}`,
       href: "/app/inbox",
       hrefLabel: "Open inbox",
     },
@@ -404,10 +428,10 @@ function Dashboard() {
               </div>
             </div>
             <p className="mt-4 text-sm opacity-90">
-              Today {name} did{" "}
+              {{ today: "Today", week: "In the last 7 days", month: "In the last 30 days", all: "So far" }[range]} {name} did{" "}
               <b className="font-extrabold">
-                <CountUp value={todayActivity.length} /> task
-                {todayActivity.length === 1 ? "" : "s"}
+                <CountUp value={rangeActivity.length} /> task
+                {rangeActivity.length === 1 ? "" : "s"}
               </b>{" "}
               for you
               {needs.length ? ` · ${needs.length} need${needs.length === 1 ? "s" : ""} you` : " · nothing pending 🎉"}
@@ -427,6 +451,11 @@ function Dashboard() {
           </div>
         </div>
       </section>
+
+      {/* Today / 7 days / Month / All time: what the card, the numbers and the list below cover */}
+      <div {...rise(1)} className="dash-in -mt-3 flex justify-center">
+        <Segmented label="Show numbers for" value={range} onChange={setRange} options={RANGES} />
+      </div>
 
       {/* Offers */}
       <section {...rise(2)} aria-labelledby="offers">
@@ -546,7 +575,7 @@ function Dashboard() {
       {/* Today's numbers — each opens the details */}
       <section {...rise(4)} aria-labelledby="today">
         <SectionTitle>
-          <span id="today">Today&apos;s numbers</span>
+          <span id="today">{range === "today" ? "Today\u2019s numbers" : `Numbers · ${span}`}</span>
         </SectionTitle>
         <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6">
           {metrics.map((m) => (
@@ -583,12 +612,14 @@ function Dashboard() {
               </Link>
             }
           >
-            <span id="activity">✅ {name} did today</span>
+            <span id="activity">
+              ✅ {name} did {range === "today" ? "today" : `· ${span}`}
+            </span>
           </SectionTitle>
-          {todayActivity.length ? (
+          {rangeActivity.length ? (
             <Card className="p-2">
               <ul className="relative before:absolute before:top-6 before:bottom-6 before:left-[1.69rem] before:w-px before:bg-gradient-to-b before:from-flow/40 before:to-transparent">
-                {todayActivity.slice(0, 6).map((e) => (
+                {rangeActivity.slice(0, 6).map((e) => (
                   <li key={e.id} className="relative">
                     <Link href={e.href ?? "/app/activity"} className="flex items-center gap-3 rounded-xl p-2.5 hover:bg-white/[0.04]">
                       <KindIcon kind={e.kind} />
@@ -596,14 +627,14 @@ function Dashboard() {
                         <p className="truncate text-sm">{e.title}</p>
                         {e.detail && <p className="truncate text-xs text-fg-subtle">{e.detail}</p>}
                       </div>
-                      <span className="shrink-0 text-xs text-fg-subtle">{fmtTime(e.at)}</span>
+                      <span className="shrink-0 text-xs text-fg-subtle">{range === "today" ? fmtTime(e.at) : fmtDateTime(e.at)}</span>
                     </Link>
                   </li>
                 ))}
               </ul>
             </Card>
           ) : (
-            <EmptyState title="Nothing yet today">Calls, messages, leads, uploads and reviews appear here as they happen.</EmptyState>
+            <EmptyState title={range === "today" ? "Nothing yet today" : `Nothing in ${span.toLowerCase()}`}>Calls, messages, leads, uploads and reviews appear here as they happen.</EmptyState>
           )}
         </section>
 
@@ -672,7 +703,7 @@ function Dashboard() {
           }}
         />
       )}
-      {metric && <MetricSheet ws={ws} metric={metric} onClose={() => setOpen(null)} />}
+      {metric && <MetricSheet ws={ws} metric={metric} range={range} onClose={() => setOpen(null)} />}
     </div>
   );
 }
