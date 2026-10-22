@@ -564,10 +564,9 @@ function Dashboard() {
           </div>
         </section>
       ) : (
-        /* Nothing waiting: just the slogan, in the spotlight (not a button) */
-        <div {...rise(3)} className="dash-in dash-slogan relative overflow-hidden rounded-[1.75rem] px-5 py-8 text-center">
-          <span aria-hidden className="pointer-events-none absolute -top-16 left-1/2 size-48 -translate-x-1/2 rounded-full bg-flow/25 blur-3xl" />
-          <h2 className="relative text-[1.6rem] leading-tight font-extrabold tracking-tight sm:text-3xl">
+        /* Nothing waiting: just the slogan, on the page itself (no card, not a button) */
+        <div {...rise(3)} className="dash-in py-4 text-center">
+          <h2 className="text-[1.6rem] leading-tight font-extrabold tracking-tight sm:text-3xl">
             Just say it. <span className="dash-slogan-ibax">{name}</span> does it.
           </h2>
         </div>

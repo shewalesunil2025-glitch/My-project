@@ -1246,11 +1246,6 @@ body {
 .dash-tile-gold { --t: #e8b84a; }
 .dash-tile-sky { --t: #38bdf8; }
 .dash-menu { animation: dash-sheet 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.dash-slogan {
-  border: 1px solid rgb(37 211 102 / 0.35);
-  background: radial-gradient(90% 120% at 50% 0%, rgb(37 211 102 / 0.16), transparent 70%), var(--color-ink-850);
-  box-shadow: 0 0 0 1px rgb(37 211 102 / 0.08) inset, 0 24px 60px -34px rgb(37 211 102 / 0.7);
-}
 .dash-slogan-ibax { color: var(--color-flow); text-shadow: 0 0 22px rgb(37 211 102 / 0.55); }
 .dash-sheet { animation: dash-sheet 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes dash-sheet { from { transform: translateY(40px); opacity: 0; } }
