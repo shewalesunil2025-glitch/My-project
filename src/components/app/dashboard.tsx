@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, Crown, X } from "lucide-react";
+import { ArrowRight, Crop, ImagePlus, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 /* Pieces of the owner's Home dashboard (src/app/app/(workspace)/home/page.tsx). */
@@ -148,11 +148,10 @@ export function PhotoCropper({ pic, onCancel, onSave }: { pic: Pic; onCancel: ()
   );
 }
 
-/** The owner's badge: their photo or logo (or initials) with a gold crown on top. Tap it to change the photo. */
-export function OwnerAvatar({ name, logo, onPhoto }: { name: string; logo?: string; onPhoto?: (dataUrl: string | undefined) => void }) {
-  const [menu, setMenu] = useState(false);
-  const [pic, setPic] = useState<Pic | null>(null);
-  const file = useRef<HTMLInputElement>(null);
+export type BadgeLook = "plain" | "verified" | "ring";
+
+/** The owner's photo or logo (or initials) in a square badge. */
+export function OwnerBadge({ name, logo, look = "verified", size = "md" }: { name: string; logo?: string; look?: BadgeLook; size?: "md" | "lg" }) {
   const initials =
     name
       .split(" ")
@@ -160,10 +159,10 @@ export function OwnerAvatar({ name, logo, onPhoto }: { name: string; logo?: stri
       .slice(0, 2)
       .map((w) => w[0]!.toUpperCase())
       .join("") || "O";
-  const badge = (
-    <>
-      <Crown className="dash-crown absolute -top-3.5 left-1/2 size-6" aria-hidden />
-      <span className="dash-owner-box grid size-14 place-items-center overflow-hidden rounded-2xl text-lg font-bold">
+  const big = size === "lg";
+  return (
+    <span className={cn("dash-badge relative inline-grid shrink-0 place-items-center", `dash-badge-${look}`, big ? "size-28" : "size-14")}>
+      <span className={cn("dash-owner-box grid size-full place-items-center overflow-hidden font-bold", look === "ring" ? "rounded-full" : big ? "rounded-[1.75rem]" : "rounded-2xl", big ? "text-3xl" : "text-lg")}>
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- the owner's own photo (data URL)
           <img src={logo} alt="" className="size-full object-cover" />
@@ -171,68 +170,129 @@ export function OwnerAvatar({ name, logo, onPhoto }: { name: string; logo?: stri
           initials
         )}
       </span>
-    </>
+      {look === "verified" && (
+        <span className={cn("dash-verified absolute grid place-items-center rounded-full font-black", big ? "-right-2 -bottom-2 size-8 text-base" : "-right-1.5 -bottom-1.5 size-5.5 text-[0.7rem]")} aria-hidden>
+          ✓
+        </span>
+      )}
+    </span>
   );
-  if (!onPhoto) return <span className="relative inline-grid size-14 shrink-0 place-items-center">{badge}</span>;
+}
+
+/** "Business profile": the photo (change it, adjust the crop) and the business and owner names. */
+export function BusinessProfileSheet({
+  business,
+  owner,
+  logo,
+  look,
+  onClose,
+  onSave,
+}: {
+  business: string;
+  owner: string;
+  logo?: string;
+  look?: BadgeLook;
+  onClose: () => void;
+  onSave: (v: { business: string; owner: string; logo?: string }) => void;
+}) {
+  const [draft, setDraft] = useState({ business, owner, logo });
+  const [pic, setPic] = useState<Pic | null>(null);
+  const file = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && !pic && onClose();
+    window.addEventListener("keydown", onKey);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = overflow;
+    };
+  }, [onClose, pic]);
 
   const open = (src: string) =>
     loadPic(src)
       .then(setPic)
       .catch(() => window.alert("That photo couldn't be opened — please pick a JPG or PNG photo."));
-  const item = "flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium hover:bg-white/[0.06]";
+  const btn = "flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-sm font-semibold hover:bg-white/[0.05]";
+  const input = "mt-1 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-fg outline-none focus:border-flow/60";
 
   return (
-    <span className="relative inline-grid shrink-0">
-      <button type="button" onClick={() => setMenu((m) => !m)} aria-label={logo ? "Change your photo" : "Add your photo or logo"} aria-expanded={menu} className="relative inline-grid size-14 place-items-center rounded-2xl transition-transform active:scale-95">
-        {badge}
-      </button>
-      {menu && (
-        <>
-          <span className="fixed inset-0 z-40" aria-hidden onClick={() => setMenu(false)} />
-          <span role="menu" className="dash-menu absolute top-full left-0 z-50 mt-2 w-48 rounded-2xl border border-white/10 bg-ink-900 p-1.5 text-fg shadow-[0_20px_50px_-20px_rgb(0_0_0/0.8)]">
-            <button type="button" role="menuitem" className={item} onClick={() => (setMenu(false), file.current?.click())}>
-              {logo ? "Change photo" : "Add photo or logo"}
-            </button>
-            {logo && (
-              <button type="button" role="menuitem" className={item} onClick={() => (setMenu(false), void open(logo))}>
-                Adjust photo
-              </button>
-            )}
-            {logo && (
-              <button type="button" role="menuitem" className={cn(item, "text-red-300")} onClick={() => (setMenu(false), onPhoto(undefined))}>
-                Remove photo
-              </button>
-            )}
-          </span>
-        </>
-      )}
-      <input
-        ref={file}
-        type="file"
-        accept="image/*"
-        className="sr-only"
-        tabIndex={-1}
-        aria-hidden
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          e.target.value = "";
-          if (!f) return;
-          const reader = new FileReader();
-          reader.onload = () => void open(String(reader.result));
-          reader.readAsDataURL(f);
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label="Business profile" onClick={onClose}>
+      <form
+        className="dash-sheet w-full max-w-md rounded-t-3xl border border-white/10 bg-ink-900 p-5 sm:rounded-3xl"
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSave({ business: draft.business.trim(), owner: draft.owner.trim(), logo: draft.logo });
         }}
-      />
-      {pic && (
-        <PhotoCropper
-          pic={pic}
-          onCancel={() => setPic(null)}
-          onSave={(url) => {
-            setPic(null);
-            onPhoto(url);
+      >
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-fg-subtle/40 sm:hidden" aria-hidden />
+        <p className="text-center text-base font-bold tracking-tight">Business profile</p>
+        <div className="mt-5 flex justify-center">
+          <OwnerBadge name={draft.owner || draft.business} logo={draft.logo} look={look} size="lg" />
+        </div>
+        <div className="mt-5 flex gap-2.5">
+          <button type="button" className={btn} onClick={() => file.current?.click()}>
+            <ImagePlus className="size-4" aria-hidden /> {draft.logo ? "Change photo" : "Add photo"}
+          </button>
+          {draft.logo && (
+            <button type="button" className={btn} onClick={() => void open(draft.logo!)}>
+              <Crop className="size-4" aria-hidden /> Adjust
+            </button>
+          )}
+        </div>
+        {draft.logo && (
+          <button type="button" className="mx-auto mt-2 block text-xs font-medium text-fg-subtle hover:text-red-300" onClick={() => setDraft((d) => ({ ...d, logo: undefined }))}>
+            Remove photo
+          </button>
+        )}
+        <input
+          ref={file}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            e.target.value = "";
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = () => void open(String(reader.result));
+            reader.readAsDataURL(f);
           }}
         />
+        <label className="mt-4 block text-xs font-medium text-fg-muted">
+          Business name
+          <input className={input} value={draft.business} maxLength={80} required onChange={(e) => setDraft((d) => ({ ...d, business: e.target.value }))} />
+        </label>
+        <label className="mt-3 block text-xs font-medium text-fg-muted">
+          Owner name
+          <input className={input} value={draft.owner} maxLength={80} onChange={(e) => setDraft((d) => ({ ...d, owner: e.target.value }))} />
+        </label>
+        <div className="mt-5 grid grid-cols-2 gap-2.5">
+          <button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold">
+            Cancel
+          </button>
+          <button type="submit" className="rounded-xl bg-flow px-4 py-3 text-sm font-bold text-ink-950">
+            Save
+          </button>
+        </div>
+      </form>
+      {pic && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <PhotoCropper
+            pic={pic}
+            onCancel={() => setPic(null)}
+            onSave={(url) => {
+              setPic(null);
+              setDraft((d) => ({ ...d, logo: url }));
+            }}
+          />
+        </div>
       )}
-    </span>
+    </div>
   );
 }
 
