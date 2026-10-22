@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
-import { Delete, Fingerprint, LockKeyhole } from "lucide-react";
+import { Delete, Eye, EyeOff, Fingerprint } from "lucide-react";
 import { logOut } from "@/lib/app/store";
 import {
   LOCK_EVENT,
@@ -57,6 +57,8 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [show, setShow] = useState(false);
+  const [lit, setLit] = useState("");
   const hasBio = Boolean(getLock(userId)?.credentialId);
 
   const bio = useCallback(async () => {
@@ -94,6 +96,10 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
   const press = useCallback(
     (d: string) => {
       if (busy) return;
+      // The key lights up for a moment, like an iPhone's passcode screen (and a tiny buzz on Android).
+      setLit(d);
+      setTimeout(() => setLit((x) => (x === d ? "" : x)), 220);
+      navigator.vibrate?.(8);
       setError("");
       setPin((p) => {
         const next = (p + d).slice(0, PIN_LENGTH);
@@ -120,50 +126,59 @@ function LockScreen({ userId, name }: { userId: string; name: string }) {
   }, [press]);
 
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  const key = "grid size-[4.25rem] place-items-center rounded-full text-2xl font-medium transition active:scale-95";
+  const letters: Record<string, string> = { "2": "ABC", "3": "DEF", "4": "GHI", "5": "JKL", "6": "MNO", "7": "PQRS", "8": "TUV", "9": "WXYZ" };
+  const digit = (d: string) => (
+    <button key={d} type="button" onClick={() => press(d)} className={cn("lock-key", lit === d && "lock-key-lit")} aria-label={d}>
+      <span className="text-[2.1rem] leading-none font-light">{d}</span>
+      <span className="mt-0.5 h-3 text-[0.6rem] font-bold tracking-[0.16em] opacity-80">{letters[d] ?? ""}</span>
+    </button>
+  );
   return (
-    <div className="fixed inset-0 z-[300] flex flex-col items-center justify-between bg-ink-950 px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)]" role="dialog" aria-modal="true" aria-label="App locked">
-      <div className="flex flex-col items-center text-center">
-        <BrandMark className="size-14" />
-        <p className="mt-5 flex items-center gap-1.5 text-sm text-fg-muted">
-          <LockKeyhole className="size-4" aria-hidden /> {name ? `${name}'s account is locked` : "Your account is locked"}
-        </p>
-        <h1 className="mt-2 text-xl font-semibold">Enter your {PIN_LENGTH}-digit PIN</h1>
-        <div className={cn("mt-6 flex gap-3.5", shake && "animate-[lock-shake_0.45s]")} aria-label={`${pin.length} of ${PIN_LENGTH} digits entered`}>
-          {Array.from({ length: PIN_LENGTH }, (_, i) => (
-            <span key={i} className={cn("size-3.5 rounded-full border-2 border-flow/60 transition", i < pin.length && "bg-flow")} />
-          ))}
+    <div className="lock-screen fixed inset-0 z-[300] flex flex-col items-center overflow-hidden px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-[max(env(safe-area-inset-bottom),1.25rem)]" role="dialog" aria-modal="true" aria-label="App locked">
+      <div aria-hidden className="lock-bg pointer-events-none absolute -inset-10" />
+      <div className="relative flex flex-col items-center text-center">
+        <BrandMark className="size-13" />
+        <h1 className="mt-4 text-xl font-medium">Enter Passcode</h1>
+        <p className="lock-sub mt-1 text-xs">{name ? `${name} · ibaxai` : "ibaxai"}</p>
+        <div className="relative mt-6 flex items-center">
+          <div className={cn("flex h-7 items-center gap-3.5", shake && "animate-[lock-shake_0.45s]")} aria-label={show ? `PIN so far: ${pin.split("").join(" ") || "empty"}` : `${pin.length} of ${PIN_LENGTH} digits entered`}>
+            {Array.from({ length: PIN_LENGTH }, (_, i) =>
+              show && i < pin.length ? (
+                <span key={i} className="w-3.5 text-center text-xl font-semibold tabular-nums">
+                  {pin[i]}
+                </span>
+              ) : (
+                <span key={i} className={cn("lock-dot size-3.5 rounded-full transition", i < pin.length && "lock-dot-on", show && "scale-50")} />
+              ),
+            )}
+          </div>
+          <button type="button" onClick={() => setShow((v) => !v)} className="lock-eye absolute -right-12 grid size-9 place-items-center rounded-full" aria-label={show ? "Hide PIN" : "Show PIN"} aria-pressed={show}>
+            {show ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
+          </button>
         </div>
-        <p role="alert" className="mt-4 min-h-10 max-w-xs text-sm text-red-300">
+        <p role="alert" className="mt-3 min-h-10 max-w-xs text-sm text-red-300">
           {error}
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-x-7 gap-y-4">
-        {keys.map((d) => (
-          <button key={d} type="button" onClick={() => press(d)} className={cn(key, "bg-white/[0.06] hover:bg-white/[0.1]")} aria-label={d}>
-            {d}
-          </button>
-        ))}
+      <div className="relative mt-auto grid grid-cols-3 gap-x-6 gap-y-3.5 sm:mt-6">
+        {keys.map(digit)}
         {hasBio ? (
-          <button type="button" onClick={() => void bio()} className={cn(key, "text-flow hover:bg-flow/10")} aria-label="Unlock with fingerprint or Face ID">
+          <button type="button" onClick={() => void bio()} className="lock-key-plain text-flow" aria-label="Unlock with fingerprint or Face ID">
             <Fingerprint className="size-8" aria-hidden />
           </button>
         ) : (
           <span />
         )}
-        <button type="button" onClick={() => press("0")} className={cn(key, "bg-white/[0.06] hover:bg-white/[0.1]")} aria-label="0">
-          0
-        </button>
-        <button type="button" onClick={() => setPin((p) => p.slice(0, -1))} className={cn(key, "text-fg-muted hover:bg-white/[0.06]")} aria-label="Delete last digit">
+        {digit("0")}
+        <button type="button" onClick={() => setPin((p) => p.slice(0, -1))} className="lock-key-plain" aria-label="Delete last digit">
           <Delete className="size-6" aria-hidden />
         </button>
       </div>
 
-      <button type="button" onClick={forgot} className="mt-4 py-2 text-sm text-fg-muted underline-offset-4 hover:text-fg hover:underline">
-        Forgot PIN? Log in with your password
+      <button type="button" onClick={forgot} className="lock-sub relative mt-3 ml-auto py-2 pr-3 text-sm hover:underline">
+        Forgot PIN?
       </button>
     </div>
   );
 }
-
