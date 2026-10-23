@@ -7,13 +7,16 @@ import { cn } from "@/lib/cn";
 export type Theme = "light" | "dark";
 const KEY = "ibax-theme";
 const BAR = { light: "#f4f8f3", dark: "#030703" };
+/** "only light" stops Android Chrome / MIUI from force-darkening the Day look. */
+const SCHEME = { light: "only light", dark: "dark" };
 
 /** Runs before the page paints, so a Day (light) user never sees a dark flash. */
-export const themeScript = `try{var t=localStorage.getItem('${KEY}');if(t==='light'){document.documentElement.dataset.theme='light';var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content','${BAR.light}')}}catch(e){}`;
+export const themeScript = `try{var t=localStorage.getItem('${KEY}');if(t==='light'){document.documentElement.dataset.theme='light';var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content','${BAR.light}');var c=document.querySelector('meta[name=color-scheme]');if(c)c.setAttribute('content','${SCHEME.light}')}}catch(e){}`;
 
 function apply(theme: Theme) {
   document.documentElement.dataset.theme = theme;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", BAR[theme]);
+  document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", SCHEME[theme]);
   try {
     localStorage.setItem(KEY, theme);
   } catch {}

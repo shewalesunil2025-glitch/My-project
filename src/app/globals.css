@@ -1110,7 +1110,7 @@ body {
    html[data-theme="light"]. Night is the default look above. Only the /app routes change.
    Unlayered on purpose, so these win over the Tailwind utilities they remap. */
 :root[data-theme="light"]:has(.theme-lumi) {
-  color-scheme: light;
+  color-scheme: only light;
   --color-ink-950: #f4f8f3;
   --color-ink-900: #ffffff;
   --color-ink-850: #ffffff;
@@ -1128,7 +1128,7 @@ body {
 }
 :root[data-theme="light"]:has(.theme-lumi),
 :root[data-theme="light"]:has(.theme-lumi) body {
-  color-scheme: light;
+  color-scheme: only light;
   background: #f4f8f3 !important;
   color: var(--color-fg) !important;
 }
