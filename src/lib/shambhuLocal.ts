@@ -2,6 +2,7 @@ import { store } from "@/content/shambhu";
 import { digitalMarketing } from "@/content/digitalMarketing";
 import { siteConfig } from "@/config/site";
 import type { AgentReply } from "@/lib/shambhuAgent";
+import { TRIAL_DAYS } from "@/content/app/services";
 
 /**
  * IBAX's free mode: answers common questions from the site's own content,
@@ -119,7 +120,7 @@ const intents: Intent[] = [
   {
     keys: /(price|pricing|cost|charge|\bfees?\b|\brates?\b|how much|kitna|kitne|kitni|keemat|kimat|daam|paisa|kharcha|कीमत|किंमत|दाम|पैसे|खर्च|शुल्क)/i,
     answers: {
-      en: `Every service can be bought on its own. Website from ${P.web} one-time, AI Voice Assistant ${P.voice}, WhatsApp ${P.wa}, Customer Support ${P.support}, Lead Follow-up ${P.leads}, Instagram and Facebook ${P.social} each, YouTube ${P.yt}, Social Pack (all three) ₹5,999/mo, Email and Google Reviews ${P.email}, and Digital Marketing ${P.dm}. All prices are in Indian rupees, all-inclusive, and yearly plans get 2 months free. New accounts get a 3-day FREE trial of the messaging automations (WhatsApp, Support, Lead Follow-up, Email, Reviews) and the website builder.`,
+      en: `Every service can be bought on its own. Website from ${P.web} one-time, AI Voice Assistant ${P.voice}, WhatsApp ${P.wa}, Customer Support ${P.support}, Lead Follow-up ${P.leads}, Instagram and Facebook ${P.social} each, YouTube ${P.yt}, Social Pack (all three) ₹5,999/mo, Email and Google Reviews ${P.email}, and Digital Marketing ${P.dm}. All prices are in Indian rupees, all-inclusive, and yearly plans get 2 months free. New accounts get a ${TRIAL_DAYS}-day FREE trial of the messaging automations (WhatsApp, Support, Lead Follow-up, Email, Reviews) and the website builder.`,
       hi: `हर सर्विस अलग से ले सकते हैं। वेबसाइट ${P.web} एक बार, AI वॉइस असिस्टेंट ${P.voice}, WhatsApp ${P.wa}, कस्टमर सपोर्ट ${P.support}, लीड फॉलो-अप ${P.leads}, Instagram और Facebook ${P.social} हर एक, YouTube ${P.yt}, सोशल पैक (तीनों) ₹5,999/mo, ईमेल और गूगल रिव्यू ${P.email}, और डिजिटल मार्केटिंग ${P.dm}। सभी कीमतें रुपये में हैं, सब कुछ शामिल, और सालाना प्लान में 2 महीने मुफ़्त।`,
       mr: `प्रत्येक सेवा वेगळी घेता येते. वेबसाईट ${P.web} एकदाच, AI व्हॉइस असिस्टंट ${P.voice}, WhatsApp ${P.wa}, कस्टमर सपोर्ट ${P.support}, लीड फॉलो-अप ${P.leads}, Instagram आणि Facebook ${P.social} प्रत्येकी, YouTube ${P.yt}, सोशल पॅक (तिन्ही) ₹5,999/mo, ईमेल आणि गूगल रिव्ह्यू ${P.email}, आणि डिजिटल मार्केटिंग ${P.dm}. सर्व किंमती रुपयांमध्ये आहेत, सर्व काही समाविष्ट, आणि वार्षिक प्लॅनमध्ये 2 महिने मोफत.`,
     },

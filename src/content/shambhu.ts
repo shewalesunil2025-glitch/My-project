@@ -57,7 +57,7 @@ export type StoreItem = {
   usd: string;
   billing: "monthly" | "one-time";
   premium?: boolean;
-  /** Free for the first 3 days (messaging automations only). */
+  /** Free for the first TRIAL_DAYS days (messaging automations only). */
   trial?: boolean;
   /** A bundle of several services, shown as a wide card. */
   bundle?: boolean;

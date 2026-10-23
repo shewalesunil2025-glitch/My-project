@@ -2,14 +2,15 @@ import Link from "next/link";
 import { Check, Gift, X } from "lucide-react";
 import { Reveal } from "@/components/effects/Reveal";
 import { Money } from "@/components/cta/Money";
+import { TRIAL_DAYS } from "@/content/app/services";
 
 const included = ["WhatsApp Automation", "Customer Support", "Lead Follow-up", "Email Automation", "Google Review replies", "Website builder (build & preview)"];
 const notIncluded = ["Instagram, Facebook & YouTube content", "AI Voice calls", "Digital Marketing & ads", "Publishing your website"];
 
-/** The 3-day free trial, highlighted right after the hero. */
+/** The free trial (TRIAL_DAYS), highlighted right after the hero. */
 export function FreeTrial() {
   return (
-    <section id="free-trial" aria-label="3-day free trial" className="relative py-16 md:py-24">
+    <section id="free-trial" aria-label={`${TRIAL_DAYS}-day free trial`} className="relative py-16 md:py-24">
       <div className="container-x">
         <Reveal>
           <div className="beam relative overflow-hidden rounded-[2rem] border border-flow/50 p-6 shadow-[0_40px_120px_-40px_rgb(37_211_102/0.55)] [background:radial-gradient(70%_120%_at_100%_0%,rgb(37_211_102/0.28),transparent_60%),radial-gradient(60%_100%_at_0%_100%,rgb(56_189_248/0.16),transparent_60%),var(--color-ink-850)] md:p-12">
@@ -20,12 +21,12 @@ export function FreeTrial() {
                   <Gift className="size-3.5" aria-hidden /> Free trial · No payment needed
                 </span>
                 <h2 className="display mt-5 text-[2.6rem] leading-[1.02] md:text-6xl">
-                  3 days <span className="text-flow">FREE.</span>
+                  {TRIAL_DAYS} days <span className="text-flow">FREE.</span>
                   <br />
                   Try it before you pay.
                 </h2>
                 <p className="mt-5 max-w-lg text-fg-muted md:text-lg">
-                  Switch on every messaging automation free for 3 days — on your own WhatsApp, with your own customers — and build your website. Love it? Continue from just <Money inr="₹499" usd="$29" />/month.
+                  Switch on every messaging automation free for {TRIAL_DAYS} days — on your own WhatsApp, with your own customers — and build your website. Love it? Continue from just <Money inr="₹499" usd="$29" />/month.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Link
@@ -40,7 +41,7 @@ export function FreeTrial() {
 
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1">
                 <div className="glass rounded-2xl p-5">
-                  <p className="text-sm font-semibold text-flow">Free for 3 days</p>
+                  <p className="text-sm font-semibold text-flow">Free for {TRIAL_DAYS} days</p>
                   <ul className="mt-3 space-y-2 text-sm">
                     {included.map((x) => (
                       <li key={x} className="flex items-start gap-2">

@@ -1,3 +1,5 @@
+import { TRIAL_DAYS } from "@/content/app/services";
+
 export const faqs = [
   {
     q: "What is ibaxai?",
@@ -13,7 +15,7 @@ export const faqs = [
   },
   {
     q: "How much does it cost?",
-    a: "Each service has a clear starting price, shown in the Automation Store in your currency (₹ for India, $ for other countries; you can change the country). Pay yearly and get 2 months free. Messaging automations (WhatsApp, Customer Support, Lead Follow-up, Email and Google Reviews) are free for the first 3 days.",
+    a: `Each service has a clear starting price, shown in the Automation Store in your currency (₹ for India, $ for other countries; you can change the country). Pay yearly and get 2 months free. Messaging automations (WhatsApp, Customer Support, Lead Follow-up, Email and Google Reviews) are free for the first ${TRIAL_DAYS} days.`,
   },
   {
     q: "How fast can I go live?",

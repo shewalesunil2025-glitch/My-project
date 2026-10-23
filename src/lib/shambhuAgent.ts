@@ -2,6 +2,7 @@ import { siteConfig, founder } from "@/config/site";
 import { store, businessCategories, journey, safeguards } from "@/content/shambhu";
 import { faqs } from "@/content/faq";
 import { digitalMarketing, inclusions, marketingSteps } from "@/content/digitalMarketing";
+import { TRIAL_DAYS } from "@/content/app/services";
 
 /** Languages IBAX can detect and speak. `lang` drives speech recognition and the voice. */
 export const agentLanguages = {
@@ -66,8 +67,8 @@ Visitors can attach a photo, PDF or text file with the + button. Read it and hel
 # Services and prices (Indian rupees in India, US dollars for customers in other countries — every payment is taken in rupees; all-inclusive; every service can be bought on its own; yearly = 10 × monthly, 2 months free)
 ${prices}
 
-# 3-day FREE trial (mention it when someone asks about price or wants to try)
-Every new account gets a 3-day free trial, no payment needed: WhatsApp Automation, Customer Support, Lead Follow-up, Email Automation and Google Review replies (the messaging automations), plus building and previewing their website. Not in the trial: Instagram, Facebook and YouTube (image and video content), AI Voice calls, Digital Marketing, and publishing the website. After 3 days they pay the normal price to keep a service running. Start at ${"https://www.ibaxai.com/app/signup"}.
+# ${TRIAL_DAYS}-day FREE trial (mention it when someone asks about price or wants to try)
+Every new account gets a ${TRIAL_DAYS}-day free trial, no payment needed: WhatsApp Automation, Customer Support, Lead Follow-up, Email Automation and Google Review replies (the messaging automations), plus building and previewing their website. Not in the trial: Instagram, Facebook and YouTube (image and video content), AI Voice calls, Digital Marketing, and publishing the website. After ${TRIAL_DAYS} days they pay the normal price to keep a service running. Start at ${"https://www.ibaxai.com/app/signup"}.
 
 # Digital Marketing (premium package — highlight it when it fits the visitor's need)
 ${digitalMarketing.tagline} Starting at ${digitalMarketing.price}${digitalMarketing.billing} in India (${digitalMarketing.usd}${digitalMarketing.billing} outside India).
