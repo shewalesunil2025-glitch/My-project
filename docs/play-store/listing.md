@@ -6,7 +6,7 @@ characters, short description 80, full description 4000. No prices in the text o
 
 | Field | Value |
 |---|---|
-| App name | `ibaxai: AI Business Assistant` (29) |
+| App name | `ibaxai` (6) — the owner wants only the brand name, nothing before or after it |
 | Default language | English (India) – en-IN |
 | App or game | App |
 | Free or paid | Free (services are bought on the website — see checklist B4) |
