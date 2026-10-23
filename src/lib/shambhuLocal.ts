@@ -152,9 +152,9 @@ const intents: Intent[] = [
   {
     keys: /(contact|human|talk|team|number|phone|call me|email|whatsapp number|mobile|reach|नंबर|मोबाइल|संपर्क|बात करनी|बोलायचं|टीम)/i,
     answers: {
-      en: `Tap "Talk to a human" below or the Contact us button at the top, email ${siteConfig.email}, or call or WhatsApp ${siteConfig.phoneDisplay}. We reply within 24 hours.`,
-      hi: `नीचे "Talk to a human" या ऊपर Contact us बटन दबाइए, ${siteConfig.email} पर ईमेल कीजिए, या ${siteConfig.phoneDisplay} पर कॉल/WhatsApp कीजिए। हमारी टीम 24 घंटे में जवाब देती है।`,
-      mr: `खाली "Talk to a human" किंवा वर Contact us बटण दाबा, ${siteConfig.email} वर ईमेल करा, किंवा ${siteConfig.phoneDisplay} वर कॉल/WhatsApp करा. आमची टीम 24 तासांत उत्तर देते.`,
+      en: `Tap "Get a call back" below and leave your number — our team will call you within 24 hours. You can also email ${siteConfig.email}.`,
+      hi: `नीचे "Get a call back" दबाइए और अपना नंबर दीजिए — हमारी टीम 24 घंटे में आपको कॉल करेगी। आप ${siteConfig.email} पर ईमेल भी कर सकते हैं।`,
+      mr: `खाली "Get a call back" दाबा आणि तुमचा नंबर द्या — आमची टीम 24 तासांत तुम्हाला कॉल करेल. तुम्ही ${siteConfig.email} वर ईमेलही करू शकता.`,
     },
   },
   {
@@ -176,9 +176,9 @@ const intents: Intent[] = [
 ];
 
 const fallback: Answers = {
-  en: `Good question! I can tell you about our services, prices, Digital Marketing and how to get started. For anything else, tap "Talk to a human" and our team will help.`,
-  hi: `अच्छा सवाल! मैं आपको हमारी सर्विस, कीमत, डिजिटल मार्केटिंग और शुरू करने का तरीका बता सकता हूँ। बाकी किसी बात के लिए "Talk to a human" दबाइए, हमारी टीम मदद करेगी।`,
-  mr: `छान प्रश्न! मी तुम्हाला आमच्या सेवा, किंमती, डिजिटल मार्केटिंग आणि सुरुवात कशी करायची हे सांगू शकतो. बाकी काहीही असेल तर "Talk to a human" दाबा, आमची टीम मदत करेल.`,
+  en: `Good question! I can tell you about our services, prices, Digital Marketing and how to get started. For anything else, tap "Get a call back" and our team will call you.`,
+  hi: `अच्छा सवाल! मैं आपको हमारी सर्विस, कीमत, डिजिटल मार्केटिंग और शुरू करने का तरीका बता सकता हूँ। बाकी किसी बात के लिए "Get a call back" दबाइए, हमारी टीम आपको कॉल करेगी।`,
+  mr: `छान प्रश्न! मी तुम्हाला आमच्या सेवा, किंमती, डिजिटल मार्केटिंग आणि सुरुवात कशी करायची हे सांगू शकतो. बाकी काहीही असेल तर "Get a call back" दाबा, आमची टीम तुम्हाला कॉल करेल.`,
 };
 
 /** Answers a question from the site's content, in the visitor's language. */
