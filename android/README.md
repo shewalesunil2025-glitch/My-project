@@ -28,7 +28,7 @@ Notes from the first build (20 Oct 2026, version 1.0.0, code 1):
   run `./gradlew bundleRelease`, then sign `app-release.aab` with `jarsigner` (SHA256withRSA) using the upload key.
 - **Keep code shrinking off** (`minifyEnabled false` in the generated `app/build.gradle`). Version 1.0.0 was
   built with it on: R8 renamed an activity the manifest still pointed to, and the app crashed on launch
-  ("Component class R.u does not exist in com.ibaxai.app"). Version 1.0.1 (code 2, 22 Oct) is built without it.
+  ("Component class R.u does not exist in com.ibaxai.app"). Version 1.0.1 (code 2, 22 Oct) is built without it; 1.0.2 (code 3, 23 Oct) also sets the app name to just "ibaxai".
 - Upload key SHA-256 (public, safe to share): `32:63:47:D7:D7:02:C4:9B:90:7A:80:1E:D3:22:8B:0C:85:11:24:0D:8F:76:11:86:22:34:E6:87:DA:1D:C6:85`
 
 ## Link the app to the website (no browser bar)
