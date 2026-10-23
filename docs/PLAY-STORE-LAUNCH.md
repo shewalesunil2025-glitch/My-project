@@ -6,7 +6,7 @@ The **Apple App Store** comes later ($99/year). Work one item at a time, tick it
 
 Legend: 👤 the owner does it by hand · 🤖 Claude does it · ✅ done · ⏳ in progress · ⬜ not started
 
-**Next:** owner collects 15–20 testers' Play Store Gmail IDs and starts the closed test (C1) → B4 (payments decision) before production. Later: Day/Night toggle on the Redmi (MIUI) phone still flashes white and goes back dark (PR #184 did not fix it).
+**Next:** owner collects 15–20 testers' Play Store Gmail IDs and starts the closed test (C1) → B4 (payments decision) before production. Free trial is **15 days** for the testing period (23 Oct, `TRIAL_DAYS` in `src/content/app/services.ts`); set it to **7** when the closed test ends, before production. Later: Day/Night toggle on the Redmi (MIUI) phone still flashes white and goes back dark (PR #184 did not fix it).
 
 Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D launch.**
 

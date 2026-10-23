@@ -8,6 +8,7 @@ import { useDemo } from "@/components/cta/DemoProvider";
 import { cn } from "@/lib/cn";
 import { CountryChip, SeePrice, useCurrency } from "@/components/cta/Money";
 import { SubHead } from "./Shambhu";
+import { TRIAL_DAYS } from "@/content/app/services";
 
 /**
  * Automation Store: every IBAX service can be bought on its own, each with a
@@ -39,7 +40,7 @@ export function AutomationStore() {
             <CountryChip />
           </div>
           <p className="mx-auto mt-5 w-fit rounded-full border border-flow/40 bg-flow/10 px-4 py-1.5 text-center text-sm font-medium text-flow-soft">
-            🎁 Messaging automations are <strong className="text-flow">FREE for 3 days</strong> —{" "}
+            🎁 Messaging automations are <strong className="text-flow">FREE for {TRIAL_DAYS} days</strong> —{" "}
             <a href="/app/signup" className="underline underline-offset-4">
               start your trial
             </a>
@@ -56,7 +57,7 @@ export function AutomationStore() {
               >
                 {s.trial && (
                   <span className="absolute top-3 right-3 rounded-full bg-flow px-2 py-0.5 text-[0.62rem] font-bold tracking-wide text-ink-950 uppercase shadow-[0_6px_18px_-6px_rgb(37_211_102/0.9)]">
-                    3 days free
+                    {TRIAL_DAYS} days free
                   </span>
                 )}
                 <span className="grid size-10 place-items-center rounded-xl border border-flow/25 bg-flow/10 text-flow transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
@@ -160,7 +161,7 @@ export function AutomationStore() {
           </Reveal>
         )}
 
-        <p className="mt-6 text-center text-sm text-fg-subtle">{currency === "USD" ? "Prices in US dollars for customers outside India; payment is taken in Indian rupees at the same value." : currency === "INR" ? "Prices in Indian rupees, all-inclusive." : ""} Pay yearly and get 2 months free. Services marked “3 days free” can be tried at no cost.</p>
+        <p className="mt-6 text-center text-sm text-fg-subtle">{currency === "USD" ? "Prices in US dollars for customers outside India; payment is taken in Indian rupees at the same value." : currency === "INR" ? "Prices in Indian rupees, all-inclusive." : ""} Pay yearly and get 2 months free. Services marked “{TRIAL_DAYS} days free” can be tried at no cost.</p>
       </div>
     </section>
   );

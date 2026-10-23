@@ -47,7 +47,7 @@ export type Subscription = {
   serviceId: string;
   period: PlanPeriod;
   price: number;
-  /** "trial": the free 3-day trial (nothing paid); "expired": the trial ended unpaid. */
+  /** "trial": the free trial, TRIAL_DAYS long (nothing paid); "expired": the trial ended unpaid. */
   status: "active" | "cancelled" | "trial" | "expired";
   startedAt: string;
   renewsAt: string;
@@ -304,7 +304,7 @@ export type Workspace = {
   waitlist?: { serviceId: string; at: string }[];
   /** Google review requests sent on WhatsApp (newest first). */
   reviewRequests?: ReviewRequest[];
-  /** The account's one free trial (3 days of messaging automations and the website builder). */
+  /** The account's one free trial (TRIAL_DAYS of messaging automations and the website builder). */
   trial?: { startedAt: string; endsAt: string } | null;
   metrics: DailyMetric[];
   website: WebsiteProject | null;

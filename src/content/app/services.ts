@@ -407,7 +407,7 @@ export const isLive = (id: string) => liveServices.includes(id);
  * build and preview its website (publishing needs the paid Website). Services that make
  * images and videos, ads and phone calls are not in the trial.
  */
-export const TRIAL_DAYS = 3;
+export const TRIAL_DAYS = 15;
 export const trialServices: readonly string[] = ["whatsapp", "followup", "support", "email", "reviews"];
 export const inTrial = (id: string) => trialServices.includes(id);
 

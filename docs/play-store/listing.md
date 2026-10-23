@@ -50,7 +50,7 @@ SIMPLE TO START
 1. Create your account with email or Google.
 2. Tell IBAX about your business.
 3. Say "I want WhatsApp automation" — IBAX sets it up with you, step by step.
-4. Try the messaging services free for 3 days.
+4. Try the messaging services free — no payment needed.
 
 YOUR DATA, YOUR CONTROL
 You choose what to connect and can disconnect any time. We never see your passwords. Delete your account and data any time in Settings.
@@ -95,7 +95,7 @@ IBAX आपके लिए क्या करता है
 1. ईमेल या Google से अकाउंट बनाइए।
 2. IBAX को अपने बिज़नेस के बारे में बताइए।
 3. बोलिए "मुझे WhatsApp automation चाहिए" — IBAX कदम-कदम पर आपके साथ इसे चालू करता है।
-4. मैसेजिंग सर्विसेज़ 3 दिन फ्री आज़माइए।
+4. मैसेजिंग सर्विसेज़ फ्री आज़माइए — कोई पेमेंट नहीं।
 
 आपका डेटा, आपका कंट्रोल
 क्या जोड़ना है आप तय करते हैं, कभी भी डिस्कनेक्ट कर सकते हैं। हम आपका पासवर्ड कभी नहीं देखते। Settings में कभी भी अकाउंट और डेटा डिलीट कर सकते हैं।
