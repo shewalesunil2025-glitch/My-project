@@ -6,7 +6,7 @@ The **Apple App Store** comes later ($99/year). Work one item at a time, tick it
 
 Legend: 👤 the owner does it by hand · 🤖 Claude does it · ✅ done · ⏳ in progress · ⬜ not started
 
-**Next:** owner creates the app in Play Console and uploads the `.aab` (B2) → B3 fingerprints → B4 (payments decision) → B10 (support email).
+**Next:** owner collects 15–20 testers' Play Store Gmail IDs and starts the closed test (C1) → B4 (payments decision) before production. Later: Day/Night toggle on the Redmi (MIUI) phone still flashes white and goes back dark (PR #184 did not fix it).
 
 Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D launch.**
 
@@ -33,9 +33,9 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 | B5 | Account deletion: in-app (Settings → Delete account ✅) **and** a public web page explaining how (`/privacy#data-deletion` ✅) | 🤖 | ✅ | Play requires both |
 | B6 | Store listing: name "ibaxai", short description (80 chars), full description (4000), in English + Hindi | 🤖 writes, 👤 approves | ✅ | `docs/play-store/listing.md` — name "ibaxai" (just the brand), English + Hindi, release notes. Owner reads once before pasting |
 | B7 | Graphics: icon 512×512 ✅ (`/icons/`), feature graphic 1024×500, 4–8 phone screenshots, optional promo video (YouTube) | 🤖 | ✅ | `docs/play-store/assets/`: 8 phone screenshots (1080×1920, sample clinic "CareWell Clinic", no prices) + feature graphic 1024×500. Promo video: the "ibaxai in 2 minutes" tour once on YouTube |
-| B8 | Data safety form + content rating (IARC) + target audience 18+ + category "Business" | 🤖 prepares, 👤 submits | ✅ (prepared) | `docs/play-store/data-safety.md` — every answer to copy into Play Console; matches `/privacy` |
+| B8 | Data safety form + content rating (IARC) + target audience 18+ + category "Business" | 🤖 prepares, 👤 submits | ✅ 23 Oct: submitted | All App content declarations done 23 Oct: Ads (No), Sign-in details (test login `+playreview` account; password only in the Play form), Content rating (IARC; shown 14+ because of chat and AI content), Target audience 18+, Data safety (collected, not shared; Contacts and App interactions also declared), Advertising ID, Government, Financial, Health (all No) |
 | B9 | Privacy Policy / Terms updated for the Android app and WhatsApp linking (what data, why, how to unlink) | 🤖 | ✅ | `/privacy` (WhatsApp linking, Android app sections) and `/terms` (WhatsApp section), dated 18 Oct 2026 |
-| B10 | Support email + website on the listing (`siteConfig.email`, www.ibaxai.com) | 👤 | ⬜ | Must be monitored |
+| B10 | Support email + website on the listing (`siteConfig.email`, www.ibaxai.com) | 👤 | ✅ | 23 Oct: Store settings set to category Business, contact `ibaxai369@gmail.com`, website www.ibaxai.com. Main store listing filled (name, short and full description, icon, feature graphic, 8 screenshots, AI asset declaration "Don't label"). Refresh the screenshots with the new Home design before production |
 | B11 | Meta Business Verification (Udyam certificate, business email/website) | 👤 | ⏳ Submitted 21 Oct: business portfolio "Ibaxai" (legal name IBAXAI, sole proprietorship), Meta app "ibaxai" (WhatsApp use case, unpublished), Udyam certificate uploaded. Waiting for Meta (2–14 days) | Opens the official WhatsApp API (no ban risk, "Connect with Facebook" + coexistence) **and** Instagram/Facebook. 2–6 weeks — start early. Not needed for the Play launch itself |
 | B12 | **Remind the owner:** after launch, switch the personal Play account to an **organization** account ("IBAXAI" shown on the store): get a free D-U-N-S number first | 👤 + 🤖 reminds | ⬜ | Owner chose personal first (19 Oct) and asked to be reminded. Reminder scheduled for 16 Nov. **D-U-N-S requested 20 Oct** (free, via Apple's D-U-N-S lookup; D&B emails the number in ~5 working days — never pay for D&B add-ons). 22 Oct: D&B (@dnb.com) asked for company details and documents; the owner replied with the details, Udyam certificate, PAN and electricity bill |
 
