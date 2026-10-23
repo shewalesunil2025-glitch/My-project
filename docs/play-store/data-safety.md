@@ -18,6 +18,7 @@ sharing. So every row below is **Collected: Yes, Shared: No**.
 |---|---|---|---|
 | Personal info → Name | Yes | Required | App functionality, Account management |
 | Personal info → Email address | Yes | Required | App functionality, Account management, Developer communications |
+| Personal info → User IDs (account ID) | Yes | Required | App functionality, Account management |
 | Personal info → Phone number | Yes | Required | App functionality, Account management |
 | Personal info → Address | Yes | Optional (business address) | App functionality |
 | Personal info → Other info (business details: name, hours, services, prices, FAQs) | Yes | Required | App functionality |
@@ -26,10 +27,12 @@ sharing. So every row below is **Collected: Yes, Shared: No**.
 | Photos and videos → Photos | Yes | Optional (attached in chat, logo) | App functionality |
 | Audio → Voice or sound recordings | Yes | Optional (only when the mic is tapped) | App functionality |
 | Files and docs | Yes | Optional (attached in chat) | App functionality |
+| Contacts (the business's customers: names and numbers of leads) | Yes | Optional | App functionality |
+| App activity → App interactions (the activity history of what the owner did) | Yes | Required | App functionality |
 | App activity → Other user-generated content (leads, website text) | Yes | Optional | App functionality |
-| App info and performance → Crash logs / Diagnostics | Yes | Required | App functionality (fixing errors) |
+| App info and performance → Crash logs / Diagnostics | Yes | Required | App functionality, Analytics (Play counts fixing errors as Analytics) |
 
-**Not collected:** precise/approximate location, contacts, calendar, SMS, call logs, web
+**Not collected:** precise/approximate location, the phone's contact list, calendar, SMS, call logs, web
 browsing history, health, financial account numbers (payments go through Razorpay — we never see
 card or bank details), device or advertising IDs.
 
