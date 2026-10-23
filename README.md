@@ -43,10 +43,11 @@ Copy `.env.example` to `.env.local` and fill in what you need:
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap and robots |
 | `NEXT_PUBLIC_BOOKING_URL` | Optional Calendly / Cal.com link. When set, every "Book a Free Demo" opens it |
 | `LEAD_WEBHOOK_URL` | Optional n8n / Make / Zapier / CRM webhook that receives demo requests |
+| `SMTP_USER`, `SMTP_PASS` | ibaxai's Gmail and a Google **App password** (free). Demo requests and chat "Get a call back" requests email the owner, and the visitor gets a thank-you email about ibaxai. Optional `OWNER_ALERT_EMAIL` (default: the support email), `SMTP_HOST` / `SMTP_PORT` for another provider |
 | `ANTHROPIC_API_KEY` | Powers IBAX AI, the voice assistant in the bottom-right corner (`/api/shambhu`, Claude). Optional: without it IBAX AI runs in free mode, answering common questions from the site content in English, Hindi and Marathi |
 | `ANTHROPIC_API_KEY` | Optional. Lets the IBAX AI assistant answer open questions with Claude (`/api/assistant`) |
 
-**Honest by default:** if `LEAD_WEBHOOK_URL` is not set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
+**Honest by default:** if neither `SMTP_USER`/`SMTP_PASS` nor `LEAD_WEBHOOK_URL` is set, `/api/lead` returns `503 not_configured`. The form then tells the visitor that online booking isn't connected yet and shows the contact email. It never fakes a success message.
 
 **IBAX AI voice assistant:** speech recognition and the child-like voice run in the visitor's browser (Web Speech API; Chrome and Android work best, Safari has partial support). IBAX AI detects the visitor's language (English, Hindi, Marathi and other Indian languages) and replies in it. Its knowledge is built from the site's own content in `src/lib/shambhuAgent.ts`, so prices and FAQs never drift.
 

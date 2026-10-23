@@ -19,7 +19,7 @@ import {
   VolumeX,
   X,
 } from "lucide-react";
-import { useDemo } from "@/components/cta/DemoProvider";
+import { CallbackForm } from "@/components/cta/CallbackForm";
 import {
   agentLanguages,
   type AgentLang,
@@ -130,7 +130,7 @@ function pickVoice(lang: AgentLang): SpeechSynthesisVoice | undefined {
  * /api/shambhu; the call button opens a live voice call (/api/live), as in the app.
  */
 export function ShambhuAgent() {
-  const { openDemo } = useDemo();
+  const [callback, setCallback] = useState(false);
   const [open, setOpen] = useState(false);
   const [lines, setLines] = useState<ChatLine[]>([
     { role: "assistant", content: GREETING, lang: "hi" },
@@ -710,12 +710,15 @@ export function ShambhuAgent() {
               </span>
               <button
                 type="button"
-                onClick={() => openDemo("Question from IBAX chat")}
+                onClick={() => setCallback((v) => !v)}
+                aria-expanded={callback}
                 className="hover:text-flow"
               >
-                Talk to a human →
+                Get a call back →
               </button>
             </div>
+
+            {callback && <CallbackForm from="website" onClose={() => setCallback(false)} />}
 
             {/* Input */}
             {tip && (

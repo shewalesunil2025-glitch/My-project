@@ -25,6 +25,7 @@ import {
   X,
 } from "lucide-react";
 import { product } from "@/config/product";
+import { CallbackForm } from "@/components/cta/CallbackForm";
 import { providerInfo, serviceById } from "@/content/app/services";
 import { priceLabel } from "@/lib/app/agentActions";
 import { paymentsAreLive } from "@/lib/app/payment";
@@ -743,7 +744,7 @@ export function IbaxChat({
           ? "Speaking…"
           : "Online · voice assistant";
   const greeting = `Namaste! Main ${name} hoon — aapka AI business assistant. English, हिंदी, मराठी — kisi bhi bhasha mein poochhiye. Koi bhi service chahiye to bas boliye, main yahin payment se activation tak sab kar dunga.`;
-  const human = `https://wa.me/${product.supportPhone.replace(/\D/g, "")}`;
+  const [callback, setCallback] = useState(false);
 
   return (
     <div className={cn("flex h-full min-h-0 flex-col", className)}>
@@ -940,15 +941,27 @@ export function IbaxChat({
             </button>
           ))}
         </span>
-        <a
-          href={human}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={() => setCallback((v) => !v)}
+          aria-expanded={callback}
           className="hover:text-flow"
         >
-          Talk to a human →
-        </a>
+          Get a call back →
+        </button>
       </div>
+
+      {callback && (
+        <CallbackForm
+          from="app"
+          defaults={{
+            name: ws.business?.ownerName || ws.business?.name,
+            phone: ws.business?.phone,
+            email: ws.business?.email,
+          }}
+          onClose={() => setCallback(false)}
+        />
+      )}
 
       {/* Input */}
       {tip && (

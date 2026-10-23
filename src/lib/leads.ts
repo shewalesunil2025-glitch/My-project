@@ -45,3 +45,27 @@ export async function submitLead(lead: LeadRequest): Promise<LeadResponse> {
     return { ok: false, reason: "upstream", message: "Network error. Please try again." };
   }
 }
+
+/** "Call me back" from the IBAX chat: the visitor leaves their number; ibaxai calls them. */
+export type CallbackRequest = { name: string; phone: string; email?: string; message?: string; from?: string };
+
+export function validateCallback(input: unknown): { req?: CallbackRequest; error?: string } {
+  if (!input || typeof input !== "object") return { error: "Invalid request." };
+  const data = input as Record<string, unknown>;
+  const str = (key: string, max: number) => (typeof data[key] === "string" ? (data[key] as string).trim().slice(0, max) : "");
+  const req: CallbackRequest = { name: str("name", 120), phone: str("phone", 40), email: str("email", 200), message: str("message", 1000), from: str("from", 40) };
+  if (!req.name) return { error: "Please tell us your name." };
+  const digits = req.phone.replace(/\D/g, "");
+  if (digits.length < 10 || digits.length > 15) return { error: "Please enter your mobile number with the right digits." };
+  if (req.email && !EMAIL_RE.test(req.email)) return { error: "Please check your email address, or leave it empty." };
+  return { req };
+}
+
+export async function submitCallback(req: CallbackRequest): Promise<LeadResponse> {
+  try {
+    const res = await fetch("/api/callback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) });
+    return (await res.json()) as LeadResponse;
+  } catch {
+    return { ok: false, reason: "upstream", message: "Network error. Please try again." };
+  }
+}
