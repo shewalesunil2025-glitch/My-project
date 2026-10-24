@@ -9,5 +9,6 @@ export async function POST(request: Request) {
   const { body } = c;
   if (!instanceOk(body.instance)) return json({ ok: false, allow: false, reason: "bad_request" }, 400);
   const result = await gate(c.db, { instance: body.instance, phone: String(body.phone ?? ""), name: clip(body.customer_name, 80), messageId: cleanId(body.message_id), text: clip(body.message, 2000) });
-  return json({ ok: true, ...result });
+  const { payUrl, ...rest } = result;
+  return json({ ok: true, ...rest, pay_url: payUrl ?? "" });
 }
