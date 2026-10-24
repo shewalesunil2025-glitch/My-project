@@ -34,7 +34,7 @@ export const solutions: Solution[] = [
     title: "WhatsApp Automation",
     headline: "Every WhatsApp message answered.",
     summary: "Instant replies, details and follow-ups on WhatsApp Business.",
-    price: "₹699/mo",
+    price: "₹799/mo",
     usd: "$49/mo",
   },
   {
@@ -50,7 +50,7 @@ export const solutions: Solution[] = [
     title: "Customer Support",
     headline: "Answers from your business, not a script.",
     summary: "Common questions answered on every channel. Tricky ones go to your team.",
-    price: "₹599/mo",
+    price: "₹699/mo",
     usd: "$49/mo",
   },
   {

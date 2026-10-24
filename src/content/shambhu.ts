@@ -67,8 +67,8 @@ export type StoreItem = {
 export const store: StoreItem[] = [
   { title: "Website", body: "A fast, modern website with ibaxai built in.", icon: Globe, price: "₹2,999", usd: "$299", billing: "one-time" },
   { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "₹1,499", usd: "$79", billing: "monthly" },
-  { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹699", usd: "$49", billing: "monthly", trial: true },
-  { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹599", usd: "$49", billing: "monthly", trial: true },
+  { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹799", usd: "$49", billing: "monthly", trial: true },
+  { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹699", usd: "$49", billing: "monthly", trial: true },
   { title: "Lead Follow-up", body: "Every enquiry followed up on time.", icon: UserRoundCheck, price: "₹499", usd: "$39", billing: "monthly", trial: true },
   { title: "Instagram Automation", body: "12 AI posts + 4 reels a month, DMs and comments.", icon: Camera, price: "₹1,999", usd: "$39", billing: "monthly" },
   { title: "Facebook Automation", body: "12 AI posts + 4 videos a month, page messages.", icon: ThumbsUp, price: "₹1,999", usd: "$39", billing: "monthly" },
