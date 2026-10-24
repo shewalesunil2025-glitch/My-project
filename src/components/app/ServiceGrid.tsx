@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Check, Crown, Link2 } from "lucide-react";
-import { inTrial, isLive, providerInfo, services } from "@/content/app/services";
+import { TRIAL_DAYS, inTrial, isLive, providerInfo, services } from "@/content/app/services";
 import type { ProviderId, Workspace } from "@/lib/app/types";
 import { trialState } from "@/lib/app/trial";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
@@ -54,7 +54,7 @@ export function ServiceGrid({ ws }: { ws: Workspace }) {
                       </Pill>
                     ) : free ? (
                       <Pill tone="green" className="text-[0.62rem]">
-                        🎁 Free
+                        🎁 {TRIAL_DAYS} days free
                       </Pill>
                     ) : !available ? (
                       <Pill tone="amber" className="text-[0.62rem]">

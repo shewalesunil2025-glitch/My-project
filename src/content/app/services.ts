@@ -107,7 +107,7 @@ export const services: ServiceDef[] = [
     icon: "Globe",
     description:
       "Build your own website in minutes: pick a template and your business details fill it in — services and prices, hours, location, FAQ, WhatsApp and call buttons and an enquiry form. Change anything, then publish in one click. Every enquiry lands in your Leads.",
-    features: ["24 premium 3D templates", "Filled in from your business details", "Services & prices, hours, map, FAQ", "WhatsApp, call & enquiry form", "Enquiries go straight to your Leads", "Publish and update in one click"],
+    features: ["24 premium 3D templates", "Filled in from your business details", "Services & prices, hours, map, FAQ", "WhatsApp, call & enquiry form", "Enquiries go straight to your Leads", "Publish and update in one click", "Hosting on your ibaxai link included", "Up to 3 changes a month by our team", "Own domain (.com): coming soon · domain cost extra"],
     price: 2999,
     usd: 299,
     billing: "one-time",
@@ -156,8 +156,8 @@ export const services: ServiceDef[] = [
     icon: "MessageCircle",
     description:
       "Answers customer questions, shares product and service details, captures leads, handles appointment and order enquiries and follows up — all on your own WhatsApp number. When a customer needs you, it pauses and alerts you. Conversations appear inside ibaxai.",
-    features: ["Instant answers & FAQs", "Product / service information", "Lead capture", "Appointment & order enquiries", "Follow-ups", "Conversations inside ibaxai"],
-    price: 699,
+    features: ["Instant answers & FAQs", "Product / service information", "Lead capture", "Appointment & order enquiries", "Follow-ups", "Conversations inside ibaxai", "Fair use: up to 500 AI replies a month (extra 500 for ₹299)"],
+    price: 799,
     usd: 49,
     setupTime: "Minutes — link your WhatsApp with a code",
     connect: ["whatsapp"],
@@ -273,7 +273,7 @@ export const services: ServiceDef[] = [
     icon: "Star",
     description:
       "More real Google reviews, on autopilot: after a visit or a sale, IBAX thanks the customer on your own WhatsApp and asks for a Google review with your review link — one tap from the app, or automatically when you mark a lead as a customer. ibaxai never writes fake reviews or manipulates ratings.",
-    features: ["Review requests on your WhatsApp", "Your own Google review link", "One tap from the app", "Auto-ask when a lead becomes a customer", "Each customer asked once a month at most", "Reply to any Google review: paste it, IBAX writes the reply", "New-review alerts — coming soon"],
+    features: ["Review requests on your WhatsApp", "Your own Google review link", "One tap from the app", "Auto-ask when a lead becomes a customer", "Each customer asked once a month at most", "Reply to any Google review: paste it, IBAX writes the reply", "Up to 200 review requests a month", "New-review alerts — coming soon"],
     price: 499,
     usd: 29,
     setupTime: "Minutes",
@@ -301,7 +301,7 @@ export const services: ServiceDef[] = [
     icon: "UserCheck",
     description:
       "Every new lead from your website or added by you gets a thank-you on your own WhatsApp straight away, then a friendly reminder if they don't reply. It stops as soon as they answer, and every morning ibaxai tells you who to call today.",
-    features: ["Instant thank-you on WhatsApp", "Up to 2 polite reminders", "Stops when the lead replies", "Morning “call these today” list", "Status tracking to conversion"],
+    features: ["Instant thank-you on WhatsApp", "Up to 2 polite reminders", "Stops when the lead replies", "Morning “call these today” list", "Status tracking to conversion", "Up to 200 new leads a month"],
     price: 499,
     usd: 39,
     setupTime: "Same day",
@@ -317,8 +317,8 @@ export const services: ServiceDef[] = [
     icon: "Headset",
     description:
       "ibaxai answers your customers' common questions — timings, prices, location, orders, bookings — on your ibaxai website chat and, when your WhatsApp is linked, on WhatsApp too, and hands anything tricky to you. Instagram, Facebook and email answers are coming next.",
-    features: ["Answers on your website chat", "Answers on WhatsApp when it's linked", "Your FAQs, prices and policies", "Hands complaints to you on WhatsApp", "Every conversation visible in ibaxai"],
-    price: 599,
+    features: ["Answers on your website chat", "Answers on WhatsApp when it's linked", "Your FAQs, prices and policies", "Hands complaints to you on WhatsApp", "Every conversation visible in ibaxai", "Fair use: up to 500 replies a month"],
+    price: 699,
     usd: 49,
     setupTime: "Same day",
     connect: [],
