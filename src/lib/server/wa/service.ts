@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AppNotification, NotificationKind, Workspace } from "@/lib/app/types";
 import { connectionState, evo, waFullDigits } from "../whatsapp";
+import { siteConfig } from "@/config/site";
+import { validUpi } from "@/lib/upi";
 import { clip, dailyLimit, maySend, shouldAutoResume, type ContactState, type Gate } from "./rules";
 
 /**
@@ -89,7 +91,15 @@ export async function gate(db: SupabaseClient, b: { instance: string; phone: str
     .eq("direction", "out")
     .gte("created_at", `${day()}T00:00:00.000Z`);
   if ((count ?? 0) >= limit) return { allow: false, reason: "limit" };
-  return { allow: true, reason: "ok" };
+  // With a UPI ID saved, IBAX may share the pay link when the customer wants to pay.
+  return { allow: true, reason: "ok", ...(validUpi(ws?.business?.upiId) ? { payUrl: `${siteConfig.url.replace(/\/$/, "")}/pay/${b.instance}` } : {}) };
+}
+
+/** For the public pay page: the business name and UPI ID behind a WhatsApp instance, or null. */
+export async function paymentInfo(db: SupabaseClient, instance: string) {
+  const ownerId = await ownerOfInstance(db, instance);
+  const biz = ownerId ? (await workspaceOf(db, ownerId))?.business : null;
+  return biz && validUpi(biz.upiId) ? { name: biz.name, upiId: biz.upiId.trim(), logo: biz.logo } : null;
 }
 
 export type Deliver = { instance: string; phone: string; name: string; reply: string; delivered: boolean; messageId: string | null; intent: string; needsHuman: boolean; leadTemp: string; interest: string };

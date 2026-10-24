@@ -11,6 +11,7 @@ import { AppLockSettings } from "@/components/app/AppLockSettings";
 import { ConnectAccount } from "@/components/app/ConnectAccount";
 import { PhoneInput } from "@/components/app/PhoneInput";
 import { Btn, Card, Field, Input, PasswordInput, Notice, PageHeader, Pill, Select, TextArea, Toggle, fmtDateTime } from "@/components/app/ui";
+import { validUpi } from "@/lib/upi";
 
 function Section({ id, title, subtitle, children }: { id: string; title: string; subtitle?: string; children: ReactNode }) {
   return (
@@ -138,6 +139,9 @@ export default function SettingsPage() {
           <Field label="Working hours" htmlFor="s-hours">
             <Input id="s-hours" value={biz.hours} onChange={setB("hours")} />
           </Field>
+          <Field label="UPI ID for customer payments" htmlFor="s-upi" help="Optional. When a customer wants to pay, IBAX sends them a UPI link and QR on WhatsApp. The money comes straight to you.">
+            <Input id="s-upi" value={biz.upiId ?? ""} onChange={setB("upiId")} placeholder="yourname@okhdfc" autoCapitalize="none" spellCheck={false} />
+          </Field>
           <Field label="Logo" htmlFor="s-logo" help="PNG or JPG, shown on your website and invoices.">
             <Input
               id="s-logo"
@@ -167,8 +171,9 @@ export default function SettingsPage() {
         </Field>
         <Btn
           onClick={() => {
+            if (biz.upiId?.trim() && !validUpi(biz.upiId)) return flash("Please check the UPI ID (like yourname@okhdfc)");
             updateWorkspace((w) => {
-              w.business = biz;
+              w.business = { ...biz, upiId: biz.upiId?.trim() || undefined };
               audit(w, "Business settings updated");
             });
             flash("Business settings saved");

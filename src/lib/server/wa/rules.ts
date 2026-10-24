@@ -31,7 +31,7 @@ export function dailyLimit(raw: unknown): number {
   return Math.min(Math.floor(n), MAX_DAILY_LIMIT);
 }
 
-export type Gate = { allow: boolean; reason: "ok" | "duplicate" | "paused" | "limit" | "unknown_instance" | "bad_request" };
+export type Gate = { allow: boolean; reason: "ok" | "duplicate" | "paused" | "limit" | "unknown_instance" | "bad_request"; payUrl?: string };
 
 /** Messages and ids we accept from the automation server. Anything else is rejected. */
 export const cleanId = (v: unknown) => (typeof v === "string" && /^[\w.:@=-]{3,128}$/.test(v) ? v : null);

@@ -30,6 +30,8 @@ export type Business = {
   targetCustomers: string;
   socialLinks: string;
   logo?: string;
+  /** The client's own UPI ID; IBAX shares a pay link with their customers on WhatsApp (src/lib/upi.ts). */
+  upiId?: string;
 };
 
 export type AssistantProfile = {
