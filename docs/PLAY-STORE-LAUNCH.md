@@ -6,7 +6,7 @@ The **Apple App Store** comes later ($99/year). Work one item at a time, tick it
 
 Legend: 👤 the owner does it by hand · 🤖 Claude does it · ✅ done · ⏳ in progress · ⬜ not started
 
-**Next:** owner collects 15–20 testers' Play Store Gmail IDs and starts the closed test (C1) → B4 (payments decision) before production. Free trial is **15 days** for the testing period (23 Oct, `TRIAL_DAYS` in `src/content/app/services.ts`); set it to **7** when the closed test ends, before production. Later: Day/Night toggle on the Redmi (MIUI) phone still flashes white and goes back dark (PR #184 did not fix it).
+**Next:** wait for Google to approve the closed test (sent 24 Oct), upgrade n8n to Starter, then send testers the link (C1) → B4 (payments decision) before production. Free trial is **15 days** for the testing period (23 Oct, `TRIAL_DAYS` in `src/content/app/services.ts`); set it to **7** when the closed test ends, before production. Later: Day/Night toggle on the Redmi (MIUI) phone still flashes white and goes back dark (PR #184 did not fix it).
 
 Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D launch.**
 
@@ -43,7 +43,7 @@ Plan: **Part A + B in about a week → Part C (14 days of testing) → Part D la
 
 | # | Task | Who | Status | Notes |
 |---|---|---|---|---|
-| C1 | Closed test with **12+ testers for 14 days** (their Gmail addresses; they install from the Play test link and keep it installed) | 👤 invites, 🤖 sets up | ⬜ | Required for new personal accounts before production |
+| C1 | Closed test with **12+ testers for 14 days** (their Gmail addresses; they install from the Play test link and keep it installed) | 👤 invites, 🤖 sets up | ⏳ | 24 Oct: email list "ibaxai closed test" (14 testers) on the Alpha track, India selected, release 4 (1.0.3) sent for review. After approval: copy the "Join on Android" link from Testers and send it on WhatsApp; the 14 days start when 12+ testers have opted in. n8n must be on a paid plan first (trial nearly used up) |
 | C2 | Testers try: sign up (email + Google), free trial, WhatsApp link, Customer Support, website builder, payment | 👤 | ⬜ | Collect issues with screenshots |
 | C3 | Fix everything testers report; re-check on a small (5") and a large phone | 🤖 | ⬜ | |
 
