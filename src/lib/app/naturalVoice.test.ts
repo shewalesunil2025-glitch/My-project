@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WAIT_FIRST_MS, WAIT_NEXT_MS, speakNaturally, speechChunks, stopNaturalVoice, unlockAudio } from "./naturalVoice";
+import { SLOW_REST_MS, WAIT_FIRST_MS, WAIT_NEXT_MS, speakNaturally, speechChunks, stopNaturalVoice, unlockAudio } from "./naturalVoice";
 
 describe("speechChunks", () => {
   it("says the first sentence on its own, then groups the rest", () => {
@@ -109,6 +109,22 @@ describe("speakNaturally", () => {
     await vi.advanceTimersByTimeAsync(WAIT_FIRST_MS + 100);
     expect(await done).toBe(speechChunks(answer).join(" "));
     expect(played).toEqual([]);
+  });
+
+  it("after a late piece, the next answers start in the phone's voice right away (no new waiting)", async () => {
+    unlockAudio();
+    delays = { 0: 60_000 };
+    const first = speakNaturally(answer);
+    await vi.advanceTimersByTimeAsync(WAIT_FIRST_MS + 100);
+    await first;
+    const asked = calls;
+    expect(await speakNaturally(answer)).toBe(answer);
+    expect(calls).toBe(asked);
+    await vi.advanceTimersByTimeAsync(SLOW_REST_MS + 1000);
+    delays = {};
+    const later = speakNaturally(answer);
+    await vi.runAllTimersAsync();
+    expect(await later).toBe("");
   });
 
   it("uses the phone's voice for a while when the voice server is at its limit, without asking again", async () => {

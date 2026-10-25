@@ -12,9 +12,15 @@ let restUntil = 0; // the voice server said no (limit reached): the phone's voic
 let speakToken = 0;
 const SILENCE = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
 
-/** How long IBAX may stay silent waiting for a piece of its voice before the phone's voice takes over. */
-export const WAIT_FIRST_MS = 7000;
-export const WAIT_NEXT_MS = 2500;
+/**
+ * How long IBAX may stay silent waiting for a piece of its voice before the phone's voice takes
+ * over: a short wait before the answer starts, and only a blink between pieces, so IBAX never
+ * stops in the middle of an answer (the free Gemini voice is often slow or at its limit).
+ */
+export const WAIT_FIRST_MS = 3000;
+export const WAIT_NEXT_MS = 400;
+/** After the natural voice was late, the phone's voice speaks the next answers for this long. */
+export const SLOW_REST_MS = 180_000;
 /** Pieces made at the same time (more would hit the voice server's rate limit). */
 const PARALLEL = 3;
 
@@ -99,9 +105,16 @@ async function naturalAudio(text: string, signal: AbortSignal): Promise<Blob | n
   return null;
 }
 
-/** The clip, or null when it isn't ready within `ms` (or failed). */
+/** The clip, or null when it isn't ready within `ms` (or failed). A late clip makes the phone's voice speak the next answers for a while. */
 function within<T>(p: Promise<T | null>, ms: number) {
-  return Promise.race([p, new Promise<null>((r) => setTimeout(() => r(null), ms))]);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<null>((r) => {
+    timer = setTimeout(() => {
+      restUntil = Math.max(restUntil, Date.now() + SLOW_REST_MS);
+      r(null);
+    }, ms);
+  });
+  return Promise.race([p.finally(() => clearTimeout(timer)), late]);
 }
 
 /** Loads a clip into a player ahead of time, so it starts the moment it's needed. */
