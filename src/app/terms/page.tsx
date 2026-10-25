@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Contact, LegalPage, type LegalSection } from "@/components/legal/LegalPage";
-import { legal, operatorLine } from "@/content/legal";
+import { legal, operatorLine, trademarkLine } from "@/content/legal";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -153,6 +153,21 @@ const sections: LegalSection[] = [
         hours, FAQs) up to date and check important replies. The assistant is set up to hand over to you instead of guessing, but you remain
         responsible for what your business tells its customers.
       </p>
+    ),
+  },
+  {
+    id: "trademarks",
+    title: "Trademarks and our logo",
+    body: (
+      <>
+        <p>{trademarkLine}</p>
+        <p>
+          The {legal.brand} name, the IBAX assistant name, our logo (the &quot;i&quot; with a sparkle on a green tile), the IBAX character, our slogan
+          and the look of our app and website belong to {legal.operator}. You may not copy them, use them in your own name, logo, domain, app or
+          ads, or use anything confusingly similar, without our written permission. Using {legal.brand} as a customer does not give you any right
+          to our trademarks.
+        </p>
+      </>
     ),
   },
   {
