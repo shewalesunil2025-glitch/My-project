@@ -10,7 +10,7 @@ import { suggestions } from "@/lib/app/assistant";
 import { useWorkspace } from "@/components/app/AppShell";
 import { AddBusinessCard } from "@/components/app/AddBusinessCard";
 import { AppLockTip } from "@/components/app/AppLockTip";
-import { audit, businessReady, updateWorkspace } from "@/lib/app/store";
+import { audit, businessReady, updateWorkspace, useSession } from "@/lib/app/store";
 import { AskBar } from "@/components/app/AskBar";
 import { RenewalBanner } from "@/components/app/RenewalBanner";
 import { KindIcon } from "@/components/app/kinds";
@@ -191,6 +191,7 @@ function MetricSheet({ ws, metric, range, onClose }: { ws: Workspace; metric: Me
 
 function Dashboard() {
   const ws = useWorkspace();
+  const { user } = useSession();
   const params = useSearchParams();
   const [open, setOpen] = useState<MetricKey | null>(null);
   const [profile, setProfile] = useState(false);
@@ -646,17 +647,15 @@ function Dashboard() {
 
       {profile && (
         <BusinessProfileSheet
-          business={ws.business.name}
-          owner={owner}
-          logo={ws.business.logo}
+          business={ws.business}
+          accountEmail={user?.email}
           onClose={() => setProfile(false)}
-          onSave={(v) => {
+          onSave={(b) => {
             updateWorkspace((w) => {
               if (!w.business) return;
-              if (w.business.logo !== v.logo) audit(w, v.logo ? "Changed the business photo" : "Removed the business photo");
-              w.business.name = v.business || w.business.name;
-              w.business.ownerName = v.owner;
-              w.business.logo = v.logo;
+              if (w.business.logo !== b.logo) audit(w, b.logo ? "Changed the business photo" : "Removed the business photo");
+              w.business = { ...w.business, ...b };
+              audit(w, "Business profile updated");
             });
             setProfile(false);
           }}

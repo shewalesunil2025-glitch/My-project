@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, Crop, ImagePlus, X } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { businessCategories } from "@/content/app/services";
+import type { Business } from "@/lib/app/types";
+import { validUpi } from "@/lib/upi";
+import { PhoneInput } from "./PhoneInput";
 
 /* Pieces of the owner's Home dashboard (src/app/app/(workspace)/home/page.tsx). */
 
@@ -173,21 +177,11 @@ export function OwnerBadge({ name, logo, size = "md" }: { name: string; logo?: s
 }
 
 /** "Business profile": the photo (change it, adjust the crop) and the business and owner names. */
-export function BusinessProfileSheet({
-  business,
-  owner,
-  logo,
-  onClose,
-  onSave,
-}: {
-  business: string;
-  owner: string;
-  logo?: string;
-  onClose: () => void;
-  onSave: (v: { business: string; owner: string; logo?: string }) => void;
-}) {
-  const [draft, setDraft] = useState({ business, owner, logo });
+/** Home → ✎ Edit: the owner's photo, personal details and every business detail, all editable in one sheet. */
+export function BusinessProfileSheet({ business, accountEmail, onClose, onSave }: { business: Business; accountEmail?: string; onClose: () => void; onSave: (b: Business) => void }) {
+  const [draft, setDraft] = useState<Business>(business);
   const [pic, setPic] = useState<Pic | null>(null);
+  const [error, setError] = useState("");
   const file = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -205,64 +199,110 @@ export function BusinessProfileSheet({
     loadPic(src)
       .then(setPic)
       .catch(() => window.alert("That photo couldn't be opened — please pick a JPG or PNG photo."));
+  const set = (k: keyof Business) => (e: { target: { value: string } }) => setDraft((d) => ({ ...d, [k]: e.target.value }));
   const btn = "flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-sm font-semibold hover:bg-white/[0.05]";
   const input = "mt-1 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-fg outline-none focus:border-flow/60";
+  const field = (label: string, k: keyof Business, o: { type?: string; placeholder?: string; area?: boolean; max?: number; help?: string } = {}) => (
+    <label className="mt-3 block text-xs font-medium text-fg-muted">
+      {label}
+      {o.area ? (
+        <textarea className={cn(input, "min-h-20 resize-y")} value={String(draft[k] ?? "")} maxLength={o.max ?? 2000} placeholder={o.placeholder} onChange={set(k)} />
+      ) : (
+        <input className={input} type={o.type ?? "text"} value={String(draft[k] ?? "")} maxLength={o.max ?? 200} placeholder={o.placeholder} onChange={set(k)} />
+      )}
+      {o.help && <span className="mt-1 block text-[0.7rem] font-normal text-fg-subtle">{o.help}</span>}
+    </label>
+  );
+  const heading = (t: string) => <p className="mt-6 text-[0.7rem] font-bold tracking-widest text-fg-subtle uppercase">{t}</p>;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label="Business profile" onClick={onClose}>
       <form
-        className="dash-sheet w-full max-w-md rounded-t-3xl border border-white/10 bg-ink-900 p-5 sm:rounded-3xl"
+        className="dash-sheet flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-3xl border border-white/10 bg-ink-900 sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
         onSubmit={(e) => {
           e.preventDefault();
-          onSave({ business: draft.business.trim(), owner: draft.owner.trim(), logo: draft.logo });
+          if (!draft.name.trim()) return setError("Please enter your business name.");
+          if (draft.upiId?.trim() && !validUpi(draft.upiId)) return setError("Please check the UPI ID (like yourname@okhdfc).");
+          const trimmed = Object.fromEntries(Object.entries(draft).map(([k, v]) => [k, typeof v === "string" && k !== "logo" ? v.trim() : v])) as Business;
+          onSave({ ...trimmed, upiId: trimmed.upiId || undefined });
         }}
       >
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-fg-subtle/40 sm:hidden" aria-hidden />
-        <p className="text-center text-base font-bold tracking-tight">Business profile</p>
-        <div className="mt-5 flex justify-center">
-          <OwnerBadge name={draft.owner || draft.business} logo={draft.logo} size="lg" />
-        </div>
-        <div className="mt-5 flex gap-2.5">
-          <button type="button" className={btn} onClick={() => file.current?.click()}>
-            <ImagePlus className="size-4" aria-hidden /> {draft.logo ? "Change photo" : "Add photo"}
-          </button>
+        <div className="overflow-y-auto overscroll-contain p-5">
+          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-fg-subtle/40 sm:hidden" aria-hidden />
+          <p className="text-center text-base font-bold tracking-tight">Business profile</p>
+          <div className="mt-5 flex justify-center">
+            <OwnerBadge name={draft.ownerName || draft.name} logo={draft.logo} size="lg" />
+          </div>
+          <div className="mt-5 flex gap-2.5">
+            <button type="button" className={btn} onClick={() => file.current?.click()}>
+              <ImagePlus className="size-4" aria-hidden /> {draft.logo ? "Change photo" : "Add photo"}
+            </button>
+            {draft.logo && (
+              <button type="button" className={btn} onClick={() => void open(draft.logo!)}>
+                <Crop className="size-4" aria-hidden /> Adjust
+              </button>
+            )}
+          </div>
           {draft.logo && (
-            <button type="button" className={btn} onClick={() => void open(draft.logo!)}>
-              <Crop className="size-4" aria-hidden /> Adjust
+            <button type="button" className="mx-auto mt-2 block text-xs font-medium text-fg-subtle hover:text-red-300" onClick={() => setDraft((d) => ({ ...d, logo: undefined }))}>
+              Remove photo
             </button>
           )}
+          <input
+            ref={file}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (!f) return;
+              const reader = new FileReader();
+              reader.onload = () => void open(String(reader.result));
+              reader.readAsDataURL(f);
+            }}
+          />
+
+          {heading("Personal")}
+          {field("Your name (owner)", "ownerName", { max: 80 })}
+          <div className="mt-3 text-xs font-medium text-fg-muted">
+            <label htmlFor="bp-phone">Phone / WhatsApp</label>
+            <div className="mt-1">
+              <PhoneInput id="bp-phone" value={draft.phone} country={draft.country} onChange={(v) => setDraft((d) => ({ ...d, phone: v }))} onCountry={(c) => setDraft((d) => ({ ...d, country: c }))} />
+            </div>
+          </div>
+          {field("Contact email", "email", { type: "email", max: 200 })}
+          {accountEmail && <p className="mt-2 text-[0.7rem] text-fg-subtle">Login email: {accountEmail} (change it in Settings → Security).</p>}
+
+          {heading("Business")}
+          {field("Business name", "name", { max: 80 })}
+          <label className="mt-3 block text-xs font-medium text-fg-muted">
+            Business type
+            <select className={cn(input, "appearance-none")} value={draft.category} onChange={set("category")}>
+              {(businessCategories.includes(draft.category) ? businessCategories : [draft.category, ...businessCategories]).map((c) => (
+                <option key={c} className="bg-ink-850">
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+          {field("Address", "address", { max: 200 })}
+          {field("City", "city", { max: 80 })}
+          {field("Working hours", "hours", { placeholder: "Mon–Sat, 10 AM – 8 PM", max: 120 })}
+          {field("About your business", "description", { area: true, help: "IBAX uses this to answer your customers." })}
+          {field("Services / products and prices", "services", { area: true })}
+          {field("Who are your customers?", "targetCustomers", { area: true, max: 600 })}
+
+          {heading("Online & payments")}
+          {field("Website", "websiteUrl", { type: "url", placeholder: "https://", max: 200 })}
+          {field("Social links", "socialLinks", { area: true, max: 600, placeholder: "Instagram, Facebook, YouTube links" })}
+          {field("UPI ID for customer payments", "upiId", { placeholder: "yourname@okhdfc", max: 100, help: "Optional. IBAX sends customers a UPI link and QR on WhatsApp; the money comes straight to you." })}
+          {error && <p className="mt-3 text-xs text-amber-200">{error}</p>}
         </div>
-        {draft.logo && (
-          <button type="button" className="mx-auto mt-2 block text-xs font-medium text-fg-subtle hover:text-red-300" onClick={() => setDraft((d) => ({ ...d, logo: undefined }))}>
-            Remove photo
-          </button>
-        )}
-        <input
-          ref={file}
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          tabIndex={-1}
-          aria-hidden
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            e.target.value = "";
-            if (!f) return;
-            const reader = new FileReader();
-            reader.onload = () => void open(String(reader.result));
-            reader.readAsDataURL(f);
-          }}
-        />
-        <label className="mt-4 block text-xs font-medium text-fg-muted">
-          Business name
-          <input className={input} value={draft.business} maxLength={80} required onChange={(e) => setDraft((d) => ({ ...d, business: e.target.value }))} />
-        </label>
-        <label className="mt-3 block text-xs font-medium text-fg-muted">
-          Owner name
-          <input className={input} value={draft.owner} maxLength={80} onChange={(e) => setDraft((d) => ({ ...d, owner: e.target.value }))} />
-        </label>
-        <div className="mt-5 grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5 border-t border-white/10 p-4">
           <button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold">
             Cancel
           </button>
