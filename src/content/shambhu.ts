@@ -66,7 +66,7 @@ export type StoreItem = {
 /** The Automation Store: every service can be bought on its own. */
 export const store: StoreItem[] = [
   { title: "Website", body: "A fast, modern website with ibaxai built in.", icon: Globe, price: "₹2,999", usd: "$299", billing: "one-time" },
-  { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "₹1,499", usd: "$79", billing: "monthly" },
+  { title: "AI Voice Assistant", body: "Answers your calls around the clock.", icon: PhoneCall, price: "₹5,999", usd: "$99", billing: "monthly" },
   { title: "WhatsApp Automation", body: "Replies, reminders and follow-ups.", icon: MessageCircle, price: "₹799", usd: "$49", billing: "monthly", trial: true },
   { title: "Customer Support", body: "Common questions answered on every channel.", icon: Headset, price: "₹699", usd: "$49", billing: "monthly", trial: true },
   { title: "Lead Follow-up", body: "Every enquiry followed up on time.", icon: UserRoundCheck, price: "₹499", usd: "$39", billing: "monthly", trial: true },

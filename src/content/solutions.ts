@@ -42,8 +42,8 @@ export const solutions: Solution[] = [
     title: "AI Voice Assistant",
     headline: "Every call answered. Even at 2 a.m.",
     summary: "Answers calls in a natural voice, takes enquiries and booking requests.",
-    price: "₹1,499/mo",
-    usd: "$79/mo",
+    price: "₹5,999/mo",
+    usd: "$99/mo",
   },
   {
     id: "support",

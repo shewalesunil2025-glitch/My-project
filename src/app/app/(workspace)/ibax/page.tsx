@@ -11,8 +11,8 @@ import { automationStatus } from "@/components/app/status";
 import { Icon, PageHeader, Pill } from "@/components/app/ui";
 import { cn } from "@/lib/cn";
 
-/** The two packages IBAX runs end to end; single services are on the Services page. */
-const packages = ["digital-marketing", "social-pack"];
+/** The premium packages IBAX runs end to end; single services are on the Services page. */
+const packages = ["digital-marketing", "social-pack", "voice"];
 
 export default function IbaxPackagesPage() {
   const ws = useWorkspace();
@@ -20,7 +20,7 @@ export default function IbaxPackagesPage() {
   const cur = appCurrency(ws);
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader eyebrow={`${product.assistantName} Premium`} title="Premium Packages" subtitle={`One plan, and ${product.assistantName} runs your marketing and social media for you.`} />
+      <PageHeader eyebrow={`${product.assistantName} Premium`} title="Premium Packages" subtitle={`One plan, and ${product.assistantName} runs your marketing, social media and phone calls for you.`} />
       {packages.map((id, i) => {
         const s = serviceById(id);
         if (!s) return null;
