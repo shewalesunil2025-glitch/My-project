@@ -31,7 +31,7 @@ export function LogoMark({ className }: { className?: string }) {
   );
 }
 
-/** The "ibaxai" wordmark: white "iba", a white X, green "ai". */
+/** The "ibaxai" wordmark: white "iba", a white X, green "ai", and a small ™. */
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span
@@ -45,6 +45,10 @@ export function Wordmark({ className }: { className?: string }) {
         <line x1="12" y1="88" x2="88" y2="12" stroke="currentColor" strokeWidth="19" strokeLinecap="round" />
       </svg>
       <span aria-hidden className="bg-gradient-to-r from-[#8be860] to-[#55cb45] bg-clip-text text-transparent">ai</span>
+      {/* ™: an unregistered trade mark (® only once it is registered). */}
+      <sup aria-hidden className="ml-[0.08em] align-super text-[0.3em] font-semibold tracking-normal text-white opacity-60">
+        TM
+      </sup>
     </span>
   );
 }

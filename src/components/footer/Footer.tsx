@@ -1,6 +1,7 @@
 import { siteConfig } from "@/config/site";
 import { store } from "@/content/shambhu";
 import { Logo } from "@/components/navigation/Logo";
+import { trademarkLine } from "@/content/legal";
 
 const columns = [
   {
@@ -84,7 +85,7 @@ export function Footer() {
       <div className="container-x relative">
         <div className="flex flex-col justify-between gap-3 border-t border-white/[0.07] pt-6 pb-24 text-xs text-fg-subtle sm:flex-row">
           <p>
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved. ·{" "}
+            © {new Date().getFullYear()} {siteConfig.name}™. All rights reserved. {trademarkLine} ·{" "}
             <a href="/privacy" className="link-underline hover:text-fg">
               Privacy Policy
             </a>{" "}

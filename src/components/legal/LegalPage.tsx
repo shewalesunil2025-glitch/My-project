@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { legal } from "@/content/legal";
+import { legal, trademarkLine } from "@/content/legal";
 
 export type LegalSection = { id: string; title: string; body: ReactNode };
 
@@ -57,7 +57,7 @@ export function LegalPage({ title, intro, sections }: { title: string; intro: Re
         <Link href="/contact" className="link-underline hover:text-fg">
           Contact
         </Link>{" "}
-        · © {new Date().getFullYear()} {legal.brand}
+        · © {new Date().getFullYear()} {legal.brand}™. {trademarkLine}
       </p>
     </main>
   );
