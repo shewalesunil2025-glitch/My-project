@@ -212,7 +212,10 @@ export default function SettingsPage() {
       </Section>
 
       <Section id="accounts" title="Connected accounts" subtitle={`${product.name} only uses the permissions you grant. Disconnect any time.`}>
-        {product.previewMode && <Notice tone="amber">Preview mode: connections are simulated. In the live app each one opens the platform&apos;s own secure sign-in.</Notice>}
+        <Notice tone="blue">
+          Connecting an account does not switch anything on by itself — a service only runs after you start it in Services. Today only WhatsApp
+          connects for real; the others open as their services go live.
+        </Notice>
         <div className="space-y-3">
           {providers.map((p) => (
             <ConnectAccount key={p} ws={ws} provider={p} />

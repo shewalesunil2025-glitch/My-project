@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Camera, Clapperboard, ExternalLink, Globe, Mail, MessageCircle, PhoneCall, Star, ThumbsUp, Unplug, type LucideIcon } from "lucide-react";
 import { product } from "@/config/product";
-import { providerInfo, serviceById } from "@/content/app/services";
+import { isLive, providerInfo, serviceById, services } from "@/content/app/services";
 import { audit, logActivity, notify, nowIso, updateWorkspace } from "@/lib/app/store";
 import type { ProviderId, Workspace } from "@/lib/app/types";
 import { unlinkWhatsApp, waAccount, whatsappLinkAvailable } from "@/lib/app/whatsappLink";
@@ -46,6 +46,14 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
 
   function disconnect() {
     if (provider === "whatsapp" && conn && !conn.simulated) void unlinkWhatsApp(conn.account);
+    if (!providerReady(provider)) {
+      // Only a saved name: nothing used it, so nothing goes on hold.
+      updateWorkspace((w) => {
+        delete w.connections[provider];
+        audit(w, `Removed ${info.name}`);
+      });
+      return;
+    }
     updateWorkspace((w) => {
       delete w.connections[provider];
       for (const a of w.automations) {
@@ -59,37 +67,55 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
     });
   }
 
+  // Only accounts a live service uses can really connect today; the rest are "coming soon".
+  const ready = providerReady(provider);
+  const usedBy = ws.automations.filter((a) => a.status !== "setup" && needs(a.serviceId, provider)).map((a) => serviceById(a.serviceId)?.name ?? a.serviceId);
   const PIcon = providerIcon[provider];
+  const live = Boolean(conn) && ready;
   return (
-    <div className={compact ? "" : cn("rounded-2xl border p-4 transition-colors", conn ? "border-flow/30 bg-[linear-gradient(135deg,rgb(37_211_102/0.08),transparent_60%),var(--color-ink-900)]" : "border-white/10 bg-ink-900")}>
+    <div className={compact ? "" : cn("rounded-2xl border p-4 transition-colors", live ? "border-flow/30 bg-[linear-gradient(135deg,rgb(37_211_102/0.08),transparent_60%),var(--color-ink-900)]" : "border-white/10 bg-ink-900")}>
       <div className="flex items-center gap-3">
-        <span className={cn("relative grid size-11 shrink-0 place-items-center rounded-2xl", conn ? "bg-flow/15 text-flow ring-1 ring-flow/40" : "bg-white/[0.05] text-fg-muted ring-1 ring-white/10")}>
+        <span className={cn("relative grid size-11 shrink-0 place-items-center rounded-2xl", live ? "bg-flow/15 text-flow ring-1 ring-flow/40" : "bg-white/[0.05] text-fg-muted ring-1 ring-white/10")}>
           <PIcon className="size-5" aria-hidden />
-          {conn && <span aria-hidden className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" />}
+          {live && <span aria-hidden className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-ink-900 bg-flow" />}
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{info.name}</p>
-          {conn ? (
+          {live && conn ? (
+            <>
+              <p className="mt-1 flex min-w-0 items-center gap-2 text-xs text-fg-subtle">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-flow/12 px-2 py-0.5 text-[0.62rem] font-semibold tracking-wide text-flow uppercase ring-1 ring-flow/30">
+                  <span aria-hidden className="size-1.5 rounded-full bg-flow" /> Connected
+                </span>
+                <span className="truncate">{conn.account}</span>
+              </p>
+              {!compact && (
+                <p className="mt-1 text-[0.7rem] text-fg-subtle">{usedBy.length ? `Used by: ${usedBy.join(", ")}` : "Not used yet — no service that needs it is on."}</p>
+              )}
+            </>
+          ) : conn ? (
             <p className="mt-1 flex min-w-0 items-center gap-2 text-xs text-fg-subtle">
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-flow/12 px-2 py-0.5 text-[0.62rem] font-semibold tracking-wide text-flow uppercase ring-1 ring-flow/30">
-                <span aria-hidden className="size-1.5 rounded-full bg-flow" /> Connected
+              <span className="inline-flex shrink-0 items-center rounded-full bg-white/[0.06] px-2 py-0.5 text-[0.62rem] font-semibold tracking-wide text-fg-muted uppercase ring-1 ring-white/10">
+                Saved only · not in use
               </span>
               <span className="truncate">{conn.account}</span>
             </p>
           ) : (
-            <p className="mt-0.5 truncate text-xs text-fg-subtle">{info.help}</p>
+            <p className="mt-0.5 truncate text-xs text-fg-subtle">{ready ? info.help : "Coming soon — it connects when its service goes live."}</p>
           )}
         </div>
         {conn ? (
           <button
             type="button"
             onClick={disconnect}
-            aria-label={`Disconnect ${info.name}`}
-            title="Disconnect"
+            aria-label={live ? `Disconnect ${info.name}` : `Remove ${info.name}`}
+            title={live ? "Disconnect" : "Remove"}
             className="grid size-10 shrink-0 place-items-center rounded-full border border-white/10 text-fg-muted transition-colors hover:border-red-400/40 hover:text-red-300"
           >
             <Unplug className="size-4" aria-hidden />
           </button>
+        ) : !ready ? (
+          <span className="shrink-0 rounded-full border border-amber-300/25 bg-amber-300/[0.06] px-3 py-1.5 text-xs font-semibold text-amber-200">Coming soon</span>
         ) : (
           !open && (
             <Btn size="sm" onClick={() => setOpen(true)} className="shrink-0">
@@ -127,6 +153,9 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
     </div>
   );
 }
+
+/** True when a live service uses this account, so connecting it does something today. */
+export const providerReady = (provider: ProviderId) => services.some((s) => isLive(s.id) && s.connect.includes(provider));
 
 function needs(serviceId: string, provider: ProviderId) {
   return serviceById(serviceId)?.connect.includes(provider) ?? false;
