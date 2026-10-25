@@ -129,8 +129,8 @@ export const services: ServiceDef[] = [
     description:
       "Your assistant picks up every call, answers questions about your business, takes enquiries and appointment requests, and transfers to a person when needed. You get a summary of every call in ibaxai.",
     features: ["Answers incoming calls 24/7", "Business information, prices & hours", "Appointment requests", "Lead capture & follow-up", "Call summaries in ibaxai", "Transfer to a person"],
-    price: 1499,
-    usd: 79,
+    price: 5999,
+    usd: 99,
     setupTime: "1–2 working days (number setup)",
     connect: ["phone"],
     info: [
