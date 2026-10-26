@@ -142,7 +142,7 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
       <label className="sr-only" htmlFor="wa-number">
         WhatsApp number
       </label>
-      <PhoneInput id="wa-number" value={number} onChange={setNumber} required />
+      <PhoneInput id="wa-number" value={number} onChange={setNumber} autoComplete="off" required />
 
       {meta && (
         <label className="flex items-start gap-2 text-xs leading-snug text-fg-muted">

@@ -32,6 +32,7 @@ export function PhoneInput({
   onCountry,
   required,
   autoFocus,
+  autoComplete = "tel-national",
   className,
 }: {
   id: string;
@@ -44,6 +45,8 @@ export function PhoneInput({
   onCountry?: (country: string) => void;
   required?: boolean;
   autoFocus?: boolean;
+  /** "off" where the browser shouldn't fill in a saved number (e.g. linking a client's WhatsApp). */
+  autoComplete?: string;
   className?: string;
 }) {
   const initial = value ?? defaultValue;
@@ -125,17 +128,20 @@ export function PhoneInput({
           id={id}
           type="tel"
           inputMode="tel"
-          autoComplete="tel-national"
+          autoComplete={autoComplete}
           autoFocus={autoFocus}
           required={required}
           value={local}
-          placeholder={country.iso === "IN" ? "98765 43210" : "Mobile number"}
+          // Dots, not a sample number: a made-up number can look like someone's saved one.
+          placeholder={country.iso === "IN" ? "••••• •••••" : "•••• ••••••"}
           onChange={(e) => {
-            const n = e.target.value.replace(/[^\d\s-]/g, "").slice(0, 18);
+            // India: 10 digits shown as "98765 43210"; other countries keep what was typed.
+            const d = e.target.value.replace(/\D/g, "");
+            const n = country.iso === "IN" ? d.slice(0, 10).replace(/^(\d{5})(\d)/, "$1 $2") : e.target.value.replace(/[^\d\s-]/g, "").slice(0, 18);
             setLocal(n);
             onChange?.(full(country, n));
           }}
-          className="h-full min-w-0 flex-1 bg-transparent px-3 text-[16px] tracking-wide text-fg tabular-nums placeholder:text-fg-subtle focus:outline-none sm:text-[15px]"
+          className="h-full min-w-0 flex-1 bg-transparent px-3 text-[16px] tracking-wide text-fg tabular-nums placeholder:tracking-[0.25em] placeholder:text-fg-subtle/70 focus:outline-none sm:text-[15px]"
         />
         {complete && (
           <span className="grid place-items-center pr-3" aria-hidden>
