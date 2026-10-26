@@ -59,7 +59,7 @@ Demo videos in English, Hindi and Marathi are inside the app.
 
 Coming next: Instagram, Facebook, YouTube and email automation.
 
-ibaxai — Intelligent Business Automation Expert.
+ibaxai — AI Automation and Digital Marketing Agency.
 ```
 
 ## Hindi (hi-IN)
@@ -104,7 +104,7 @@ IBAX आपके लिए क्या करता है
 
 जल्द आ रहा है: Instagram, Facebook, YouTube और ईमेल ऑटोमेशन।
 
-ibaxai — Intelligent Business Automation Expert.
+ibaxai — AI Automation and Digital Marketing Agency.
 ```
 
 ## Release notes (first release)
