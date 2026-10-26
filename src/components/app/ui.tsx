@@ -30,7 +30,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { LogoMark, Wordmark } from "@/components/navigation/Logo";
+import { LogoLockup, LogoMark, Wordmark } from "@/components/navigation/Logo";
 import { product } from "@/config/product";
 
 /* ── Brand: the ibaxai symbol and wordmark, the same as the website ── */
@@ -53,12 +53,16 @@ export function BrandLogo({
   const mark = { sm: "size-7", md: "size-8", lg: "size-20" }[size];
   const word = { sm: "text-[1.1rem]", md: "text-[1.25rem]", lg: "text-[2.6rem]" }[size];
   return (
-    <span className={cn(stacked ? "flex w-fit flex-col items-center gap-4 text-center" : "inline-flex items-center gap-2.5", className)}>
-      <BrandMark className={mark} />
+    <span className={cn(stacked ? "flex w-fit flex-col items-center text-center" : "inline-flex items-center gap-2.5", className)}>
+      {stacked ? (
+        <LogoLockup className={{ sm: "w-28", md: "w-36", lg: "w-56" }[size]} markClassName="drop-shadow-[0_0_16px_rgb(33_192_99/0.5)]" />
+      ) : (
+        <BrandMark className={mark} />
+      )}
       <span className={cn("flex flex-col", stacked ? "items-center" : "items-start")}>
-        <Wordmark className={word} />
+        {!stacked && <Wordmark className={word} />}
         {tagline && (
-          <span className={cn("mt-1.5 font-mono whitespace-nowrap uppercase text-fg-subtle", !stacked && "max-sm:hidden", size === "lg" ? "text-[0.62rem] tracking-[0.22em]" : "text-[0.5rem] tracking-[0.22em]")}>
+          <span className={cn(stacked ? "mt-3" : "mt-1.5", "font-mono whitespace-nowrap uppercase text-fg-subtle", !stacked && "max-sm:hidden", size === "lg" ? "text-[0.62rem] tracking-[0.22em]" : "text-[0.5rem] tracking-[0.22em]")}>
             {product.logoTagline}
           </span>
         )}

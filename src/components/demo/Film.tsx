@@ -3,7 +3,7 @@ import { Activity, Bell, Check, Ellipsis, Gift, House, LayoutGrid, Mic, SendHori
 import { inTrial, providerInfo, serviceById, TRIAL_DAYS, type ServiceDef } from "@/content/app/services";
 import { demoParts, type DemoMode } from "@/content/demoScripts";
 import { BrandMark, Icon } from "@/components/app/ui";
-import { Wordmark } from "@/components/navigation/Logo";
+import { LogoLockup, Wordmark } from "@/components/navigation/Logo";
 
 /**
  * One frame of a service's demo video, drawn from the time `t` (seconds), so the video can be
@@ -136,11 +136,8 @@ export function Film({ svc, mode, durations, t }: FilmProps) {
     stage = (
       <div className="absolute inset-0 grid place-items-center text-center">
         <div>
-          <div style={enter(lt, 0, 0.7)} className="mx-auto w-fit drop-shadow-[0_0_40px_rgba(102,211,76,.75)]">
-            <BrandMark className="size-24" />
-          </div>
-          <div style={enter(lt, 0.25)} className="mt-4 flex justify-center">
-            <Wordmark className="text-[30px]" />
+          <div style={enter(lt, 0, 0.7)} className="mx-auto w-[197px]">
+            <LogoLockup className="w-full" markClassName="drop-shadow-[0_0_40px_rgba(102,211,76,.75)]" />
           </div>
           <p style={enter(lt, 0.45)} className="mt-7 text-[34px] leading-[1.05] font-bold tracking-tight text-white">
             Just say it.

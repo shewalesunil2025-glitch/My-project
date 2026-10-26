@@ -1,5 +1,4 @@
-import { siteConfig } from "@/config/site";
-import { LogoMark } from "@/components/navigation/Logo";
+import { LogoLockup } from "@/components/navigation/Logo";
 
 /** When the hero entrances should start: part-way into the curtain lift (ms after the intro starts). */
 const HERO_CUE_MS = 1350;
@@ -22,9 +21,8 @@ export function IntroLoader() {
       <div aria-hidden className="intro">
         <div className="intro-glow" />
         <div className="intro-mark">
-          <LogoMark className="size-14" />
+          <LogoLockup className="w-[7.2rem]" />
         </div>
-        <p className="intro-name">{siteConfig.name}</p>
         <div className="intro-line">
           <span />
         </div>

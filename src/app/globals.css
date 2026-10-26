@@ -272,14 +272,6 @@ body {
   filter: drop-shadow(0 0 24px rgb(37 211 102 / 0.55));
   animation: intro-mark 0.9s var(--ease-out-expo) both;
 }
-.intro-name {
-  position: relative;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  font-size: 0.8rem; /* the brand is written in lowercase: ibaxai */
-  color: var(--color-fg-muted);
-  animation: intro-fade 0.8s ease-out 0.2s both;
-}
 .intro-line {
   position: relative;
   width: 9rem;
@@ -719,24 +711,18 @@ body {
 }
 .ibax-splash-word {
   position: relative;
-  display: inline-flex;
-  align-items: baseline;
-  margin-top: 2.3rem;
+  /* The mark is 48.7% of the word's width, with a 4.5% gap, as in the brand artwork. */
+  width: calc(7.5rem / 0.487);
+  margin-top: calc(7.5rem / 0.487 * 0.045);
   font-size: 3.4rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  color: #fff;
+}
+.ibax-splash-word path {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 .ibax-splash-letter {
   display: inline-block;
   animation: ibax-splash-letter 0.6s var(--ease-out-expo) both;
-}
-.ibax-splash-ai {
-  background: linear-gradient(90deg, #8be860, #55cb45);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 .ibax-splash-tag {
   position: relative;
@@ -749,7 +735,6 @@ body {
   white-space: nowrap;
   animation: ibax-splash-tag 1s var(--ease-out-expo) 2.6s both;
 }
-@media (min-width: 640px) { .ibax-splash-word { font-size: 4.2rem; } }
 @keyframes ibax-splash-fly {
   from { offset-distance: 0%; opacity: 0; scale: 0.5; }
   15% { opacity: 1; }

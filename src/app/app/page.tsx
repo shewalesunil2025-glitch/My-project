@@ -7,9 +7,8 @@ import { ArrowRight, CirclePlay, Fingerprint, KeyRound, LogIn, ScanFace, UserPlu
 import { product } from "@/config/product";
 import { logOut, useSession } from "@/lib/app/store";
 import { LOCK_EVENT, bioName, forgetUnlocked, getLock, unlockWithBiometric } from "@/lib/app/appLock";
-import { BrandMark } from "@/components/app/ui";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
-import { Wordmark } from "@/components/navigation/Logo";
+import { LogoLockup } from "@/components/navigation/Logo";
 import { cn } from "@/lib/cn";
 
 /** Soft green light arcs in two corners, like the edge of a glowing planet. */
@@ -87,12 +86,10 @@ export default function WelcomePage() {
 
       <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-7 pt-[max(env(safe-area-inset-top),2rem)] pb-[max(env(safe-area-inset-bottom),1.75rem)]">
         <section className="flex flex-1 flex-col items-center justify-center text-center">
-          <span className="relative">
-            <span aria-hidden className="absolute inset-[-30%] rounded-full bg-flow/25 blur-3xl" />
-            <BrandMark className="relative size-28 drop-shadow-[0_0_28px_rgb(37_211_102/0.55)] sm:size-32" />
-          </span>
-          <h1 className="mt-7">
-            <Wordmark className="text-[3.3rem] leading-none sm:text-[3.8rem]" />
+          {/* Symbol centred over "ibaxai", as in the brand artwork. */}
+          <h1 className="relative w-[14.5rem] sm:w-[16.5rem]">
+            <span aria-hidden className="absolute top-[-12%] left-1/2 aspect-square w-[75%] -translate-x-1/2 rounded-full bg-flow/25 blur-3xl" />
+            <LogoLockup className="relative w-full" markClassName="drop-shadow-[0_0_28px_rgb(37_211_102/0.55)]" />
           </h1>
           <p className="mt-4 text-[0.6rem] font-medium tracking-[0.2em] whitespace-nowrap text-fg-muted uppercase min-[400px]:tracking-[0.26em] sm:text-[0.7rem]">{product.logoTagline}</p>
           <span aria-hidden className="mt-7 h-px w-36 bg-[linear-gradient(90deg,transparent,#25d366,transparent)] shadow-[0_0_12px_#25d366]" />

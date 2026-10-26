@@ -1,6 +1,7 @@
 "use client";
 
 import { product } from "@/config/product";
+import { Wordmark } from "@/components/navigation/Logo";
 
 /**
  * Opening screen of the app, IBAX's signature moment — "the spark of automation":
@@ -10,7 +11,6 @@ import { product } from "@/config/product";
  * "ibaxai" letter by letter, and the tagline. Pure CSS (and a tiny script for the sound),
  * so it plays before the app's JavaScript loads; shown once per visit. The mark is drawn exactly like LogoMark.
  */
-const letters = ["i", "b", "a", "x", "a", "i"];
 
 /**
  * The opening sound, in time with the animation. Only when the phone lets a page play sound
@@ -96,20 +96,12 @@ export function AppSplash() {
             </svg>
           </span>
         </div>
-        <div className="ibax-splash-word font-[family-name:var(--font-poppins)]" aria-label={product.name}>
-          {letters.map((l, i) =>
-            l === "x" ? (
-              <svg key={i} viewBox="0 0 100 100" className="ibax-splash-letter mx-[0.03em] h-[0.6em] w-[0.6em]" style={{ animationDelay: `${2.15 + i * 0.07}s` }}>
-                <line x1="12" y1="12" x2="88" y2="88" stroke="#fff" strokeWidth="19" strokeLinecap="round" />
-                <line x1="12" y1="88" x2="88" y2="12" stroke="#fff" strokeWidth="19" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <span key={i} className={`ibax-splash-letter ${i > 3 ? "ibax-splash-ai" : ""}`} style={{ animationDelay: `${2.15 + i * 0.07}s` }}>
-                {l}
-              </span>
-            ),
-          )}
-        </div>
+        {/* "ibaxai" letter by letter, centred under the mark as in the brand artwork. */}
+        <Wordmark
+          className="ibax-splash-word [&>svg]:h-auto [&>svg]:w-full"
+          tm={false}
+          letterProps={(i) => ({ className: "ibax-splash-letter", style: { animationDelay: `${2.15 + i * 0.07}s` } })}
+        />
         <p className="ibax-splash-tag">{product.logoTagline}</p>
       </div>
     </>
