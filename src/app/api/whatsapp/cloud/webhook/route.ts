@@ -1,6 +1,6 @@
 import { after } from "next/server";
 import { evolution } from "@/lib/server/whatsapp";
-import { cloudLinkByPhoneId, evoBase, evoKeyFor, meta, signatureOk } from "@/lib/server/waCloud";
+import { cloudLinkByPhoneId, evoBase, evoKeyFor, signatureOk } from "@/lib/server/waCloud";
 
 /**
  * Meta's WhatsApp webhook (Meta → WhatsApp → Configuration → Callback URL).
@@ -11,10 +11,14 @@ import { cloudLinkByPhoneId, evoBase, evoKeyFor, meta, signatureOk } from "@/lib
 
 export function GET(request: Request) {
   const q = new URL(request.url).searchParams;
-  if (q.get("hub.mode") === "subscribe" && meta.verifyToken && q.get("hub.verify_token") === meta.verifyToken) {
+  // Read at request time and ignore stray spaces / line breaks pasted around the value.
+  const expected = (process.env.META_WEBHOOK_VERIFY_TOKEN ?? "").trim();
+  const given = (q.get("hub.verify_token") ?? "").trim();
+  if (q.get("hub.mode") === "subscribe" && expected && given === expected) {
     return new Response(q.get("hub.challenge") ?? "", { status: 200 });
   }
-  return new Response("Forbidden", { status: 403 });
+  // The header only says whether the token is set on the server, never its value.
+  return new Response("Forbidden", { status: 403, headers: { "x-ibax-verify": expected ? "token-mismatch" : "token-not-set" } });
 }
 
 type WaMessage = {
