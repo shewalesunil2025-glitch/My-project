@@ -179,11 +179,6 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
           </>
         )}
       </p>
-      {meta && (
-        <button type="button" onClick={() => start()} disabled={!ready || busy} className="w-full text-center text-xs font-medium text-fg-muted underline-offset-4 hover:text-fg hover:underline disabled:opacity-50">
-          Or link with a code instead
-        </button>
-      )}
     </form>
   );
 }
