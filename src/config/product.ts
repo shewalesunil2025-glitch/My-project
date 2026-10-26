@@ -1,7 +1,7 @@
 /**
  * The business app's brand. Change `name` here and it updates everywhere in the app.
  *
- * "ibaxai" (Intelligent Business Automation Expert) — the brand and its
+ * "ibaxai" (AI Automation and Digital Marketing Agency) — the brand and its
  * domain, www.ibaxai.com. The assistant inside the app and on the website is IBAX.
  */
 export const product = {
@@ -13,7 +13,7 @@ export const product = {
   /** The brand slogan, shown on the website hero, the app welcome screen and the footer. */
   slogan: "Just say it. IBAX does it.",
   /** Shown under the logo, as on the website. */
-  logoTagline: "Intelligent Business Automation Expert",
+  logoTagline: "AI Automation and Digital Marketing Agency",
   description:
     "ibaxai runs your website, AI assistants, WhatsApp, calls, social media, reviews, content and leads from one app — you give the instructions, ibaxai handles the technology.",
   /** Currency for the prices in src/content/app/services.ts (Indian rupees, all-inclusive). */

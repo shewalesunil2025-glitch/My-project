@@ -106,7 +106,7 @@ export function Footer() {
               Contact Us
             </a>
           </p>
-          <p>AI Automation • Websites • Intelligent Business Systems</p>
+          <p>AI Automation • Digital Marketing • Websites</p>
         </div>
       </div>
     </footer>

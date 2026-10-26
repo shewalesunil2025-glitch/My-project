@@ -31,7 +31,7 @@ if(ctx.state!=='running'||late>0.8){ctx.close();return}
 var s=ctx.createBufferSource();s.buffer=buf;s.connect(ctx.destination);s.onended=function(){ctx.close()};s.start(0,late);
 }).catch(function(){try{ctx.close()}catch(e){}});
 }catch(e){}})();`;
-const SPARK = "M512 150C524 250 544 272 650 288 544 304 524 326 512 426 500 326 480 304 374 288 480 272 500 250 512 150Z";
+const SPARK = "M512 140C526 256 549 281 672 300 549 319 526 344 512 460 498 344 475 319 352 300 475 281 498 256 512 140Z";
 
 export function AppSplash() {
   return (
@@ -50,16 +50,16 @@ export function AppSplash() {
           <svg viewBox="0 0 1024 1024" className="ibax-splash-mark">
             <defs>
               <linearGradient id="ibax-splash-tile" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stopColor="#aaf087" />
-                <stop offset="0.5" stopColor="#62cf4a" />
-                <stop offset="1" stopColor="#36a03a" />
+                <stop offset="0" stopColor="#dff99a" />
+                <stop offset="0.5" stopColor="#86e45e" />
+                <stop offset="1" stopColor="#20c55a" />
               </linearGradient>
               <radialGradient id="ibax-splash-gloss" cx="205" cy="123" r="717" gradientUnits="userSpaceOnUse">
                 <stop offset="0" stopColor="#fff" stopOpacity="0.22" />
                 <stop offset="0.7" stopColor="#fff" stopOpacity="0" />
               </radialGradient>
               <clipPath id="ibax-splash-reveal">
-                <circle className="ibax-splash-reveal" cx="512" cy="288" r="900" />
+                <circle className="ibax-splash-reveal" cx="512" cy="300" r="900" />
               </clipPath>
               <clipPath id="ibax-splash-tileclip">
                 <rect width="1024" height="1024" rx="250" />
@@ -69,7 +69,7 @@ export function AppSplash() {
             <g clipPath="url(#ibax-splash-reveal)">
               <rect width="1024" height="1024" rx="250" fill="url(#ibax-splash-tile)" />
               <rect width="1024" height="1024" rx="250" fill="url(#ibax-splash-gloss)" />
-              <rect x="7" y="7" width="1010" height="1010" rx="244" fill="none" stroke="#c4f5ab" strokeOpacity="0.55" strokeWidth="10" />
+              <rect x="7" y="7" width="1010" height="1010" rx="244" fill="none" stroke="#eafcc4" strokeOpacity="0.55" strokeWidth="10" />
             </g>
             {/* Light traces the outline from the star, both ways round. */}
             <g className="ibax-splash-trace" fill="none" stroke="#d9f7e6" strokeWidth="12" strokeLinecap="round">
@@ -80,7 +80,7 @@ export function AppSplash() {
               <rect className="ibax-splash-sweep" x="-500" y="-300" width="240" height="1700" fill="#fff" />
             </g>
             <path className="ibax-splash-spark" d={SPARK} fill="#06140a" />
-            <rect className="ibax-splash-stem" x="440" y="500" width="144" height="340" rx="72" fill="#06140a" />
+            <rect className="ibax-splash-stem" x="434" y="523" width="156" height="312" rx="78" fill="#06140a" />
           </svg>
           {/* Automation nodes circle the mark once. */}
           <span className="ibax-splash-orbit">
