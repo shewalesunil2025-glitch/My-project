@@ -2,7 +2,7 @@
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 
-## Where we are (updated 2026-10-17)
+## Where we are (updated 2026-10-26)
 
 **Launch plan (owner's decision):** build 3–4 services fully first — Website (self-service builder), WhatsApp, Lead Follow-up, Customer Support — then add Razorpay and launch.
 
@@ -14,6 +14,7 @@ The app, the IBAX bot and the activation flow are built. The automations behind 
 | Google sign-in | ✅ Live: Google Cloud project `ibaxai` (OAuth client "ibaxai web", app published), Supabase Google provider on, Site URL `https://www.ibaxai.com`; the vercel.app address redirects to www.ibaxai.com | — |
 | Apple sign-in | ⏸ Needs a paid Apple Developer account ($99/year) | Later |
 | WhatsApp ($49) | ✅ Live: Bluehost VPS (Mumbai, `129-121-169-80.sslip.io`) runs Evolution API; Vercel env vars set; AI Replies published; owner linked their own number. Link code and QR refresh on screen while linking | Owner: activate the service from IBAX chat and test a reply from another phone; later move to the WhatsApp Cloud API |
+| WhatsApp official (Meta Cloud API) | 🟡 Built: **Connect with number + OTP** (Meta Embedded Signup) in WhatsApp linking, keeping the WhatsApp Business app on the number if the client wants (coexistence); webhook `/api/whatsapp/cloud/webhook` hands messages to the same n8n AI Replies, and replies go out through Meta (`/api/whatsapp/cloud/evo`); message templates (create, see status, send) under Connected accounts. Meta: app `1810020233450398`, Tech Provider (Independent), Embedded Signup configuration "ibaxai WhatsApp signup" (Cloud API, token never expires). Vercel: `NEXT_PUBLIC_META_APP_ID`, `NEXT_PUBLIC_META_WA_CONFIG_ID` set | Owner: run `0006_whatsapp_cloud.sql`; Vercel `META_APP_SECRET` + `META_WEBHOOK_VERIFY_TOKEN`; Meta webhook + JS SDK domain; test with `/app/settings?meta=1`; record the App Review video; after approval set `NEXT_PUBLIC_META_WA_LIVE=1` |
 | Lead Follow-up ($39) | ✅ Live: website enquiries and leads added in the app get a WhatsApp thank-you from the owner's number, then up to 2 reminders (after 1 hour / 1 day / 2 days, 9 am–9 pm India time); stops when the lead replies or is marked converted/lost; 9 am "call these today" list on WhatsApp. SQL `0003_followups.sql` run; n8n **IBAX · Lead Follow-up · Hourly** published | Owner: test by adding a lead with a second number |
 | Customer Support ($49) | ✅ **Live.** Answers customers' common questions (FAQs, prices, timings, policies) on the client's ibaxai website chat (`/api/site-chat`) and, when their WhatsApp is linked and WhatsApp Automation isn't on, on WhatsApp too (n8n **Activation** saves it like WhatsApp; policies go into the FAQs); complaints alert the owner on WhatsApp | Instagram, Facebook and email answers come with those services |
 | Google Review Management (₹499) | ✅ Part 1 live: review requests on the owner's WhatsApp with a one-tap Google review link (g.page/r/…/review or writereview?placeid=…; `src/lib/reviewMessage.ts` fixes pasted links) — "Ask review" on each lead, the Reviews page, from IBAX chat (`ask_review`), or automatically when a lead is marked Converted; once per customer per 30 days, 40 a day (`/api/reviews`, `src/lib/server/reviews.ts`). In the free trial | **Reply drafts live:** paste a Google review on the Reviews page → IBAX writes the reply in the customer's language (`/api/reviews/reply`). Part 2: Google Business Profile API (owner applies: Google Cloud project `ibaxai` → request Business Profile API access) → new-review alerts and posting replies automatically |
@@ -78,5 +79,28 @@ To go live:
 2. n8n: a Google Gemini credential with our own free API key, selected on the **Gemini Flash** node ✅ (the reply step retries 3 times when Google is busy).
 3. Evolution API server (one VPS for all clients). Vercel: `EVOLUTION_API_URL`, `EVOLUTION_API_KEY` (the server's global key) and `N8N_EVOLUTION_WEBHOOK_URL` (AI Replies production URL plus `?token=…`). The app then creates each client's instance `ibax-<number>` with that webhook (`MESSAGES_UPSERT`), and the client links WhatsApp themselves with a pairing code.
 4. Publish **AI Replies**, test with one pilot number, then add `whatsapp` to `liveServices`.
+
+## WhatsApp official — Meta Cloud API (Embedded Signup)
+
+The client presses **Connect with number + OTP**, Meta's window opens, they type their number and the OTP, and it is linked. Same `ibax-<digits>` instance name as the Evolution links, so the chats, leads, follow-ups and n8n workflows don't change.
+
+| Piece | What it does |
+|---|---|
+| `src/lib/app/metaSignup.ts` | Loads Meta's JS SDK, opens Embedded Signup (`config_id`, `featureType: whatsapp_business_app_onboarding` when the client keeps the WhatsApp Business app), sends the one-time code + ids to the server |
+| `/api/whatsapp/cloud` | `finish`: swaps the code for the business token (`META_APP_SECRET`), subscribes the app to the account's webhooks, registers the number (not with the app kept), saves it encrypted in `wa_cloud` (`0006_whatsapp_cloud.sql`). Also `status`, `disconnect` |
+| `/api/whatsapp/cloud/webhook` | Meta's callback (verify token `META_WEBHOOK_VERIFY_TOKEN`, signature checked). Customer messages and the owner's own app messages (`smb_message_echoes`) go to the n8n AI Replies webhook in Evolution's format |
+| `/api/whatsapp/cloud/evo/message/sendText/<instance>` | n8n's "send" for Cloud numbers lands here (per-number key) and goes out through Meta. The app's own sends (`evo()` in `src/lib/server/whatsapp.ts`) switch to Meta the same way |
+| `/api/whatsapp/cloud/templates` | Create / list / send message templates (needed for App Review and for messages after the 24-hour window) |
+
+Meta setup (owner, once):
+1. App settings → Basic done; Tech Provider (Independent) started; Embedded Signup configuration created ✅
+2. Supabase → SQL Editor: run `supabase/migrations/0006_whatsapp_cloud.sql`
+3. Vercel: `META_APP_SECRET` (Meta → App settings → Basic → App secret) and `META_WEBHOOK_VERIFY_TOKEN` (any long random text) → Redeploy
+4. Meta → WhatsApp → Configuration: Callback URL `https://www.ibaxai.com/api/whatsapp/cloud/webhook`, the same verify token; subscribe `messages` and `smb_message_echoes`
+5. Facebook Login for Business → Settings: Login with the JavaScript SDK **Yes**; Allowed domains `https://www.ibaxai.com`
+6. Test: open `https://www.ibaxai.com/app/settings?meta=1` → WhatsApp → Connect → Connect with number + OTP
+7. App Review: advanced access for `whatsapp_business_messaging` and `whatsapp_business_management`, with a screen recording (connect a number, send a message from the Inbox, create a template). After approval: Vercel `NEXT_PUBLIC_META_WA_LIVE=1` → Redeploy, and every client sees the button
+
+Limits: free-text replies only within 24 hours of the customer's last message; after that, an approved template (Meta charges for business-started template messages, about ₹0.15–0.80 each, billed to the client's own WhatsApp account).
 
 Evolution API uses WhatsApp Web, not Meta's official API. Use it for replies only (no bulk or promotional sends), and plan the move to the WhatsApp Cloud API. Only the receive and send nodes change.

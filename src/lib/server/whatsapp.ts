@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { fullDigits, phoneDigits } from "@/lib/phone";
+import { cloudLink, cloudSendText } from "./waCloud";
 
 /**
  * Server-only helpers for WhatsApp through our Evolution API server.
@@ -38,6 +39,16 @@ export const instanceToken = (userId: string, instance: string) =>
   createHash("sha256").update(`${evolution.key}:${userId}:${instance}`).digest("hex");
 
 export async function evo(path: string, init: RequestInit & { key?: string } = {}) {
+  // A number linked through Meta's official Cloud API sends through Meta instead (same reply shape).
+  const send = /^\/message\/sendText\/([^/?]+)$/.exec(path);
+  if (send) {
+    const link = await cloudLink(decodeURIComponent(send[1]));
+    if (link) {
+      const b = JSON.parse(String(init.body ?? "{}")) as { number?: string; text?: string };
+      const r = await cloudSendText(link, String(b.number ?? ""), String(b.text ?? ""));
+      return { ok: r.ok, status: r.ok ? 201 : 400, data: r.ok ? { key: { id: r.id } } : { error: r.error } };
+    }
+  }
   const { key, ...rest } = init;
   const res = await fetch(`${evolution.url}${path}`, {
     ...rest,
@@ -64,6 +75,8 @@ export type Ownership = "none" | "mine" | "other";
 
 /** Does this instance exist, and does it belong to this user? */
 export async function ownership(userId: string, instance: string): Promise<Ownership> {
+  const cloud = await cloudLink(instance);
+  if (cloud) return cloud.ownerId === userId ? "mine" : "other";
   const all = await evo(`/instance/fetchInstances?instanceName=${encodeURIComponent(instance)}`);
   const list = Array.isArray(all.data) ? all.data : [];
   if (!all.ok || list.length === 0) return "none";
@@ -72,6 +85,7 @@ export async function ownership(userId: string, instance: string): Promise<Owner
 }
 
 export async function connectionState(instance: string): Promise<string> {
+  if (await cloudLink(instance)) return "open";
   const r = await evo(`/instance/connectionState/${encodeURIComponent(instance)}`);
   return (r.data as { instance?: { state?: string } } | null)?.instance?.state ?? "unknown";
 }

@@ -10,6 +10,7 @@ import { unlinkWhatsApp, waAccount, whatsappLinkAvailable } from "@/lib/app/what
 import { Btn, Field, Input, fmtDate } from "./ui";
 import { cn } from "@/lib/cn";
 import { WhatsAppLink } from "./WhatsAppLink";
+import { WhatsAppTemplates } from "./WhatsAppTemplates";
 
 const providerIcon: Record<ProviderId, LucideIcon> = {
   whatsapp: MessageCircle,
@@ -129,6 +130,7 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
           <WhatsAppLink onLinked={(n) => connect(waAccount(n), false)} onPreview={(n) => connect(waAccount(n))} />
         </div>
       )}
+      {conn && provider === "whatsapp" && !conn.simulated && <WhatsAppTemplates />}
       {open && !conn && !(provider === "whatsapp" && whatsappLinkAvailable()) && (
         <div className="mt-4 space-y-3 border-t border-white/[0.06] pt-4">
           <p className="flex items-start gap-2 text-xs text-fg-muted">

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDb, ownerDial } from "@/lib/server/followup";
 import { rememberInstance } from "@/lib/server/wachat";
+import { cloudLink, unlinkCloud } from "@/lib/server/waCloud";
 import { connectionState, evo, evolution, evolutionReady, instanceFor, instanceToken, ownership, userFromRequest, waDigits } from "@/lib/server/whatsapp";
 
 /**
@@ -43,7 +44,9 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "disconnect") {
-      if (owner === "mine") await evo(`/instance/logout/${encodeURIComponent(instance)}`, { method: "DELETE" });
+      const cloud = owner === "mine" ? await cloudLink(instance) : null;
+      if (cloud) await unlinkCloud(cloud);
+      else if (owner === "mine") await evo(`/instance/logout/${encodeURIComponent(instance)}`, { method: "DELETE" });
       return json({ ok: true });
     }
 
