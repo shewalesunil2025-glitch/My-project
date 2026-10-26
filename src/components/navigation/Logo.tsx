@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { useId } from "react";
+import { useId, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import { siteConfig } from "@/config/site";
+import { WORDMARK_GLYPHS, WORDMARK_VIEWBOX } from "./wordmarkGlyphs";
 
 /** The IBAX symbol: a sparkle over a short, wide "i", in deep ink on a soft lime-to-green tile. */
 export function LogoMark({ className }: { className?: string }) {
@@ -31,19 +32,43 @@ export function LogoMark({ className }: { className?: string }) {
   );
 }
 
-/** The "ibaxai" wordmark in one bold font: white "ibax", green "ai", and a small ™. */
-export function Wordmark({ className }: { className?: string }) {
+type LetterProps = { className?: string; style?: CSSProperties };
+
+/** The "ibaxai" wordmark, drawn exactly like the brand artwork: "ibax" in ink (white on dark), "ai" in green, and a small ™. */
+export function Wordmark({ className, tm = true, letterProps }: { className?: string; tm?: boolean; letterProps?: (index: number) => LetterProps }) {
+  const id = `ibaxw-${useId().replace(/:/g, "")}`;
   return (
-    <span
-      className={cn("inline-block font-[family-name:var(--font-poppins)] font-bold tracking-[-0.03em] whitespace-nowrap leading-none", className)}
-      aria-label={siteConfig.name}
-    >
-      <span aria-hidden className="text-white">ibax</span>
-      <span aria-hidden className="bg-gradient-to-r from-[#8be860] to-[#55cb45] bg-clip-text text-transparent">ai</span>
-      {/* ™: an unregistered trade mark (® only once it is registered). */}
-      <sup aria-hidden className="ml-[0.08em] align-super text-[0.3em] font-semibold tracking-normal text-white opacity-60">
-        TM
-      </sup>
+    <span className={cn("relative inline-block leading-none", className)} role="img" aria-label={siteConfig.name}>
+      <svg viewBox={WORDMARK_VIEWBOX} className="block h-[0.8em] w-auto overflow-visible text-white" aria-hidden>
+        <defs>
+          <linearGradient id={`${id}-ai`} x1="334" y1="0" x2="468" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#86e45e" />
+            <stop offset="1" stopColor="#22c55a" />
+          </linearGradient>
+        </defs>
+        {WORDMARK_GLYPHS.map((g, i) => (
+          <path key={i} d={g.d} fill={g.ai ? `url(#${id}-ai)` : "currentColor"} {...letterProps?.(i)} />
+        ))}
+      </svg>
+      {/* ™: an unregistered trade mark (® only once it is registered). Placed beside the letters so they stay centred. */}
+      {tm && (
+        <sup aria-hidden className="absolute top-[-0.05em] left-full ml-[0.08em] text-[0.22em] leading-none font-semibold tracking-normal text-white opacity-60">
+          TM
+        </sup>
+      )}
+    </span>
+  );
+}
+
+/**
+ * Symbol centred above the wordmark, in the brand artwork's proportions: the tile is 48.7% of
+ * the word's width, with a gap of 4.5%. Size it with a width class (e.g. "w-60").
+ */
+export function LogoLockup({ className, markClassName }: { className?: string; markClassName?: string }) {
+  return (
+    <span className={cn("flex flex-col items-center", className)}>
+      <LogoMark className={cn("aspect-square size-auto w-[48.7%]", markClassName)} />
+      <Wordmark className="mt-[4.5%] w-full [&>svg]:h-auto [&>svg]:w-full" />
     </span>
   );
 }

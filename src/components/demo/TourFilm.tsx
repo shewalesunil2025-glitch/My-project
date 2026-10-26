@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Bot, Check, Gift, Globe, Lock, Mail, MessageCircle, Mic, PhoneCall, SendHorizontal, ShieldCheck, Star, TrendingUp, Users } from "lucide-react";
 import { BrandMark, Icon } from "@/components/app/ui";
-import { Wordmark } from "@/components/navigation/Logo";
+import { LogoLockup, Wordmark } from "@/components/navigation/Logo";
 import { services } from "@/content/app/services";
 import { tourParts } from "@/content/tourScript";
 import { Bubble, Btn, enter, finger, Phone, PT, typed } from "./Film";
@@ -43,11 +43,8 @@ export function TourFilm({ durations, t }: { durations: number[]; t: number }) {
     stage = (
       <div className="absolute inset-0 grid place-items-center text-center">
         <div>
-          <div style={enter(lt, 0, 0.7)} className="mx-auto w-fit drop-shadow-[0_0_40px_rgba(102,211,76,.75)]">
-            <BrandMark className="size-24" />
-          </div>
-          <div style={enter(lt, 0.25)} className="mt-4 flex justify-center">
-            <Wordmark className="text-[30px]" />
+          <div style={enter(lt, 0, 0.7)} className="mx-auto w-[197px]">
+            <LogoLockup className="w-full" markClassName="drop-shadow-[0_0_40px_rgba(102,211,76,.75)]" />
           </div>
           {!outro && (
             <p style={enter(lt, 0.45)} className="mt-3 text-[15px] font-semibold text-white/70">
