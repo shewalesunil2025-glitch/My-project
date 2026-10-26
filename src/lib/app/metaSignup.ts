@@ -69,7 +69,10 @@ export type SignupResult =
   | { ok: false; reason: "cancelled" | "sdk" | "not_configured" | "taken" | "exchange_failed" | "number_not_found" | "register_failed" | "server_error" };
 
 /** Opens Meta's signup popup. `keepApp`: the client keeps using the WhatsApp Business app on this number. */
-export async function connectOfficialWhatsApp(keepApp: boolean): Promise<SignupResult> {
+export async function connectOfficialWhatsApp(keepApp: boolean, number = ""): Promise<SignupResult> {
+  // "+91 98765 43210" → Meta's prefill shape, so the client sees their number already filled in.
+  const m = /^\+(\d{1,4})\s*(.+)$/.exec(number.trim());
+  const phone = m ? { code: Number(m[1]), number: m[2].replace(/\D/g, "") } : undefined;
   if (!officialWhatsAppAvailable()) return { ok: false, reason: "not_configured" };
   let fb: FB;
   try {
@@ -96,7 +99,7 @@ export async function connectOfficialWhatsApp(keepApp: boolean): Promise<SignupR
       config_id: CONFIG_ID,
       response_type: "code",
       override_default_response_type: true,
-      extras: { setup: {}, featureType: keepApp ? "whatsapp_business_app_onboarding" : "", sessionInfoVersion: "3" },
+      extras: { setup: phone ? { business: { phone } } : {}, featureType: keepApp ? "whatsapp_business_app_onboarding" : "", sessionInfoVersion: "3" },
     }),
   );
   // The ids message can arrive just after the login callback.
