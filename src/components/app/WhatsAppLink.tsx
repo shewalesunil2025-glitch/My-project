@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Check, ShieldCheck, Smartphone } from "lucide-react";
+import { BadgeCheck, Check, ShieldCheck, Smartphone } from "lucide-react";
+import { connectOfficialWhatsApp, officialWhatsAppAvailable, signupErrors } from "@/lib/app/metaSignup";
 import { linkErrors, startWhatsAppLink, whatsAppStatus } from "@/lib/app/whatsappLink";
 import { Btn, Notice, Spinner } from "./ui";
 
-type Phase = { step: "number" } | { step: "starting" } | { step: "pairing"; code: string | null; qr: string | null } | { step: "linked" };
+type Phase = { step: "number" } | { step: "starting" } | { step: "meta" } | { step: "pairing"; code: string | null; qr: string | null } | { step: "linked" };
 
 const POLL_MS = 3000;
 const POLL_FOR_MS = 5 * 60 * 1000;
@@ -14,11 +15,14 @@ const POLL_FOR_MS = 5 * 60 * 1000;
  * Self-service WhatsApp linking: the owner enters their number, gets a pairing code
  * (WhatsApp → Linked devices → Link with phone number) or a QR code, and we wait until
  * WhatsApp reports the link. `onPreview` is called when the WhatsApp server isn't set up.
+ * When the Meta app is set up, the official way comes first: Meta's own window, where the owner
+ * picks their number and confirms it with an OTP (WhatsApp Cloud API, Embedded Signup).
  */
 export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (number: string) => void; onPreview: (number: string) => void; disabled?: boolean }) {
   const [number, setNumber] = useState("");
   const [phase, setPhase] = useState<Phase>({ step: "number" });
   const [error, setError] = useState("");
+  const [keepApp, setKeepApp] = useState(true);
   const done = useRef(false);
 
   useEffect(() => {
@@ -64,6 +68,19 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
     setPhase({ step: "pairing", code: res.pairingCode, qr: res.qr });
   }
 
+  async function official() {
+    setError("");
+    setPhase({ step: "meta" });
+    const res = await connectOfficialWhatsApp(keepApp);
+    if (!res.ok) {
+      setError(signupErrors[res.reason] ?? signupErrors.server_error);
+      return setPhase({ step: "number" });
+    }
+    done.current = true;
+    setPhase({ step: "linked" });
+    onLinked(res.number);
+  }
+
   if (phase.step === "linked")
     return (
       <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300">
@@ -106,7 +123,33 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
     );
   }
 
+  const meta = officialWhatsAppAvailable();
   return (
+    <div className="space-y-4">
+      {meta && (
+        <div className="space-y-2 rounded-xl border border-flow/25 bg-flow/[0.05] p-3">
+          <p className="flex items-start gap-1.5 text-xs leading-snug text-fg-muted">
+            <BadgeCheck className="mt-0.5 size-3.5 shrink-0 text-flow" aria-hidden />
+            <span>
+              <b className="text-fg">Official WhatsApp (Meta).</b> A Meta window opens: enter your number and the OTP WhatsApp sends you. That&apos;s it.
+            </span>
+          </p>
+          <label className="flex items-start gap-2 text-xs text-fg-muted">
+            <input type="checkbox" checked={keepApp} onChange={(e) => setKeepApp(e.target.checked)} className="mt-0.5 accent-[#25d366]" />
+            I use the WhatsApp Business app on this number and want to keep using it
+          </label>
+          <Btn size="sm" className="w-full" onClick={official} disabled={disabled || phase.step === "meta" || phase.step === "starting"}>
+            {phase.step === "meta" ? (
+              <Spinner />
+            ) : (
+              <>
+                <ShieldCheck className="size-3.5" aria-hidden /> Connect with number + OTP
+              </>
+            )}
+          </Btn>
+        </div>
+      )}
+      {meta && <p className="text-center text-[0.7rem] tracking-wide text-fg-subtle uppercase">or link with a code</p>}
     <form onSubmit={start} className="space-y-2">
       <p className="flex items-start gap-1.5 text-xs leading-snug text-fg-muted">
         <Smartphone className="mt-0.5 size-3.5 shrink-0" aria-hidden />
@@ -135,5 +178,6 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
         )}
       </Btn>
     </form>
+    </div>
   );
 }
