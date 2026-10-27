@@ -18,7 +18,9 @@ export type LiveCall = {
 
 export type LiveOptions = {
   /** "site": a visitor on the website instead of an owner in the app. */
-  audience?: "app" | "site";
+  audience?: "app" | "site" | "voice-test";
+  /** Sign-in header, for calls that need the owner's own data (voice-test). */
+  headers?: Record<string, string>;
   /** Workspace facts for this call (business, services, numbers). */
   context: string;
   onState: (s: LiveState) => void;
@@ -84,8 +86,8 @@ type ServerMessage = {
  */
 type LiveStart = { ok?: boolean; token?: string; setup?: { systemInstruction: { parts: { text: string }[] } } & Record<string, unknown> } | null;
 
-const fetchStart = (audience: string): Promise<LiveStart> =>
-  fetch("/api/live", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ audience }) })
+const fetchStart = (audience: string, headers: Record<string, string> = {}): Promise<LiveStart> =>
+  fetch("/api/live", { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify({ audience }) })
     .then((r) => (r.ok ? (r.json() as Promise<LiveStart>) : null))
     .catch(() => null);
 
@@ -113,9 +115,9 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     // sounded near, then far), so they stay off; IBAX's own voice is told apart below.
     .getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false } })
     .catch(() => null);
-  let start = await takeStart(audience);
+  let start = audience === "voice-test" ? await fetchStart(audience, opts.headers) : await takeStart(audience);
   // A pass that was fetched earlier may have expired: get a fresh one.
-  if (!start?.ok) start = await fetchStart(audience);
+  if (!start?.ok) start = await fetchStart(audience, opts.headers);
   if (!start?.ok || !start.token || !start.setup) {
     void micAsk.then((s) => s?.getTracks().forEach((t) => t.stop()));
     return null;
