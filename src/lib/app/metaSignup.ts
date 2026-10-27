@@ -14,20 +14,24 @@ const SDK_VERSION = "v25.0";
 
 const LIVE = process.env.NEXT_PUBLIC_META_WA_LIVE === "1";
 
+/** The Meta app and Embedded Signup configuration are set up in this build. */
+export const officialWhatsAppAvailable = () => Boolean(APP_ID && CONFIG_ID);
+
 /**
- * Until Meta approves the app (App Review), only the app's own admins can finish the signup, so
- * the button stays hidden for clients. Set NEXT_PUBLIC_META_WA_LIVE=1 after approval. To test or
- * record the review video before that, open the app once with ?meta=1 (remembered on this device).
+ * Whether to show "Get OTP & connect" to this account. The server decides: everyone once Meta
+ * has approved the app (NEXT_PUBLIC_META_WA_LIVE=1), before that only the accounts listed in
+ * META_WA_TEST_EMAILS (the owner), on any device, with nothing to open or remember.
  */
-export function officialWhatsAppAvailable() {
-  if (!APP_ID || !CONFIG_ID || typeof window === "undefined") return false;
+export async function officialAccess(): Promise<boolean> {
+  if (!officialWhatsAppAvailable()) return false;
   if (LIVE) return true;
-  try {
-    if (new URLSearchParams(window.location.search).get("meta") === "1") localStorage.setItem("ibax-meta-test", "1");
-    return localStorage.getItem("ibax-meta-test") === "1";
-  } catch {
-    return false;
-  }
+  const res = await fetch("/api/whatsapp/cloud", {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(await cloudAuthHeader()) },
+    body: JSON.stringify({ action: "access" }),
+  }).catch(() => null);
+  const d = (await res?.json().catch(() => null)) as { allowed?: boolean } | null;
+  return d?.allowed === true;
 }
 
 type FB = {
@@ -66,7 +70,12 @@ function loadSdk(): Promise<FB> {
 
 export type SignupResult =
   | { ok: true; number: string; name: string }
-  | { ok: false; reason: "cancelled" | "sdk" | "not_configured" | "taken" | "exchange_failed" | "number_not_found" | "register_failed" | "server_error" };
+  | { ok: false; reason: "cancelled" | "sdk" | "not_configured" | "taken" | "already_linked" | "not_live" | "exchange_failed" | "number_not_found" | "register_failed" | "server_error"; message?: string };
+
+/** Loads Meta's SDK ahead of the click, so the popup opens straight away (browsers block popups that wait on a download). */
+export function preloadMetaSdk() {
+  if (officialWhatsAppAvailable()) void loadSdk().catch(() => undefined);
+}
 
 /** Opens Meta's signup popup. `keepApp`: the client keeps using the WhatsApp Business app on this number. */
 export async function connectOfficialWhatsApp(keepApp: boolean, number = ""): Promise<SignupResult> {
@@ -83,11 +92,20 @@ export async function connectOfficialWhatsApp(keepApp: boolean, number = ""): Pr
 
   // The popup posts the chosen account and number to this window when the client finishes.
   let ids: { waba_id?: string; phone_number_id?: string } = {};
+  let metaError = "";
   const onMessage = (e: MessageEvent) => {
-    if (!/(^|\.)facebook\.com$/.test(new URL(e.origin).hostname)) return;
+    let host = "";
+    try {
+      host = new URL(e.origin).hostname;
+    } catch {
+      return; // a message from a sandboxed frame ("null" origin)
+    }
+    if (!/(^|\.)facebook\.com$/.test(host)) return;
     try {
       const d = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
-      if (d?.type === "WA_EMBEDDED_SIGNUP" && String(d.event ?? "").startsWith("FINISH")) ids = d.data ?? {};
+      if (d?.type !== "WA_EMBEDDED_SIGNUP") return;
+      if (String(d.event ?? "").startsWith("FINISH")) ids = d.data ?? {};
+      else if (d.event === "CANCEL" || d.event === "ERROR") metaError = String(d.data?.error_message ?? "").slice(0, 200);
     } catch {
       /* other Facebook messages */
     }
@@ -103,9 +121,9 @@ export async function connectOfficialWhatsApp(keepApp: boolean, number = ""): Pr
     }),
   );
   // The ids message can arrive just after the login callback.
-  for (let i = 0; i < 20 && code && !ids.phone_number_id; i++) await new Promise((r) => setTimeout(r, 150));
+  for (let i = 0; i < 20 && code && !ids.waba_id; i++) await new Promise((r) => setTimeout(r, 150));
   window.removeEventListener("message", onMessage);
-  if (!code || !ids.phone_number_id || !ids.waba_id) return { ok: false, reason: "cancelled" };
+  if (!code || !ids.waba_id) return { ok: false, reason: "cancelled", message: metaError || undefined };
 
   const res = await fetch("/api/whatsapp/cloud", {
     method: "POST",
@@ -113,6 +131,7 @@ export async function connectOfficialWhatsApp(keepApp: boolean, number = ""): Pr
     body: JSON.stringify({ action: "finish", code, waba_id: ids.waba_id, phone_number_id: ids.phone_number_id, coexistence: keepApp }),
   }).catch(() => null);
   const data = (await res?.json().catch(() => null)) as SignupResult | null;
+  if (res?.status === 401) return { ok: false, reason: "server_error", message: "Your session ended. Please log in again, then try once more." };
   return data ?? { ok: false, reason: "server_error" };
 }
 
@@ -120,6 +139,8 @@ export const signupErrors: Record<string, string> = {
   cancelled: "The Meta window was closed before the number was confirmed. Please try again.",
   sdk: "Couldn't open Meta's window. Check your internet, allow pop-ups for ibaxai.com, then try again.",
   taken: "This WhatsApp number is already linked to another ibaxai account.",
+  already_linked: "This number is already linked with a link code and keeps working. To move it to the official WhatsApp, disconnect it first.",
+  not_live: "Official WhatsApp linking isn't open for your account yet. Use the link code for now.",
   exchange_failed: "Meta didn't confirm the link. Please try again.",
   number_not_found: "Meta didn't share the WhatsApp number. Please try again and pick your number.",
   register_failed: "Meta couldn't switch this number on. If it is on the WhatsApp app, tick “I use the WhatsApp Business app” and try again.",

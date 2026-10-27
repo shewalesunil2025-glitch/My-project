@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { directReviewLink, reviewMessage } from "@/lib/reviewMessage";
 import { connectionState, evo, evolutionReady, instanceFor, ownership, waDigits } from "./whatsapp";
 import { dialForCountry } from "@/lib/phone";
+import { usesCloud } from "./waCloud";
 
 /**
  * Google Review requests: after a visit or a sale, IBAX asks the customer on the owner's own
@@ -42,6 +43,8 @@ export async function requestReview(db: SupabaseClient, ownerId: string, custome
   const instance = instanceFor(digits);
   // Only the account that linked this WhatsApp may send from it.
   if ((await ownership(ownerId, instance)) !== "mine") return "not_linked";
+  // Review requests are business-started messages: on Meta's official API they need an approved template (not built yet).
+  if (await usesCloud(instance)) return "off";
 
   const now = Date.now();
   const history = ws?.reviewRequests ?? [];
