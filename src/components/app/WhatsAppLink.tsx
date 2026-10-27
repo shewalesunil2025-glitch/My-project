@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { BadgeCheck, Check, MessageCircle, ShieldCheck, Smartphone } from "lucide-react";
-import { connectOfficialWhatsApp, officialWhatsAppAvailable, signupErrors } from "@/lib/app/metaSignup";
+import { connectOfficialWhatsApp, officialAccess, preloadMetaSdk, signupErrors } from "@/lib/app/metaSignup";
 import { linkErrors, startWhatsAppLink, whatsAppStatus } from "@/lib/app/whatsappLink";
 import { PhoneInput } from "./PhoneInput";
 import { Btn, Notice, Spinner } from "./ui";
@@ -25,6 +25,21 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
   const [error, setError] = useState("");
   const [keepApp, setKeepApp] = useState(true);
   const done = useRef(false);
+
+  const [meta, setMeta] = useState(false);
+
+  // The server says whether this account gets the official OTP signup; if so, get Meta's SDK ready.
+  useEffect(() => {
+    let on = true;
+    void officialAccess().then((ok) => {
+      if (!on || !ok) return;
+      setMeta(true);
+      preloadMetaSdk();
+    });
+    return () => {
+      on = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (phase.step !== "pairing") return;
@@ -74,7 +89,7 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
     setPhase({ step: "meta" });
     const res = await connectOfficialWhatsApp(keepApp, number);
     if (!res.ok) {
-      setError(signupErrors[res.reason] ?? signupErrors.server_error);
+      setError(res.message || signupErrors[res.reason] || signupErrors.server_error);
       return setPhase({ step: "number" });
     }
     done.current = true;
@@ -124,7 +139,6 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
     );
   }
 
-  const meta = officialWhatsAppAvailable();
   const ready = number.replace(/\D/g, "").length >= 8;
   const busy = phase.step === "meta" || phase.step === "starting";
   return (

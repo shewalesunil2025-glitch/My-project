@@ -1,13 +1,13 @@
 # Meta App Review — WhatsApp number + OTP for every client
 
-Until Meta approves the app, only the app's admins, developers and testers can finish the Embedded Signup (number + OTP). After approval every client can. The button is switched on for everyone with `NEXT_PUBLIC_META_WA_LIVE=1` (Vercel → Redeploy), and the link code / QR disappears.
+Until Meta approves the app, only the app's admins, developers and testers can finish the Embedded Signup (number + OTP). After approval every client can. The server only lets the logins in `META_WA_TEST_EMAILS` finish a signup until then; it is switched on for everyone with `NEXT_PUBLIC_META_WA_LIVE=1` (Vercel → Redeploy), and the link code / QR disappears.
 
 App: ibaxai, app ID `1810020233450398`. Business verification: Approved. Tech Provider: Independent. App is Live. Embedded Signup configuration: "ibaxai WhatsApp signup" (Cloud API). Webhook: `https://www.ibaxai.com/api/whatsapp/cloud/webhook` (`messages`, `smb_message_echoes`).
 
 ## Before you submit (owner)
 
 1. Make a review login in ibaxai (sign up with an email the owner controls, e.g. `+playreview`). Reviewers use it, so keep it working. Never put its password in this repository.
-2. Test the whole flow once yourself on a spare number: `www.ibaxai.com/app/settings?meta=1` → WhatsApp → Connect with number + OTP → "WhatsApp linked" → a customer sends a message → IBAX replies → create a template.
+2. Test the whole flow once yourself on a spare number: `www.ibaxai.com/app/settings` → Connected accounts → WhatsApp → Connect with number + OTP (it shows for the login emails listed in Vercel `META_WA_TEST_EMAILS`) → "WhatsApp linked" → a customer sends a message → IBAX replies → create a template.
 3. Record one screen video (2–4 minutes, 1080p, English or Hindi with English captions) of exactly that flow (script below). Upload it to the review request.
 
 ## Permissions to request (Advanced access)
@@ -32,7 +32,7 @@ App: ibaxai, app ID `1810020233450398`. Business verification: Approved. Tech Pr
 ## Instructions for the reviewer (paste into the form)
 
 1. Open https://www.ibaxai.com/app and log in with the credentials given in the form.
-2. Open Settings → Connected accounts → WhatsApp → press "Connect with number + OTP" (if the button is not shown, append `?meta=1` to the Settings address).
+2. Open Settings → Connected accounts → WhatsApp → press "Connect with number + OTP" (the review login's email must be in `META_WA_TEST_EMAILS` while the app is in review, so the button shows for the reviewer).
 3. Complete Meta's signup window with a phone number you control.
 4. Message that number from another phone: the assistant replies, and the chat appears in the Inbox.
 5. Message templates: Connected accounts → WhatsApp → "Message templates".

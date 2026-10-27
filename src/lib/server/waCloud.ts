@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { siteConfig } from "@/config/site";
 
@@ -24,6 +24,25 @@ export const meta = {
 };
 
 export const cloudReady = () => Boolean(meta.appId && meta.secret);
+
+/**
+ * Until Meta approves the app (App Review), only the accounts listed in META_WA_TEST_EMAILS
+ * (comma separated login emails) may finish an Embedded Signup. After approval set
+ * NEXT_PUBLIC_META_WA_LIVE=1 and everyone can. Checked on the server, not just hidden in the UI.
+ */
+export function cloudSignupAllowed(email?: string) {
+  if (process.env.NEXT_PUBLIC_META_WA_LIVE === "1") return true;
+  const list = (process.env.META_WA_TEST_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return Boolean(email && list.includes(email.toLowerCase()));
+}
+
+/** True when this instance is a number linked through Meta's Cloud API. */
+export async function usesCloud(instance: string) {
+  return (await cloudLink(instance)) !== null;
+}
+
+/** The registration PIN is derived from the app secret, so a lost row or a re-link never loses it. */
+const pinFor = (phoneNumberId: string) => (parseInt(createHmac("sha256", `${meta.secret}`).update(`pin:${phoneNumberId}`).digest("hex").slice(0, 8), 16) % 900000 + 100000).toString();
 
 /** Where n8n sends replies for Cloud numbers (it appends /message/sendText/<instance>). */
 export const evoBase = () => `${siteConfig.url.replace(/\/$/, "")}/api/whatsapp/cloud/evo`;
@@ -143,7 +162,7 @@ export async function cloudSendText(link: CloudLink, to: string, text: string) {
  * our app to the account's webhooks, registers the number for the Cloud API (not needed when the
  * client keeps the WhatsApp Business app) and saves the link.
  */
-export async function finishSignup(ownerId: string, input: { code: string; wabaId: string; phoneNumberId: string; coexistence: boolean }) {
+export async function finishSignup(ownerId: string, input: { code: string; wabaId: string; phoneNumberId?: string; coexistence: boolean }) {
   const d = db();
   if (!d || !cloudReady()) return { ok: false as const, reason: "not_configured" };
 
@@ -158,21 +177,35 @@ export async function finishSignup(ownerId: string, input: { code: string; wabaI
     return { ok: false as const, reason: "exchange_failed" };
   }
 
-  const phone = await graph(`/${input.phoneNumberId}?fields=display_phone_number,verified_name`, token);
+  // With the WhatsApp Business app kept, Meta may not send the number's id: find it in the account.
+  let phoneNumberId = input.phoneNumberId ?? "";
+  if (!phoneNumberId) {
+    const list = await graph(`/${input.wabaId}/phone_numbers?fields=id`, token);
+    const ids = ((list.data?.data as { id?: string }[] | undefined) ?? []).map((n) => String(n.id ?? "")).filter(Boolean);
+    if (!list.ok || ids.length !== 1) return { ok: false as const, reason: "number_not_found" };
+    phoneNumberId = ids[0];
+  }
+
+  const phone = await graph(`/${phoneNumberId}?fields=display_phone_number,verified_name`, token);
   const digits = String(phone.data?.display_phone_number ?? "").replace(/\D/g, "");
   if (!phone.ok || digits.length < 8 || digits.length > 15) return { ok: false as const, reason: "number_not_found" };
   const instance = `ibax-${digits}`;
 
   const { data: taken } = await d.from("wa_instances").select("owner_id").eq("instance", instance).maybeSingle();
   if (taken && taken.owner_id !== ownerId) return { ok: false as const, reason: "taken" };
+  // Already linked with a link code / QR: leave that working link alone, never move it to Meta.
+  if (taken) {
+    const { data: cloudRow } = await d.from("wa_cloud").select("instance").eq("instance", instance).maybeSingle();
+    if (!cloudRow) return { ok: false as const, reason: "already_linked" };
+  }
 
   const sub = await graph(`/${input.wabaId}/subscribed_apps`, token, { method: "POST" });
   if (!sub.ok) console.error("[wa-cloud] subscribe failed", sub.status, JSON.stringify(sub.data?.error ?? {}).slice(0, 300));
 
   let pin = "";
   if (!input.coexistence) {
-    pin = String(randomInt(100000, 1000000));
-    const reg = await graph(`/${input.phoneNumberId}/register`, token, { method: "POST", body: JSON.stringify({ messaging_product: "whatsapp", pin }) });
+    pin = pinFor(phoneNumberId);
+    const reg = await graph(`/${phoneNumberId}/register`, token, { method: "POST", body: JSON.stringify({ messaging_product: "whatsapp", pin }) });
     if (!reg.ok) {
       console.error("[wa-cloud] register failed", reg.status, JSON.stringify(reg.data?.error ?? {}).slice(0, 300));
       return { ok: false as const, reason: "register_failed" };
@@ -185,7 +218,7 @@ export async function finishSignup(ownerId: string, input: { code: string; wabaI
       instance,
       owner_id: ownerId,
       waba_id: input.wabaId,
-      phone_number_id: input.phoneNumberId,
+      phone_number_id: phoneNumberId,
       display_phone: String(phone.data?.display_phone_number ?? ""),
       verified_name: String(phone.data?.verified_name ?? ""),
       coexistence: input.coexistence,
@@ -207,6 +240,9 @@ export async function finishSignup(ownerId: string, input: { code: string; wabaI
 /** Unlinks a Cloud number: our app stops getting its messages, and the saved token is deleted. */
 export async function unlinkCloud(link: CloudLink) {
   await graph(`/${link.wabaId}/subscribed_apps`, link.token, { method: "DELETE" });
-  await db()?.from("wa_cloud").delete().eq("instance", link.instance);
+  const d = db();
+  await d?.from("wa_cloud").delete().eq("instance", link.instance);
+  // This server made the ownership row when the number was linked, so it goes with the link.
+  await d?.from("wa_instances").delete().eq("instance", link.instance);
   cache.delete(link.instance);
 }

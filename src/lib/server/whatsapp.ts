@@ -61,14 +61,14 @@ export async function evo(path: string, init: RequestInit & { key?: string } = {
 }
 
 /** The signed-in Supabase user behind a request's bearer token, or null. */
-export async function userFromRequest(request: Request): Promise<{ id: string } | null> {
+export async function userFromRequest(request: Request): Promise<{ id: string; email?: string } | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const secret = process.env.SUPABASE_SECRET_KEY;
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!url || !secret || !token) return null;
   const admin = createClient(url, secret, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data, error } = await admin.auth.getUser(token);
-  return error || !data.user ? null : { id: data.user.id };
+  return error || !data.user ? null : { id: data.user.id, email: data.user.email ?? undefined };
 }
 
 export type Ownership = "none" | "mine" | "other";

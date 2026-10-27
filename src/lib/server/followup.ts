@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { connectionState, evo, evolutionReady, instanceFor, waDigits, waFullDigits } from "./whatsapp";
 import { dialForCountry } from "@/lib/phone";
 import { secretMatches } from "./wa/rules";
+import { usesCloud } from "./waCloud";
 
 /**
  * Lead Follow-up: messages each new lead on the owner's own WhatsApp — a thank-you straight
@@ -102,6 +103,8 @@ export async function enroll(db: SupabaseClient, ownerId: string, lead: NewLead)
   if (!phone) return "invalid";
   const setup = await setupFor(db, ownerId);
   if (!setup?.active || !evolutionReady()) return "off";
+  // Meta only allows free text within 24 hours of the customer's message; follow-ups need approved templates (not built yet).
+  if (await usesCloud(setup.instance)) return "off";
 
   const { data: existing } = await db.from("followups").select("id, state").eq("owner_id", ownerId).eq("phone", phone).maybeSingle();
   if (existing?.state === "waiting") return "already";
@@ -163,6 +166,7 @@ export async function runDue(db: SupabaseClient) {
     if (!setups.has(row.owner_id)) setups.set(row.owner_id, await setupFor(db, row.owner_id));
     const setup = setups.get(row.owner_id);
     if (!setup?.active || setup.instance !== row.instance) continue; // paused or a different number now
+    if (await usesCloud(row.instance)) continue; // official numbers need templates for follow-ups
     if (await sendStep(db, row, setup)) sent++;
   }
   return { sent };
