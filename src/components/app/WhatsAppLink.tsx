@@ -117,13 +117,12 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
           </div>
         )}
         <ol className="list-decimal space-y-1 pl-5 text-xs leading-snug text-fg-muted">
-          <li>On the phone with this WhatsApp, open WhatsApp.</li>
-          <li>Tap ⋮ (Android) or Settings (iPhone) → Linked devices → Link a device.</li>
+          <li>Open WhatsApp → ⋮ (Android) or Settings (iPhone) → Linked devices → Link a device.</li>
           <li>{code ? "Tap “Link with phone number instead” and type the code above." : "Scan the QR code below."}</li>
         </ol>
         {phase.qr && (
-          <details open className="text-xs text-fg-muted">
-            <summary className="cursor-pointer">{code ? "Or scan a QR code (from a computer)" : "QR code"}</summary>
+          <details open={!code} className="text-xs text-fg-muted">
+            <summary className="cursor-pointer">{code ? "On a computer? Scan a QR code instead" : "QR code"}</summary>
             {/* eslint-disable-next-line @next/next/no-img-element -- data URL from the WhatsApp server */}
             <img src={phase.qr} alt="WhatsApp link QR code" className="mx-auto mt-2 size-48 rounded-lg bg-white p-2" />
           </details>
@@ -142,57 +141,69 @@ export function WhatsAppLink({ onLinked, onPreview, disabled }: { onLinked: (num
   const ready = number.replace(/\D/g, "").length >= 8;
   const busy = phase.step === "meta" || phase.step === "starting";
   return (
-    <form onSubmit={meta ? (e) => (e.preventDefault(), void official()) : start} className="space-y-3">
-      <div className="flex items-center gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#3be37a,#13a84f)] text-white shadow-[0_8px_24px_-8px_rgb(37_211_102/0.7)]">
-          <MessageCircle className="size-5" aria-hidden />
-        </span>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-fg">Connect your WhatsApp</p>
-          <p className="text-xs text-fg-muted">The number your customers message</p>
+    <div className="space-y-4">
+      {/* Quick connect: works for everyone today, no Facebook account needed. */}
+      <form onSubmit={start} className="space-y-3">
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#3be37a,#13a84f)] text-white shadow-[0_8px_24px_-8px_rgb(37_211_102/0.7)]">
+            <MessageCircle className="size-5" aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-fg">Connect your WhatsApp</p>
+            <p className="text-xs text-fg-muted">Quick connect · about 30 seconds · no Facebook needed</p>
+          </div>
         </div>
-      </div>
 
-      <label className="sr-only" htmlFor="wa-number">
-        WhatsApp number
-      </label>
-      <PhoneInput id="wa-number" value={number} onChange={setNumber} autoComplete="off" required />
-
-      {meta && (
-        <label className="flex items-start gap-2 text-xs leading-snug text-fg-muted">
-          <input type="checkbox" checked={keepApp} onChange={(e) => setKeepApp(e.target.checked)} className="mt-0.5 accent-[#25d366]" />I use the WhatsApp Business app on this number and want to keep using it
+        <label className="sr-only" htmlFor="wa-number">
+          WhatsApp number
         </label>
+        <PhoneInput id="wa-number" value={number} onChange={setNumber} autoComplete="off" required />
+
+        {error && !meta && <Notice tone="amber">{error}</Notice>}
+
+        <Btn type="submit" className="w-full" disabled={!ready || disabled || busy}>
+          {phase.step === "starting" ? (
+            <Spinner />
+          ) : (
+            <>
+              <ShieldCheck className="size-4" aria-hidden /> Get my link code
+            </>
+          )}
+        </Btn>
+
+        <p className="flex items-start gap-1.5 text-[0.7rem] leading-snug text-fg-subtle">
+          <Smartphone className="mt-px size-3.5 shrink-0" aria-hidden />
+          You&apos;ll get a code to type in WhatsApp → Linked devices. Your chats stay on your phone.
+        </p>
+      </form>
+
+      {/* Official WhatsApp (Meta): only for accounts the server allows (the owner now, everyone after Meta approves). */}
+      {meta && (
+        <div className="space-y-3 rounded-2xl border border-flow/25 bg-flow/[0.05] p-3.5">
+          <div className="flex items-start gap-2">
+            <BadgeCheck className="mt-0.5 size-4 shrink-0 text-flow" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-fg">Official WhatsApp (Meta)</p>
+              <p className="mt-0.5 text-xs leading-snug text-fg-muted">
+                Meta&apos;s secure window opens: log in with Facebook (you can create an account there), pick your number and confirm it with an OTP.
+              </p>
+            </div>
+          </div>
+          <label className="flex items-start gap-2 text-xs leading-snug text-fg-muted">
+            <input type="checkbox" checked={keepApp} onChange={(e) => setKeepApp(e.target.checked)} className="mt-0.5 accent-[#25d366]" />I use the WhatsApp Business app on this number and want to keep using it
+          </label>
+          {error && <Notice tone="amber">{error}</Notice>}
+          <Btn variant="ghost" className="w-full" onClick={() => void official()} disabled={disabled || busy}>
+            {phase.step === "meta" ? (
+              <Spinner />
+            ) : (
+              <>
+                <ShieldCheck className="size-4" aria-hidden /> Continue with Meta
+              </>
+            )}
+          </Btn>
+        </div>
       )}
-
-      {error && <Notice tone="amber">{error}</Notice>}
-
-      <Btn type="submit" className="w-full" disabled={!ready || disabled || busy}>
-        {busy ? (
-          <Spinner />
-        ) : meta ? (
-          <>
-            <ShieldCheck className="size-4" aria-hidden /> Get OTP &amp; connect
-          </>
-        ) : (
-          <>
-            <ShieldCheck className="size-4" aria-hidden /> Get my link code
-          </>
-        )}
-      </Btn>
-
-      <p className="flex items-start gap-1.5 text-[0.7rem] leading-snug text-fg-subtle">
-        {meta ? (
-          <>
-            <BadgeCheck className="mt-px size-3.5 shrink-0 text-flow" aria-hidden />
-            Official WhatsApp by Meta. A secure Meta window opens: confirm this number with the OTP WhatsApp sends you.
-          </>
-        ) : (
-          <>
-            <Smartphone className="mt-px size-3.5 shrink-0" aria-hidden />
-            You&apos;ll get a code to type in WhatsApp → Linked devices. Your chats stay on your phone.
-          </>
-        )}
-      </p>
-    </form>
+    </div>
   );
 }
