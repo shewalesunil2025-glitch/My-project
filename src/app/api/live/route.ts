@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { agentSystemPrompt, agentTools } from "@/lib/app/agentSpec";
 import { buildAgentSystemPrompt } from "@/lib/shambhuAgent";
+import { adminDb } from "@/lib/server/followup";
+import { userFromRequest } from "@/lib/server/whatsapp";
+import { voiceTestPlan } from "@/lib/server/voice/browserTest";
 import { geminiLiveModels, geminiLiveToken, geminiReady, toSchema } from "@/lib/server/gemini";
 
 /**
@@ -27,6 +30,15 @@ export async function POST(request: Request) {
   // "site": a visitor on the website, not an owner in the app (no workspace, so no actions).
   const body = (await request.json().catch(() => ({}))) as { audience?: unknown };
   const site = body.audience === "site";
+  // "voice-test": the owner tries their own AI Voice Assistant in the browser (not a phone call).
+  let voiceTest: Awaited<ReturnType<typeof voiceTestPlan>> = null;
+  if (body.audience === "voice-test") {
+    const user = await userFromRequest(request);
+    const db = adminDb();
+    if (!user || !db) return NextResponse.json({ ok: false, reason: "unauthorized" }, { status: 401 });
+    voiceTest = await voiceTestPlan(db, user.id);
+    if (!voiceTest) return NextResponse.json({ ok: false, reason: "no_assistant" }, { status: 409 });
+  }
   try {
     const model = process.env.GEMINI_LIVE_MODEL || (await geminiLiveModels())[0];
     const token = model ? await geminiLiveToken() : null;
@@ -39,12 +51,12 @@ export async function POST(request: Request) {
           model: `models/${model}`,
           generationConfig: {
             responseModalities: ["AUDIO"],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.GEMINI_TTS_VOICE || "Sulafat" } } },
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceTest?.voice ?? (process.env.GEMINI_TTS_VOICE || "Sulafat") } } },
             // 2.5 native-audio models think before speaking by default (5 s); a call can't wait.
             ...(/2\.5.*native-audio/.test(model) ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
           },
-          systemInstruction: { parts: [{ text: site ? buildAgentSystemPrompt() + SITE_VOICE_RULES : agentSystemPrompt() + VOICE_RULES }] },
-          ...(site ? {} : { tools: [{ functionDeclarations: agentTools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }] }),
+          systemInstruction: { parts: [{ text: voiceTest ? voiceTest.instructions : site ? buildAgentSystemPrompt() + SITE_VOICE_RULES : agentSystemPrompt() + VOICE_RULES }] },
+          ...(site || voiceTest ? {} : { tools: [{ functionDeclarations: agentTools.map((t) => ({ name: t.name, description: t.description, parameters: toSchema(t.input_schema) })) }] }),
           inputAudioTranscription: {},
           outputAudioTranscription: {},
         },

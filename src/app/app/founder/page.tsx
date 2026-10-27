@@ -74,6 +74,9 @@ export default function FounderConsole() {
       <Link href="/app/home" className="mb-5 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" aria-hidden /> Back to my workspace
       </Link>
+      <Link href="/app/founder/voice" className="mb-4 ml-4 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg">
+        <Phone className="size-4" aria-hidden /> AI Voice numbers &amp; packages
+      </Link>
       <PageHeader eyebrow="Founder" title="Founder Console" subtitle="Every client, their services and where they are stuck. Only your founder account can open this." />
 
       {state === "loading" && (
