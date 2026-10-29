@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Mic, PhoneCall, PhoneForwarded, Square } from "lucide-react";
-import { startLiveCall, type LiveCall } from "@/lib/app/liveCall";
+import { startLiveCall, type LiveCall, type LiveState } from "@/lib/app/liveCall";
+import { openAudio } from "@/lib/app/voiceCapture";
 import { voiceCall, voiceHeaders, voiceState, type VoiceState } from "@/lib/app/voiceClient";
 import { Btn, BtnLink, Card, Field, Input, Notice, PageHeader, Pill, Segmented, Select, Spinner, TextArea, Toggle, type PillTone } from "@/components/app/ui";
 
@@ -29,6 +30,8 @@ export default function VoicePage() {
   const [existing, setExisting] = useState("");
   const [carrier, setCarrier] = useState("");
   const [test, setTest] = useState<"off" | "connecting" | "on">("off");
+  const [live, setLive] = useState<LiveState | null>(null);
+  const [dropped, setDropped] = useState("");
   const call = useRef<LiveCall | null>(null);
 
   const load = useCallback(async () => {
@@ -58,15 +61,15 @@ export default function VoicePage() {
   };
 
   async function toggleTest() {
-    if (test !== "off") { call.current?.end(); call.current = null; return setTest("off"); }
-    setErr(""); setTest("connecting");
-    const audio = new AudioContext();
+    if (test !== "off") { call.current?.end(); call.current = null; setLive(null); return setTest("off"); }
+    setErr(""); setDropped(""); setTest("connecting");
+    const audio = openAudio(); // made inside the tap so the browser lets it play
     const c = await startLiveCall(audio, {
       audience: "voice-test", headers: await voiceHeaders(), context: "",
-      onState: (st) => setTest(st === "connecting" ? "connecting" : "on"),
+      onState: (st) => { setLive(st); setTest(st === "connecting" ? "connecting" : "on"); },
       onOwnerSaid: () => {}, onIbaxSaid: () => {},
       onAction: async () => ({ content: "Not available in a test call.", is_error: true }),
-      onDrop: () => { setTest("off"); call.current = null; },
+      onDrop: (reason) => { setTest("off"); setLive(null); setDropped(reason); call.current = null; },
     });
     if (!c) { setTest("off"); return setErr("The browser test isn't available right now. Save your assistant first, then try again."); }
     call.current = c;
@@ -120,6 +123,8 @@ export default function VoicePage() {
           {test === "off" ? <><Mic className="mr-2 inline size-4" aria-hidden />Start browser test</> : <><Square className="mr-2 inline size-4" aria-hidden />{test === "connecting" ? "Connecting… (tap to cancel)" : "Stop"}</>}
         </Btn>
         {!s.assistant && <p className="text-sm text-ink-soft">Save your assistant first.</p>}
+        {test === "on" && <p className="text-sm">{live === "speaking" ? "The assistant is speaking…" : "Connected — listening. The assistant greets first; if you hear nothing, say “Hello”."}</p>}
+        {dropped && <Notice tone="amber">The practice call stopped ({dropped === "mic" ? "the microphone is blocked — allow it in the browser" : dropped === "limit" ? "time limit reached" : dropped}). Try again.</Notice>}
       </Card>
 
       <Card className="space-y-3 p-5">
