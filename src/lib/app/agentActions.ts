@@ -316,6 +316,19 @@ export function joinWaitlist(serviceId: string) {
   return true;
 }
 
+/** Takes the owner off a service's waitlist (they can join again any time). */
+export function leaveWaitlist(serviceId: string) {
+  const svc = serviceById(serviceId);
+  const ws = currentWorkspace();
+  if (!svc || !ws) return false;
+  if (!onWaitlist(ws, svc.id)) return true;
+  updateWorkspace((w) => {
+    w.waitlist = (w.waitlist ?? []).filter((x) => x.serviceId !== svc.id);
+    audit(w, `Left the ${svc.name} waitlist`);
+  });
+  return true;
+}
+
 export function setServiceState(serviceId: string, state: "pause" | "resume") {
   const ws = currentWorkspace();
   const a = ws && automationFor(ws, serviceId);

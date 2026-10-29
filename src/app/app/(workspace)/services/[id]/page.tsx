@@ -7,7 +7,7 @@ import { useState } from "react";
 import type { PlanPeriod } from "@/lib/app/types";
 import { ArrowLeft, Check, CirclePlay, Clock, Gift, Info, Link2 } from "lucide-react";
 import { annualPrice, inTrial, isLive, providerInfo, serviceById, services, TRIAL_DAYS } from "@/content/app/services";
-import { joinWaitlist, onWaitlist, startTrialService } from "@/lib/app/agentActions";
+import { joinWaitlist, leaveWaitlist, onWaitlist, startTrialService } from "@/lib/app/agentActions";
 import { timeLeft, trialOver, trialState } from "@/lib/app/trial";
 import { audit, businessReady, logActivity, notify, nowIso, uid, updateWorkspace } from "@/lib/app/store";
 import { appCurrency, money, svcPrice } from "@/lib/app/money";
@@ -225,10 +225,15 @@ export default function ServiceDetailPage() {
                   <span className="text-fg-muted">{svc.billing === "one-time" ? " one-time" : " / month"} at launch</span>
                 </p>
                 {onWaitlist(ws, svc.id) ? (
-                  <Notice>
-                    <Check className="mr-1.5 inline size-4" aria-hidden />
-                    You&apos;re on the waitlist.
-                  </Notice>
+                  <>
+                    <Notice>
+                      <Check className="mr-1.5 inline size-4" aria-hidden />
+                      You&apos;re on the waitlist.
+                    </Notice>
+                    <Btn className="w-full" variant="ghost" onClick={() => leaveWaitlist(svc.id)}>
+                      Leave the waitlist
+                    </Btn>
+                  </>
                 ) : (
                   <Btn className="w-full" size="lg" onClick={() => joinWaitlist(svc.id)}>
                     Join the waitlist
