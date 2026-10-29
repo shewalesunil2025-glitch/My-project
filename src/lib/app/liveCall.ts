@@ -30,6 +30,8 @@ export type LiveOptions = {
   onIbaxSaid: (text: string) => void;
   /** IBAX asked to do something (show payment, activate…): the result goes back to it. */
   onAction: (name: string, args: Record<string, unknown>) => Promise<{ content: string; is_error?: boolean }>;
+  /** How loud the mic is right now (0 to 1), a few times a second, to show that the voice is being picked up. */
+  onLevel?: (level: number) => void;
   /** The call stopped by itself (lost connection, limit reached). */
   onDrop: (reason: string) => void;
 };
@@ -113,7 +115,8 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   const micAsk = navigator.mediaDevices
     // The phone's echo canceller and auto-volume also turn IBAX's voice up and down (it
     // sounded near, then far), so they stay off; IBAX's own voice is told apart below.
-    .getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false } })
+    // On a laptop the built-in mic is quiet without auto-volume (the phone problem below doesn't apply), so it stays on there.
+    .getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) } })
     .catch(() => null);
   let start = audience === "voice-test" ? await fetchStart(audience, opts.headers) : await takeStart(audience);
   // A pass that was fetched earlier may have expired: get a fresh one.
@@ -204,8 +207,13 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     const mute = audio.createGain();
     mute.gain.value = 0;
     source.connect(tap).connect(mute).connect(audio.destination);
+    let lastLevel = 0;
     tap.port.onmessage = (e: MessageEvent<Float32Array>) => {
       if (ended) return;
+      if (opts.onLevel && Date.now() - lastLevel > 150) {
+        lastLevel = Date.now();
+        opts.onLevel(Math.min(1, rms(e.data) * 8));
+      }
       if (!ready) {
         early.push(e.data);
         earlyLength += e.data.length;
