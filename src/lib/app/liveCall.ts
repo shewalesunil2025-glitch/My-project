@@ -335,6 +335,8 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     if (msg.setupComplete) {
       ready = true;
       setState("listening");
+      // The model waits for the caller to speak first. In the voice-assistant practice call it should greet, like a phone assistant does.
+      if (audience === "voice-test") ws.send(JSON.stringify({ realtimeInput: { text: "The call has just connected. Say your greeting now." } }));
       // Send what the owner already said while connecting, in one-second pieces.
       const second = audio.sampleRate;
       while (early.length) {
