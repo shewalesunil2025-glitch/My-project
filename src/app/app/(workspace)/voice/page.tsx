@@ -32,6 +32,7 @@ export default function VoicePage() {
   const [test, setTest] = useState<"off" | "connecting" | "on">("off");
   const [live, setLive] = useState<LiveState | null>(null);
   const [dropped, setDropped] = useState("");
+  const [level, setLevel] = useState(0);
   const call = useRef<LiveCall | null>(null);
 
   const load = useCallback(async () => {
@@ -66,6 +67,7 @@ export default function VoicePage() {
     const audio = openAudio(); // made inside the tap so the browser lets it play
     const c = await startLiveCall(audio, {
       audience: "voice-test", headers: await voiceHeaders(), context: "",
+      onLevel: setLevel,
       onState: (st) => { setLive(st); setTest(st === "connecting" ? "connecting" : "on"); },
       onOwnerSaid: () => {}, onIbaxSaid: () => {},
       onAction: async () => ({ content: "Not available in a test call.", is_error: true }),
@@ -124,6 +126,12 @@ export default function VoicePage() {
         </Btn>
         {!s.assistant && <p className="text-sm text-ink-soft">Save your assistant first.</p>}
         {test === "on" && <p className="text-sm">{live === "speaking" ? "The assistant is speaking…" : "Connected — listening. The assistant greets first; if you hear nothing, say “Hello”."}</p>}
+        {test === "on" && (
+          <div className="text-sm" aria-live="polite">
+            <p className="mb-1 text-ink-soft">Your microphone — speak, the bar should move:</p>
+            <div className="h-2 w-full max-w-xs overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-green-400 transition-[width]" style={{ width: `${Math.round(level * 100)}%` }} /></div>
+          </div>
+        )}
         {dropped && <Notice tone="amber">The practice call stopped ({dropped === "mic" ? "the microphone is blocked — allow it in the browser" : dropped === "limit" ? "time limit reached" : dropped}). Try again.</Notice>}
       </Card>
 
