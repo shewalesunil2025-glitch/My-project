@@ -33,6 +33,7 @@ export default function VoicePage() {
   const [live, setLive] = useState<LiveState | null>(null);
   const [dropped, setDropped] = useState("");
   const [level, setLevel] = useState(0);
+  const [stats, setStats] = useState({ sent: 0, received: 0, heard: "", peak: 0 });
   const call = useRef<LiveCall | null>(null);
 
   const load = useCallback(async () => {
@@ -68,6 +69,7 @@ export default function VoicePage() {
     const c = await startLiveCall(audio, {
       audience: "voice-test", headers: await voiceHeaders(), context: "",
       onLevel: setLevel,
+      onStats: setStats,
       onState: (st) => { setLive(st); setTest(st === "connecting" ? "connecting" : "on"); },
       onOwnerSaid: () => {}, onIbaxSaid: () => {},
       onAction: async () => ({ content: "Not available in a test call.", is_error: true }),
@@ -130,6 +132,9 @@ export default function VoicePage() {
           <div className="text-sm" aria-live="polite">
             <p className="mb-1 text-ink-soft">Your microphone — speak, the bar should move:</p>
             <div className="h-2 w-full max-w-xs overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-green-400 transition-[width]" style={{ width: `${Math.round(level * 100)}%` }} /></div>
+            <p className="mt-2 text-xs text-ink-soft">
+              Check: mic peak {stats.peak.toFixed(3)} · audio sent {stats.sent} · replies received {stats.received} · Google heard: “{stats.heard || "—"}”
+            </p>
           </div>
         )}
         {dropped && <Notice tone="amber">The practice call stopped ({dropped === "mic" ? "the microphone is blocked — allow it in the browser" : dropped === "limit" ? "time limit reached" : dropped}). Try again.</Notice>}

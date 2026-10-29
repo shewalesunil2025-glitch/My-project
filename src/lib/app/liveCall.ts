@@ -32,6 +32,8 @@ export type LiveOptions = {
   onAction: (name: string, args: Record<string, unknown>) => Promise<{ content: string; is_error?: boolean }>;
   /** How loud the mic is right now (0 to 1), a few times a second, to show that the voice is being picked up. */
   onLevel?: (level: number) => void;
+  /** Counters for the practice call: audio pieces sent, messages received, and the words Google says it heard. */
+  onStats?: (s: { sent: number; received: number; heard: string; peak: number }) => void;
   /** The call stopped by itself (lost connection, limit reached). */
   onDrop: (reason: string) => void;
 };
@@ -142,6 +144,7 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   let earlyLength = 0;
   let ownerText = "";
   let ibaxText = "";
+  const stats = { sent: 0, received: 0, heard: "", peak: 0 };
   let ownerShown = false;
   let skipping = false; // the owner cut IBAX off: drop the rest of that answer
   let nextAt = 0;
@@ -210,9 +213,11 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     let lastLevel = 0;
     tap.port.onmessage = (e: MessageEvent<Float32Array>) => {
       if (ended) return;
-      if (opts.onLevel && Date.now() - lastLevel > 150) {
+      stats.peak = Math.max(stats.peak, rms(e.data));
+      if (Date.now() - lastLevel > 150) {
         lastLevel = Date.now();
-        opts.onLevel(Math.min(1, rms(e.data) * 8));
+        opts.onLevel?.(Math.min(1, rms(e.data) * 8));
+        opts.onStats?.({ ...stats });
       }
       if (!ready) {
         early.push(e.data);
@@ -239,7 +244,10 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
       const data = toBase64(toPcm16(pending, audio.sampleRate));
       pending = [];
       pendingLength = 0;
-      if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ realtimeInput: { audio: { data, mimeType: `audio/pcm;rate=${IN_RATE}` } } }));
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ realtimeInput: { audio: { data, mimeType: `audio/pcm;rate=${IN_RATE}` } } }));
+        stats.sent++;
+      }
     };
   } catch {
     stream.getTracks().forEach((t) => t.stop());
@@ -358,8 +366,12 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
     }
     if (msg.goAway) return end("limit");
     const sc = msg.serverContent;
+    stats.received++;
     if (sc) {
-      if (sc.inputTranscription?.text) ownerText += sc.inputTranscription.text;
+      if (sc.inputTranscription?.text) {
+        ownerText += sc.inputTranscription.text;
+        stats.heard = ownerText.slice(-80);
+      }
       if (sc.interrupted) {
         stopPlayback();
         skipping = false;
