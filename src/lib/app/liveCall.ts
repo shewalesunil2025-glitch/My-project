@@ -117,8 +117,14 @@ export async function startLiveCall(audio: AudioContext, opts: LiveOptions): Pro
   const micAsk = navigator.mediaDevices
     // The phone's echo canceller and auto-volume also turn IBAX's voice up and down (it
     // sounded near, then far), so they stay off; IBAX's own voice is told apart below.
-    // On a laptop the built-in mic is quiet without auto-volume (the phone problem below doesn't apply), so it stays on there.
-    .getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) } })
+    // Phones: the echo canceller also made IBAX's voice swing loud and soft, so it stays off there.
+    // Laptops: the browser's normal mic settings (like any call or meeting site). Some laptop drivers
+    // (Realtek mic arrays) send only silence when these are off, and the speaker echo is cancelled.
+    .getUserMedia({
+      audio: /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        ? { echoCancellation: false, noiseSuppression: true, autoGainControl: false }
+        : { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    })
     .catch(() => null);
   let start = audience === "voice-test" ? await fetchStart(audience, opts.headers) : await takeStart(audience);
   // A pass that was fetched earlier may have expired: get a fresh one.
