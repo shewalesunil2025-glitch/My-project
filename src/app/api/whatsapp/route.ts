@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { adminDb, ownerDial } from "@/lib/server/followup";
 import { rememberInstance } from "@/lib/server/wachat";
 import { cloudLink, unlinkCloud } from "@/lib/server/waCloud";
+import { deleteInstance, isOrphan } from "@/lib/server/waRelease";
 import { connectionState, evo, evolution, evolutionReady, instanceFor, instanceToken, ownership, userFromRequest, waDigits } from "@/lib/server/whatsapp";
 
 /**
@@ -29,7 +30,10 @@ export async function POST(request: Request) {
   const instance = instanceFor(digits);
 
   try {
-    const owner = await ownership(user.id, instance);
+    let owner = await ownership(user.id, instance);
+    // The account that linked this number was deleted: nobody owns it any more, and nothing is connected on it.
+    // Clear the left-over instance so the real owner can link it again (they still have to enter the code in WhatsApp).
+    if (owner === "other" && db && (await isOrphan(db, instance)) && (await connectionState(instance)) !== "open" && (await deleteInstance(instance))) owner = "none";
     if (owner === "other") return json({ ok: false, reason: "taken" }, 409);
 
     if (body.action === "status") {
