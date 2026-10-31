@@ -1,5 +1,6 @@
+import { activateService, automationFor } from "./agentActions";
 import { cloudPaidPlans } from "./cloud";
-import { audit, nowIso, updateWorkspace } from "./store";
+import { audit, currentWorkspace, nowIso, updateWorkspace } from "./store";
 import { paidUntilFor } from "./trial";
 import type { Subscription, Workspace } from "./types";
 
@@ -18,6 +19,35 @@ export function renewalsDue(ws: Workspace, now = Date.now()) {
   return { soon, ended };
 }
 
+/**
+ * A payment the server verified (a row in `subscriptions`) for a service that still runs as a free
+ * trial in the workspace: the app never got to convert it (the page closed after paying, or it was
+ * paid on another device). The paid plan wins: the trial end date is dropped, the plan runs to the
+ * server's end date plus the grace days, and a service that was paused for "trial ended" is switched back on.
+ * Returns the ids of the services that were converted. Safe to run again.
+ */
+export function convertPaidTrials(w: Workspace, rows: { service_id: string; period: string; renews_at: string | null }[], now = Date.now()): string[] {
+  const done: string[] = [];
+  for (const r of rows) {
+    if (!r.renews_at || Date.parse(r.renews_at) <= now) continue;
+    const a = w.automations.find((x) => x.serviceId === r.service_id);
+    if (!a || !a.trialEndsAt) continue;
+    const sub = w.subscriptions.find((x) => x.id === a.subscriptionId);
+    const period = r.period === "annual" ? "annual" : "monthly";
+    if (sub) Object.assign(sub, { period, status: "active", renewsAt: r.renews_at });
+    delete a.trialEndsAt;
+    a.paidUntil = paidUntilFor(r.renews_at);
+    if (a.status === "paused") {
+      a.status = a.activatedAt ? "active" : "setup";
+      a.note = undefined;
+    }
+    a.logs.unshift({ at: nowIso(), level: "success", message: `Payment found — the plan runs until ${new Date(r.renews_at).toLocaleDateString()}` });
+    audit(w, `Paid plan for ${r.service_id} found on the server — trial converted`);
+    done.push(r.service_id);
+  }
+  return done;
+}
+
 let lastSync = 0;
 
 /**
@@ -29,7 +59,9 @@ export async function syncPaidPlans() {
   lastSync = Date.now();
   const rows = await cloudPaidPlans();
   if (!rows.length) return;
+  let converted: string[] = [];
   updateWorkspace((w) => {
+    converted = convertPaidTrials(w, rows);
     for (const r of rows) {
       if (!r.renews_at) continue;
       const sub = w.subscriptions.find((s) => s.serviceId === r.service_id && s.period !== "one-time" && s.status !== "trial");
@@ -49,4 +81,8 @@ export async function syncPaidPlans() {
       audit(w, `Plan for ${sub.serviceId} renewed until ${r.renews_at.slice(0, 10)}`);
     }
   });
+  // The automation server still has the trial's end date: tell it the plan is paid.
+  for (const id of converted) {
+    if (automationFor(currentWorkspace()!, id)?.status === "active") void activateService(id).catch(() => {});
+  }
 }
