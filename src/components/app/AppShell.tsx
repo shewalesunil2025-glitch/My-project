@@ -115,8 +115,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Sidebar (desktop) */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/[0.06] bg-ink-900/80 backdrop-blur lg:flex">
-        <Link href="/app/home" className="flex items-center gap-2.5 px-5 pt-5 pb-4">
-          <BrandLogo tagline />
+        <Link href="/app/home" className="flex items-center gap-2.5 px-5 pt-5 pb-5">
+          <BrandLogo size="nav" />
         </Link>
         <nav aria-label="Workspace" className="no-scrollbar flex-1 overflow-y-auto px-3 pb-4">
           <ul className="space-y-0.5">
