@@ -46,16 +46,16 @@ export function BrandLogo({
   stacked = false,
 }: {
   className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "nav";
   tagline?: boolean;
   stacked?: boolean;
 }) {
-  const mark = { sm: "size-7", md: "size-8", lg: "size-20" }[size];
-  const word = { sm: "text-[1.1rem]", md: "text-[1.25rem]", lg: "text-[2.6rem]" }[size];
+  const mark = { sm: "size-7", md: "size-8", lg: "size-20", nav: "size-11" }[size];
+  const word = { sm: "text-[1.1rem]", md: "text-[1.25rem]", lg: "text-[2.6rem]", nav: "text-[1.75rem]" }[size];
   return (
     <span className={cn(stacked ? "flex w-fit flex-col items-center text-center" : "inline-flex items-center gap-2.5", className)}>
       {stacked ? (
-        <LogoLockup className={{ sm: "w-28", md: "w-36", lg: "w-56" }[size]} markClassName="drop-shadow-[0_0_16px_rgb(33_192_99/0.5)]" />
+        <LogoLockup className={{ sm: "w-28", md: "w-36", lg: "w-56", nav: "w-36" }[size]} markClassName="drop-shadow-[0_0_16px_rgb(33_192_99/0.5)]" />
       ) : (
         <BrandMark className={mark} />
       )}
