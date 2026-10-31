@@ -31,9 +31,9 @@ export async function POST(request: Request) {
 
   try {
     let owner = await ownership(user.id, instance);
-    // The account that linked this number was deleted: nobody owns it any more, and nothing is connected on it.
+    // The account that linked this number was deleted: nobody owns it any more, and WhatsApp says it is logged out ("close", never a guess when the server is unsure).
     // Clear the left-over instance so the real owner can link it again (they still have to enter the code in WhatsApp).
-    if (owner === "other" && db && (await isOrphan(db, instance)) && (await connectionState(instance)) !== "open" && (await deleteInstance(instance))) owner = "none";
+    if (owner === "other" && db && (await isOrphan(db, instance)) && (await connectionState(instance)) === "close" && (await deleteInstance(instance))) owner = "none";
     if (owner === "other") return json({ ok: false, reason: "taken" }, 409);
 
     if (body.action === "status") {

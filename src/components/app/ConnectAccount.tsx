@@ -46,6 +46,8 @@ export function ConnectAccount({ ws, provider, compact }: { ws: Workspace; provi
   }
 
   function disconnect() {
+    // A linked account is never disconnected by a stray tap: the owner has to say yes.
+    if (conn && !conn.simulated && !window.confirm(`Disconnect ${info.name}${conn.account ? ` (${conn.account})` : ""}? ${info.name === "WhatsApp" ? "IBAX will stop replying on it until you link it again." : "Automations that use it will pause until you reconnect."}`)) return;
     if (provider === "whatsapp" && conn && !conn.simulated) void unlinkWhatsApp(conn.account);
     if (!providerReady(provider)) {
       // Only a saved name: nothing used it, so nothing goes on hold.
