@@ -28,10 +28,20 @@ type Range = "today" | "week" | "month" | "all";
 const RANGES: { value: Range; label: string }[] = [
   { value: "today", label: "Today" },
   { value: "week", label: "7 days" },
-  { value: "month", label: "Month" },
+  { value: "month", label: "30 days" },
   { value: "all", label: "All time" },
 ];
 const RANGE_TITLE: Record<Range, string> = { today: "Today", week: "Last 7 days", month: "Last 30 days", all: "All time" };
+/** The dates a range covers, in plain words, so the client always knows what the numbers are for. */
+const rangeDates = (range: Range) => {
+  const now = new Date();
+  const d = (x: Date) => x.toLocaleDateString([], { day: "numeric", month: "short" });
+  const back = (n: number) => new Date(now.getTime() - n * 86_400_000);
+  if (range === "today") return `${now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "short" })}`;
+  if (range === "week") return `${d(back(7))} to now`;
+  if (range === "month") return `${d(back(30))} to now`;
+  return "everything since you started with ibaxai";
+};
 const inRange = (iso: string | undefined, range: Range) => {
   if (!iso) return false;
   if (range === "all") return true;
@@ -534,6 +544,9 @@ function Dashboard() {
         <div className="mb-4 flex justify-center">
           <Segmented label="Show numbers for" value={range} onChange={setRange} options={RANGES} />
         </div>
+        <p className="mb-3 text-center text-xs text-fg-muted" aria-live="polite">
+          Showing <span className="font-semibold text-fg">{RANGE_TITLE[range]}</span> · {rangeDates(range)}
+        </p>
         <SectionTitle>
           <span id="today">{range === "today" ? "Today\u2019s numbers" : `Numbers · ${span}`}</span>
         </SectionTitle>
