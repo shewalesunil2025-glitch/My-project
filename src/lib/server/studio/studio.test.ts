@@ -108,6 +108,22 @@ describe("the daily job", () => {
     expect(j.thumbnail_path).toContain("thumbnail-bg");
     expect((await advance(d)).did).toBe("nothing");
   });
+  it("keeps finished scenes when a picture fails and carries on from there", async () => {
+    let calls = 0;
+    const base = deps();
+    const d = deps({ ai: { ...base.ai, picture: async () => { if (++calls === 3) throw new Error("image service down"); return { mime: "image/jpeg", data: Buffer.from("x") }; } } });
+    await startDay(d);
+    await advance(d);
+    await advance(d);
+    await advance(d);
+    expect(tables.studio_jobs[0].status).toBe("assets");
+    expect(tables.studio_jobs[0].scene_paths).toHaveLength(2);
+    expect(tables.studio_jobs[0].error).toContain("image service down");
+    await advance(d);
+    expect(tables.studio_jobs[0].status).toBe("awaiting_render");
+    expect(tables.studio_jobs[0].scene_paths).toHaveLength(4);
+    expect(calls).toBe(6); // 4 scenes + 1 failed try + the thumbnail, nothing made twice
+  });
   it("retries a failing step and stops after 3 tries with a notice", async () => {
     const d = deps();
     await startDay(d);

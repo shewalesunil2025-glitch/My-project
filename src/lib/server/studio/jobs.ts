@@ -35,6 +35,8 @@ export type Deps = {
 
 const MAX_TRIES = 3;
 const RENDER_TIMEOUT_MS = 30 * 60_000;
+/** Time spent on pictures and voices in one call (the route allows 300 s). */
+const ASSET_BUDGET_MS = 200_000;
 
 async function log(db: SupabaseClient, jobId: string | null, level: "info" | "warning" | "error", message: string, detail: Row = {}) {
   await db.from("studio_events").insert({ job_id: jobId, level, message: message.slice(0, 500), detail });
@@ -95,15 +97,27 @@ export async function advance(d: Deps): Promise<{ ok: true; did: string; jobId?:
       const plan = await d.ai.writePlan(String(job.research?.notes ?? ""), job.avoid ?? [], Boolean(job.research?.live));
       await move(d.db, job, to, { topic: plan.script.topic, script: plan.script, instagram: plan.instagram, youtube: plan.youtube, error: "", tries: 0 });
     } else {
+      // Pictures and voices one scene at a time, saving after each, so a slow image service
+      // never runs past the server's time limit: the next call carries on where this one stopped.
       const base = `${job.day}/${job.id}`;
-      const scenes: Row[] = [];
-      for (const [i, s] of (job.script?.scenes ?? []).entries()) {
+      const until = Date.now() + ASSET_BUDGET_MS;
+      const all = (job.script?.scenes ?? []) as Row[];
+      const scenes: Row[] = [...(job.scene_paths ?? [])];
+      while (scenes.length < all.length && Date.now() < until) {
+        const i = scenes.length;
+        const s = all[i];
         const img = await d.ai.picture(s.visual);
         const image = `${base}/scene-${i + 1}.${img.mime.includes("png") ? "png" : "jpg"}`;
         await d.storage.upload(image, img.data, img.mime);
         const voice = `${base}/voice-${i + 1}.wav`;
         await d.storage.upload(voice, await d.ai.voice(s.voiceover), "audio/wav");
         scenes.push({ image, voice, seconds: s.seconds, text: s.onScreen, subtitle: s.voiceover });
+        await d.db.from("studio_jobs").update({ scene_paths: scenes, error: "", tries: 0, updated_at: new Date().toISOString() }).eq("id", job.id);
+        job.scene_paths = scenes;
+      }
+      if (scenes.length < all.length || Date.now() >= until) {
+        await log(d.db, job.id, "info", `Pictures and voice: ${scenes.length} of ${all.length} scenes done`);
+        return { ok: true, did: "step", jobId: job.id, status: job.status };
       }
       const plan = { script: job.script, instagram: job.instagram, youtube: job.youtube } as Plan;
       const t = await d.ai.picture(d.ai.thumbnailPrompt(plan));

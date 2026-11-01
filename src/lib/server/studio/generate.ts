@@ -106,15 +106,22 @@ export async function writePlan(notes: string, avoid: string[], live: boolean): 
 /** One picture: Gemini's image model when billing allows it, else free FLUX (Cloudflare), else Pollinations. */
 export async function picture(prompt: string): Promise<{ mime: string; data: Buffer; model: string }> {
   const full = `${prompt}. Vertical 9:16, cinematic lighting, high detail, no text, no watermark, no logos.`;
-  for (const make of [() => geminiImage(full), () => cloudflareImage(full), () => freeImage(full)]) {
+  const why: string[] = [];
+  const providers: [string, () => Promise<{ mime: string; data: string; model: string } | null>][] = [
+    ["Gemini image", () => geminiImage(full)],
+    ["Cloudflare FLUX", () => cloudflareImage(full)],
+    ["Pollinations", () => freeImage(full)],
+  ];
+  for (const [name, make] of providers) {
     try {
       const img = await make();
       if (img?.data) return { mime: img.mime, data: Buffer.from(img.data, "base64"), model: img.model };
-    } catch {
-      /* next provider */
+      why.push(`${name}: not set up`);
+    } catch (e) {
+      why.push(`${name}: ${(e instanceof Error ? e.message : String(e)).slice(0, 90)}`);
     }
   }
-  throw new Error("No image provider worked");
+  throw new Error(`No image provider worked (${why.join("; ")})`);
 }
 
 /** The thumbnail background (the worker adds the bold text and resizes it to 1280x720). */
