@@ -2,9 +2,15 @@
 
 The app, the IBAX bot and the activation flow are built. The automations behind each service are not. A service is sold only when its automation is live: until then it shows **Coming soon** and takes a waitlist (`liveServices` in `src/content/app/services.ts`).
 
-## Where we are (updated 2026-10-26)
+## Where we are (updated 2026-11-01)
 
 **Launch plan (owner's decision):** build 3–4 services fully first — Website (self-service builder), WhatsApp, Lead Follow-up, Customer Support — then add Razorpay and launch.
+
+**Resume here (1 Nov 2026, owner closed the session):**
+1. Content Studio: topic, script, captions, Cloudflare pictures and Gemini voice work for real (job "Waiting for the video maker"). Next: log in to the VPS (`ssh root@129.121.169.80`). The owner reset the root password in Bluehost but SSH still says "Permission denied": check which username the reset was for, or use Bluehost's browser console / support. Then install Node, ffmpeg, `fonts-noto-core` and run `scripts/studio-worker.mjs` by cron (worker secret: set `N8N_WEBHOOK_SECRET_NEXT` in Vercel to a new value and use the same on the VPS). Then Instagram + YouTube keys.
+2. WhatsApp: owner's own number (917499414443) — test "Get my link code" again, or Founder Console → "Free a stuck WhatsApp number". Dhirendra: free month given by SQL; confirm WhatsApp shows Active; his Reviews service is still in "setup".
+3. AI Voice: waiting for the Exotel quote (form at exotel.com/contact-us).
+4. Gemini paid tier: ₹2,000 prepaid on the old (closed) billing account; new account asks for ₹3,000 — owner's decision; free tier works meanwhile.
 
 | Area | Status | Next step |
 |---|---|---|
