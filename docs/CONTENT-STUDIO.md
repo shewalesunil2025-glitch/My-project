@@ -28,6 +28,9 @@ One video a day for ibaxai's own Instagram and YouTube. The system finds the top
 4. Browser push and Telegram notifications are not built (in-app notification + email are).
 5. The n8n daily trigger is optional: the VPS cron below does the same for free.
 
+## Progress
+- 1 Nov: `0009_studio.sql` run; topic + script + captions work on real Gemini (research falls back to ideas, no live search on this key). Pictures failed: Gemini image needs billing, Pollinations free limit reached, so the owner created a free Cloudflare account and set `CF_ACCOUNT_ID` + `CF_AI_TOKEN` in Vercel.
+
 ## Switch it on (owner, one step at a time)
 1. Supabase → SQL Editor: run `0009_studio.sql`.
 2. VPS: `apt install ffmpeg fonts-noto-core nodejs` (if missing), copy `scripts/studio-worker.mjs`, then cron: `*/10 * * * *` worker, and `0 2 * * *` worker with `--start` (7:30 India time). `IBAX_SECRET` = the same value as Vercel's `N8N_WEBHOOK_SECRET` (typed on the VPS, never in chat).
