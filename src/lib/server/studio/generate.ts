@@ -10,12 +10,20 @@ import { PLAN_RULES, PLAN_SCHEMA, cleanPlan, type Plan } from "@/lib/studio/core
 const MODEL = () => process.env.STUDIO_MODEL || process.env.GEMINI_MODEL || "gemini-flash-latest";
 
 async function gemini(body: Record<string, unknown>, timeoutMs: number) {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL())}:generateContent`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(timeoutMs),
-  });
+  const send = (b: Record<string, unknown>) =>
+    fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL())}:generateContent`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
+      body: JSON.stringify(b),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  // Thinking makes the newest models slow (the first real run timed out): keep it minimal.
+  const config = (body.generationConfig ?? {}) as Record<string, unknown>;
+  let res = await send({ ...body, generationConfig: { ...config, thinkingConfig: { thinkingLevel: "minimal" } } });
+  if (res.status === 400) {
+    const detail = await res.clone().text();
+    if (/thinking/i.test(detail)) res = await send(body);
+  }
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; groundingMetadata?: { groundingChunks?: { web?: { uri?: string; title?: string } }[] } }[] };
   const c = data.candidates?.[0];
@@ -35,12 +43,12 @@ export async function research(avoid: string[]): Promise<Research> {
   if (!geminiReady()) throw new Error("GEMINI_API_KEY is not set");
   const ask = `Find 5 AI topics from the last 7 days that would make a good 30-second Instagram Reel / YouTube Short for Indian small-business owners and AI fans: new AI tools, AI news, AI business ideas, automation tips. For each: one line on what it is, why people care, and the source. Skip: ${avoid.join("; ") || "nothing"}.`;
   try {
-    const r = await gemini({ contents: [{ role: "user", parts: [{ text: ask }] }], tools: [{ google_search: {} }], generationConfig: { temperature: 0.4, maxOutputTokens: 1500 } }, 45_000);
+    const r = await gemini({ contents: [{ role: "user", parts: [{ text: ask }] }], tools: [{ google_search: {} }], generationConfig: { temperature: 0.4, maxOutputTokens: 1500 } }, 90_000);
     if (r.text.trim()) return { notes: r.text.slice(0, 6000), sources: r.sources, live: r.sources.length > 0, at: new Date().toISOString() };
   } catch (e) {
     console.error("[studio] search research failed", e instanceof Error ? e.message : e);
   }
-  const r = await gemini({ contents: [{ role: "user", parts: [{ text: `${ask}\nYou cannot search the web: suggest evergreen, useful AI tips and ideas instead of news, and say so.` }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } }, 30_000);
+  const r = await gemini({ contents: [{ role: "user", parts: [{ text: `${ask}\nYou cannot search the web: suggest evergreen, useful AI tips and ideas instead of news, and say so.` }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } }, 60_000);
   return { notes: r.text.slice(0, 6000), sources: [], live: false, at: new Date().toISOString() };
 }
 
@@ -54,7 +62,7 @@ export async function writePlan(notes: string, avoid: string[], live: boolean): 
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.8, maxOutputTokens: 4096, responseMimeType: "application/json", responseSchema: toSchema(PLAN_SCHEMA) },
       },
-      60_000,
+      120_000,
     );
     let parsed: unknown = null;
     try {
