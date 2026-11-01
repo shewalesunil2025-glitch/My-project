@@ -77,6 +77,9 @@ export default function FounderConsole() {
       <Link href="/app/founder/voice" className="mb-4 ml-4 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg">
         <Phone className="size-4" aria-hidden /> AI Voice numbers &amp; packages
       </Link>
+      <Link href="/app/founder/studio" className="mb-4 ml-4 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg">
+        <ShieldCheck className="size-4" aria-hidden /> Content Studio (daily AI video)
+      </Link>
       <Link href="/app/founder/whatsapp" className="mb-4 ml-4 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg">
         <MessageCircle className="size-4" aria-hidden /> Free a stuck WhatsApp number
       </Link>
